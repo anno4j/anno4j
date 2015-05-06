@@ -3,7 +3,6 @@ package com.github.anno4j.model.impl;
 import com.github.anno4j.model.*;
 import com.github.anno4j.model.ontologies.OADM;
 import org.openrdf.annotations.Iri;
-import org.openrdf.model.Resource;
 
 /**
  * Created by schlegel on 06/05/15.
@@ -74,11 +73,6 @@ public class AnnotationDefault extends Annotation {
     }
 
     @Override
-    public Resource getResource() {
-        return null;
-    }
-
-    @Override
     public String getSerializedAt() {
         return serializedAt;
     }
@@ -96,5 +90,19 @@ public class AnnotationDefault extends Annotation {
     @Override
     public void setAnnotatedAt(String annotatedAt) {
         this.annotatedAt = annotatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "AnnotationDefault{" +
+                "body=" + body +
+                ", target=" + target +
+                ", motivatedBy=" + motivatedBy +
+                ", serializedBy=" + serializedBy +
+                ", serializedAt='" + serializedAt + '\'' +
+                ", annotatedBy=" + annotatedBy +
+                ", annotatedAt='" + annotatedAt + '\'' +
+                ", resource='" + getResource() + '\'' +
+                '}';
     }
 }
