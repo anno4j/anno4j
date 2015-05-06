@@ -12,6 +12,9 @@ public abstract class Annotation implements RDFObject {
 
     private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
+    public Annotation() {
+    }
+
     abstract public void setBody(Body body);
     abstract public Body getBody();
 
@@ -24,8 +27,16 @@ public abstract class Annotation implements RDFObject {
     abstract public void setAnnotatedBy(Agent agent);
     abstract public Agent getAnnotatedBy();
 
+    abstract public void setAnnotatedAt(String timestamp);
+    abstract public String getAnnotatedAt();
+
     abstract public void setSerializedBy(Agent agent);
     abstract public Agent getSerializedBy();
+
+    abstract public void setSerializedAt(String timestamp);
+    abstract public String getSerializedAt();
+
+
 
     @Override
     public ObjectConnection getObjectConnection() {

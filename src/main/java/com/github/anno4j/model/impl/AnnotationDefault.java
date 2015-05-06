@@ -1,20 +1,27 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.model.*;
+import com.github.anno4j.model.ontologies.OADM;
 import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 
 /**
  * Created by schlegel on 06/05/15.
  */
-@Iri()
+@Iri(OADM.ANNOTATION)
 public class AnnotationDefault extends Annotation {
 
-    private Body body;
-    private Target target;
-    private Motivation motivatedBy;
-    private Agent serializedBy;
-    private Agent annotatedBy;
+
+    @Iri(OADM.HAS_BODY)      private Body body;
+    @Iri(OADM.HAS_TARGET)    private Target target;
+    @Iri(OADM.MOTIVATED_BY)  private Motivation motivatedBy;
+    @Iri(OADM.SERIALIZED_BY) private Agent serializedBy;
+    @Iri(OADM.SERIALIZED_AT) private String serializedAt;
+    @Iri(OADM.ANNOTATED_BY)  private Agent annotatedBy;
+    @Iri(OADM.ANNOTATED_AT)  private String annotatedAt;
+
+    public AnnotationDefault() {
+    }
 
     @Override
     public Body getBody() {
@@ -69,5 +76,25 @@ public class AnnotationDefault extends Annotation {
     @Override
     public Resource getResource() {
         return null;
+    }
+
+    @Override
+    public String getSerializedAt() {
+        return serializedAt;
+    }
+
+    @Override
+    public void setSerializedAt(String serializedAt) {
+        this.serializedAt = serializedAt;
+    }
+
+    @Override
+    public String getAnnotatedAt() {
+        return annotatedAt;
+    }
+
+    @Override
+    public void setAnnotatedAt(String annotatedAt) {
+        this.annotatedAt = annotatedAt;
     }
 }
