@@ -1,11 +1,14 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.model.*;
+import org.openrdf.annotations.Iri;
+import org.openrdf.model.Resource;
 
 /**
  * Created by schlegel on 06/05/15.
  */
-public class AnnotationDefault implements Annotation {
+@Iri()
+public class AnnotationDefault extends Annotation {
 
     private Body body;
     private Target target;
@@ -61,5 +64,10 @@ public class AnnotationDefault implements Annotation {
     @Override
     public void setAnnotatedBy(Agent annotatedBy) {
         this.annotatedBy = annotatedBy;
+    }
+
+    @Override
+    public Resource getResource() {
+        return null;
     }
 }
