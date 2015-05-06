@@ -10,7 +10,6 @@ import org.openrdf.annotations.Iri;
 @Iri(OADM.ANNOTATION)
 public class AnnotationDefault extends Annotation {
 
-
     @Iri(OADM.HAS_BODY)      private Body body;
     @Iri(OADM.HAS_TARGET)    private Target target;
     @Iri(OADM.MOTIVATED_BY)  private Motivation motivatedBy;
