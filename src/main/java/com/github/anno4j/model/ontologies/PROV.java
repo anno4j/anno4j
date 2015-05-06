@@ -1,7 +1,17 @@
 package main.java.com.github.anno4j.model.ontologies;
 
 /**
- * Created by Manu on 06/05/15.
+ * Ontology class for the PROV ontology (prov:).
  */
 public class PROV {
+
+    public final static String NS = "http://www.w3.org/ns/prov/";
+
+    public final static String SOFTWARE_AGENT = NS + "SoftwareAgent";
+
+    public final static String GENERATED_AT_TIME = NS + "generatedAtTime";
+
+    public final static String WAS_GENERATED_BY = NS + "wasGeneratedBy";
+
+    public final static String INVALIDATED_AT_TIME = NS + "invalidatedAtTime";
 }

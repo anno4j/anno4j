@@ -1,7 +1,13 @@
 package main.java.com.github.anno4j.model.ontologies;
 
 /**
- * Created by Manu on 06/05/15.
+ * Ontology class for the Dublin Core Terms ontology (dcterms:).
  */
 public class DCTERMS {
+
+    public final static String NS = "http://purl.org/dc/terms/";
+
+    public final static String CONFORMS_TO = NS + "conformsTo";
+
+    public final static String FORMAT = NS + "format";
 }
