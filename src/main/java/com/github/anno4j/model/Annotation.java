@@ -1,22 +1,40 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.Anno4j;
+import org.openrdf.model.Resource;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.RDFObject;
+
 /**
  * Created by schlegel on 06/05/15.
  */
-public interface Annotation {
+public abstract class Annotation implements RDFObject {
 
-    public void setBody(Body body);
-    public Body getBody();
+    private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
-    public void setTarget(Target target);
-    public Target getTarget();
+    abstract public void setBody(Body body);
+    abstract public Body getBody();
 
-    public void setMotivatedBy(Motivation motivation);
-    public Motivation getMotivatedBy();
+    abstract public void setTarget(Target target);
+    abstract public Target getTarget();
 
-    public void setAnnotatedBy(Agent agent);
-    public Agent getAnnotatedBy();
+    abstract public void setMotivatedBy(Motivation motivation);
+    abstract public Motivation getMotivatedBy();
 
-    public void setSerializedBy(Agent agent);
-    public Agent getSerializedBy();
+    abstract public void setAnnotatedBy(Agent agent);
+    abstract public Agent getAnnotatedBy();
+
+    abstract public void setSerializedBy(Agent agent);
+    abstract public Agent getSerializedBy();
+
+    @Override
+    public ObjectConnection getObjectConnection() {
+        // will be implemented by the proxy object
+        return null;
+    }
+
+    @Override
+    public Resource getResource() {
+        return this.resource;
+    }
 }
