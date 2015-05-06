@@ -8,3 +8,5 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .idea
 anno4j.iml
+
+*.iml
