@@ -6,7 +6,7 @@ import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
 
 /**
- * Created by schlegel on 06/05/15.
+ * Conforms to OADM Motivation (http://www.openannotation.org/spec/core/core.html#Motivations)
  */
 public abstract class Motivation implements RDFObject {
 

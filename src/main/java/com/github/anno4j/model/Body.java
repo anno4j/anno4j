@@ -6,7 +6,7 @@ import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
 
 /**
- * Created by schlegel on 06/05/15.
+ * Conforms to OADM Body concept (http://www.openannotation.org/spec/core/core.html#BodyTargetType)
  */
 public abstract class Body implements RDFObject {
 

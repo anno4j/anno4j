@@ -6,7 +6,7 @@ import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
 
 /**
- * Created by schlegel on 06/05/15.
+ * Conforms to oa:Annotation (http://www.openannotation.org/spec/core/core.html)
  */
 public abstract class Annotation implements RDFObject {
 
@@ -35,8 +35,6 @@ public abstract class Annotation implements RDFObject {
 
     abstract public void setSerializedAt(String timestamp);
     abstract public String getSerializedAt();
-
-
 
     @Override
     public ObjectConnection getObjectConnection() {

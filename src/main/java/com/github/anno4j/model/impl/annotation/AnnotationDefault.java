@@ -1,11 +1,11 @@
-package com.github.anno4j.model.impl;
+package com.github.anno4j.model.impl.annotation;
 
 import com.github.anno4j.model.*;
 import com.github.anno4j.model.ontologies.OADM;
 import org.openrdf.annotations.Iri;
 
 /**
- * Created by schlegel on 06/05/15.
+ * Default implementation for {@link Annotation}
  */
 @Iri(OADM.ANNOTATION)
 public class AnnotationDefault extends Annotation {
