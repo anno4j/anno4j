@@ -1,4 +1,4 @@
-package main.java.com.github.anno4j.model.ontologies;
+package com.github.anno4j.model.ontologies;
 
 /**
  * Ontology class for the Dublin Core Types ontology (dctypes:).
