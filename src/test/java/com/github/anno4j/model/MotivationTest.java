@@ -39,7 +39,7 @@ public class MotivationTest {
     }
 
     @Test
-    public void testMotivation() throws Exception {
+    public void testMotivationBookmarking() throws Exception {
         // Create test annotation
         Annotation annotation = new AnnotationDefault();
 
