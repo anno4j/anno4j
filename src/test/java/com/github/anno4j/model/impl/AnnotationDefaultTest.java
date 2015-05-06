@@ -1,6 +1,7 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -6,7 +6,8 @@ import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
 
 /**
- * Created by schlegel on 06/05/15.
+ * Conforms to http://www.w3.org/ns/prov#Agent
+ * An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity.
  */
 public abstract class Agent implements RDFObject {
 
