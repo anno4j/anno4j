@@ -34,6 +34,19 @@
         <url>https://github.com/schlegel/anno4j/issues</url>
     </issueManagement>
 
+    <repositories>
+        <repository>
+            <id>snapshots</id>
+            <url>http://nil.dimis.fim.uni-passau.de:8080/nexus-2.0.6/content/repositories/thirdparty</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
