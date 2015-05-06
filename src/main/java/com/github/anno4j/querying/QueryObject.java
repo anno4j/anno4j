@@ -1,5 +1,6 @@
 package com.github.anno4j.querying;
 
+import com.github.anno4j.model.ontologies.OADM;
 import org.openrdf.repository.object.RDFObject;
 
 import java.util.ArrayList;
@@ -17,13 +18,13 @@ import java.util.Map;
  */
 public class QueryObject<T extends RDFObject> {
 
-    private final String BODY_PREFIX = "oa:hasBody/";
+    private final String BODY_PREFIX = OADM.PREFIX + OADM.HAS_BODY + "/";
 
-    private final String TARGET_PREFIX = "oa:hasTarget/";
+    private final String TARGET_PREFIX = OADM.PREFIX + OADM.HAS_TARGET + "/";
 
-    private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource/";
+    private final String SOURCE_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SOURCE  + "/";
 
-    private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector/";
+    private final String SELECTOR_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SELECTOR + "/";
 
     private Map<String, String> prefixes = new HashMap<String, String>();
 
