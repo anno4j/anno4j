@@ -7,6 +7,8 @@ public class PROV {
 
     public final static String NS = "http://www.w3.org/ns/prov/";
 
+    public final static String PREFIX = "prov:";
+
     public final static String SOFTWARE_AGENT = NS + "SoftwareAgent";
 
     public final static String GENERATED_AT_TIME = NS + "generatedAtTime";

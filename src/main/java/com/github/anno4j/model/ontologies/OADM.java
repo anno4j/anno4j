@@ -7,6 +7,8 @@ public class OADM {
 
     public final static String NS = "http://www.w3.org/ns/oa#";
 
+    public final static String PREFIX = "oa:";
+
     /**
      * Classes
      */
@@ -90,7 +92,7 @@ public class OADM {
 
     public final static String START = NS + "start";
 
-    public final static String PREFIX = NS + "prefix";
+    public final static String TEXT_PREFIX = NS + "prefix";
 
     public final static String SUFFIX = NS + "suffix";
 
