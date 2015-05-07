@@ -18,7 +18,6 @@ public class QueryServiceTest {
 
     @Test
     public void queryTest() throws Exception {
-        ObjectConnection connection = Anno4j.getInstance().getObjectRepository().getConnection();
 
         // Create test annotation
         TestBody body = new TestBody();
@@ -29,7 +28,7 @@ public class QueryServiceTest {
         annotation.setBody(body);
 
         // persist annotation
-        connection.addObject(annotation);
+        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
 
         // Querying for the persisted body
         QueryService<AnnotationDefault> queryService = Anno4j.getInstance().createQueryService(AnnotationDefault.class);
@@ -46,6 +45,5 @@ public class QueryServiceTest {
         TestBody testBody = (TestBody) annotationDefault.getBody();
         assertEquals("Example Value", testBody.getValue());
 
-        connection.close();
     }
 }
