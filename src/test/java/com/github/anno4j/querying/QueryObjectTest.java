@@ -16,11 +16,8 @@ public class QueryObjectTest {
     }
 
     @Test
-    public void dummyTest() throws Exception {
-
-        queryObject.setAnnotationCriteria("rdf:value/oa:hasBody", "");
-
-        queryObject.execute();
+    public void queryTest() throws Exception {
+        // TODO: create test on the result set
 
     }
 
