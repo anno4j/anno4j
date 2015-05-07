@@ -1,5 +1,6 @@
 package com.github.anno4j.model.impl.agent;
 
+import com.github.anno4j.model.Agent;
 import com.github.anno4j.model.ontologies.FOAF;
 import com.github.anno4j.model.ontologies.PROV;
 import org.openrdf.annotations.Iri;
@@ -10,9 +11,11 @@ import org.openrdf.annotations.Iri;
  * A software agent is running software.
  */
 @Iri(PROV.SOFTWARE_AGENT)
-public class AgentSoftware extends AgentDefault {
+public class AgentSoftware extends Agent {
 
     @Iri(FOAF.HOMEPAGE) private String homepage;
+
+    public AgentSoftware() {};
 
     public String getHomepage() {
         return homepage;
@@ -25,7 +28,8 @@ public class AgentSoftware extends AgentDefault {
     @Override
     public String toString() {
         return "AgentSoftware{" +
-                "homepage='" + homepage + '\'' +
+                "name='" + this.getName() + '\'' +
+                ", homepage='" + homepage + '\'' +
                 ", resource='" + getResource() +
                 '}';
     }
