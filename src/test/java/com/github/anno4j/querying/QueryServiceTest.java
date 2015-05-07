@@ -7,7 +7,6 @@ import com.github.anno4j.model.mock.TestBody;
 import org.junit.Test;
 import org.openrdf.repository.object.ObjectConnection;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +32,7 @@ public class QueryServiceTest {
         connection.addObject(annotation);
 
         // Querying for the persisted body
-        QueryService<AnnotationDefault> queryService = new QueryService(AnnotationDefault.class);
+        QueryService<AnnotationDefault> queryService = Anno4j.getInstance().createQueryService(AnnotationDefault.class);
         List<AnnotationDefault> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")

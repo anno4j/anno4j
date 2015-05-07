@@ -1,6 +1,5 @@
 package com.github.anno4j.querying;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.ontologies.*;
 import org.apache.marmotta.ldpath.api.backend.NodeBackend;
@@ -19,11 +18,15 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectQuery;
+import org.openrdf.repository.object.ObjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +43,7 @@ public class QueryService<T extends Annotation> {
     private final Logger logger = LoggerFactory.getLogger(QueryService.class);
 
     private Class<T> type;
+    private ObjectRepository objectRepository;
 
     private final String BODY_PREFIX = "oa:hasBody/";
 
@@ -61,8 +65,9 @@ public class QueryService<T extends Annotation> {
 
     private int varIndex = 0;
 
-    public QueryService(Class<T> type) {
+    public QueryService(Class<T> type, ObjectRepository objectRepository) {
         this.type = type;
+        this.objectRepository = objectRepository;
         // Setting some standard name spaces
         addPrefix(OADM.PREFIX, OADM.NS);
         addPrefix(CNT.PREFIX, CNT.NS);
@@ -339,7 +344,7 @@ public class QueryService<T extends Annotation> {
      * @return the result set
      */
     public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
-        ObjectConnection con = Anno4j.getInstance().getObjectRepository().getConnection();
+        ObjectConnection con = objectRepository.getConnection();
         ObjectQuery query = con.prepareObjectQuery(createQuery());
 
         return (List<T>) query.evaluate(this.type).asList();

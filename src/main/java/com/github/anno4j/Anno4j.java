@@ -27,8 +27,6 @@ public class Anno4j {
     private static Anno4j instance = null;
 
     private IDGenerator idGenerator = new IDGeneratorLocalURN();
-    private PersistenceService persistenceService = new PersistenceService();
-    private QueryService queryService = new QueryService(Anno4j.class);
 
     private Repository repository;
     private ObjectRepository objectRepository;
@@ -54,12 +52,12 @@ public class Anno4j {
         this.idGenerator = idGenerator;
     }
 
-    public PersistenceService getPersistenceService() {
-        return persistenceService;
+    public PersistenceService createPersistenceService() {
+        return new PersistenceService(objectRepository);
     }
 
-    public QueryService getQueryService() {
-        return queryService;
+    public QueryService createQueryService(Class clazz) {
+        return new QueryService(clazz, objectRepository);
     }
 
     public Repository getRepository() {
