@@ -5,6 +5,8 @@ import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
@@ -53,5 +55,22 @@ public class AnnotationDefaultTest {
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
         assertEquals(annotation.getAnnotatedAt(), result.getAnnotatedAt());
         assertEquals(annotation.getSerializedAt(), result.getSerializedAt());
+    }
+
+    @Test
+    public void testResourceDefinition() throws Exception {
+        // Create annotation
+        Annotation annotation = new AnnotationDefault();
+        Resource resource = new URIImpl("http://www.somepage.org/resource1/");
+        annotation.setResource(resource);
+
+        // Persist annotation
+        connection.addObject(annotation);
+
+        // Query persisted object
+        AnnotationDefault result = (AnnotationDefault) connection.getObject(annotation.getResource());
+
+        // Tests
+        assertEquals(annotation.getResource(), result.getResource());
     }
 }
