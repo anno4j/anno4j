@@ -1,7 +1,6 @@
 package com.github.anno4j.example;
 
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Target;
 import com.github.anno4j.model.impl.StringURLResource;
 import com.github.anno4j.model.impl.agent.AgentPerson;
 import com.github.anno4j.model.impl.agent.AgentSoftware;
@@ -12,16 +11,12 @@ import com.github.anno4j.model.impl.target.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.Resource;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.RDFObject;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
-
-import javax.naming.spi.ObjectFactory;
 
 /**
  * Test case to implement the example annotation at {@link }http://www.w3.org/TR/2014/WD-annotation-model-20141211/#complete-example}.
