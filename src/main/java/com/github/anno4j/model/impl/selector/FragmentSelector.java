@@ -23,6 +23,13 @@ public class FragmentSelector extends Selector {
     @Iri(RDF.VALUE)           private String value;
     @Iri(DCTERMS.CONFORMS_TO) private String conformsTo;
 
+    public FragmentSelector() {};
+
+    public FragmentSelector(String value, String conformsTo) {
+        this.value = value;
+        this.conformsTo = conformsTo;
+    }
+
     public String getValue() {
         return value;
     }

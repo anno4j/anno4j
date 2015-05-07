@@ -26,6 +26,14 @@ public class TextQuoteSelector extends Selector {
     @Iri(OADM.PREFIX) private String prefix;
     @Iri(OADM.SUFFIX) private String suffix;
 
+    public TextQuoteSelector() {};
+
+    public TextQuoteSelector(String exact, String prefix, String suffix) {
+        this.exact = exact;
+        this.prefix = prefix;
+        this.suffix = suffix;
+    }
+
     public String getExact() {
         return exact;
     }
