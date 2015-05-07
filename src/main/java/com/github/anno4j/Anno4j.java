@@ -4,6 +4,7 @@ import com.github.anno4j.exceptions.ConceptNotFoundException;
 import com.github.anno4j.persistence.IDGenerator;
 import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.persistence.impl.IDGeneratorLocalURN;
+import com.github.anno4j.querying.QueryService;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -27,6 +28,7 @@ public class Anno4j {
 
     private IDGenerator idGenerator = new IDGeneratorLocalURN();
     private PersistenceService persistenceService = new PersistenceService();
+    private QueryService queryService = new QueryService();
 
     private Repository repository;
     private ObjectRepository objectRepository;
@@ -56,8 +58,8 @@ public class Anno4j {
         return persistenceService;
     }
 
-    public void setPersistenceService(PersistenceService persistenceService) {
-        this.persistenceService = persistenceService;
+    public QueryService getQueryService() {
+        return queryService;
     }
 
     public Repository getRepository() {
