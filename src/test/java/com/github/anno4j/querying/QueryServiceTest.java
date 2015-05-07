@@ -6,13 +6,13 @@ import org.junit.Test;
 /**
  *
  */
-public class QueryObjectTest {
+public class QueryServiceTest {
 
-    QueryObject queryObject;
+    QueryService queryService;
 
     @Before
     public void setUp() throws Exception {
-        queryObject = new QueryObject();
+        queryService = new QueryService();
     }
 
     @Test

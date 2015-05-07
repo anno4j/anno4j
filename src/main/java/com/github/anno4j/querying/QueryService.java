@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * @param <T>
  * @author Andreas Eisenkolb
  */
-public class QueryObject<T extends RDFObject> {
+public class QueryService<T extends RDFObject> {
 
     private final String BODY_PREFIX = OADM.PREFIX + OADM.HAS_BODY + "/";
 
@@ -47,10 +47,9 @@ public class QueryObject<T extends RDFObject> {
     private Integer limit = null;
 
     private Integer offset = null;
+	private int varIndex = 0;
 
-    private int varIndex = 0;
-
-    public QueryObject() {
+    public QueryService() {
         // Setting some standard name spaces
         addPrefix(OADM.PREFIX, OADM.NS);
         addPrefix(CNT.PREFIX, CNT.NS);
@@ -73,7 +72,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setBodyCriteria(String ldpath, String value, Comparison comparison) {
+    public QueryService setBodyCriteria(String ldpath, String value, Comparison comparison) {
         criterias.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
         return this;
     }
@@ -100,7 +99,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setBodyCriteria(String ldpath, String value) {
+    public QueryService setBodyCriteria(String ldpath, String value) {
         return setBodyCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -125,7 +124,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setAnnotationCriteria(String ldpath, String value, Comparison comparison) {
+    public QueryService setAnnotationCriteria(String ldpath, String value, Comparison comparison) {
         criterias.add(new Criteria(ldpath, value, comparison));
         return this;
     }
@@ -152,7 +151,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setAnnotationCriteria(String ldpath, String value) {
+    public QueryService setAnnotationCriteria(String ldpath, String value) {
         return setAnnotationCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -177,7 +176,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setSelectorCriteria(String ldpath, String value, Comparison comparison) {
+    public QueryService setSelectorCriteria(String ldpath, String value, Comparison comparison) {
         criterias.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
         return this;
     }
@@ -204,7 +203,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setSelectorCriteria(String ldpath, String value) {
+    public QueryService setSelectorCriteria(String ldpath, String value) {
         return setSelectorCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -227,7 +226,7 @@ public class QueryObject<T extends RDFObject> {
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      * @return itself to allow chaining.
      */
-    public QueryObject setSourceCriteria(String ldpath, String value, Comparison comparison) {
+    public QueryService setSourceCriteria(String ldpath, String value, Comparison comparison) {
         criterias.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
         return this;
     }
@@ -248,7 +247,7 @@ public class QueryObject<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setSourceCriteria(String ldpath, String value) {
+    public QueryService setSourceCriteria(String ldpath, String value) {
         return setSourceCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -268,7 +267,7 @@ public class QueryObject<T extends RDFObject> {
      * @param url   The URL
      * @return itself to allow chaining.
      */
-    public QueryObject addPrefix(String label, String url) {
+    public QueryService addPrefix(String label, String url) {
         this.prefixes.put(label, url);
         return this;
     }
@@ -279,7 +278,7 @@ public class QueryObject<T extends RDFObject> {
      * @param prefixes HashMap with multiple namespaces.
      * @return itself to allow chaining.
      */
-    public QueryObject addPrefixes(HashMap<String, String> prefixes) {
+    public QueryService addPrefixes(HashMap<String, String> prefixes) {
         this.prefixes.putAll(prefixes);
         return this;
     }
@@ -290,7 +289,7 @@ public class QueryObject<T extends RDFObject> {
      * @param order Defines the order of the result set.
      * @return itself to allow chaining.
      */
-    public QueryObject orderBy(Order order) {
+    public QueryService orderBy(Order order) {
         this.order = order;
         return this;
     }
@@ -301,7 +300,7 @@ public class QueryObject<T extends RDFObject> {
      * @param limit The limit value.
      * @return itself to allow chaining.
      */
-    public QueryObject limit(Integer limit) {
+    public QueryService limit(Integer limit) {
         this.limit = limit;
         return this;
     }
@@ -312,7 +311,7 @@ public class QueryObject<T extends RDFObject> {
      * @param offset The offset value.
      * @return itself to allow chaining.
      */
-    public QueryObject offset(Integer offset) {
+    public QueryService offset(Integer offset) {
         this.offset = offset;
         return this;
     }
