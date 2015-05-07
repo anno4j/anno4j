@@ -6,21 +6,21 @@ import org.junit.Test;
 /**
  *
  */
-public class QueryObjectTest {
+public class QueryServiceTest {
 
-    QueryObject queryObject;
+    QueryService queryService;
 
     @Before
     public void setUp() throws Exception {
-        queryObject = new QueryObject();
+        queryService = new QueryService();
     }
 
     @Test
     public void dummyTest() throws Exception {
 
-        queryObject.setAnnotationCriteria("rdf:value/oa:hasBody", "");
+        queryService.setAnnotationCriteria("rdf:value/oa:hasBody", "");
 
-        queryObject.execute();
+        queryService.execute();
 
     }
 
