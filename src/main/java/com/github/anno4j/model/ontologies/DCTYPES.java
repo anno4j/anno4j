@@ -7,7 +7,7 @@ public class DCTYPES {
 
     public final static String NS = "http://purl.org/dc/dcmitype/";
 
-    public final static String PREFIX = "dctypes:";
+    public final static String PREFIX = "dctypes";
 
     public final static String DATASET = NS + "Dataset";
 

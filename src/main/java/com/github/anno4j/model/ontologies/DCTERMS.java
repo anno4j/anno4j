@@ -7,7 +7,7 @@ public class DCTERMS {
 
     public final static String NS = "http://purl.org/dc/terms/";
 
-    public final static String PREFIX = "dcterms:";
+    public final static String PREFIX = "dcterms";
 
     public final static String CONFORMS_TO = NS + "conformsTo";
 

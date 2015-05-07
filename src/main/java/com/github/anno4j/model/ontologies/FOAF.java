@@ -7,7 +7,7 @@ public class FOAF {
 
     public final static String NS = "http://xmlns.com/foaf/0.1/";
 
-    public final static String PREFIX = "foaf:";
+    public final static String PREFIX = "foaf";
 
     public final static String PERSON = NS + "Person";
 
