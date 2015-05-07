@@ -7,7 +7,7 @@ public class CNT {
 
     public final static String NS = "http://www.w3.org/2011/content#";
 
-    public final static String PREFIX = "cnt:";
+    public final static String PREFIX = "cnt";
 
     public final static String CONTENT_AS_TEXT = NS + "ContentAsText";
 

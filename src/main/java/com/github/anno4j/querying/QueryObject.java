@@ -1,12 +1,19 @@
 package com.github.anno4j.querying;
 
-import com.github.anno4j.model.ontologies.OADM;
+import com.github.anno4j.model.ontologies.*;
+import org.apache.marmotta.ldpath.LDPath;
+import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
+import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
+import org.apache.marmotta.ldpath.model.selectors.PathSelector;
+import org.apache.marmotta.ldpath.parser.LdPathParser;
+import org.apache.marmotta.ldpath.parser.ParseException;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.model.vocabulary.SKOS;
 import org.openrdf.repository.object.RDFObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.StringReader;
+import java.util.*;
 
 /**
  * The QueryObject allows to query the MICO triple stores by using criterias. Furthermore
@@ -22,7 +29,7 @@ public class QueryObject<T extends RDFObject> {
 
     private final String TARGET_PREFIX = OADM.PREFIX + OADM.HAS_TARGET + "/";
 
-    private final String SOURCE_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SOURCE  + "/";
+    private final String SOURCE_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SOURCE + "/";
 
     private final String SELECTOR_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SELECTOR + "/";
 
@@ -32,24 +39,23 @@ public class QueryObject<T extends RDFObject> {
 
     private Order order = null;
 
-    private Integer limit = -1;
+    private Integer limit = null;
 
-    private Integer offset = 0;
+    private Integer offset = null;
 
     public QueryObject() {
-        prefixes.put("oa:", "http://www.w3.org/ns/oa#");
-        prefixes.put("cnt:", "http://www.w3.org/2011/content#");
-        prefixes.put("dc:", "http://purl.org/dc/elements/1.1/");
-        prefixes.put("dcterms", "http://purl.org/dc/terms/");
-        prefixes.put("dctypes", "http://purl.org/dc/dcmitype/");
-        prefixes.put("foaf", "http://xmlns.com/foaf/0.1/");
-        prefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-        prefixes.put("prov", "http://www.w3.org/ns/prov#");
-        prefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        prefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        prefixes.put("skos", "http://www.w3.org/2004/02/skos/core#");
-        prefixes.put("trig", "http://www.w3.org/2004/03/trix/rdfg-1/");
-        prefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
+        // Setting some standard name spaces
+        addPrefix(OADM.PREFIX, OADM.NS);
+        addPrefix(CNT.PREFIX, CNT.NS);
+        addPrefix(DC.PREFIX, DC.NS);
+        addPrefix(DCTERMS.PREFIX, DCTERMS.NS);
+        addPrefix(DCTYPES.PREFIX, DCTYPES.NS);
+        addPrefix(FOAF.PREFIX, FOAF.NS);
+        addPrefix(PROV.PREFIX, PROV.NS);
+        addPrefix(RDF.PREFIX, RDF.NS);
+        addPrefix(OWL.PREFIX, OWL.NAMESPACE);
+        addPrefix(RDFS.PREFIX, RDFS.NAMESPACE);
+        addPrefix(SKOS.PREFIX, SKOS.NAMESPACE);
     }
 
     /**
@@ -207,13 +213,60 @@ public class QueryObject<T extends RDFObject> {
     }
 
     /**
-     * Executes the generated query and returns the result.
+     * Creates and executes the SPARQL query according to the
+     * criterias specified by the user.
      *
      * @param <T>
-     * @return itself to allow chaining.
+     * @return the result set
      */
     public <T> List<T> execute() {
 
+        String query = createQuery();
+
         return null;
+    }
+
+    /**
+     * Converts itself to a executable SPARQL query.
+     *
+     * @return the SPARQL query as string
+     */
+    private String createQuery() {
+
+        StringBuilder query = new StringBuilder();
+
+        /**
+         * Adding the prefixes to the SPARQL query (format: PREFIX Label: <IRI>)
+         */
+        for (String key : prefixes.keySet()) {
+            query
+                    .append("PREFIX ")
+                    .append(key)
+                    .append(": <")
+                    .append(prefixes.get(key))
+                    .append("> ")
+                    .append(System.getProperty("line.separator"));
+        }
+
+        // For readability: Adding an empty line between the prefix and the statement part
+        query.append(System.getProperty("line.separator"));
+
+        System.out.println( query.toString());
+
+        // Creating the actual statements
+
+        for (Criteria criteria : criterias) {
+            LdPathParser parser = new LdPathParser(new SesameValueBackend(), new StringReader(criteria.getLdpath()));
+            try {
+
+                NodeSelector selector = (PathSelector) parser.parseSelector(prefixes);
+                System.out.println(selector.getPathExpression(new SesameValueBackend()));
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return query.toString();
     }
 }

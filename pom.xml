@@ -80,6 +80,11 @@
             <artifactId>ldpath-core</artifactId>
             <version>3.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.marmotta</groupId>
+            <artifactId>ldpath-backend-sesame</artifactId>
+            <version>3.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
