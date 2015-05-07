@@ -28,7 +28,7 @@ public class Anno4j {
 
     private IDGenerator idGenerator = new IDGeneratorLocalURN();
     private PersistenceService persistenceService = new PersistenceService();
-    private QueryService queryService = new QueryService();
+    private QueryService queryService = new QueryService(Anno4j.class);
 
     private Repository repository;
     private ObjectRepository objectRepository;

@@ -1,7 +1,8 @@
 package com.github.anno4j.querying;
 
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.ontologies.*;
-import org.apache.marmotta.ldpath.LDPath;
 import org.apache.marmotta.ldpath.api.backend.NodeBackend;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
@@ -13,7 +14,13 @@ import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.SKOS;
-import org.openrdf.repository.object.RDFObject;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 import java.util.*;
@@ -21,22 +28,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The QueryObject allows to query the MICO triple stores by using criterias. Furthermore
+ * The QueryService allows to query the MICO triple stores by using criterias. Furthermore
  * this is provided by simple classes. This is why the user does not need to write SPARQL queries
  * by himself.
  *
  * @param <T>
  * @author Andreas Eisenkolb
  */
-public class QueryService<T extends RDFObject> {
+public class QueryService<T extends Annotation> {
 
-    private final String BODY_PREFIX = OADM.PREFIX + OADM.HAS_BODY + "/";
+    private final Logger logger = LoggerFactory.getLogger(QueryService.class);
 
-    private final String TARGET_PREFIX = OADM.PREFIX + OADM.HAS_TARGET + "/";
+    private Class<T> type;
 
-    private final String SOURCE_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SOURCE + "/";
+    private final String BODY_PREFIX = "oa:hasBody/";
 
-    private final String SELECTOR_PREFIX = TARGET_PREFIX + OADM.PREFIX + OADM.HAS_SELECTOR + "/";
+    private final String TARGET_PREFIX = "oa:hasTarget/";
+
+    private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource/";
+
+    private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector/";
 
     private Map<String, String> prefixes = new HashMap<String, String>();
 
@@ -47,9 +58,11 @@ public class QueryService<T extends RDFObject> {
     private Integer limit = null;
 
     private Integer offset = null;
-	private int varIndex = 0;
 
-    public QueryService() {
+    private int varIndex = 0;
+
+    public QueryService(Class<T> type) {
+        this.type = type;
         // Setting some standard name spaces
         addPrefix(OADM.PREFIX, OADM.NS);
         addPrefix(CNT.PREFIX, CNT.NS);
@@ -63,6 +76,8 @@ public class QueryService<T extends RDFObject> {
         addPrefix(RDFS.PREFIX, RDFS.NAMESPACE);
         addPrefix(SKOS.PREFIX, SKOS.NAMESPACE);
     }
+
+
 
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects.
@@ -85,7 +100,7 @@ public class QueryService<T extends RDFObject> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setBodyCriteria(String ldpath, Number value, Comparison comparison) {
+    public QueryService setBodyCriteria(String ldpath, Number value, Comparison comparison) {
         criterias.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
         return this;
     }
@@ -112,7 +127,7 @@ public class QueryService<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setBodyCriteria(String ldpath, Number value) {
+    public QueryService setBodyCriteria(String ldpath, Number value) {
         return setBodyCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -137,7 +152,7 @@ public class QueryService<T extends RDFObject> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setAnnotationCriteria(String ldpath, Number value, Comparison comparison) {
+    public QueryService setAnnotationCriteria(String ldpath, Number value, Comparison comparison) {
         criterias.add(new Criteria(ldpath, value, comparison));
         return this;
     }
@@ -164,7 +179,7 @@ public class QueryService<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setAnnotationCriteria(String ldpath, Number value) {
+    public QueryService setAnnotationCriteria(String ldpath, Number value) {
         return setAnnotationCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -189,7 +204,7 @@ public class QueryService<T extends RDFObject> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setSelectorCriteria(String ldpath, Number value, Comparison comparison) {
+    public QueryService setSelectorCriteria(String ldpath, Number value, Comparison comparison) {
         criterias.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
         return this;
     }
@@ -216,7 +231,7 @@ public class QueryService<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setSelectorCriteria(String ldpath, Number value) {
+    public QueryService setSelectorCriteria(String ldpath, Number value) {
         return setSelectorCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -237,7 +252,7 @@ public class QueryService<T extends RDFObject> {
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      * @return itself to allow chaining.
      */
-    public QueryObject setSourceCriteria(String ldpath, Number value, Comparison comparison) {
+    public QueryService setSourceCriteria(String ldpath, Number value, Comparison comparison) {
         criterias.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
         return this;
     }
@@ -256,7 +271,7 @@ public class QueryService<T extends RDFObject> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryObject setSourceCriteria(String ldpath, Number value) {
+    public QueryService setSourceCriteria(String ldpath, Number value) {
         return setSourceCriteria(ldpath, value, Comparison.EQ);
     }
 
@@ -323,12 +338,11 @@ public class QueryService<T extends RDFObject> {
      * @param <T>
      * @return the result set
      */
-    public <T> List<T> execute() throws ParseException {
+    public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
+        ObjectConnection con = Anno4j.getInstance().getObjectRepository().getConnection();
+        ObjectQuery query = con.prepareObjectQuery(createQuery());
 
-        String query = createQuery();
-
-        // TODO: Query
-        return null;
+        return (List<T>) query.evaluate(this.type).asList();
     }
 
     /**
@@ -381,7 +395,8 @@ public class QueryService<T extends RDFObject> {
 
         query.append("}");
 
-        System.out.println(query.toString());
+        logger.info("Created query:\n" + query.toString());
+
         return query.toString();
     }
 
