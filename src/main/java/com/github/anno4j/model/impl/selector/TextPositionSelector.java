@@ -21,6 +21,13 @@ public class TextPositionSelector extends Selector {
     @Iri(OADM.START) private long start;
     @Iri(OADM.END)   private long end;
 
+    public TextPositionSelector() {};
+
+    public TextPositionSelector(long start, long end) {
+        this.start = start;
+        this.end = end;
+    }
+
     public long getStart() {
         return start;
     }
