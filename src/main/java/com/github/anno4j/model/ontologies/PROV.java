@@ -9,7 +9,7 @@ public class PROV {
 
     public final static String AGENT = NS + "Agent";
 
-    public final static String PREFIX = "prov:";
+    public final static String PREFIX = "prov";
 
     public final static String SOFTWARE_AGENT = NS + "SoftwareAgent";
 

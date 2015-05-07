@@ -46,4 +46,6 @@ public abstract class Annotation implements RDFObject {
     public Resource getResource() {
         return this.resource;
     }
+
+    public void setResource(Resource resource) { this.resource = resource; }
 }
