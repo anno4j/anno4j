@@ -2,19 +2,28 @@ package com.github.anno4j.querying;
 
 public class Criteria {
 
+    private boolean isNaN;
     private String ldpath;
 
-    private String value;
+    private String constraint;
 
     private Comparison comparison;
 
     public Criteria() {
     }
 
-    public Criteria(String ldpath, String value, Comparison comparison) {
+    public Criteria(String ldpath, String constraint, Comparison comparison) {
         this.ldpath = ldpath;
         this.comparison = comparison;
-        this.value = value;
+        this.constraint = constraint;
+        this.isNaN = true;
+    }
+
+    public Criteria(String ldpath, Number constraint, Comparison comparison) {
+        this.ldpath = ldpath;
+        this.comparison = comparison;
+        this.constraint = constraint.toString();
+        this.isNaN = false;
     }
 
     public String getLdpath() {
@@ -33,11 +42,15 @@ public class Criteria {
         this.comparison = comparison;
     }
 
-    public String getValue() {
-        return value;
+    public String getConstraint() {
+        return constraint;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setConstraint(String constraint) {
+        this.constraint = constraint;
+    }
+
+    public boolean isNaN() {
+        return isNaN;
     }
 }
