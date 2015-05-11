@@ -1,22 +1,19 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import com.github.anno4j.model.impl.motivation.Bookmarking;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.result.Result;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class MotivationTest {
 
@@ -41,7 +38,7 @@ public class MotivationTest {
     @Test
     public void testMotivationBookmarking() throws Exception {
         // Create test annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
 
         // Create and add motivation
         Motivation motivation = new Bookmarking();

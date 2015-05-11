@@ -1,6 +1,5 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import com.github.anno4j.model.impl.selector.FragmentSelector;
 import com.github.anno4j.model.impl.selector.FragmentSpecification;
 import com.github.anno4j.model.impl.target.SpecificResource;
@@ -42,7 +41,7 @@ public class SelectorTest {
     @Test
     public void testSelector() throws Exception {
         // Create annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
 
         // Create a test target
         Target target = new TestTarget();

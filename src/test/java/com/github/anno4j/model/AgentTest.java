@@ -3,7 +3,6 @@ package com.github.anno4j.model;
 import com.github.anno4j.model.impl.agent.AgentOrganization;
 import com.github.anno4j.model.impl.agent.AgentPerson;
 import com.github.anno4j.model.impl.agent.AgentSoftware;
-import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class AgentTest {
 
@@ -41,7 +40,7 @@ public class AgentTest {
     @Test
     public void testAgentPerson() throws Exception {
         // Create test annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
 
         // Create and add the agent
         AgentPerson agentPerson = new AgentPerson();
@@ -66,7 +65,7 @@ public class AgentTest {
     @Test
     public void testAgentOrganization() throws Exception {
         // Create test annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
 
         // Create and add the agent
         AgentOrganization agentOrganization = new AgentOrganization();
@@ -87,7 +86,7 @@ public class AgentTest {
     @Test
     public void testAgentSoftware() throws Exception {
         // Create test annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
 
         // Create and add the agent
         AgentSoftware agentSoftware = new AgentSoftware();

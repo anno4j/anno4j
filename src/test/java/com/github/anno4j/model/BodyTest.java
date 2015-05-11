@@ -1,6 +1,5 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import com.github.anno4j.model.mock.TestBody;
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +42,7 @@ public class BodyTest {
         TestBody body = new TestBody();
         body.setValue("Example Value");
 
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
         annotation.setBody(body);
 
 
@@ -51,7 +50,7 @@ public class BodyTest {
         connection.addObject(annotation);
 
         // query persisted object and check test body implementation
-        AnnotationDefault result = connection.getObject(AnnotationDefault.class, annotation.getResource());
+        Annotation result = connection.getObject(Annotation.class, annotation.getResource());
         assertEquals(((TestBody)annotation.getBody()).getValue(), ((TestBody) result.getBody()).getValue());
     }
 }

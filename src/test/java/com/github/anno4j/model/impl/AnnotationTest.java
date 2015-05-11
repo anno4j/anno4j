@@ -1,7 +1,6 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by schlegel on 06/05/15.
  */
-public class AnnotationDefaultTest {
+public class AnnotationTest {
 
     Repository repository;
     ObjectConnection connection;
@@ -42,7 +41,7 @@ public class AnnotationDefaultTest {
     @Test
     public void testPersistAnnotation() throws Exception {
         // Create test annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
         annotation.setAnnotatedAt("" + System.currentTimeMillis());
         annotation.setSerializedAt("" + System.currentTimeMillis());
 
@@ -50,7 +49,7 @@ public class AnnotationDefaultTest {
         connection.addObject(annotation);
 
         // query persisted object
-        AnnotationDefault result = connection.getObject(AnnotationDefault.class, annotation.getResource());
+        Annotation result = connection.getObject(Annotation.class, annotation.getResource());
 
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
         assertEquals(annotation.getAnnotatedAt(), result.getAnnotatedAt());
@@ -60,7 +59,7 @@ public class AnnotationDefaultTest {
     @Test
     public void testResourceDefinition() throws Exception {
         // Create annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
         Resource resource = new URIImpl("http://www.somepage.org/resource1/");
         annotation.setResource(resource);
 
@@ -68,7 +67,7 @@ public class AnnotationDefaultTest {
         connection.addObject(annotation);
 
         // Query persisted object
-        AnnotationDefault result = (AnnotationDefault) connection.getObject(annotation.getResource());
+        Annotation result = (Annotation) connection.getObject(annotation.getResource());
 
         // Tests
         assertEquals(annotation.getResource(), result.getResource());

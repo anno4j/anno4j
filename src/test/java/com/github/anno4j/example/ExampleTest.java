@@ -4,7 +4,6 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.StringURLResource;
 import com.github.anno4j.model.impl.agent.AgentPerson;
 import com.github.anno4j.model.impl.agent.AgentSoftware;
-import com.github.anno4j.model.impl.annotation.AnnotationDefault;
 import com.github.anno4j.model.impl.motivation.Commenting;
 import com.github.anno4j.model.impl.selector.TextPositionSelector;
 import com.github.anno4j.model.impl.target.SpecificResource;
@@ -44,7 +43,7 @@ public class ExampleTest {
     @Test
     public void exampleTest() {
         // Create the base annotation
-        Annotation annotation = new AnnotationDefault();
+        Annotation annotation = new Annotation();
         annotation.setMotivatedBy(new Commenting());
         annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
         annotation.setSerializedAt("2013-02-04T12:00:00Z");
