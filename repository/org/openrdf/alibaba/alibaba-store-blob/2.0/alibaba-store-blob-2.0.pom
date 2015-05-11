@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.openrdf.alibaba</groupId>
+		<artifactId>alibaba</artifactId>
+		<version>2.0</version>
+	</parent>
+
+	<artifactId>alibaba-store-blob</artifactId>
+
+	<name>AliBaba Blob Store</name>
+	<description><![CDATA[
+Provides an on disk key store of RDF file streams.
+]]>
+	</description>
+	<dependencies>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
