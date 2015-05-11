@@ -6,10 +6,19 @@ package com.github.anno4j.exceptions;
  */
 public class ConceptNotFoundException extends IllegalStateException {
 
-    public ConceptNotFoundException(String s) {
-        super(s);
+    /**
+     * Constructor
+     * @param message Exception message
+     */
+    public ConceptNotFoundException(String message) {
+        super(message);
     }
 
+    /**
+     * Constructor
+     * @param message Exception message
+     * @param cause Exception cause
+     */
     public ConceptNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }

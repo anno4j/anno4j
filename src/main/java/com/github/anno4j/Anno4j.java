@@ -18,21 +18,50 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- * Read and write API for W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/)
+ * Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/).
+ *
+ * <br/><br/>Anno4j can be configured by using the specific setter-methodes (e.g. setIdGenerator, setRepository). A default configuration (in-memory SPARQL endpoint) will be used if no configuration is set.
+ *
+ * <br/><br/> Usage: Anno4j implements a singelton pattern. The getInstance() methode can be called to get a Anno4j object.
  */
 public class Anno4j {
 
+    /**
+     * Path to required concepts file of openrdf/alibaba.
+     */
     private static final String CONCEPT_PATH = "META-INF/org.openrdf.concepts";
+
+    /**
+     * Logger of this class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(Anno4j.class);
+
+    /**
+     * Singleton instance of this class.
+     */
     private static Anno4j instance = null;
 
+    /**
+     * Configured ID generator for Anno4j.
+     */
     private IDGenerator idGenerator = new IDGeneratorLocalURN();
 
+    /**
+     * Configured openrdf/sesame repository for connecting a local/remote SPARQL endpoint.
+     */
     private Repository repository;
+
+    /**
+     * Wrapper of the repository field for alibaba, will be updated if a new repository is set.
+     */
     private ObjectRepository objectRepository;
 
 
+    /**
+     * Private constructor because of singleton pattern
+     */
     private Anno4j() {
+        // In-memory default configuration
         Repository sailRepository = new SailRepository(new MemoryStore());
         try {
             sailRepository.initialize();
@@ -44,14 +73,6 @@ public class Anno4j {
         }
     }
 
-    public IDGenerator getIdGenerator() {
-        return idGenerator;
-    }
-
-    public void setIdGenerator(IDGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-    }
-
     public PersistenceService createPersistenceService() {
         return new PersistenceService(objectRepository);
     }
@@ -60,20 +81,55 @@ public class Anno4j {
         return new QueryService(clazz, objectRepository);
     }
 
+
+    /**
+     * Getter for the configured IDGenerator intance.
+     * @return configured IDGenerator instance.
+     */
+    public IDGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    /**
+     * Configures the IDGenerator to use in Anno4j.
+     * @param idGenerator IDGenerator to use in Anno4j.
+     */
+    public void setIdGenerator(IDGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
+
+    /**
+     * Getter for the configured Repository instance (Connector for local/remote SPARQL repository).
+     * @return configured Repository instance
+     */
     public Repository getRepository() {
         return repository;
     }
 
+    /**
+     * Configures the Repository (Connector for local/remote SPARQL repository) to use in Anno4j.
+     * @param repository Repository to use in Anno4j.
+     * @throws RepositoryException
+     * @throws RepositoryConfigException
+     */
     public void setRepository(Repository repository) throws RepositoryException, RepositoryConfigException {
         this.repository = repository;
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        this.objectRepository = factory.createRepository(repository);
+        // update alibaba wrapper
+        this.objectRepository = new ObjectRepositoryFactory().createRepository(repository);
     }
 
+    /**
+     * Getter for configured ObjectRepository (openrdf/alibaba wrapper for the internal Repository).
+     * @return configured ObjectRepository.
+     */
     public ObjectRepository getObjectRepository() {
         return objectRepository;
     }
 
+    /**
+     * Getter for the Anno4j getter instance.
+     * @return singleton Anno4j instance.
+     */
     public static Anno4j getInstance() {
         if(instance == null) {
             synchronized (Anno4j.class) {
@@ -91,5 +147,4 @@ public class Anno4j {
         }
         return instance;
     }
-
 }
