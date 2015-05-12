@@ -12,6 +12,11 @@ import org.openrdf.annotations.Iri;
 @Iri(OADM.MOTIVATION_BOOKMARKING)
 public class Bookmarking extends Motivation {
 
+    /**
+     * Print method.
+     *
+     * @return Returns a textual representation of this class.
+     */
     @Override
     public String toString() {
         return "Bookmarking{}" +

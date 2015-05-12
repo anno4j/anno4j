@@ -6,9 +6,10 @@ import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
 
 /**
- *
+ * This object is used when an entity is solely represented by its resource/resourceURI.
  */
 public class StringURLResource implements RDFObject {
+
 
     private Resource resource;
 

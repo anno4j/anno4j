@@ -16,12 +16,23 @@ public enum FragmentSpecification {
     SVG                 ("http://www.w3.org/TR/SVG/")
     ;
 
+    /**
+     * String contains the textual representation of the given standard.
+     */
     private final String specification;
 
+    /**
+     * Constructor for the enum class, setting the specification string.
+     *
+     * @param specification Textual representation of the specification.
+     */
     FragmentSpecification(String specification) {
         this.specification = specification;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return this.specification;

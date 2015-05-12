@@ -10,6 +10,9 @@ import org.openrdf.repository.object.RDFObject;
  */
 public abstract class Body implements RDFObject {
 
+    /**
+     * The resource URI.
+     */
     private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
     @Override
@@ -23,5 +26,9 @@ public abstract class Body implements RDFObject {
         return this.resource;
     }
 
+    /**
+     * Setter for the resource URI.
+     * @param resource  The resource URI to set.
+     */
     public void setResource(Resource resource) { this.resource = resource; }
 }

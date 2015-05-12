@@ -20,33 +20,89 @@ import org.openrdf.annotations.Iri;
 @Iri(OADM.SELECTOR_FRAGMENT)
 public class FragmentSelector extends Selector {
 
+    /**
+     * Refers to http://www.w3.org/TR/rdf-schema/#ch_value
+     *
+     * rdf:value is an instance of rdf:Property that may be used in describing structured values.
+     */
     @Iri(RDF.VALUE)           private String value;
+
+    /**
+     * http://dublincore.org/documents/dcmi-terms/#terms-conformsTo
+     *
+     * An established standard to which the described resource conforms.
+     */
     @Iri(DCTERMS.CONFORMS_TO) private String conformsTo;
 
+    /**
+     * Basic constructor.
+     */
     public FragmentSelector() {};
 
+    /**
+     * Constructor setting the value and the conformsTo variables.
+     *
+     * @param value         Contains the value of the selector.
+     * @param conformsTo    Contains string representation of the referenced standard.
+     */
     public FragmentSelector(String value, String conformsTo) {
         this.value = value;
         this.conformsTo = conformsTo;
     }
 
-    public String getValue() {
-        return value;
+    public void setConformsTo(FragmentSpecification fragmentSpecification) {
+        this.conformsTo = fragmentSpecification.toString();
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getConformsTo() {
-        return conformsTo;
-    }
-
+    /**
+     * Sets new http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     * <p/>
+     * An established standard to which the described resource conforms..
+     *
+     * @param conformsTo New value of http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     *                   <p/>
+     *                   An established standard to which the described resource conforms..
+     */
     public void setConformsTo(String conformsTo) {
         this.conformsTo = conformsTo;
     }
 
-    public void setConformsTo(FragmentSpecification fragmentSpecification) {
-        this.conformsTo = fragmentSpecification.toString();
+    /**
+     * Gets Refers to http:www.w3.orgTRrdf-schema#ch_value
+     * <p/>
+     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
+     *
+     * @return Value of Refers to http:www.w3.orgTRrdf-schema#ch_value
+     * <p/>
+     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Gets http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     * <p/>
+     * An established standard to which the described resource conforms..
+     *
+     * @return Value of http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     * <p/>
+     * An established standard to which the described resource conforms..
+     */
+    public String getConformsTo() {
+        return conformsTo;
+    }
+
+    /**
+     * Sets new Refers to http:www.w3.orgTRrdf-schema#ch_value
+     * <p/>
+     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
+     *
+     * @param value New value of Refers to http:www.w3.orgTRrdf-schema#ch_value
+     *              <p/>
+     *              rdf:value is an instance of rdf:Property that may be used in describing structured values..
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 }

@@ -24,29 +24,84 @@ import org.openrdf.repository.object.RDFObject;
 @Iri(OADM.SPECIFIC_RESOURCE)
 public class SpecificResource extends Target {
 
+    /**
+     * Refers to http://www.w3.org/ns/oa#hasSource
+     * The relationship between a Specific Resource and the resource that it is a more specific representation of.
+     * There must be exactly 1 oa:hasSource relationship associated with a Specific Resource.
+     */
     @Iri(OADM.HAS_SOURCE)   private RDFObject source;
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#hasSelector
+     * The relationship between a oa:SpecificResource and a oa:Selector.
+     * There MUST be exactly 0 or 1 oa:hasSelector relationship associated with a Specific Resource.
+     */
     @Iri(OADM.HAS_SELECTOR) private Selector selector;
 
+    /**
+     * Standard constructor.
+     */
     public SpecificResource() {};
 
+    /**
+     * Constructor setting the source and selector variables.
+     * @param source    Specifies the original target of the corresponding annotation.
+     * @param selector  Points to the given selector.
+     */
     public SpecificResource(RDFObject source, Selector selector) {
         this.source = source;
         this.selector = selector;
     }
 
-    public RDFObject getSource() {
-        return source;
-    }
-
-    public void setSource(RDFObject source) {
-        this.source = source;
-    }
-
+    /**
+     * Gets Refers to http:www.w3.orgnsoa#hasSelector
+     * The relationship between a oa:SpecificResource and a oa:Selector.
+     * There MUST be exactly 0 or 1 oa:hasSelector relationship associated with a Specific Resource..
+     *
+     * @return Value of Refers to http:www.w3.orgnsoa#hasSelector
+     * The relationship between a oa:SpecificResource and a oa:Selector.
+     * There MUST be exactly 0 or 1 oa:hasSelector relationship associated with a Specific Resource..
+     */
     public Selector getSelector() {
         return selector;
     }
 
+    /**
+     * Sets new Refers to http:www.w3.orgnsoa#hasSelector
+     * The relationship between a oa:SpecificResource and a oa:Selector.
+     * There MUST be exactly 0 or 1 oa:hasSelector relationship associated with a Specific Resource..
+     *
+     * @param selector New value of Refers to http:www.w3.orgnsoa#hasSelector
+     *                 The relationship between a oa:SpecificResource and a oa:Selector.
+     *                 There MUST be exactly 0 or 1 oa:hasSelector relationship associated with a Specific Resource..
+     */
     public void setSelector(Selector selector) {
         this.selector = selector;
+    }
+
+    /**
+     * Gets Refers to http:www.w3.orgnsoa#hasSource
+     * The relationship between a Specific Resource and the resource that it is a more specific representation of.
+     * There must be exactly 1 oa:hasSource relationship associated with a Specific Resource..
+     *
+     * @return Value of Refers to http:www.w3.orgnsoa#hasSource
+     * The relationship between a Specific Resource and the resource that it is a more specific representation of.
+     * There must be exactly 1 oa:hasSource relationship associated with a Specific Resource..
+     */
+    public RDFObject getSource() {
+        return source;
+    }
+
+    /**
+     * Sets new Refers to http:www.w3.orgnsoa#hasSource
+     * The relationship between a Specific Resource and the resource that it is a more specific representation of.
+     * There must be exactly 1 oa:hasSource relationship associated with a Specific Resource..
+     *
+     * @param source New value of Refers to http:www.w3.orgnsoa#hasSource
+     *               The relationship between a Specific Resource and the resource that it is a more specific representation of.
+     *               There must be exactly 1 oa:hasSource relationship associated with a Specific Resource..
+     */
+    public void setSource(RDFObject source) {
+        this.source = source;
     }
 }

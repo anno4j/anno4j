@@ -13,18 +13,22 @@ import org.openrdf.annotations.Iri;
 @Iri(PROV.SOFTWARE_AGENT)
 public class AgentSoftware extends Agent {
 
+    /**
+     * Refers to http://xmlns.com/foaf/spec/#term_homepage
+     * homepage - A homepage for some thing.
+     */
     @Iri(FOAF.HOMEPAGE) private String homepage;
 
+    /**
+     * Standard constructor.
+     */
     public AgentSoftware() {};
 
-    public String getHomepage() {
-        return homepage;
-    }
-
-    public void setHomepage(String homepage) {
-        this.homepage = homepage;
-    }
-
+    /**
+     * Print method.
+     *
+     * @return Returns a textual representation of this class.
+     */
     @Override
     public String toString() {
         return "AgentSoftware{" +
@@ -32,5 +36,27 @@ public class AgentSoftware extends Agent {
                 ", homepage='" + homepage + '\'' +
                 ", resource='" + getResource() +
                 '}';
+    }
+
+    /**
+     * Sets new Refers to http:xmlns.comfoafspec#term_homepage
+     * homepage - A homepage for some thing..
+     *
+     * @param homepage New value of Refers to http:xmlns.comfoafspec#term_homepage
+     *                 homepage - A homepage for some thing..
+     */
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
+
+    /**
+     * Gets Refers to http:xmlns.comfoafspec#term_homepage
+     * homepage - A homepage for some thing..
+     *
+     * @return Value of Refers to http:xmlns.comfoafspec#term_homepage
+     * homepage - A homepage for some thing..
+     */
+    public String getHomepage() {
+        return homepage;
     }
 }
