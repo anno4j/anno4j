@@ -83,7 +83,6 @@ public class QueryService<T extends Annotation> {
     }
 
 
-
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects.
      *
