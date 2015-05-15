@@ -10,6 +10,14 @@
     <packaging>jar</packaging>
     <name>Anno4j</name>
     <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/)</description>
+    <url>https://github.com/anno4j/anno4j</url>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/anno4j/anno4j/issues</url>
+    </issueManagement>
+    <scm>
+        <url>https://github.com/anno4j/anno4j.git</url>
+    </scm>
 
     <organization>
         <name>Chair of Distributed Information Systems - University of Passau</name>
@@ -37,13 +45,7 @@
             <email>emanuel.berndl@gmail.com</email>
         </developer>
     </developers>
-    <issueManagement>
-        <system>Github</system>
-        <url>https://github.com/anno4j/anno4j/issues</url>
-    </issueManagement>
-    <scm>
-        <url>https://github.com/anno4j/anno4j.git</url>
-    </scm>
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
