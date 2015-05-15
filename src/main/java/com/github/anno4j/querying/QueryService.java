@@ -31,7 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The QueryService allows to query the MICO triple stores by using criterias. Furthermore
+ * The QueryService allows to query the MICO triple stores by using criteria. Furthermore
  * this is provided by simple classes. This is why the user does not need to write SPARQL queries
  * by himself.
  *
@@ -78,9 +78,9 @@ public class QueryService<T extends Annotation> {
     private Map<String, String> prefixes = new HashMap<String, String>();
 
     /**
-     * All user defined criterias
+     * All user defined criteria
      */
-    private ArrayList<Criteria> criterias = new ArrayList<Criteria>();
+    private ArrayList<Criteria> criteria = new ArrayList<Criteria>();
 
     /**
      * Specifies the ordering of the result set
@@ -129,7 +129,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setBodyCriteria(String ldpath, String value, Comparison comparison) {
-        criterias.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -142,7 +142,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setBodyCriteria(String ldpath, Number value, Comparison comparison) {
-        criterias.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -181,7 +181,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setAnnotationCriteria(String ldpath, String value, Comparison comparison) {
-        criterias.add(new Criteria(ldpath, value, comparison));
+        criteria.add(new Criteria(ldpath, value, comparison));
         return this;
     }
 
@@ -194,7 +194,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setAnnotationCriteria(String ldpath, Number value, Comparison comparison) {
-        criterias.add(new Criteria(ldpath, value, comparison));
+        criteria.add(new Criteria(ldpath, value, comparison));
         return this;
     }
 
@@ -233,7 +233,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSelectorCriteria(String ldpath, String value, Comparison comparison) {
-        criterias.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -246,7 +246,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSelectorCriteria(String ldpath, Number value, Comparison comparison) {
-        criterias.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -283,7 +283,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSourceCriteria(String ldpath, String value, Comparison comparison) {
-        criterias.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -294,7 +294,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSourceCriteria(String ldpath, Number value, Comparison comparison) {
-        criterias.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -374,7 +374,7 @@ public class QueryService<T extends Annotation> {
 
     /**
      * Creates and executes the SPARQL query according to the
-     * criterias specified by the user.
+     * criteria specified by the user.
      *
      * @param <T>
      * @return the result set
@@ -421,15 +421,15 @@ public class QueryService<T extends Annotation> {
         SesameValueBackend backend = new SesameValueBackend();
 
         // Creating the actual statements
-        for (Criteria criteria : criterias) {
+        for (Criteria c : criteria) {
 
             query.append("{ ").append(System.getProperty("line.separator"));
 
-            LdPathParser parser = new LdPathParser(backend, new StringReader(criteria.getLdpath()));
+            LdPathParser parser = new LdPathParser(backend, new StringReader(c.getLdpath()));
 
             String variableName = resolveLDPath(parser.parseSelector(prefixes), backend, query, "annotation");
 
-            evalComparison(query, criteria, variableName);
+            evalComparison(query, c, variableName);
 
             query.append("}").append(System.getProperty("line.separator"));
         }
