@@ -31,10 +31,18 @@ public enum Comparison {
 
     private String sparqlOperator;
 
-    Comparison(String s) {
-        this.sparqlOperator = s;
+    /**
+     * Constructor
+     * @param sparqlOperator comparison operator in SPARQL
+     */
+    Comparison(String sparqlOperator) {
+        this.sparqlOperator = sparqlOperator;
     }
 
+    /**
+     * Getter for the SPARQL comparison operator
+     * @return comparison operator in SPARQL
+     */
     public String getSparqlOperator() {
         return sparqlOperator;
     }

@@ -11,24 +11,37 @@ import org.openrdf.repository.object.RDFObject;
 public abstract class Body implements RDFObject {
 
     /**
-     * The resource URI.
+     * Unique identifier for the instance.
      */
     private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
+    /**
+     * Constructor.
+     */
+    public Body() {
+    }
+
+    /**
+     *  The current {@link ObjectConnection} this object is atached to. Will be implemented by the proxy object.
+     */
     @Override
     public ObjectConnection getObjectConnection() {
         // will be implemented by the proxy object
         return null;
     }
 
+    /**
+     * Getter for the unique identifier.
+     * @return a unique identifier for this instance.
+     */
     @Override
     public Resource getResource() {
         return this.resource;
     }
 
     /**
-     * Setter for the resource URI.
-     * @param resource  The resource URI to set.
+     * Setter for the unique identifier.
+     * @param resource the unique identifier.
      */
     public void setResource(Resource resource) { this.resource = resource; }
 }

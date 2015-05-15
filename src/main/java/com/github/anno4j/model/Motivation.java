@@ -11,12 +11,18 @@ import org.openrdf.repository.object.RDFObject;
 public abstract class Motivation implements RDFObject {
 
     /**
-     * The resource URI of the entity.
+     * Unique identifier for the instance.
      */
     private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     */
+    public Motivation() {
+    }
+
+    /**
+     *  The current {@link ObjectConnection} this object is atached to. Will be implemented by the proxy object.
      */
     @Override
     public ObjectConnection getObjectConnection() {
@@ -25,7 +31,8 @@ public abstract class Motivation implements RDFObject {
     }
 
     /**
-     * {@inheritDoc}
+     * Getter for the unique identifier.
+     * @return a unique identifier for this instance.
      */
     @Override
     public Resource getResource() {
@@ -33,8 +40,8 @@ public abstract class Motivation implements RDFObject {
     }
 
     /**
-     * Setter for the resource URI.
-     * @param resource  The resource URI to set.
+     * Setter for the unique identifier.
+     * @param resource the unique identifier.
      */
     public void setResource(Resource resource) { this.resource = resource; }
 }
