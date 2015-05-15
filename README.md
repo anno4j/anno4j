@@ -61,3 +61,20 @@ and therefore helps the user to write readable code.
     - parameter beschreiben
        - LDPath short introduction
        - verschiedenen Selectortypen 
+
+## Overall example
+
+The following will guide through an exemplary process of producing a whole annotation from scratch. The annotation that is
+used is conform to the [complete example](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#complete-example) that
+is shown at the end of the [Web Annotation Data Model](http://www.w3.org/TR/annotation-model/).
+
+Important to note here: As the current status of anno4j does not support multiple instances of some relations (in this example
+the body and the motivation), the exemplary annotation does only support one of each. On instances where an entity is not specified
+any further, a resource URI is used (in the example these are *openid1* and *homepage1*).
+
+The first step is to create an annotation, which will be typed accordingly (via the relationship *rdf:type* as an *oa:Annotation*) on its own:
+
+    // Create the base annotation
+    Annotation annotation = new Annotation();
+
+Then, provenance information is supported for the annotation.

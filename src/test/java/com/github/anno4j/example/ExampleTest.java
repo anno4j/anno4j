@@ -51,6 +51,7 @@ public class ExampleTest {
         // Create the person agent for the annotation
         Person person = new Person();
         person.setName("A. Person");
+        person.setOpenID("http://example.org/agent1/openID1");
 
         annotation.setAnnotatedBy(person);
 
