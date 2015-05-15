@@ -421,15 +421,15 @@ public class QueryService<T extends Annotation> {
         SesameValueBackend backend = new SesameValueBackend();
 
         // Creating the actual statements
-        for (Criteria criteria : criteria) {
+        for (Criteria c : criteria) {
 
             query.append("{ ").append(System.getProperty("line.separator"));
 
-            LdPathParser parser = new LdPathParser(backend, new StringReader(criteria.getLdpath()));
+            LdPathParser parser = new LdPathParser(backend, new StringReader(c.getLdpath()));
 
             String variableName = resolveLDPath(parser.parseSelector(prefixes), backend, query, "annotation");
 
-            evalComparison(query, criteria, variableName);
+            evalComparison(query, c, variableName);
 
             query.append("}").append(System.getProperty("line.separator"));
         }
