@@ -1,13 +1,18 @@
-# anno4j - Read & Write W3C Web Annotation Data Model / W3C Open Annotation Data Model
+# Anno4j
 
 > This library provides programmatic access to read and write [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) / [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/) from and to local/remote SPARQL endpoints. An easy-to-use and extensible Java API allows creation and querying of annotations even for non-experts.  
 
-Features:
+## Features:
 
 - Extensible creation of Web/Open Annotations based on Java Annotations syntax.
 - Built-in and predefined implementations for Body and Targets conform to W3C Web Annotation Data Model and W3C Open Annotation Data Model
 - Annotations are transformed to RDF and automatically transmitted to local/remote SPARQL using SPARQL Update functionality
 - Querying of annotations with path-based criteria
+    - [x] Basic Comparisons like (equal, greater and lower)
+    - [x] Union of different paths
+    - [x] Type condition
+    - [ ] Ordering of results
+    - [ ] Custom filters
 
 ## Introduction
 Anno4j is an Java RDF library to easily cope with annotations conform to the Web Annotation Data Model / Open Annotation Data Model. The library provides an extensible way of creating annotations and defines bundled with different body and target implementations. Annotations are automatically persisted on local or remote connected [SPARQL (SPARQL Protocol and RDF Query Language)](http://www.w3.org/TR/sparql11-overview/) endpoints without having to issue any kind of SPARQL query. Besides the creation of annotations, Anno4j also provides an easy-to-use query API based on the path query language [LDPath](http://marmotta.apache.org/ldpath/).
@@ -21,6 +26,8 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 ## Getting Started
 
 ### Configuration
+
+## Restrictions
 
 ### Create and save annotations
 
