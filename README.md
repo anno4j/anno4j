@@ -21,6 +21,10 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 
 ## Install
 
+## Getting Started
+
+### Configuration
+
 ## Example
 
 The following will guide through an exemplary process of producing a whole annotation from scratch. The annotation that is
@@ -140,10 +144,6 @@ the target. As the target is not specified any further in the example, we make u
     annotation.setTarget(specificResource);
 
 The whole example implementation can be seen [here](src/test/java/com/github/anno4j/example/ExampleTest.java).
-
-## Getting Started
-
-### Configuration
 
 ## Restrictions
 
