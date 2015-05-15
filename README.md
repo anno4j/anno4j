@@ -1,14 +1,18 @@
-# anno4j - Read & Write W3C Web Annotation Data Model/Open Annotation Data Model
+# anno4j - Read & Write W3C Web Annotation Data Model / W3C Open Annotation Data Model
 
-> This library provides programmatic access to read and write [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) / [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/) from and to local/remote SPARQL endpoints.
+> This library provides programmatic access to read and write [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) / [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/) from and to local/remote SPARQL endpoints. An easy-to-use and extensible Java API allows creation and querying of annotations even for non-experts.  
 
 Features:
 
-- [x] Write 
-- [x] Read
-- [] TODO list more features
+- Extensible creation of Web/Open Annotations based on Java Annotations syntax.
+- Built-in and predefined implementations for Body and Targets conform to W3C Web Annotation Data Model and W3C Open Annotation Data Model
+- Annotations are transformed to RDF and automatically transmitted to local/remote SPARQL using SPARQL Update functionality
+- Querying of annotations with path-based criteria
 
 ## Introduction
+Anno4j is an Java RDF library to easily cope with annotations conform to the Web Annotation Data Model / Open Annotation Data Model. The library provides an extensible way of creating annotations and defines bundled with different body and target implementations. Annotations are automatically persisted on local or remote connected [SPARQL (SPARQL Protocol and RDF Query Language)](http://www.w3.org/TR/sparql11-overview/) endpoints without having to issue any kind of SPARQL query. Besides the creation of annotations, Anno4j also provides an easy-to-use query API based on the path query language [LDPath](http://marmotta.apache.org/ldpath/).
+
+The Web Annotation Data Model / Open Annotation Data Model specification describes a structured model and format to enable (web) annotations to be shared and reused across different hardware and software platform. The model is based on [RDF (Resource Description Framework)](http://www.w3.org/TR/rdf11-primer/), a standard model for data interchange on the Web.
 
 ## Install
 
@@ -73,6 +77,12 @@ and therefore helps the user to write readable code.
        - verschiedenen Selectortypen 
          
 ## Contributors
+
+- Kai Schlegel (University of Passau)
+- Andreas Eisenkolb (University of Passau)
+- Emanuel Berndl (University of Passau)
+
+> This software was partially developed within the [MICO project](http://www.mico-project.eu/) (Media in Context - European Commission 7th Framework Programme grant agreement no: 610480).
 
 ## License
  Apache License Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0
