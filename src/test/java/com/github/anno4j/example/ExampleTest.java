@@ -44,9 +44,9 @@ public class ExampleTest {
     public void exampleTest() {
         // Create the base annotation
         Annotation annotation = new Annotation();
-        annotation.setMotivatedBy(new Commenting());
         annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
         annotation.setSerializedAt("2013-02-04T12:00:00Z");
+        annotation.setMotivatedBy(new Commenting());
 
         // Create the person agent for the annotation
         Person person = new Person();
@@ -75,6 +75,8 @@ public class ExampleTest {
 
         // Create the actual target
         StringURLResource source = new StringURLResource("http://example.org/source1");
+        specificResource.setSource(source);
+
         annotation.setTarget(specificResource);
     }
 }

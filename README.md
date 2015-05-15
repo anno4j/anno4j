@@ -14,6 +14,124 @@ Features:
 
 ## Example
 
+The following will guide through an exemplary process of producing a whole annotation from scratch. The annotation that is
+used is conform to the [complete example](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#complete-example) that
+is shown at the end of the [Web Annotation Data Model specification](http://www.w3.org/TR/annotation-model/).
+
+Important to note here: As the current status of anno4j does not support multiple instances of some relations (in this example
+the body and the motivation), the exemplary annotation does only support one of each. On instances where an entity is not specified
+any further, a simple resource URI entity is used (in the example these are *openid1* and *homepage1*).
+
+The first step is to create an annotation, which will be typed accordingly (via the relationship *rdf:type* as an *oa:Annotation*) on its own:
+
+    // Create the base annotation
+    Annotation annotation = new Annotation();
+
+Then, provenance information is supported for the annotation. The timestamps *oa:annotatedAt* and *oa:serializedAt* are
+supported by filling the members of the Annotation class:
+
+    annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
+    annotation.setSerializedAt("2013-02-04T12:00:00Z");
+
+The motivation is defined by creating a new *Commenting* object, which is then added to the annotation:
+
+    annotation.setMotivatedBy(new Commenting());
+
+As the annotation is given by a human being, the provenance feature of an agent, in this case a *foaf:Person*, is utilized.
+A *Person* object is created, filled with respective information, and the added to the annotation by setting the *annotatedBy*
+field. All of this corresponds to the *agent1* entity of the example, which is connected to the annotation via the relationship
+*oa:annotatedBy*.
+
+    // Create the person agent for the annotation
+    Person person = new Person();
+    person.setName("A. Person");
+    person.setOpenID("http://example.org/agent1/openID1");
+
+    annotation.setAnnotatedBy(person);
+
+In this example, the annotator made use of an homepage to create the annotation. This is implemented by a *prov:SoftwareAgent*
+(corresponding to *agent2* in the example), which is also created and then added to the annotation via the field *serializedBy*
+(relationship *oa:serializedBy* in the RDF graph).
+
+    // Create the software agent for the annotation
+    Software software = new Software();
+    software.setName("Code v2.1");
+    software.setHomepage("http://example.org/agent2/homepage1");
+
+    annotation.setSerializedBy(software);
+
+The next step contains the actual content of the annotation, called the body (bottom left side of the example picture).
+As the example is a text annotation, it is typed being a *oa:EmbeddedContent* with the *rdf:format* *"text/plain"*. The
+text of the annotation is supported via the *rdf:value* property of the body node, its language is specified by the
+relationship *dc:language*.
+
+In anno4j, all this is done by implementing an own body class (extending the abstract class
+*Body*). The type of the body is supported in the first line (@Iri("http://www.w3.org/ns/oa#EmbeddedContent")) as a java-annotation,
+he respective attributes are implemented using the *@Iri* java-annotation.
+See the documentation of the class [here](src/test/java/com/github/anno4j/example/TextAnnotationBody.java).
+
+    @Iri("http://www.w3.org/ns/oa#EmbeddedContent")
+    public class TextAnnotationBody extends Body {
+
+        @Iri(DC.FORMAT)   private String format;
+        @Iri(RDF.VALUE)   private String value;
+        @Iri(DC.LANGUAGE) private String language;
+
+        public TextAnnotationBody() {};
+
+        public TextAnnotationBody(String format, String value, String language) {
+            this.format = format;
+            this.value = value;
+            this.language = language;
+        }
+
+        public String getFormat() { return format; }
+
+        public void setValue(String value) { this.value = value; }
+
+        public String getLanguage() { return language; }
+
+        public void setLanguage(String language) { this.language = language; }
+
+        public void setFormat(String format) { this.format = format; }
+
+        public String getValue() { return value; }
+    }
+
+An instance of this class is then created, filled accordingly, and then added to the annotation as body:
+
+    // Create the body
+    TextAnnotationBody body = new TextAnnotationBody("text/plain", "One of my favourite cities", "en");
+    annotation.setBody(body);
+
+The last thing that has to be added is the target (bottom right side of the picture), the "thing" that the annotation is about. In this case, the target
+is specified in a more detailed fashion, as a fragment and not the whole media item is to be selected. This circumstance is
+implemented by a combination of specific resource and a selector. A specific resource (which has the *rdf:type* *oa:SpecificResource*)
+is an entity, that joins the actual target with its selector. A selector addresses only a spatial or temporal part or
+fragment of the given multimedia item. In the case of the example, an *oa:TextPositionSelector* selects a part of the
+text that is annotated by stating a start- (relationship *oa:start*) and end position (relationship *oa:end*). Lastly,
+the actual target is connected with the specific resource node via an *oa:hasSource* relationship.
+
+In anno4j, a specific resource and a selector has to be created and then joined accordingly:
+
+    // Create the selector
+    SpecificResource specificResource = new SpecificResource();
+
+    TextPositionSelector textPositionSelector = new TextPositionSelector(4096, 4104);
+
+    specificResource.setSelector(textPositionSelector);
+
+Then, a target is created and then joined with the specific resource node. The last step connects the annotation with
+the target. As the target is not specified any further in the example, we make use of a simple resource URI entity.
+
+    // Create the actual target
+    StringURLResource source = new StringURLResource("http://example.org/source1");
+    specificResource.setSource(source);
+
+    annotation.setTarget(specificResource);
+
+The whole example implementation can be seen [here](src/test/java/com/github/anno4j/example/ExampleTest.java).
+
 ## Getting Started
 
 ### Configuration
