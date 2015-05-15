@@ -13,31 +13,55 @@ import org.openrdf.repository.object.RDFObject;
  */
 public abstract class Agent implements RDFObject {
 
+    /**
+     * The resource URI of the entity.
+     */
     private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
-    @Iri(FOAF.NAME)
-    private String name;
+    /**
+     * The name of the agent.
+     */
+    @Iri(FOAF.NAME) private String name;
 
+    /**
+     * Standard constructor.
+     */
     public Agent() {};
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObjectConnection getObjectConnection() {
         // will be implemented by the proxy object
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Resource getResource() {
         return this.resource;
     }
 
     public void setResource(Resource resource) { this.resource = resource; }
+
+    /**
+     * Sets new The name of the agent..
+     *
+     * @param name New value of The name of the agent..
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets The name of the agent..
+     *
+     * @return Value of The name of the agent..
+     */
+    public String getName() {
+        return name;
+    }
 }

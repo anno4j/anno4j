@@ -42,27 +42,64 @@ public class QueryService<T extends Annotation> {
 
     private final Logger logger = LoggerFactory.getLogger(QueryService.class);
 
+    /**
+     * The type of the result set.
+     */
     private Class<T> type;
+
+    /**
+     * The repository needed for the actual querying
+     */
     private ObjectRepository objectRepository;
 
+    /**
+     * LDPath for the shortcut method setBodyCriteria
+     */
     private final String BODY_PREFIX = "oa:hasBody/";
 
+    /**
+     * LDPath for the shortcut method setTargetCriteria
+     */
     private final String TARGET_PREFIX = "oa:hasTarget/";
 
+    /**
+     * LDPath for the shortcut method setSourceCriteria
+     */
     private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource/";
 
+    /**
+     * LDPath for the shortcut method setSelectorCriteria
+     */
     private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector/";
 
+    /**
+     * All user defined name spaces
+     */
     private Map<String, String> prefixes = new HashMap<String, String>();
 
+    /**
+     * All user defined criterias
+     */
     private ArrayList<Criteria> criterias = new ArrayList<Criteria>();
 
+    /**
+     * Specifies the ordering of the result set
+     */
     private Order order = null;
 
+    /**
+     * Limit value of the query
+     */
     private Integer limit = null;
 
+    /**
+     * Offset value for the query
+     */
     private Integer offset = null;
 
+    /**
+     * Required to have an ongoing variable name when creating the SPARQL query
+     */
     private int varIndex = 0;
 
     public QueryService(Class<T> type, ObjectRepository objectRepository) {

@@ -11,7 +11,7 @@ import org.openrdf.annotations.Iri;
  * A software agent is running software.
  */
 @Iri(PROV.SOFTWARE_AGENT)
-public class AgentSoftware extends Agent {
+public class Software extends Agent {
 
     /**
      * Refers to http://xmlns.com/foaf/spec/#term_homepage
@@ -22,7 +22,7 @@ public class AgentSoftware extends Agent {
     /**
      * Standard constructor.
      */
-    public AgentSoftware() {};
+    public Software() {};
 
     /**
      * Print method.
@@ -31,7 +31,7 @@ public class AgentSoftware extends Agent {
      */
     @Override
     public String toString() {
-        return "AgentSoftware{" +
+        return "Software{" +
                 "name='" + this.getName() + '\'' +
                 ", homepage='" + homepage + '\'' +
                 ", resource='" + getResource() +

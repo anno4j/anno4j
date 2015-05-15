@@ -9,23 +9,42 @@ import org.openrdf.annotations.Iri;
 @Iri("http://www.example.com/schema#TargetType")
 public class TestTarget extends Target {
 
-    public TestTarget() {};
-
+    /**
+     * The value of the annotation.
+     */
     @Iri("http://www.example.com/schema#value")
     private String value;
 
-    public String getValue() {
-        return value;
-    }
+    /**
+     * Standard constructor.
+     */
+    public TestTarget() {};
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "TestTarget{" +
                 "value='" + value + '\'' +
                 '}';
+    }
+
+    /**
+     * Gets The value of the annotation..
+     *
+     * @return Value of The value of the annotation..
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Sets new The value of the annotation..
+     *
+     * @param value New value of The value of the annotation..
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 }

@@ -10,18 +10,31 @@ import org.openrdf.repository.object.RDFObject;
  */
 public abstract class Motivation implements RDFObject {
 
+    /**
+     * The resource URI of the entity.
+     */
     private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObjectConnection getObjectConnection() {
         // will be implemented by the proxy object
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Resource getResource() {
         return this.resource;
     }
 
+    /**
+     * Setter for the resource URI.
+     * @param resource  The resource URI to set.
+     */
     public void setResource(Resource resource) { this.resource = resource; }
 }

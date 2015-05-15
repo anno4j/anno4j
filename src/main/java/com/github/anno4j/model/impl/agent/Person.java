@@ -10,7 +10,7 @@ import org.openrdf.annotations.Iri;
  * A person.
  */
 @Iri(FOAF.PERSON)
-public class AgentPerson extends Agent {
+public class Person extends Agent {
 
     /**
      * Refers to http://xmlns.com/foaf/spec/#term_mbox
@@ -27,7 +27,7 @@ public class AgentPerson extends Agent {
     /**
      * Standard constructor.
      */
-    public AgentPerson() {};
+    public Person() {};
 
     /**
      * Print method.
@@ -36,7 +36,7 @@ public class AgentPerson extends Agent {
      */
     @Override
     public String toString() {
-        return "AgentPerson{" +
+        return "Person{" +
                 "name='" + this.getName() + '\'' +
                 ", mbox='" + mbox + '\'' +
                 ", openID='" + openID + '\'' +

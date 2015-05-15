@@ -1,8 +1,8 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.agent.AgentOrganization;
-import com.github.anno4j.model.impl.agent.AgentPerson;
-import com.github.anno4j.model.impl.agent.AgentSoftware;
+import com.github.anno4j.model.impl.agent.Organization;
+import com.github.anno4j.model.impl.agent.Person;
+import com.github.anno4j.model.impl.agent.Software;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +17,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test suite for the various agents (Organization, Person, Software).
+ *
+ * A simple annotation is built up for every agent, then persisted and queried.
+ */
 public class AgentTest {
 
     Repository repository;
@@ -43,23 +48,23 @@ public class AgentTest {
         Annotation annotation = new Annotation();
 
         // Create and add the agent
-        AgentPerson agentPerson = new AgentPerson();
-        agentPerson.setName("TestName");
-        agentPerson.setMbox("TextMbox");
-        agentPerson.setOpenID("TestID");
+        Person person = new Person();
+        person.setName("TestName");
+        person.setMbox("TextMbox");
+        person.setOpenID("TestID");
 
-        annotation.setAnnotatedBy(agentPerson);
+        annotation.setAnnotatedBy(person);
 
         // Persist annotation
         connection.addObject(annotation);
 
         // Query persisted object
-        List<AgentPerson> result = connection.getObjects(AgentPerson.class).asList();
+        List<Person> result = connection.getObjects(Person.class).asList();
 
-        AgentPerson resultObject = result.get(0);
-        assertEquals(agentPerson.getName(), resultObject.getName());
-        assertEquals(agentPerson.getMbox(), resultObject.getMbox());
-        assertEquals(agentPerson.getOpenID(), resultObject.getOpenID());
+        Person resultObject = result.get(0);
+        assertEquals(person.getName(), resultObject.getName());
+        assertEquals(person.getMbox(), resultObject.getMbox());
+        assertEquals(person.getOpenID(), resultObject.getOpenID());
     }
 
     @Test
@@ -68,19 +73,19 @@ public class AgentTest {
         Annotation annotation = new Annotation();
 
         // Create and add the agent
-        AgentOrganization agentOrganization = new AgentOrganization();
-        agentOrganization.setName("TestName");
+        Organization organization = new Organization();
+        organization.setName("TestName");
 
-        annotation.setAnnotatedBy(agentOrganization);
+        annotation.setAnnotatedBy(organization);
 
         // Persist annotation
         connection.addObject(annotation);
 
         // Query persisted object
-        List<AgentOrganization> result = connection.getObjects(AgentOrganization.class).asList();
+        List<Organization> result = connection.getObjects(Organization.class).asList();
 
-        AgentOrganization resultObject = result.get(0);
-        assertEquals(agentOrganization.getName(), resultObject.getName());
+        Organization resultObject = result.get(0);
+        assertEquals(organization.getName(), resultObject.getName());
     }
 
     @Test
@@ -89,20 +94,20 @@ public class AgentTest {
         Annotation annotation = new Annotation();
 
         // Create and add the agent
-        AgentSoftware agentSoftware = new AgentSoftware();
-        agentSoftware.setName("TestName");
-        agentSoftware.setHomepage("TestPage");
+        Software software = new Software();
+        software.setName("TestName");
+        software.setHomepage("TestPage");
 
-        annotation.setAnnotatedBy(agentSoftware);
+        annotation.setAnnotatedBy(software);
 
         // Persist annotation
         connection.addObject(annotation);
 
         // Query persisted object
-        List<AgentSoftware> result = connection.getObjects(AgentSoftware.class).asList();
+        List<Software> result = connection.getObjects(Software.class).asList();
 
-        AgentSoftware resultObject = result.get(0);
-        assertEquals(agentSoftware.getName(), resultObject.getName());
-        assertEquals(agentSoftware.getHomepage(), resultObject.getHomepage());
+        Software resultObject = result.get(0);
+        assertEquals(software.getName(), resultObject.getName());
+        assertEquals(software.getHomepage(), resultObject.getHomepage());
     }
 }
