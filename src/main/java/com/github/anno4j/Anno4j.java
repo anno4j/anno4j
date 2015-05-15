@@ -3,7 +3,7 @@ package com.github.anno4j;
 import com.github.anno4j.exceptions.ConceptNotFoundException;
 import com.github.anno4j.persistence.IDGenerator;
 import com.github.anno4j.persistence.PersistenceService;
-import com.github.anno4j.persistence.impl.IDGeneratorLocalURN;
+import com.github.anno4j.persistence.impl.IDGeneratorAnno4jURN;
 import com.github.anno4j.querying.QueryService;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -44,7 +44,7 @@ public class Anno4j {
     /**
      * Configured ID generator for Anno4j.
      */
-    private IDGenerator idGenerator = new IDGeneratorLocalURN();
+    private IDGenerator idGenerator = new IDGeneratorAnno4jURN();
 
     /**
      * Configured openrdf/sesame repository for connecting a local/remote SPARQL endpoint.

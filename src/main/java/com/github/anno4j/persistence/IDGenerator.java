@@ -8,8 +8,8 @@ import org.openrdf.model.Resource;
 public interface IDGenerator {
 
     /**
-     * Generates a unique ressource
-     * @return
+     * Generates a unique resource.
+     * @return a Resource containing a unique identifier.
      */
     Resource generateID();
 }

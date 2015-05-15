@@ -1,12 +1,24 @@
-# anno4j
-Read and write API for W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/)
+# anno4j - Read & Write W3C Web Annotation Data Model/Open Annotation Data Model
 
+> This library provides programmatic access to read and write [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) / [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/) from and to local/remote SPARQL endpoints.
 
-## Configuration
+Features:
 
+- [x] Write 
+- [x] Read
+- [] TODO list more features
 
+## Introduction
 
-## Persiting
+## Install
+
+## Example
+
+## Getting Started
+
+### Configuration
+
+### Create and save annotations
 
 anno4j uses [AliBaba](https://bitbucket.org/openrdf/alibaba/) to provide an easy way to extend the 
 W3C Open Annotation Data Model by simply annotating Plain Old Java Objects (POJOs) with the *@IRI* Java annotation 
@@ -42,13 +54,11 @@ can be done:
 
 This would lead to the persistence of the annotation object and all of its annotated attributes to the preset repository.  
 
-## Querying
+### Queryi for annotations
 
 anno4j also allows to query triple stores without writing own SPARQL queries. Therefore it provides hibernate like criteria
 queries to query against a particular class. Furthermore anno4j is a so-called fluent interface, that allows method chaining
 and therefore helps the user to write readable code.
-
-
 
     QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class);
 
@@ -61,20 +71,8 @@ and therefore helps the user to write readable code.
     - parameter beschreiben
        - LDPath short introduction
        - verschiedenen Selectortypen 
+         
+## Contributors
 
-## Overall example
-
-The following will guide through an exemplary process of producing a whole annotation from scratch. The annotation that is
-used is conform to the [complete example](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#complete-example) that
-is shown at the end of the [Web Annotation Data Model](http://www.w3.org/TR/annotation-model/).
-
-Important to note here: As the current status of anno4j does not support multiple instances of some relations (in this example
-the body and the motivation), the exemplary annotation does only support one of each. On instances where an entity is not specified
-any further, a resource URI is used (in the example these are *openid1* and *homepage1*).
-
-The first step is to create an annotation, which will be typed accordingly (via the relationship *rdf:type* as an *oa:Annotation*) on its own:
-
-    // Create the base annotation
-    Annotation annotation = new Annotation();
-
-Then, provenance information is supported for the annotation.
+## License
+ Apache License Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0
