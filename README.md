@@ -27,7 +27,7 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 
 ### Configuration
 
-## Restrictions
+### Restrictions
 
 ### Create and save annotations
 

@@ -1,6 +1,7 @@
 package com.github.anno4j.model.impl;
 
 import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
 
@@ -17,7 +18,8 @@ public class StringURLResource implements RDFObject {
     /**
      * Constructor
      */
-    public StringURLResource() {
+    public StringURLResource(String resourceURI) {
+        this.resource = new URIImpl(resourceURI);
     }
 
     /**
