@@ -2,8 +2,8 @@ package com.github.anno4j.example;
 
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.StringURLResource;
-import com.github.anno4j.model.impl.agent.AgentPerson;
-import com.github.anno4j.model.impl.agent.AgentSoftware;
+import com.github.anno4j.model.impl.agent.Person;
+import com.github.anno4j.model.impl.agent.Software;
 import com.github.anno4j.model.impl.motivation.Commenting;
 import com.github.anno4j.model.impl.selector.TextPositionSelector;
 import com.github.anno4j.model.impl.target.SpecificResource;
@@ -49,28 +49,30 @@ public class ExampleTest {
         annotation.setSerializedAt("2013-02-04T12:00:00Z");
 
         // Create the person agent for the annotation
-        AgentPerson agentPerson = new AgentPerson();
-        agentPerson.setName("A. Person");
+        Person person = new Person();
+        person.setName("A. Person");
 
-        annotation.setAnnotatedBy(agentPerson);
+        annotation.setAnnotatedBy(person);
 
         // Create the software agent for the annotation
-        AgentSoftware agentSoftware = new AgentSoftware();
-        agentSoftware.setName("Code v2.1");
-        agentSoftware.setHomepage("http://example.org/agent2/homepage1");
+        Software software = new Software();
+        software.setName("Code v2.1");
+        software.setHomepage("http://example.org/agent2/homepage1");
 
-        annotation.setSerializedBy(agentSoftware);
+        annotation.setSerializedBy(software);
 
         // Create the body
         TextAnnotationBody body = new TextAnnotationBody("text/plain", "One of my favourite cities", "en");
         annotation.setBody(body);
 
-        // Create the target and selector
+        // Create the selector
         SpecificResource specificResource = new SpecificResource();
 
         TextPositionSelector textPositionSelector = new TextPositionSelector(4096, 4104);
 
         specificResource.setSelector(textPositionSelector);
+
+        // Create the actual target
         StringURLResource source = new StringURLResource("http://example.org/source1");
         annotation.setTarget(specificResource);
     }

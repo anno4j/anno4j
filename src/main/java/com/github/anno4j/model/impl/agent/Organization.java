@@ -10,12 +10,12 @@ import org.openrdf.annotations.Iri;
  * An organization.
  */
 @Iri(FOAF.ORGANIZATION)
-public class AgentOrganization extends Agent {
+public class Organization extends Agent {
 
     /**
      * Standard constructor.
      */
-    public AgentOrganization() {};
+    public Organization() {};
 
     /**
      * Print method.
@@ -24,7 +24,7 @@ public class AgentOrganization extends Agent {
      */
     @Override
     public String toString() {
-        return "AgentOrganization{}" + '\'' +
+        return "Organization{}" + '\'' +
                 "name='" + this.getName() + '\'' +
                 ", resource='" + getResource() +
                 '}';
