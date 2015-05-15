@@ -35,11 +35,43 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 
 ### Install
 
+1. Add maven dependency (Anno4j is in oss.sonatype.org Repository)
+
+```
+      <dependency>
+        <groupId>com.github.anno4j</groupId>
+        <artifactId>anno4j-core</artifactId>
+        <version>1.0</version>
+      </dependency>
+```
+      
+2. Add an empty concept file "org.openrdf.concepts" under your META-INF directory
+
 ### Configuration
+
+The central Anno4j object implements the singleton pattern. To the Anno4j instance, simple call the getInstance() method.
+
+```java
+    Anno4j anno4j = Anno4j.getInstance();
+```
+
+Default configuration of Anno4j is a local in-memory SPARQL endpoint. Anno4j is based on [Sesame](http://rdf4j.org/). To connect to your local or remote SPARQL endpoint, just create a corresponding repository object (see [here](http://rdf4j.org/sesame/2.7/docs/users.docbook?view#section-repository-api)) and set it in the Anno4j instance.
+
+
+```java
+    anno4j.setRepository(new SPARQLRepository("http://www.mydomain.com/sparql"));
+```       
+
+For RDF creation, Anno4j need a central instance for generating unique identifiers. The ID generator needs to implement the com.github.anno4j.persistence.IDGenerator interface. To activate your ID generator, just create a corresponding object and set it in the Anno4j instance.
+
+```java
+    anno4j.setIdGenerator(new MyIDGenerator());
+```       
+
 
 ### Create and save annotations
 
-anno4j uses [AliBaba](https://bitbucket.org/openrdf/alibaba/) to provide an easy way to extend the 
+Anno4j uses [AliBaba](https://bitbucket.org/openrdf/alibaba/) to provide an easy way to extend the 
 W3C Open Annotation Data Model by simply annotating Plain Old Java Objects (POJOs) with the *@IRI* Java annotation 
 (example see: com.github.anno4j.model.impl.annotation.AnnotationDefault.java). To indicate for example that a given 
 POJO is a *Annotation*, adding @Iri(OADM.ANNOTATION) directly above the class declaration is enough, where OADM.ANNOTATION is
