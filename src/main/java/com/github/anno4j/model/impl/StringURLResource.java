@@ -10,18 +10,30 @@ import org.openrdf.repository.object.RDFObject;
  */
 public class StringURLResource implements RDFObject {
 
-
+    /**
+     * The resource URI of the entity.
+     */
     private Resource resource;
 
+    /**
+     * Constructor also setting the resource URI.
+     * @param resourceURI
+     */
     public StringURLResource(String resourceURI) {
         this.resource = new URIImpl(resourceURI);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObjectConnection getObjectConnection() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Resource getResource() {
         return this.resource;

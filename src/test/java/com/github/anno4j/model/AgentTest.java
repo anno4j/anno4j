@@ -17,6 +17,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test suite for the various agents (Organization, Person, Software).
+ *
+ * A simple annotation is built up for every agent, then persisted and queried.
+ */
 public class AgentTest {
 
     Repository repository;

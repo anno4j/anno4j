@@ -18,6 +18,12 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test suite for the selectors of an annotation.
+ * This test uses a fragment selector, that is conform to the W3C Media Fragments. Other selectors can be used accordingly.
+ *
+ * A simple annotation is set up, provided with a respective selector, then persisted and queried.
+ */
 public class SelectorTest {
 
     Repository repository;

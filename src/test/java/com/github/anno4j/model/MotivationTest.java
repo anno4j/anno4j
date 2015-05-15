@@ -15,6 +15,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test suite for the motivation of an annotation. Only one instance is tested, all the other types of motivations are built up in the same fashion.
+ *
+ * An annotation with motivation is set up, persisted, and queried.
+ */
 public class MotivationTest {
 
     Repository repository;
