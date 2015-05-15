@@ -57,7 +57,7 @@ public class SelectorTest {
 
         // Create selector
         FragmentSelector fragmentSelector = new FragmentSelector();
-        fragmentSelector.setConformsTo(FragmentSpecification.W3C_MEDIA_FRAGMENTS);
+        fragmentSelector.setConformsToFragmentSpecification(FragmentSpecification.W3C_MEDIA_FRAGMENTS);
         fragmentSelector.setValue("#xywh=50,50,640,480");
 
         // Connect all entities

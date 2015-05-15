@@ -50,7 +50,13 @@ public class FragmentSelector extends Selector {
         this.conformsTo = conformsTo;
     }
 
-    public void setConformsTo(FragmentSpecification fragmentSpecification) {
+    /**
+     * Sets new http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo.
+     * <p/>
+     * An established standard to which the described resource conforms.
+     * @param fragmentSpecification New value of http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     */
+    public void setConformsToFragmentSpecification(FragmentSpecification fragmentSpecification) {
         this.conformsTo = fragmentSpecification.toString();
     }
 
