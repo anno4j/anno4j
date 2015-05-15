@@ -37,41 +37,51 @@ any further, a simple resource URI entity is used (in the example these are *ope
 
 The first step is to create an annotation, which will be typed accordingly (via the relationship *rdf:type* as an *oa:Annotation*) on its own:
 
+```java
     // Create the base annotation
     Annotation annotation = new Annotation();
+```
 
 Then, provenance information is supported for the annotation. The timestamps *oa:annotatedAt* and *oa:serializedAt* are
 supported by filling the members of the Annotation class:
 
+```java
     annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
     annotation.setSerializedAt("2013-02-04T12:00:00Z");
+```
 
 The motivation is defined by creating a new *Commenting* object, which is then added to the annotation:
 
+```java
     annotation.setMotivatedBy(new Commenting());
+```
 
 As the annotation is given by a human being, the provenance feature of an agent, in this case a *foaf:Person*, is utilized.
 A *Person* object is created, filled with respective information, and the added to the annotation by setting the *annotatedBy*
 field. All of this corresponds to the *agent1* entity of the example, which is connected to the annotation via the relationship
 *oa:annotatedBy*.
 
+```java
     // Create the person agent for the annotation
     Person person = new Person();
     person.setName("A. Person");
     person.setOpenID("http://example.org/agent1/openID1");
-
+    
     annotation.setAnnotatedBy(person);
+```
 
 In this example, the annotator made use of an homepage to create the annotation. This is implemented by a *prov:SoftwareAgent*
 (corresponding to *agent2* in the example), which is also created and then added to the annotation via the field *serializedBy*
 (relationship *oa:serializedBy* in the RDF graph).
 
+```java
     // Create the software agent for the annotation
     Software software = new Software();
     software.setName("Code v2.1");
     software.setHomepage("http://example.org/agent2/homepage1");
 
     annotation.setSerializedBy(software);
+```
 
 The next step contains the actual content of the annotation, called the body (bottom left side of the example picture).
 As the example is a text annotation, it is typed being a *oa:EmbeddedContent* with the *rdf:format* *"text/plain"*. The
@@ -83,6 +93,7 @@ In anno4j, all this is done by implementing an own body class (extending the abs
 he respective attributes are implemented using the *@Iri* java-annotation.
 See the documentation of the class [here](src/test/java/com/github/anno4j/example/TextAnnotationBody.java).
 
+```java
     @Iri("http://www.w3.org/ns/oa#EmbeddedContent")
     public class TextAnnotationBody extends Body {
 
@@ -110,12 +121,15 @@ See the documentation of the class [here](src/test/java/com/github/anno4j/exampl
 
         public String getValue() { return value; }
     }
+```
 
 An instance of this class is then created, filled accordingly, and then added to the annotation as body:
 
+```java
     // Create the body
     TextAnnotationBody body = new TextAnnotationBody("text/plain", "One of my favourite cities", "en");
     annotation.setBody(body);
+```
 
 The last thing that has to be added is the target (bottom right side of the picture), the "thing" that the annotation is about. In this case, the target
 is specified in a more detailed fashion, as a fragment and not the whole media item is to be selected. This circumstance is
@@ -127,21 +141,25 @@ the actual target is connected with the specific resource node via an *oa:hasSou
 
 In anno4j, a specific resource and a selector has to be created and then joined accordingly:
 
+```java
     // Create the selector
     SpecificResource specificResource = new SpecificResource();
 
     TextPositionSelector textPositionSelector = new TextPositionSelector(4096, 4104);
 
     specificResource.setSelector(textPositionSelector);
+```
 
 Then, a target is created and then joined with the specific resource node. The last step connects the annotation with
 the target. As the target is not specified any further in the example, we make use of a simple resource URI entity.
 
+```java
     // Create the actual target
     StringURLResource source = new StringURLResource("http://example.org/source1");
     specificResource.setSource(source);
 
     annotation.setTarget(specificResource);
+```
 
 The whole example implementation can be seen [here](src/test/java/com/github/anno4j/example/ExampleTest.java).
 
@@ -166,20 +184,23 @@ added directly above the class attributes that should be stored in the repositor
     
 To specify this triple the attribute body of the *http://www.w3.org/ns/oa#Annotation* simply needs the *@Iri(OADM.HAS_BODY)*
 annotation:
-    
+   
+```java
     @Iri(OADM.HAS_BODY)
     private Body body;
+```
 
 After annotating all needed attributes, the given object can be persisted using anno4j. The following code shows how this 
 can be done:
 
-
+```java
     // Simple Annotation object
     Annotation annotation = new Annotation();
     annotation.setSerializedAt("07.05.2015");
 
      // persist annotation
      Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+```
 
 This would lead to the persistence of the annotation object and all of its annotated attributes to the preset repository.  
 
@@ -191,15 +212,18 @@ and therefore helps the user to write readable code.
 
 The following code shows how to get the instance of the query service, which is responsible for all provided querying mechanism:
 
-
+```java
     QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class);
+```
 
 This example code shows, that it is necessary to specify the type of the result set by passing the type (Annotation.class) to the
 createQueryService method. After retrieving the QueryService object, often the first thing to do is to add namespaces to 
 the QueryService by using the addPrefix method. This function requires two parameters: the prefix and the actual url. The
 following code would add an example namespace to the query service.
 
+```java
     queryService.addPrefix("ex", "http://www.example.com/schema#");
+```
     
 After adding all needed namespaces to the query service, the next step would be to define some criteria. Therefore the QueryService
 object provides several methods to add this constraints. Keeping the Open Annotation Data Model in mind, an annotation object
@@ -207,10 +231,10 @@ contains to other objects: the body and the target. In turn, the target can also
 objects the query service provides own methods to directly specify criteria on the respective node. The naming convention for the
 methods is: set(ObjectName)Criteria. To add a criteria to the annotation body, the *setBodyCriteria* function has to be invoked.
 
-To add criteria the given setter needs at first a string value representing the LD Path. LD Path is a simple path-based query language similar 
+To add criteria the given setter needs at first a string value representing the [LDPath](http://marmotta.apache.org/ldpath/). LD Path is a simple path-based query language similar 
 to XPath or SPARQL Property Paths that is particularly well-suited for querying and retrieving resources from the Linked Data Cloud by 
 following RDF links between resources and servers. For example, the following path query would select the names of 
-all friends of the context resource [1]:
+all friends of the context resource:
 
     foaf:knows / foaf:name :: xsd:string
     
@@ -226,16 +250,20 @@ anno4j supports all common comparison methods like:
 If the comparison method is note provided, the query service will use Comparison.EQ by default. The following example code shows how the setBodyCriteria
 function could be invoked:
 
+```java
     queryService.setBodyCriteria("ex:value", "Example Value", Comparison.EQ);
+```
 
 After adding one or multiple criteria the QueryService can be executed. This means, that the QueryService will automatically create a SPARQL query
 according to the users namespaces and criteria and use this query to retrieve the data from the triple store. To achieve this, the execute method has
 to be invoked. Because anno4j provides a fluent-interface, the code examples from above can be rewritten to the following code example:
 
+```java
     queryService
         .addPrefix("ex", "http://www.example.com/schema#")
         .setBodyCriteria("ex:value", "Example Value")
         .execute();
+```
 
 ## Contributors
 
@@ -249,5 +277,3 @@ to be invoked. Because anno4j provides a fluent-interface, the code examples fro
  Apache License Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0
 
 ## References
-
-[1] : [https://code.google.com/p/ldpath/](https://code.google.com/p/ldpath/)
