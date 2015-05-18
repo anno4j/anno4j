@@ -122,13 +122,23 @@ The following code shows how to get the instance of the query service, which is 
 
 This example code shows, that it is necessary to specify the type of the result set by passing the type (Annotation.class) to the
 createQueryService method. After retrieving the QueryService object, often the first thing to do is to add namespaces to 
-the QueryService by using the addPrefix method. This function requires two parameters: the prefix and the actual url. The
-following code would add an example namespace to the query service.
+the QueryService by using the addPrefix method, passing the prefix and the actual url:
 
 ```java
     queryService.addPrefix("ex", "http://www.example.com/schema#");
 ```
-    
+
+However, some prefixes are predefined and thereby always available without being specified. These are:
+
+    oa:      <http://www.w3.org/ns/oa#>
+    cnt:     <http://www.w3.org/2011/content#>
+    dc:      <http://purl.org/dc/elements/1.1/>
+    dcterms: <http://purl.org/dc/terms/>
+    dctypes: <http://purl.org/dc/dcmitype>
+    foaf:    <http://xmlns.com/foaf/0.1/>
+    prov:    <http://www.w3.org/ns/prov/>
+    rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
 After adding all needed namespaces to the query service, the next step would be to define some criteria. Therefore the QueryService
 object provides several methods to add this constraints. Keeping the Open Annotation Data Model in mind, an annotation object
 contains to other objects: the body and the target. In turn, the target can also has a Source or a Selector object. For all of these
@@ -308,6 +318,48 @@ the target. As the target is not specified any further in the example, we make u
 The whole example implementation can be seen [here](src/test/java/com/github/anno4j/example/ExampleTest.java).
 
 ## Restrictions
+
+For the first version, anno4j does not provide full coverage of LD Path for querying. However, these selectors are supported:
+ 
+ 
+**Property Selections**
+
+A path definition selecting the value of a property. Either a URI enclosed in <> or a namespace prefix and a local name separated by :
+
+    <URI> | PREFIX:LOCAL
+
+
+**Path Traversal**
+
+Traverse a path by following several edges in the RDF graph. Each step is separated by a /.
+
+    PATH / PATH
+
+**Unions**
+
+Several alternative paths can be merged by using a union | between path elements
+
+    PATH | PATH
+
+**Groupings**
+
+Path expressions can be grouped to change precedence or to improve readability by including them in braces:
+
+    ( PATH )
+
+**Value Testing**
+
+The values of selections can be tested and filtered by adding test conditions in square brackets [] after a path selection:
+
+    PATH [TEST]
+
+More precisely, anno4j currently supports only the specific **is-a Test**. 
+
+    PATH[is-a VALUE]
+ 
+    
+For the next version of anno4j it is planned to integrate more of these tests. For examples and a detailed documentation visit: [http://marmotta.apache.org/ldpath/language.html](http://marmotta.apache.org/ldpath/language.html).
+
 
 ## Contributors
 
