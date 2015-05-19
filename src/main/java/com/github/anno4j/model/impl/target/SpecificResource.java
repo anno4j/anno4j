@@ -39,6 +39,13 @@ public class SpecificResource extends Target {
     @Iri(OADM.HAS_SELECTOR) private Selector selector;
 
     /**
+     * Refers to http://www.w3.org/ns/oa#hasScope
+     * The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
+     * There MAY be 0 or more hasScope relationships for each Specific Resource.
+     */
+    @Iri(OADM.HAS_SCOPE)    private RDFObject scope;
+
+    /**
      * Standard constructor.
      */
     public SpecificResource() {};
@@ -103,5 +110,31 @@ public class SpecificResource extends Target {
      */
     public void setSource(RDFObject source) {
         this.source = source;
+    }
+
+    /**
+     * Gets Refers to http:www.w3.orgnsoa#hasScope
+     * The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
+     * There MAY be 0 or more hasScope relationships for each Specific Resource..
+     *
+     * @return Value of Refers to http:www.w3.orgnsoa#hasScope
+     * The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
+     * There MAY be 0 or more hasScope relationships for each Specific Resource..
+     */
+    public RDFObject getScope() {
+        return scope;
+    }
+
+    /**
+     * Sets new Refers to http:www.w3.orgnsoa#hasScope
+     * The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
+     * There MAY be 0 or more hasScope relationships for each Specific Resource..
+     *
+     * @param scope New value of Refers to http:www.w3.orgnsoa#hasScope
+     *              The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
+     *              There MAY be 0 or more hasScope relationships for each Specific Resource..
+     */
+    public void setScope(RDFObject scope) {
+        this.scope = scope;
     }
 }
