@@ -319,8 +319,35 @@ The whole example implementation can be seen [here](src/test/java/com/github/ann
 
 ## Restrictions
 
-For the first version, anno4j does not provide full coverage of LD Path for querying. However, these selectors are supported:
- 
+For the first version, anno4j does not provide full coverage of the Web Annotation Working Group specification and LD Path for querying.
+
+### Restrictions to the Ontology Model
+
+The current state of anno4j does not support the full functionality that is posed by the specification of the ontology
+model used by the Web Annotation Working Group. The restrictions are as follows:
+
+**Multiplicity**
+
+Multiplicity constructs (see [here](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#multiplicity)) are not yet supported.
+
+**Multiple instances**
+
+The specification allows to have multiple instances at certain points, for example an annotation can have multiple bodies,
+targets, and/or motivations. This is currently not possible.
+
+**Styles**
+
+Styles, used generally at client side to render annotations accordingly (see [here](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#styles)),
+are not yet implemented.
+
+**States**
+
+States are utilised to represent versions of annotations that develop over time (see [here](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#states))
+can not be used yet.
+
+### LD Path restrictions
+
+The following selectors are supported for LD Path:
  
 **Property Selections**
 
