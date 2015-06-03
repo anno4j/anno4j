@@ -1,8 +1,6 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.ontologies.RDF;
-import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.object.ObjectConnection;
@@ -52,5 +50,13 @@ public class ResourceObject implements RDFObject {
      */
     public void setResourceAsString(String resourceAsString) {
         this.resource = new URIImpl(resourceAsString);
+    }
+
+    /**
+     * Gets new identifier for this instance as String.
+     * @return identifier as String.
+     */
+    public String getResourceAsString() {
+        return this.resource.stringValue();
     }
 }
