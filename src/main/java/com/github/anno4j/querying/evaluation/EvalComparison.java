@@ -16,29 +16,30 @@ public class EvalComparison {
      * @param variableName The latest created variable name
      */
     public static void evaluate(StringBuilder query, Criteria criteria, String variableName) {
-        if (Comparison.EQ.equals(criteria.getComparison())) {
-            query
-                    .append("FILTER regex( str(?")
-                    .append(variableName)
-                    .append(") ")
-                    .append((criteria.isNaN()) ? ", \"" : ", ") // Adding quotes if the given value is not a number
-                    .append(criteria.getConstraint())
-                    .append((criteria.isNaN()) ? "\" ) ." : " ) .") // Adding quotes if the given value is not a number
-                    .append(System.getProperty("line.separator"));
-        } else {
-            if (!criteria.isNaN()) {
+
+        if (criteria.isNaN()) {
+            if (Comparison.EQ.equals(criteria.getComparison())) {
                 query
-                        .append("FILTER ( ?")
+                        .append("FILTER regex( str(?")
                         .append(variableName)
-                        .append(" ")
-                        .append(criteria.getComparison().getSparqlOperator())
-                        .append(" ")
+                        .append(") ")
+                        .append((criteria.isNaN()) ? ", \"" : ", ") // Adding quotes if the given value is not a number
                         .append(criteria.getConstraint())
-                        .append(" ) .")
+                        .append((criteria.isNaN()) ? "\" ) ." : " ) .") // Adding quotes if the given value is not a number
                         .append(System.getProperty("line.separator"));
             } else {
                 throw new IllegalStateException(criteria.getComparison() + " only allowed on Numbers.");
             }
+        } else {
+            query
+                    .append("FILTER ( ?")
+                    .append(variableName)
+                    .append(" ")
+                    .append(criteria.getComparison().getSparqlOperator())
+                    .append(" ")
+                    .append(criteria.getConstraint())
+                    .append(" ) .")
+                    .append(System.getProperty("line.separator"));
         }
     }
 }

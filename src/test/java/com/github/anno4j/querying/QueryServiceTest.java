@@ -121,4 +121,27 @@ public class QueryServiceTest {
         TestBody testBody = (TestBody) annotationDefault.getBody();
         assertEquals("Example Value", testBody.getValue());
     }
+
+    @Test
+    public void dataTypeTest() throws Exception {
+        // Create test annotation
+        TestBody body = new TestBody();
+        body.setDoubleValue(2.0);
+
+        Annotation annotation = new Annotation();
+        annotation.setBody(body);
+
+        // persist annotation
+        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+
+        QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class);
+        List<Annotation> defaultList = queryService
+                .addPrefix("ex", "http://www.example.com/schema#")
+                .setBodyCriteria("ex:doubleValue[^^xsd:double]")
+                .execute();
+
+        TestBody testBody = (TestBody) defaultList.get(0).getBody();
+
+        assertEquals(new Double(2.0), testBody.getDoubleValue());
+    }
 }

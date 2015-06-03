@@ -5,6 +5,7 @@ import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.IsATest;
 import org.apache.marmotta.ldpath.model.tests.LiteralLanguageTest;
+import org.apache.marmotta.ldpath.model.tests.LiteralTypeTest;
 
 public class EvalTestingSelector {
 
@@ -39,6 +40,17 @@ public class EvalTestingSelector {
                     .append("), \"")
                     .append(languageTest.getLang())
                     .append("\" ) .")
+                    .append(System.getProperty("line.separator"));
+
+            return delVarName;
+        } else if(nodeTest instanceof LiteralTypeTest) {
+            LiteralTypeTest literalTypeTest = (LiteralTypeTest) nodeTest;
+            query
+                    .append("FILTER ( datatype(?")
+                    .append(delVarName)
+                    .append(") = <")
+                    .append(literalTypeTest.getTypeUri())
+                    .append("> ) .")
                     .append(System.getProperty("line.separator"));
 
             return delVarName;

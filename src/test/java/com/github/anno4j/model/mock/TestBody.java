@@ -19,6 +19,17 @@ public class TestBody extends Body {
     @Iri("http://www.example.com/schema#langValue")
     private LangString langValue;
 
+    @Iri("http://www.example.com/schema#doubleValue")
+    private Double doubleValue;
+
+    public Double getDoubleValue() {
+        return doubleValue;
+    }
+
+    public void setDoubleValue(Double doubleValue) {
+        this.doubleValue = doubleValue;
+    }
+
     public LangString getLangValue() {
         return langValue;
     }
