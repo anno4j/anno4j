@@ -10,12 +10,18 @@ import com.github.anno4j.model.impl.target.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test case to implement the example annotation at {@link }http://www.w3.org/TR/2014/WD-annotation-model-20141211/#complete-example}.
@@ -41,7 +47,7 @@ public class ExampleTest {
     }
 
     @Test
-    public void exampleTest() {
+    public void exampleTest() throws Exception {
         // Create the base annotation
         Annotation annotation = new Annotation();
         annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
@@ -74,9 +80,23 @@ public class ExampleTest {
         specificResource.setSelector(textPositionSelector);
 
         // Create the actual target
-        StringURLResource source = new StringURLResource("http://example.org/source1");
+        StringURLResource source = new StringURLResource();
+        source.setResourceAsString("http://example.org/source1");
         specificResource.setSource(source);
 
         annotation.setTarget(specificResource);
+
+        // Persist annotation
+        connection.addObject(annotation);
+
+        // Query persisted object
+        List<SpecificResource> result = connection.getObjects(SpecificResource.class).asList();
+
+        assertEquals(1, result.size());
+
+        SpecificResource resultObject = result.get(0);
+
+        assertEquals(source.getResource(), resultObject.getSource().getResource());
+
     }
 }
