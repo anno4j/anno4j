@@ -1,4 +1,4 @@
-package com.github.anno4j.querying.ldpath;
+package com.github.anno4j.querying.evaluation.ldpath;
 
 import org.apache.marmotta.ldpath.model.selectors.PathSelector;
 

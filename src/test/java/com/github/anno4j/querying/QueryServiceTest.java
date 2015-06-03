@@ -3,8 +3,11 @@ package com.github.anno4j.querying;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.mock.TestBody;
+import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.object.LangString;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -14,6 +17,16 @@ import static org.junit.Assert.assertEquals;
  * Test method for the QueryService functionality
  */
 public class QueryServiceTest {
+
+    @Before
+    /**
+     * Refresh the backend before each unit test
+     */
+    public void setUp() throws Exception {
+        SailRepository repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+        Anno4j.getInstance().setRepository(repository);
+    }
 
     /**
      * A simple query test. Queries the data that was persisted in the first place.

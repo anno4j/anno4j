@@ -1,9 +1,10 @@
-package com.github.anno4j.querying.ldpath;
+package com.github.anno4j.querying.evaluation.ldpath;
 
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.IsATest;
+import org.apache.marmotta.ldpath.model.tests.LiteralLanguageTest;
 
 public class EvalTestingSelector {
 
@@ -18,9 +19,8 @@ public class EvalTestingSelector {
     public static String evaluate(TestingSelector testingSelector, StringBuilder query, String variableName) {
 
         NodeTest nodeTest = testingSelector.getTest();
+        String delVarName = LDPathEvaluator.evaluate(testingSelector.getDelegate(), query, variableName);
         if (nodeTest instanceof IsATest) {
-            String delVarName = LDPathEvaluator.evaluate(testingSelector.getDelegate(), query, variableName);
-
             IsATest isATest = (IsATest) nodeTest;
             query
                     .append("?")
@@ -31,8 +31,20 @@ public class EvalTestingSelector {
                     .append(System.getProperty("line.separator"));
 
             return delVarName;
+        } else if (nodeTest instanceof LiteralLanguageTest) {
+            LiteralLanguageTest languageTest = (LiteralLanguageTest) nodeTest;
+            query
+                    .append("FILTER langmatches( lang(?")
+                    .append(delVarName)
+                    .append("), \"")
+                    .append(languageTest.getLang())
+                    .append("\" ) .")
+                    .append(System.getProperty("line.separator"));
+
+            return delVarName;
         } else {
             throw new IllegalStateException(nodeTest.getClass() + " is not supported.");
         }
+
     }
 }
