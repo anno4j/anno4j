@@ -8,6 +8,7 @@ import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.model.selectors.*;
 import org.apache.marmotta.ldpath.model.tests.IsATest;
+import org.apache.marmotta.ldpath.model.tests.LiteralLanguageTest;
 import org.apache.marmotta.ldpath.parser.LdPathParser;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.vocabulary.OWL;
@@ -173,6 +174,17 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects.
+     *
+     * @param ldpath Syntax similar to XPath. Beginning from the Body object
+     * @return itself to allow chaining.
+     */
+    public QueryService setBodyCriteria(String ldpath) {
+        criteria.add(new Criteria(BODY_PREFIX + ldpath, Comparison.EQ));
+        return this;
+    }
+
+    /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.AnnotationImpl objects.
      *
      * @param ldpath     Syntax similar to XPath. Beginning from the Annotation object
@@ -222,6 +234,17 @@ public class QueryService<T extends Annotation> {
      */
     public QueryService setAnnotationCriteria(String ldpath, Number value) {
         return setAnnotationCriteria(ldpath, value, Comparison.EQ);
+    }
+
+    /**
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.AnnotationImpl objects.
+     *
+     * @param ldpath Syntax similar to XPath. Beginning from the Annotation object
+     * @return itself to allow chaining.
+     */
+    public QueryService setAnnotationCriteria(String ldpath) {
+        criteria.add(new Criteria(ldpath, Comparison.EQ));
+        return this;
     }
 
     /**
@@ -277,6 +300,17 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.SelectorImpl.* objects.
+     *
+     * @param ldpath Syntax similar to XPath. Beginning from the Selector object
+     * @return itself to allow chaining.
+     */
+    public QueryService setSelectorCriteria(String ldpath) {
+        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, Comparison.EQ));
+        return this;
+    }
+
+    /**
      * @param ldpath     Syntax similar to XPath. Beginning from the Source object
      * @param value      The constraint value
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
@@ -314,6 +348,15 @@ public class QueryService<T extends Annotation> {
      */
     public QueryService setSourceCriteria(String ldpath, Number value) {
         return setSourceCriteria(ldpath, value, Comparison.EQ);
+    }
+
+    /**
+     * @param ldpath Syntax similar to XPath. Beginning from the Source object
+     * @return itself to allow chaining.
+     */
+    public QueryService setSourceCriteria(String ldpath) {
+        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, Comparison.EQ));
+        return this;
     }
 
     /**
@@ -429,7 +472,9 @@ public class QueryService<T extends Annotation> {
 
             String variableName = resolveLDPath(parser.parseSelector(prefixes), backend, query, "annotation");
 
-            evalComparison(query, c, variableName);
+            if (c.getConstraint() != null) {
+                evalComparison(query, c, variableName);
+            }
 
             query.append("}").append(System.getProperty("line.separator"));
         }
@@ -451,8 +496,9 @@ public class QueryService<T extends Annotation> {
     private void evalComparison(StringBuilder query, Criteria criteria, String variableName) {
         if (Comparison.EQ.equals(criteria.getComparison())) {
             query
-                    .append("FILTER regex( ?")
+                    .append("FILTER regex( str(?")
                     .append(variableName)
+                    .append(") ")
                     .append((criteria.isNaN()) ? ", \"" : ", ") // Adding quotes if the given value is not a number
                     .append(criteria.getConstraint())
                     .append((criteria.isNaN()) ? "\" ) ." : " ) .") // Adding quotes if the given value is not a number
@@ -545,7 +591,10 @@ public class QueryService<T extends Annotation> {
      */
     private String evalGroupedSelector(GroupedSelector nodeSelector, NodeBackend backend, StringBuilder query, String variableName) {
         GroupedSelector sel = nodeSelector;
-        return resolveLDPath(sel.getContent(), backend, query, variableName);
+        query.append(" { ");
+        String tmpName = resolveLDPath(sel.getContent(), backend, query, variableName);
+        query.append(" } ").append(System.getProperty("line.separator"));
+        return tmpName;
     }
 
     /**
@@ -559,11 +608,9 @@ public class QueryService<T extends Annotation> {
      */
     private String evalTestingSelector(TestingSelector nodeSelector, NodeBackend backend, StringBuilder query, String variableName) {
         TestingSelector sel = nodeSelector;
-
         NodeTest nodeTest = sel.getTest();
+        String delVarName = resolveLDPath(sel.getDelegate(), backend, query, variableName);
         if (nodeTest instanceof IsATest) {
-            String delVarName = resolveLDPath(sel.getDelegate(), backend, query, variableName);
-
             IsATest isATest = (IsATest) nodeTest;
             query
                     .append("?")
@@ -571,6 +618,17 @@ public class QueryService<T extends Annotation> {
                     .append(" ")
                     .append(isATest.getPathExpression(backend).replaceFirst("is-", ""))
                     .append(" .")
+                    .append(System.getProperty("line.separator"));
+
+            return delVarName;
+        } else if (nodeTest instanceof LiteralLanguageTest) {
+            LiteralLanguageTest languageTest = (LiteralLanguageTest) nodeTest;
+            query
+                    .append("FILTER langmatches( lang(?")
+                    .append(delVarName)
+                    .append("), \"")
+                    .append(languageTest.getLang())
+                    .append("\" ) .")
                     .append(System.getProperty("line.separator"));
 
             return delVarName;

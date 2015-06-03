@@ -1,6 +1,7 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.impl.ResourceObject;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
@@ -8,40 +9,10 @@ import org.openrdf.repository.object.RDFObject;
 /**
  * Conforms to OADM Body concept (http://www.openannotation.org/spec/core/core.html#BodyTargetType)
  */
-public abstract class Body implements RDFObject {
+public abstract class Body extends ResourceObject {
 
     /**
-     * Unique identifier for the instance.
+     * Basic constructor.
      */
-    private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
-
-    /**
-     * Constructor.
-     */
-    public Body() {
-    }
-
-    /**
-     *  The current {@link ObjectConnection} this object is atached to. Will be implemented by the proxy object.
-     */
-    @Override
-    public ObjectConnection getObjectConnection() {
-        // will be implemented by the proxy object
-        return null;
-    }
-
-    /**
-     * Getter for the unique identifier.
-     * @return a unique identifier for this instance.
-     */
-    @Override
-    public Resource getResource() {
-        return this.resource;
-    }
-
-    /**
-     * Setter for the unique identifier.
-     * @param resource the unique identifier.
-     */
-    public void setResource(Resource resource) { this.resource = resource; }
+    public Body() {}
 }
