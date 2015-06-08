@@ -68,8 +68,6 @@ public class EvalQuery {
 
         query.append("}");
 
-        logger.info("Created query:\n" + query.toString());
-
         return query.toString();
     }
 }

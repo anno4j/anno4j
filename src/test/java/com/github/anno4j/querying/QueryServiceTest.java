@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test method for the QueryService functionality
+ * Test class for the QueryService functionality
  */
 public class QueryServiceTest {
 
@@ -29,12 +29,10 @@ public class QueryServiceTest {
     }
 
     /**
-     * A simple query test. Queries the data that was persisted in the first place.
-     *
-     * @throws Exception
+     * Testing simple LDPath path expression.
      */
     @Test
-    public void simpleQueryTest() throws Exception {
+    public void simplePathTest() throws Exception {
 
         // Create test annotation
         TestBody body = new TestBody();
@@ -67,6 +65,9 @@ public class QueryServiceTest {
     }
 
     @Test
+    /**
+     * Testing the LDPath language testing functionality.
+     */
     public void langTest() throws Exception {
 
         TestBody body = new TestBody();
@@ -92,6 +93,9 @@ public class QueryServiceTest {
     }
 
     @Test
+    /**
+     * Testing a query without setting a constraint for the used BodyCriteria.
+     */
     public void constraintLessTest() throws Exception {
         // Create test annotation
         TestBody body = new TestBody();
@@ -123,6 +127,9 @@ public class QueryServiceTest {
     }
 
     @Test
+    /**
+     * Querying for a specific data type (e.g. xsd:double)
+     */
     public void dataTypeTest() throws Exception {
         // Create test annotation
         TestBody body = new TestBody();

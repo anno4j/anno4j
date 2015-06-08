@@ -3,6 +3,11 @@ package com.github.anno4j.querying;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.ontologies.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.sparql.algebra.Algebra;
+import com.hp.hpl.jena.sparql.algebra.Op;
+import com.hp.hpl.jena.sparql.algebra.OpAsQuery;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
@@ -414,7 +419,22 @@ public class QueryService<T extends Annotation> {
      */
     public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         ObjectConnection con = objectRepository.getConnection();
-        ObjectQuery query = con.prepareObjectQuery(EvalQuery.evaluate(criteria, prefixes));
+        String sparql = EvalQuery.evaluate(criteria, prefixes);
+
+        logger.info("Created query:\n" + prettyPrint(sparql));
+
+        ObjectQuery query = con.prepareObjectQuery(sparql);
         return (List<T>) query.evaluate(this.type).asList();
+    }
+
+    /**
+     * Reformats the SPARQL query for logging purpose
+     *
+     * @param sparql The generated SPARQL query
+     *
+     * @return Formatted query
+     */
+    private String prettyPrint(String sparql) {
+        return OpAsQuery.asQuery(Algebra.compile(QueryFactory.create(sparql))).serialize();
     }
 }
