@@ -434,7 +434,7 @@ public class QueryService<T extends Annotation> {
      *
      * @return Formatted query
      */
-    private String prettyPrint(String sparql) {
+    public String prettyPrint(String sparql) {
         return OpAsQuery.asQuery(Algebra.compile(QueryFactory.create(sparql))).serialize();
     }
 }
