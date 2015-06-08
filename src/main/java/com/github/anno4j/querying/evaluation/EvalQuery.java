@@ -34,26 +34,21 @@ public class EvalQuery {
                     .append(key)
                     .append(": <")
                     .append(prefixes.get(key))
-                    .append("> ")
-                    .append(System.getProperty("line.separator"));
+                    .append("> ");
         }
 
         // For readability: Adding an empty line between the prefix and the statement part
         query
-                .append(System.getProperty("line.separator"))
                 .append("SELECT ?annotation ")
-                .append(System.getProperty("line.separator"))
                 .append("WHERE {")
-                .append(System.getProperty("line.separator"))
-                .append("?annotation a oa:Annotation .")
-                .append(System.getProperty("line.separator"));
+                .append("?annotation a oa:Annotation .");
 
         SesameValueBackend backend = new SesameValueBackend();
 
         // Creating the actual statements
         for (Criteria c : criteria) {
 
-            query.append("{ ").append(System.getProperty("line.separator"));
+            query.append("{ ");
 
             LdPathParser parser = new LdPathParser(backend, new StringReader(c.getLdpath()));
 
@@ -63,7 +58,7 @@ public class EvalQuery {
                 EvalComparison.evaluate(query, c, variableName);
             }
 
-            query.append("}").append(System.getProperty("line.separator"));
+            query.append("}");
         }
 
         query.append("}");

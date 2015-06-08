@@ -25,8 +25,7 @@ public class EvalComparison {
                         .append(") ")
                         .append((criteria.isNaN()) ? ", \"" : ", ") // Adding quotes if the given value is not a number
                         .append(criteria.getConstraint())
-                        .append((criteria.isNaN()) ? "\" ) ." : " ) .") // Adding quotes if the given value is not a number
-                        .append(System.getProperty("line.separator"));
+                        .append((criteria.isNaN()) ? "\" ) ." : " ) ."); // Adding quotes if the given value is not a number
             } else {
                 throw new IllegalStateException(criteria.getComparison() + " only allowed on Numbers.");
             }
@@ -38,8 +37,7 @@ public class EvalComparison {
                     .append(criteria.getComparison().getSparqlOperator())
                     .append(" ")
                     .append(criteria.getConstraint())
-                    .append(" ) .")
-                    .append(System.getProperty("line.separator"));
+                    .append(" ) .");
         }
     }
 }
