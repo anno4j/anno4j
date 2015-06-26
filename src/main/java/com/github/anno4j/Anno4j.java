@@ -4,6 +4,7 @@ import com.github.anno4j.exceptions.ConceptNotFoundException;
 import com.github.anno4j.persistence.IDGenerator;
 import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.persistence.impl.IDGeneratorAnno4jURN;
+import com.github.anno4j.querying.QueryOptimizer;
 import com.github.anno4j.querying.QueryService;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -79,6 +80,10 @@ public class Anno4j {
 
     public QueryService createQueryService(Class clazz) {
         return new QueryService(clazz, objectRepository);
+    }
+
+    public QueryOptimizer getQueryOptimizer() {
+        return QueryOptimizer.getInstance();
     }
 
 

@@ -1,13 +1,12 @@
 package com.github.anno4j.querying;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.ontologies.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
-import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.sparql.algebra.Algebra;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpAsQuery;
+import com.hp.hpl.jena.sparql.algebra.*;
+import com.hp.hpl.jena.sparql.algebra.optimize.TransformJoinStrategy;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
@@ -94,6 +93,11 @@ public class QueryService<T extends Annotation> {
     private Integer offset = null;
 
     /**
+     * Object to apply optimization strategies to SPARQL queries
+     */
+    private QueryOptimizer queryOptimizer = null;
+
+    /**
      * Required to have an ongoing variable name when creating the SPARQL query
      */
     private int varIndex = 0;
@@ -113,6 +117,8 @@ public class QueryService<T extends Annotation> {
         addPrefix(OWL.PREFIX, OWL.NAMESPACE);
         addPrefix(RDFS.PREFIX, RDFS.NAMESPACE);
         addPrefix(SKOS.PREFIX, SKOS.NAMESPACE);
+
+        this.queryOptimizer = Anno4j.getInstance().getQueryOptimizer();
     }
 
 
@@ -421,20 +427,19 @@ public class QueryService<T extends Annotation> {
         ObjectConnection con = objectRepository.getConnection();
         String sparql = EvalQuery.evaluate(criteria, prefixes);
 
-        logger.info("Created query:\n" + prettyPrint(sparql));
+        // Pretty printed query
+        logger.info("Created query:\n" + queryOptimizer.prettyPrint(sparql));
+
+        // Optimize the join order
+        sparql = queryOptimizer.optimizeJoinOrder(sparql);
+        logger.info("Join order optimized: " + sparql);
+
+        // Optimize the FILTER placement
+        sparql = queryOptimizer.optimizeFilters(sparql);
+        logger.info("FILTERs optimized: " + sparql);
 
         ObjectQuery query = con.prepareObjectQuery(sparql);
         return (List<T>) query.evaluate(this.type).asList();
     }
 
-    /**
-     * Reformats the SPARQL query for logging purpose
-     *
-     * @param sparql The generated SPARQL query
-     *
-     * @return Formatted query
-     */
-    public String prettyPrint(String sparql) {
-        return OpAsQuery.asQuery(Algebra.compile(QueryFactory.create(sparql))).serialize();
-    }
 }
