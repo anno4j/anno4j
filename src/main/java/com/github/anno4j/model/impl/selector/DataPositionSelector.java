@@ -109,4 +109,13 @@ public class DataPositionSelector extends Selector {
     public long getStart() {
         return start;
     }
+
+    @Override
+    public String toString() {
+        return "DataPositionSelector{" +
+                "resource='" + this.getResource() + "'" +
+                ", start=" + start +
+                ", end=" + end +
+                "}'";
+    }
 }

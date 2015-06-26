@@ -15,4 +15,11 @@ public abstract class Body extends ResourceObject {
      * Basic constructor.
      */
     public Body() {}
+
+    @Override
+    public String toString() {
+        return "Body{" +
+                "resource=" + this.getResource() + "'" +
+                "}";
+    }
 }

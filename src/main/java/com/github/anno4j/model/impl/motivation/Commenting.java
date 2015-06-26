@@ -20,6 +20,6 @@ public class Commenting extends Motivation {
     @Override
     public String toString() {
         return "Commenting{}" +
-            ", resource='" + getResource();
+            ", resource='" + getResource() + "'";
     }
 }

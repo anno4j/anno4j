@@ -1,6 +1,7 @@
 package com.github.anno4j.example;
 
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.StringURLResource;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
@@ -80,7 +81,7 @@ public class ExampleTest {
         specificResource.setSelector(textPositionSelector);
 
         // Create the actual target
-        StringURLResource source = new StringURLResource();
+        ResourceObject source = new ResourceObject();
         source.setResourceAsString("http://example.org/source1");
         specificResource.setSource(source);
 
@@ -90,13 +91,15 @@ public class ExampleTest {
         connection.addObject(annotation);
 
         // Query persisted object
-        List<SpecificResource> result = connection.getObjects(SpecificResource.class).asList();
+        List<Annotation> result = connection.getObjects(Annotation.class).asList();
 
         assertEquals(1, result.size());
 
-        SpecificResource resultObject = result.get(0);
+        Annotation resultObject = result.get(0);
 
-        assertEquals(source.getResource(), resultObject.getSource().getResource());
+        assertEquals(annotation.getResource(), resultObject.getResource());
 
+        // Test print method
+        System.out.println(annotation);
     }
 }

@@ -176,15 +176,15 @@ public class Annotation extends ResourceObject {
 
     @Override
     public String toString() {
-        return "AnnotationDefault{" +
-                "body=" + body +
-                ", target=" + target +
+        return "Annotation{" +
+                "resource='" + this.getResource() + "'" +
+                ", body=" + ((body != null) ? body.toString() : "empty") +
+                ", target=" + ((target != null) ? target.toString() : "empty") +
                 ", motivatedBy=" + motivatedBy +
                 ", serializedBy=" + serializedBy +
                 ", serializedAt='" + serializedAt + '\'' +
                 ", annotatedBy=" + annotatedBy +
                 ", annotatedAt='" + annotatedAt + '\'' +
-                ", resource='" + getResource() + '\'' +
                 '}';
     }
 }

@@ -20,6 +20,6 @@ public class Describing extends Motivation {
     @Override
     public String toString() {
         return "Describing{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

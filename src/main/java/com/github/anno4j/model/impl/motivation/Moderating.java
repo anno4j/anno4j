@@ -20,6 +20,6 @@ public class Moderating extends Motivation{
     @Override
     public String toString() {
         return "Moderating{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

@@ -15,4 +15,11 @@ public abstract class Target extends ResourceObject {
      * Standard constructor.
      */
     public Target() {}
+
+    @Override
+    public String toString() {
+        return "Target{" +
+                "resource='" + this.getResource() + "'" +
+                "}";
+    }
 }

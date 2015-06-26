@@ -15,18 +15,13 @@ public class Organization extends Agent {
     /**
      * Standard constructor.
      */
-    public Organization() {};
+    public Organization() {}
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
     @Override
     public String toString() {
-        return "Organization{}" + '\'' +
-                "name='" + this.getName() + '\'' +
-                ", resource='" + getResource() +
-                '}';
+        return "Organization{" +
+                "resource='" + this.getResource() + "'" +
+                ", name='" + this.getName() +
+                "'}";
     }
 }

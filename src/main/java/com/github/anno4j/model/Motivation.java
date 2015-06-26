@@ -15,4 +15,11 @@ public abstract class Motivation extends ResourceObject {
      * Standard constructor.
      */
     public Motivation() {}
+
+    @Override
+    public String toString() {
+        return "Motivation{" +
+                "resource='" + this.getResource() + "'" +
+                "}";
+    }
 }

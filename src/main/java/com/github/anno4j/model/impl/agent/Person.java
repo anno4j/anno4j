@@ -29,18 +29,14 @@ public class Person extends Agent {
      */
     public Person() {};
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
     @Override
     public String toString() {
         return "Person{" +
-                "name='" + this.getName() + '\'' +
+                "resource='" + this.getResource() + "'" +
+                ", name='" + this.getName() + "'" +
                 ", mbox='" + mbox + '\'' +
                 ", openID='" + openID + '\'' +
-                '}';
+                "}";
     }
 
     /**

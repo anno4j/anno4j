@@ -20,6 +20,6 @@ public class Bookmarking extends Motivation {
     @Override
     public String toString() {
         return "Bookmarking{}" +
-        ", resource='" + getResource();
+        ", resource='" + getResource() + "'";
     }
 }

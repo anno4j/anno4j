@@ -20,4 +20,11 @@ public abstract class Selector extends ResourceObject {
      * Standard constructor.
      */
     public Selector() {}
+
+    @Override
+    public String toString() {
+        return "Selector{" +
+                "resource=" + this.getResource() + "'" +
+                "}";
+    }
 }

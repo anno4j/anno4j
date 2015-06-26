@@ -94,4 +94,13 @@ public class SvgSelector extends Selector {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "SvgSelector{" +
+                "resource='" + this.getResource() + "'" +
+                ", value='" + value + '\'' +
+                ", conformsTo='" + conformsTo + '\'' +
+                "}'";
+    }
 }

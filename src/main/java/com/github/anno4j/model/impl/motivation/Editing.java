@@ -20,6 +20,6 @@ public class Editing extends Motivation{
     @Override
     public String toString() {
         return "Editing{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

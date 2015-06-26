@@ -43,4 +43,12 @@ public abstract class Agent extends ResourceObject {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return "Agent{" +
+                "resource='" + this.getResource() + "'" +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

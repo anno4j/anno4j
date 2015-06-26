@@ -111,4 +111,13 @@ public class FragmentSelector extends Selector {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "FragmentSelector{" +
+                "resource='" + this.getResource() + "'" +
+                ", value='" + value + '\'' +
+                ", conformsTo='" + conformsTo + '\'' +
+                "}'";
+    }
 }

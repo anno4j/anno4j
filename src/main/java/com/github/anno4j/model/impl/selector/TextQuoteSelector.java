@@ -137,4 +137,14 @@ public class TextQuoteSelector extends Selector {
     public String getPrefix() {
         return prefix;
     }
+
+    @Override
+    public String toString() {
+        return "TextQuoteSelector{" +
+                "resource='" + this.getResource() + "'" +
+                ", exact='" + exact + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", suffix='" + suffix + '\'' +
+                "}'";
+    }
 }

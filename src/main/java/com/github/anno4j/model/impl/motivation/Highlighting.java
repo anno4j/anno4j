@@ -20,6 +20,6 @@ public class Highlighting extends Motivation {
     @Override
     public String toString() {
         return "Highlighting{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }
