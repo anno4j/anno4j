@@ -1,6 +1,5 @@
 package com.github.anno4j;
 
-import com.github.anno4j.exceptions.ConceptNotFoundException;
 import com.github.anno4j.persistence.IDGenerator;
 import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.persistence.impl.IDGeneratorAnno4jURN;
@@ -15,8 +14,6 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-
 /**
  * Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/).
  *
@@ -25,11 +22,6 @@ import java.io.File;
  * <br/><br/> Usage: Anno4j implements a singelton pattern. The getInstance() methode can be called to get a Anno4j object.
  */
 public class Anno4j {
-
-    /**
-     * Path to required concepts file of openrdf/alibaba.
-     */
-    private static final String CONCEPT_PATH = "META-INF/org.openrdf.concepts";
 
     /**
      * Logger of this class.
@@ -134,13 +126,6 @@ public class Anno4j {
         if(instance == null) {
             synchronized (Anno4j.class) {
                 if(instance == null) {
-                     // Check if the extractor has created the org.openrdf.concepts file. Alibaba requires this file (can be empty),
-                    // to persist the annotated objects. If the file was not found, a ConceptNotFoundException will be thrown.
-                    if (!new File(Anno4j.class.getClassLoader().getResource(CONCEPT_PATH).getFile()).isFile()) {
-                        logger.error("No org.openrdf.conpepts file inside your META-INF directory");
-                        throw new ConceptNotFoundException("Please create an empty org.openrdf.conpepts file inside your META-INF folder.");
-                    }
-
                     instance = new Anno4j();
                 }
             }
