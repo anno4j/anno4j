@@ -1,6 +1,8 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.ontologies.RDFS;
+import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
@@ -21,6 +23,7 @@ import org.openrdf.sail.memory.MemoryStore;
 /**
  * Class to implement RDF in order to create a baseline for every object that we use in Anno4j.
  */
+@Iri(RDFS.RESOURCE)
 public class ResourceObject implements RDFObject {
 
     /**
@@ -35,6 +38,19 @@ public class ResourceObject implements RDFObject {
     public ObjectConnection getObjectConnection() {
         // will be implemented by the proxy object
         return null;
+    }
+
+    /**
+     * Default constructor
+     */
+    public ResourceObject() {};
+
+    /**
+     * Constructor also setting the resource, which is supported by the corresponding String.
+     * @param resource  String representation of the resource to set.
+     */
+    public ResourceObject(String resource) {
+        this.setResourceAsString(resource);
     }
 
     /**
