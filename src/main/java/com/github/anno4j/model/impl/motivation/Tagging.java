@@ -20,6 +20,6 @@ public class Tagging extends Motivation{
     @Override
     public String toString() {
         return "Tagging{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

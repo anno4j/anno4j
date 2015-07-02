@@ -20,6 +20,6 @@ public class Linking extends Motivation {
     @Override
     public String toString() {
         return "Linking{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

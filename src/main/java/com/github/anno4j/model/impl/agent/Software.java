@@ -24,18 +24,13 @@ public class Software extends Agent {
      */
     public Software() {};
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
     @Override
     public String toString() {
         return "Software{" +
-                "name='" + this.getName() + '\'' +
+                "resource='" + this.getResource() + "'" +
+                ", name='" + this.getName() + "'" +
                 ", homepage='" + homepage + '\'' +
-                ", resource='" + getResource() +
-                '}';
+                "}";
     }
 
     /**

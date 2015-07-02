@@ -64,6 +64,17 @@ public class Criteria {
     }
 
     /**
+     * Constructor without a constraint
+     *
+     * @param ldpath     The LDPath value
+     * @param comparison he comparison mode, e.g. Comparison.EQ (=)
+     */
+    public Criteria(String ldpath, Comparison comparison) {
+        this.ldpath = ldpath;
+        this.comparison = comparison;
+    }
+
+    /**
      * @return the ldpath string
      */
     public String getLdpath() {

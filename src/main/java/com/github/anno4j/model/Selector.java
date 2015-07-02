@@ -1,6 +1,7 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.impl.ResourceObject;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.RDFObject;
@@ -13,41 +14,17 @@ import org.openrdf.repository.object.RDFObject;
  * The nature of the Selector will be dependent on the type of the representation for which the segment is conveyed. The specific type of selector should be indicated using a subclass of oa:Selector.
  * The Specifier's description MAY be conveyed as an external or embedded resource (cnt:Content), or as RDF properties within the graph. The description SHOULD use existing standards whenever possible. If the Specifier has an HTTP URI, then its description, and only its description, MUST be returned when the URI is dereferenced.
  */
-public abstract class Selector implements RDFObject {
+public abstract class Selector extends ResourceObject {
 
     /**
-     * Unique identifier for the instance.
+     * Standard constructor.
      */
-    private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
+    public Selector() {}
 
-    /**
-     * Constructor.
-     */
-    public Selector() {
-
-    }
-
-    /**
-     *  The current {@link ObjectConnection} this object is atached to. Will be implemented by the proxy object.
-     */
     @Override
-    public ObjectConnection getObjectConnection() {
-        // will be implemented by the proxy object
-        return null;
+    public String toString() {
+        return "Selector{" +
+                "resource=" + this.getResource() + "'" +
+                "}";
     }
-
-    /**
-     * Getter for the unique identifier.
-     * @return a unique identifier for this instance.
-     */
-    @Override
-    public Resource getResource() {
-        return this.resource;
-    }
-
-    /**
-     * Setter for the unique identifier.
-     * @param resource the unique identifier.
-     */
-    public void setResource(Resource resource) { this.resource = resource; }
 }

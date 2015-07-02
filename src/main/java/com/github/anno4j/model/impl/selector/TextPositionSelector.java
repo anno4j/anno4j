@@ -109,4 +109,13 @@ public class TextPositionSelector extends Selector {
     public long getEnd() {
         return end;
     }
+
+    @Override
+    public String toString() {
+        return "TextPositionSelector{" +
+                "resource='" + this.getResource() + "'" +
+                ", start=" + start +
+                ", end=" + end +
+                "}'";
+    }
 }

@@ -1,6 +1,7 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.ontologies.OADM;
 import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
@@ -11,12 +12,7 @@ import org.openrdf.repository.object.RDFObject;
  * Conforms to oa:Annotation (http://www.openannotation.org/spec/core/core.html)
  */
 @Iri(OADM.ANNOTATION)
-public class Annotation implements RDFObject {
-
-    /**
-     * Unique identifier for the instance.
-     */
-    private Resource resource = Anno4j.getInstance().getIdGenerator().generateID();
+public class Annotation extends ResourceObject {
 
     /**
      * Refers to http://www.w3.org/ns/oa#hasBody
@@ -50,31 +46,7 @@ public class Annotation implements RDFObject {
     /**
      * Constructor.
      */
-    public Annotation() {
-    }
-
-    /**
-     *  The current {@link ObjectConnection} this object is atached to. Will be implemented by the proxy object.
-     */
-    @Override
-    public ObjectConnection getObjectConnection() {
-        // will be implemented by the proxy object
-        return null;
-    }
-
-    /**
-     * Getter for the unique identifier.
-     * @return a unique identifier for this instance.
-     */
-    public Resource getResource() {
-        return this.resource;
-    }
-
-    /**
-     * Setter for the unique identifier.
-     * @param resource the unique identifier.
-     */
-    public void setResource(Resource resource) { this.resource = resource; }
+    public Annotation() {}
 
     /**
      * Gets http:www.w3.org/ns/oa#hasBody relationship.
@@ -204,15 +176,15 @@ public class Annotation implements RDFObject {
 
     @Override
     public String toString() {
-        return "AnnotationDefault{" +
-                "body=" + body +
-                ", target=" + target +
+        return "Annotation{" +
+                "resource='" + this.getResource() + "'" +
+                ", body=" + ((body != null) ? body.toString() : "empty") +
+                ", target=" + ((target != null) ? target.toString() : "empty") +
                 ", motivatedBy=" + motivatedBy +
                 ", serializedBy=" + serializedBy +
                 ", serializedAt='" + serializedAt + '\'' +
                 ", annotatedBy=" + annotatedBy +
                 ", annotatedAt='" + annotatedAt + '\'' +
-                ", resource='" + getResource() + '\'' +
                 '}';
     }
 }

@@ -98,4 +98,13 @@ public class TextAnnotationBody extends Body {
     public String getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "TextAnnotationBody{" +
+                "format='" + format + '\'' +
+                ", value='" + value + '\'' +
+                ", language='" + language + '\'' +
+                '}';
+    }
 }

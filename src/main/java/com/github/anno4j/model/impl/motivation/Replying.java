@@ -20,6 +20,6 @@ public class Replying extends Motivation{
     @Override
     public String toString() {
         return "Replying{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

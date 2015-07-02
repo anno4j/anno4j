@@ -2,6 +2,7 @@ package com.github.anno4j.model.impl.target;
 
 import com.github.anno4j.model.Selector;
 import com.github.anno4j.model.Target;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.ontologies.OADM;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.RDFObject;
@@ -29,7 +30,7 @@ public class SpecificResource extends Target {
      * The relationship between a Specific Resource and the resource that it is a more specific representation of.
      * There must be exactly 1 oa:hasSource relationship associated with a Specific Resource.
      */
-    @Iri(OADM.HAS_SOURCE)   private RDFObject source;
+    @Iri(OADM.HAS_SOURCE)   private ResourceObject source;
 
     /**
      * Refers to http://www.w3.org/ns/oa#hasSelector
@@ -43,7 +44,7 @@ public class SpecificResource extends Target {
      * The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
      * There MAY be 0 or more hasScope relationships for each Specific Resource.
      */
-    @Iri(OADM.HAS_SCOPE)    private RDFObject scope;
+    @Iri(OADM.HAS_SCOPE)    private ResourceObject scope;
 
     /**
      * Standard constructor.
@@ -55,7 +56,7 @@ public class SpecificResource extends Target {
      * @param source    Specifies the original target of the corresponding annotation.
      * @param selector  Points to the given selector.
      */
-    public SpecificResource(RDFObject source, Selector selector) {
+    public SpecificResource(ResourceObject source, Selector selector) {
         this.source = source;
         this.selector = selector;
     }
@@ -108,7 +109,7 @@ public class SpecificResource extends Target {
      *               The relationship between a Specific Resource and the resource that it is a more specific representation of.
      *               There must be exactly 1 oa:hasSource relationship associated with a Specific Resource..
      */
-    public void setSource(RDFObject source) {
+    public void setSource(ResourceObject source) {
         this.source = source;
     }
 
@@ -134,7 +135,17 @@ public class SpecificResource extends Target {
      *              The relationship between a Specific Resource and the resource that provides the scope or context for it in this Annotation.
      *              There MAY be 0 or more hasScope relationships for each Specific Resource..
      */
-    public void setScope(RDFObject scope) {
+    public void setScope(ResourceObject scope) {
         this.scope = scope;
+    }
+
+    @Override
+    public String toString() {
+        return "SpecificResource{" +
+                "resource='" + this.getResource() + "'" +
+                ", source=" + source +
+                ", selector=" + selector +
+                ", scope=" + scope +
+                "}'";
     }
 }

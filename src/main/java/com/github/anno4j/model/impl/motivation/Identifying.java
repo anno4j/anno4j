@@ -20,6 +20,6 @@ public class Identifying extends Motivation {
     @Override
     public String toString() {
         return "Identifying{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

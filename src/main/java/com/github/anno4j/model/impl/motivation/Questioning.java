@@ -20,6 +20,6 @@ public class Questioning extends Motivation{
     @Override
     public String toString() {
         return "Questioning{}" +
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }

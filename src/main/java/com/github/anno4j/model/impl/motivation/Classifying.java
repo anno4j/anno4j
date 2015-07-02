@@ -20,6 +20,6 @@ public class Classifying extends Motivation {
     @Override
     public String toString() {
         return "Classifying{}"+
-                ", resource='" + getResource();
+                ", resource='" + getResource() + "'";
     }
 }
