@@ -41,7 +41,7 @@ public class EvalQuery {
         query
                 .append("SELECT ?annotation ")
                 .append("WHERE {")
-                .append("?annotation a oa:Annotation .");
+                .append("?annotation a oa:Annotation.");
 
         SesameValueBackend backend = new SesameValueBackend();
 
