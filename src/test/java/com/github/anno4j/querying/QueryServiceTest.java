@@ -151,4 +151,39 @@ public class QueryServiceTest {
 
         assertEquals(new Double(2.0), testBody.getDoubleValue());
     }
+
+    @Test
+    /**
+     * Testing a query without setting a constraint but type
+     */
+    public void isATest() throws Exception {
+        // Create test annotation
+        TestBody body = new TestBody();
+        body.setValue("Example Value");
+
+        Annotation annotation = new Annotation();
+        annotation.setSerializedAt("07.05.2015");
+        annotation.setBody(body);
+
+        // persist annotation
+        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+
+        // Querying for the persisted annotation
+        QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class);
+        List<Annotation> defaultList = queryService
+                .addPrefix("ex", "http://www.example.com/schema#")
+                .setBodyCriteria("[is-a ex:bodyType]")
+                .execute();
+
+        assertEquals(1, defaultList.size());
+
+        // Testing against the serialization date
+        Annotation annotationDefault = defaultList.get(0);
+        assertEquals("07.05.2015", annotationDefault.getSerializedAt());
+
+        // Testing if the body was persisted correctly
+        TestBody testBody = (TestBody) annotationDefault.getBody();
+        assertEquals("Example Value", testBody.getValue());
+    }
+
 }

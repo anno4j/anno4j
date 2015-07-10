@@ -1,4 +1,5 @@
 # Object Literals
+java.lang.CharSequence	=	http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral
 java.lang.String		=	http://www.w3.org/2001/XMLSchema#string
 java.lang.Integer		=	http://www.w3.org/2001/XMLSchema#int
 java.lang.Boolean		=	http://www.w3.org/2001/XMLSchema#boolean

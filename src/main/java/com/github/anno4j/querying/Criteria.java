@@ -39,6 +39,17 @@ public class Criteria {
      * Custom constructor for a textual constraint
      *
      * @param ldpath     The LDPath value
+     */
+    public Criteria(String ldpath) {
+        this.ldpath = ldpath;
+        this.comparison = Comparison.EQ;
+        this.isNaN = true;
+    }
+
+    /**
+     * Custom constructor for a textual constraint
+     *
+     * @param ldpath     The LDPath value
      * @param constraint A textual constraint
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      */
