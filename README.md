@@ -396,3 +396,4 @@ For the next version of anno4j it is planned to integrate more of these tests. F
 
 ## License
  Apache License Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0
+ 
