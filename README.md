@@ -36,15 +36,13 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 ### Install
 
 1. Add maven dependency (Anno4j is in oss.sonatype.org Repository)
-
 ```
       <dependency>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-core</artifactId>
         <version>1.0.4</version>
       </dependency>
-```
-      
+```     
 2. Add an empty concept file "org.openrdf.concepts" under your META-INF directory
 
 ### Configuration
