@@ -357,6 +357,18 @@ public class QueryService<T extends Annotation> {
         return this;
     }
 
+
+    /**
+     * Adding a criteria object to the QueryService
+     *
+     * @param criteria The criteria object
+     * @return itself to allow chaining.
+     */
+    public QueryService addCriteriaObject(Criteria criteria) {
+        this.criteria.add(criteria);
+        return this;
+    }
+
     /**
      * Setting shortcut names for URI prefixes.
      *
