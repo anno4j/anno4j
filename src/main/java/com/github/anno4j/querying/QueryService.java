@@ -2,8 +2,11 @@ package com.github.anno4j.querying;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.Body;
 import com.github.anno4j.model.ontologies.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
+import com.hp.hpl.jena.query.Query;
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
@@ -46,8 +49,13 @@ public class QueryService<T extends Annotation> {
 
     /**
      * LDPath for the shortcut method setBodyCriteria
+     *
+     * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
+     * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasBody/[is-a ex:exampleType]",
+     * if we would append the slash to the BODY_PREFIX constant, which would be simple wrong!
+     *
      */
-    private final String BODY_PREFIX = "oa:hasBody/";
+    private final String BODY_PREFIX = "oa:hasBody";
 
     /**
      * LDPath for the shortcut method setTargetCriteria
@@ -56,13 +64,21 @@ public class QueryService<T extends Annotation> {
 
     /**
      * LDPath for the shortcut method setSourceCriteria
+     *
+     * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
+     * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSource/[is-a ex:exampleType]",
+     * if we would append the slash to the SOURCE_PREFIX constant, which would be simple wrong!
      */
-    private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource/";
+    private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource";
 
     /**
      * LDPath for the shortcut method setSelectorCriteria
+     *
+     * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
+     * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSelector/[is-a ex:exampleType]",
+     * if we would append the slash to the SELECTOR_PREFIX constant, which would be simple wrong!
      */
-    private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector/";
+    private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector";
 
     /**
      * All user defined name spaces
@@ -76,6 +92,7 @@ public class QueryService<T extends Annotation> {
 
     /**
      * Specifies the ordering of the result set
+     * TODO: evaluate if this is possible with the current implementation, because the user does not know the generated variable names etc...
      */
     private Order order = null;
 
@@ -128,7 +145,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setBodyCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -141,7 +158,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setBodyCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -178,7 +195,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setBodyCriteria(String ldpath) {
-        criteria.add(new Criteria(BODY_PREFIX + ldpath, Comparison.EQ));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, Comparison.EQ));
         return this;
     }
 
@@ -254,7 +271,8 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSelectorCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
+
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -267,7 +285,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSelectorCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -304,7 +322,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSelectorCriteria(String ldpath) {
-        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, Comparison.EQ));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, Comparison.EQ));
         return this;
     }
 
@@ -315,7 +333,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSourceCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath  : SOURCE_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -326,7 +344,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSourceCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -353,7 +371,7 @@ public class QueryService<T extends Annotation> {
      * @return itself to allow chaining.
      */
     public QueryService setSourceCriteria(String ldpath) {
-        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, Comparison.EQ));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, Comparison.EQ));
         return this;
     }
 
@@ -434,21 +452,33 @@ public class QueryService<T extends Annotation> {
      */
     public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         ObjectConnection con = objectRepository.getConnection();
-        String sparql = EvalQuery.evaluate(criteria, prefixes);
 
-        // Pretty printed query
-        logger.info("Created query:\n" + queryOptimizer.prettyPrint(sparql));
+        Query sparql = EvalQuery.evaluate(criteria, prefixes);
+
+        if (limit != null) {
+            sparql.setLimit(limit);
+        }
+
+        if (offset != null) {
+            sparql.setOffset(offset);
+        }
+
+//        // Print with line numbers
+//        sparql.serialize(new IndentedWriter(System.out, true));
+//        System.out.println();
+
+        String q = sparql.serialize();
+        logger.info("Created query:\n" + queryOptimizer.prettyPrint(q));
 
         // Optimize the join order
-        sparql = queryOptimizer.optimizeJoinOrder(sparql);
-        logger.info("Join order optimized: " + sparql);
+        q = queryOptimizer.optimizeJoinOrder(q);
+        logger.info("Join order optimized:\n " + q);
 
         // Optimize the FILTER placement
-        sparql = queryOptimizer.optimizeFilters(sparql);
-        logger.info("FILTERs optimized: " + sparql);
+        q = queryOptimizer.optimizeFilters(q);
+        logger.info("FILTERs optimized:\n " + q);
 
-        ObjectQuery query = con.prepareObjectQuery(sparql);
+        ObjectQuery query = con.prepareObjectQuery(q);
         return (List<T>) query.evaluate(this.type).asList();
     }
-
 }

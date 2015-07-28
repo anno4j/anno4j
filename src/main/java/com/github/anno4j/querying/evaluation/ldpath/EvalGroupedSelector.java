@@ -1,28 +1,25 @@
 package com.github.anno4j.querying.evaluation.ldpath;
 
+import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import org.apache.marmotta.ldpath.model.selectors.GroupedSelector;
+
+import java.util.ArrayList;
 
 public class EvalGroupedSelector {
 
     /**
-     * Evaluates the complex GroupedSelector.
+     * Evaluates the LDPath GroupSelector
      *
-     * @param groupedSelector The GroupedSelector to evaluate
-     * @param query        StringBuilder for creating the actual query parts
-     * @param variableName The latest created variable name
-     * @return the latest referenced variable name
+     * @param groupedSelector The GroupSelector to evaluate
+     * @param elementGroup  ElementGroup containing the actual query parts
+     * @param variable The latest created variable
+     * @return the latest referenced variable
      */
-    public static String evaluate (GroupedSelector groupedSelector, StringBuilder query, String variableName) {
-        query
-                .append("{")
-                .append(System.getProperty("line.separator"));
-
-        String newVarname = LDPathEvaluator.evaluate(groupedSelector.getContent(), query, variableName);
-
-        query
-                .append("} ")
-                .append(System.getProperty("line.separator"));
-
-        return newVarname;
+    public static Var evaluate(GroupedSelector groupedSelector, ElementGroup elementGroup, Var variable) {
+        ElementGroup newGroup = new ElementGroup();
+        elementGroup.addElement(newGroup);
+        return LDPathEvaluator.evaluate(groupedSelector.getContent(), newGroup, variable);
     }
 }

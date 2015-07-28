@@ -1,7 +1,16 @@
 package com.github.anno4j.querying.evaluation;
 
+import com.github.anno4j.model.ontologies.OADM;
 import com.github.anno4j.querying.Criteria;
 import com.github.anno4j.querying.evaluation.ldpath.LDPathEvaluator;
+import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.graph.Node_URI;
+import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.syntax.ElementGroup;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.parser.LdPathParser;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -16,53 +25,38 @@ public class EvalQuery {
 
     private static final Logger logger = LoggerFactory.getLogger(EvalQuery.class);
 
-    /**
-     * Converts itself to a executable SPARQL query.
-     *
-     * @return the SPARQL query as string
-     */
-    public static String evaluate(ArrayList<Criteria> criteria, Map<String, String> prefixes) throws ParseException {
+    public static Query evaluate(ArrayList<Criteria> criteria, Map<String, String> prefixes) throws ParseException {
 
-        StringBuilder query = new StringBuilder();
+        Query query = QueryFactory.make();
+        query.setQuerySelectType();
 
-        /**
-         * Adding the prefixes to the SPARQL query (format: PREFIX Label: <IRI>)
-         */
-        for (String key : prefixes.keySet()) {
-            query
-                    .append("PREFIX ")
-                    .append(key)
-                    .append(": <")
-                    .append(prefixes.get(key))
-                    .append("> ");
-        }
+        ElementGroup elementGroup = new ElementGroup();
 
-        // For readability: Adding an empty line between the prefix and the statement part
-        query
-                .append("SELECT ?annotation ")
-                .append("WHERE {")
-                .append("?annotation a oa:Annotation.");
+        Var annotationVar = Var.alloc("annotation");
 
-        SesameValueBackend backend = new SesameValueBackend();
+        // Creating and adding the first triple - "?annotation rdf:type oa:Annotation
+        Triple t1 = new Triple(annotationVar, RDF.type.asNode(), NodeFactory.createURI(OADM.ANNOTATION));
+        elementGroup.addTriplePattern(t1);
 
-        // Creating the actual statements
+        // Evaluating the criteria
         for (Criteria c : criteria) {
-
-            query.append("{ ");
-
+            SesameValueBackend backend = new SesameValueBackend();
             LdPathParser parser = new LdPathParser(backend, new StringReader(c.getLdpath()));
-
-            String variableName = LDPathEvaluator.evaluate(parser.parseSelector(prefixes), query, "annotation");
+            Var var = LDPathEvaluator.evaluate(parser.parseSelector(prefixes), elementGroup, annotationVar);
 
             if (c.getConstraint() != null) {
-                EvalComparison.evaluate(query, c, variableName);
+                EvalComparison.evaluate(elementGroup, c, var);
             }
-
-            query.append("}");
         }
 
-        query.append("}");
+        // Adding all generated patterns to the query object
+        query.setQueryPattern(elementGroup);
 
-        return query.toString();
+        // Choose what we want so select - SELECT ?annotation in this case
+        query.addResultVar(annotationVar);
+        // Setting the default prefixes, like rdf: or dc:
+        query.getPrefixMapping().setNsPrefixes(prefixes);
+
+        return query;
     }
 }
