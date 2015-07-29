@@ -83,6 +83,12 @@ public class RoleClassLoader {
 			loaded = load(new CheckForBehaviour(cl), cl, "behaviours", BEHAVIOURS, false, loaded);
 
             scanConceptsWithReflections();
+
+            Collection<Class<?>> concepts = roleMapper.getConceptClasses();
+            for(Class<?> conceptClass : concepts) {
+                logger.info("Registered concept class " + conceptClass.getCanonicalName());
+            }
+
 		} catch (ObjectStoreConfigException e) {
 			throw e;
 		} catch (Exception e) {
