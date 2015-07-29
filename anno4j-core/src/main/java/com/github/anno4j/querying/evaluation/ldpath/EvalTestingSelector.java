@@ -43,7 +43,6 @@ public class EvalTestingSelector {
             elementGroup.addTriplePattern(new Triple(delVar.asNode(), RDF.type.asNode(), NodeFactory.createURI(isATest.getPathExpression(new SesameValueBackend()).replace("<", "").replace(">", "").replaceFirst("is-a ", ""))));
         } else if (nodeTest instanceof LiteralLanguageTest) {
             LiteralLanguageTest languageTest = (LiteralLanguageTest) nodeTest;
-            System.out.println("getLang: " + languageTest.getLang());
             elementGroup.addElementFilter(new ElementFilter(new E_LangMatches(new E_Lang(new ExprVar(delVar)), new NodeValueString(languageTest.getLang()))));
         } else if (nodeTest instanceof LiteralTypeTest) {
             LiteralTypeTest literalTypeTest = (LiteralTypeTest) nodeTest;
