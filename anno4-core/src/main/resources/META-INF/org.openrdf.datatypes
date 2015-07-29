@@ -1,0 +1,13 @@
+# Object Literals
+java.lang.CharSequence	=	http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral
+java.lang.String		=	http://www.w3.org/2001/XMLSchema#string
+java.lang.Integer		=	http://www.w3.org/2001/XMLSchema#int
+java.lang.Boolean		=	http://www.w3.org/2001/XMLSchema#boolean
+java.lang.Byte			=	http://www.w3.org/2001/XMLSchema#byte
+java.lang.Double		=	http://www.w3.org/2001/XMLSchema#double
+java.math.BigDecimal	=	http://www.w3.org/2001/XMLSchema#decimal
+java.lang.Float			=	http://www.w3.org/2001/XMLSchema#float
+java.lang.Long			=	http://www.w3.org/2001/XMLSchema#long
+java.lang.Short			=	http://www.w3.org/2001/XMLSchema#short
+java.util.Locale		=	http://www.w3.org/2001/XMLSchema#language
+java.net.URI			=	http://www.w3.org/2001/XMLSchema#anyURI

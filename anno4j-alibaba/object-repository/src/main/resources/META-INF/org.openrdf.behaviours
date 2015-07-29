@@ -1,0 +1,5 @@
+## Object Behaviours
+org.openrdf.repository.object.behaviours.RDFObjectImpl = http://www.w3.org/2000/01/rdf-schema#Resource
+org.openrdf.repository.object.behaviours.RDFList = http://www.w3.org/1999/02/22-rdf-syntax-ns#List
+org.openrdf.repository.object.behaviours.RDFSContainerDisabler = http://www.w3.org/1999/02/22-rdf-syntax-ns#List
+org.openrdf.repository.object.behaviours.RDFSContainer = http://www.w3.org/2000/01/rdf-schema#Container http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq http://www.w3.org/1999/02/22-rdf-syntax-ns#Alt http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag

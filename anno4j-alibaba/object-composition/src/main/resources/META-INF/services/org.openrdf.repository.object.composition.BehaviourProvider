@@ -1,0 +1,2 @@
+org.openrdf.repository.object.composition.AbstractClassFactory
+org.openrdf.repository.object.advice.behaviour.AdviceBehaviourProvider

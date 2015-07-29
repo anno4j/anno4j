@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>com.github.anno4j</groupId>
-    <artifactId>anno4j-parent</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>Anno4j Parent</name>
+    <parent>
+        <groupId>com.github.anno4j</groupId>
+        <artifactId>anno4j-parent</artifactId>
+        <version>1.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>anno4j-core</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>Anno4j Core</name>
     <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/)</description>
     <url>https://github.com/anno4j/anno4j</url>
     <issueManagement>
@@ -18,7 +24,7 @@
     <scm>
         <url>https://github.com/anno4j/anno4j.git</url>
     </scm>
-    
+
     <organization>
         <name>Chair of Distributed Information Systems - University of Passau</name>
         <url>http://www.fim.uni-passau.de/en/distributed-information-systems/</url>
@@ -30,7 +36,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <developers>
         <developer>
             <name>Kai Schlegel</name>
@@ -45,12 +51,7 @@
             <email>emanuel.berndl@gmail.com</email>
         </developer>
     </developers>
-    
-    <modules>
-        <module>anno4-core</module>
-        <module>anno4j-alibaba</module>
-    </modules>
-    
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -78,14 +79,19 @@
             </snapshots>
         </repository>
     </repositories>
-    
+
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-    
+
     <dependencies>
+        <dependency>
+            <groupId>com.github.anno4j</groupId>
+            <artifactId>alibaba-repository-object</artifactId>
+            <version>1.0.5</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
@@ -97,8 +103,23 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.marmotta</groupId>
+            <artifactId>ldpath-core</artifactId>
+         <version>3.4.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.marmotta</groupId>
+            <artifactId>ldpath-backend-sesame</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-arq</artifactId>
+            <version>2.13.0</version>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>

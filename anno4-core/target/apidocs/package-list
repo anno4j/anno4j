@@ -1,0 +1,13 @@
+com.github.anno4j
+com.github.anno4j.model
+com.github.anno4j.model.impl
+com.github.anno4j.model.impl.agent
+com.github.anno4j.model.impl.motivation
+com.github.anno4j.model.impl.selector
+com.github.anno4j.model.impl.target
+com.github.anno4j.model.ontologies
+com.github.anno4j.persistence
+com.github.anno4j.persistence.impl
+com.github.anno4j.querying
+com.github.anno4j.querying.evaluation
+com.github.anno4j.querying.evaluation.ldpath

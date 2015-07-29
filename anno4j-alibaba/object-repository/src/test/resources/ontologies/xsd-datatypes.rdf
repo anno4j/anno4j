@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!DOCTYPE rdf:RDF [
+<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+]>
+<rdf:RDF xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdfs:Datatype rdf:about="&xsd;anyType">
+    <rdfs:subClassOf rdf:resource="&rdfs;Literal"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;anySimpleType">
+    <rdfs:subClassOf rdf:resource="&xsd;anyType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;duration">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;dateTime">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;time">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;date">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;gYearMonth">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;gYear">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;gMonthDay">
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;gDay">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;gMonth">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;string">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;boolean">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;base64Binary">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;hexBinary">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;float">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;decimal">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;double">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;anyURI">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;URI">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;NOTATION">
+    <rdfs:subClassOf rdf:resource="&xsd;anySimpleType"/>
+  </rdfs:Datatype>
+
+  <rdfs:Datatype rdf:about="&xsd;normalizedString">
+    <rdfs:subClassOf rdf:resource="&xsd;string"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;token">
+    <rdfs:subClassOf rdf:resource="&xsd;normalizedString"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;language">
+    <rdfs:subClassOf rdf:resource="&xsd;token"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;Name">
+    <rdfs:subClassOf rdf:resource="&xsd;token"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;NMTOKEN">
+    <rdfs:subClassOf rdf:resource="&xsd;token"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;NCName">
+    <rdfs:subClassOf rdf:resource="&xsd;Name"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;ID">
+    <rdfs:subClassOf rdf:resource="&xsd;NCName"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;IDREF">
+    <rdfs:subClassOf rdf:resource="&xsd;NCName"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;ENTITY">
+    <rdfs:subClassOf rdf:resource="&xsd;NCName"/>
+  </rdfs:Datatype>
+
+  <rdfs:Datatype rdf:about="&xsd;integer">
+    <rdfs:subClassOf rdf:resource="&xsd;decimal"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;nonPositiveInteger">
+    <rdfs:subClassOf rdf:resource="&xsd;integer"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;long">
+    <rdfs:subClassOf rdf:resource="&xsd;integer"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;nonNegativeInteger">
+    <rdfs:subClassOf rdf:resource="&xsd;integer"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;negativeInteger">
+    <rdfs:subClassOf rdf:resource="&xsd;nonPositiveInteger"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;int">
+    <rdfs:subClassOf rdf:resource="&xsd;long"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;unsignedLong">
+    <rdfs:subClassOf rdf:resource="&xsd;nonNegativeInteger"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;positiveInteger">
+    <rdfs:subClassOf rdf:resource="&xsd;nonNegativeInteger"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;short">
+    <rdfs:subClassOf rdf:resource="&xsd;int"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;unsignedInt">
+    <rdfs:subClassOf rdf:resource="&xsd;unsignedLong"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;byte">
+    <rdfs:subClassOf rdf:resource="&xsd;short"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;unsignedShort">
+    <rdfs:subClassOf rdf:resource="&xsd;unsignedInt"/>
+  </rdfs:Datatype>
+  <rdfs:Datatype rdf:about="&xsd;unsignedByte">
+    <rdfs:subClassOf rdf:resource="&xsd;unsignedShort"/>
+  </rdfs:Datatype>
+</rdf:RDF>

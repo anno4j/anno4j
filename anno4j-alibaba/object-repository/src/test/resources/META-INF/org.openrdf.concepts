@@ -1,0 +1,5 @@
+org.openrdf.repository.object.concepts.Agent
+org.openrdf.repository.object.concepts.Container
+org.openrdf.repository.object.concepts.Person
+org.openrdf.repository.object.concepts.Seq
+org.openrdf.repository.object.FieldPredicateTest$Person = urn:test:FieldPredicatetPerson

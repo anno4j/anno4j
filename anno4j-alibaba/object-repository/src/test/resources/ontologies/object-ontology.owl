@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE rdf:RDF [
+   <!ENTITY msg "http://www.openrdf.org/rdf/2011/messaging#" >
+   <!ENTITY dc     "http://purl.org/dc/elements/1.1/" >
+   <!ENTITY owl    "http://www.w3.org/2002/07/owl#" >
+   <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#" >
+   <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+   <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#" >
+ ]>
+<rdf:RDF xmlns:msg="&msg;" xmlns:dc="&dc;" xmlns:owl="&owl;" xmlns:rdf="&rdf;" xmlns:rdfs="&rdfs;" xmlns:xsd="&xsd;"
+	xml:base="http://www.openrdf.org/rdf/2011/messaging">
+
+	<!-- Ontology -->
+
+	<owl:Ontology rdf:about="">
+		<rdfs:label xml:lang="en">Messaging</rdfs:label>
+		<dc:title xml:lang="en">AliBaba Messaging Ontology</dc:title>
+		<dc:date rdf:datatype="&xsd;date">2011-02-16</dc:date>
+		<dc:format>OWL-Lite</dc:format>
+		<dc:creator>James Leigh &lt;james@leighnet.ca&gt;</dc:creator>
+		<owl:versionInfo>2.0</owl:versionInfo>
+	</owl:Ontology>
+
+	<!-- Classes -->
+
+	<owl:Class rdf:ID="Message">
+		<rdfs:label xml:lang="en">Message</rdfs:label>
+		<rdfs:comment xml:lang="en">The base class for all messages.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+	</owl:Class>
+
+	<!-- Annotations -->
+
+	<owl:AnnotationProperty rdf:ID="matching">
+		<rdfs:label xml:lang="en">matching</rdfs:label>
+		<rdfs:comment xml:lang="en">Any resource with a URI matching an entire given expression is an instance of this class. Expressions ending with '*' are matched against the prefix. Expressions starting with '/' are matched from the beginning of the path (if hierarchical). Expressions starting with '*' are suffixed matched against the authority until the first '/'. This annotation should be used in an anonymous class to assign properties and messages by URI patterns.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+	</owl:AnnotationProperty>
+
+	<owl:AnnotationProperty rdf:ID="sparql">
+		<rdfs:label xml:lang="en">sparql</rdfs:label>
+		<rdfs:comment xml:lang="en">Named SPARQL queries should be placed in this annotation on methods that
+should respond with this query. In addition to parameters, the variable "this" will be bound to the message target. It is recommended to use the '$' prefix for explicitly bound variables (as in $this) and '?' for all other variables.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+	</owl:AnnotationProperty>
+
+	<!-- Message Properties -->
+
+	<owl:ObjectProperty rdf:ID="target">
+		<rdf:type rdf:resource="&owl;FunctionalProperty" />
+		<rdfs:label xml:lang="en">target</rdfs:label>
+		<rdfs:comment xml:lang="en">The receiver of this message.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+		<rdfs:domain rdf:resource="#Message" />
+	</owl:ObjectProperty>
+
+	<owl:ObjectProperty rdf:ID="objectSet">
+		<rdfs:label xml:lang="en">object set</rdfs:label>
+		<rdfs:comment xml:lang="en">The return value of this message.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+		<rdfs:domain rdf:resource="#Message" />
+	</owl:ObjectProperty>
+
+	<owl:DatatypeProperty rdf:ID="literalSet">
+		<rdfs:label xml:lang="en">literal set</rdfs:label>
+		<rdfs:comment xml:lang="en">The return value of this message.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+		<rdfs:domain rdf:resource="#Message" />
+	</owl:DatatypeProperty>
+
+	<owl:ObjectProperty rdf:ID="object">
+		<rdf:type rdf:resource="&owl;FunctionalProperty" />
+		<rdfs:label xml:lang="en">object</rdfs:label>
+		<rdfs:comment xml:lang="en">Single return value of this message.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+		<rdfs:subPropertyOf rdf:resource="#objectSet" />
+		<rdfs:domain rdf:resource="#Message" />
+	</owl:ObjectProperty>
+
+	<owl:DatatypeProperty rdf:ID="literal">
+		<rdf:type rdf:resource="&owl;FunctionalProperty" />
+		<rdfs:label xml:lang="en">literal</rdfs:label>
+		<rdfs:comment xml:lang="en">Single return value of this message.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="" />
+		<rdfs:subPropertyOf rdf:resource="#literalSet" />
+		<rdfs:domain rdf:resource="#Message" />
+	</owl:DatatypeProperty>
+
+</rdf:RDF>

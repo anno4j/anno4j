@@ -1,0 +1,223 @@
+<?xml version="1.0"?>
+<rdf:RDF
+  xmlns:rdf ="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:gedcom="http://www.daml.org/2001/01/gedcom/gedcom#"
+  xmlns     ="http://www.daml.org/2001/01/gedcom/gedcom#"
+ xml:base="http://www.daml.org/2001/01/gedcom/gedcom">
+
+<owl:Ontology rdf:about="">
+  <owl:versionInfo>$Id: gedcom.daml,v 1.15 2002/09/06 15:38:18 mdean Exp $</owl:versionInfo>
+  <rdfs:comment>Genealogical Data Communication (GEDCOM) represented in DAML+OIL</rdfs:comment>
+</owl:Ontology>
+
+<rdfs:Class rdf:ID="Individual">
+  <rdfs:comment>
+    An individual named in a GEDCOM file.
+  </rdfs:comment>
+  <owl:sameAs rdf:resource="http://www.daml.org/2001/03/daml+oil-ex#Person"/>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#givenName"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#givenName"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#surname"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#surname"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#name"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#name"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#sex"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#sex"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#title"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#title"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#spouseIn"/>
+      <owl:allValuesFrom rdf:resource="#Family"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#childIn"/>
+      <owl:allValuesFrom rdf:resource="#Family"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#childIn"/>
+      <owl:maxCardinality>1</owl:maxCardinality>	
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#birth"/>
+      <owl:allValuesFrom rdf:resource="#Birth"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#birth"/>
+      <owl:maxCardinality>1</owl:maxCardinality>	
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#death"/>
+      <owl:allValuesFrom rdf:resource="#Death"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#death"/>
+      <owl:maxCardinality>1</owl:maxCardinality>	
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="Family">
+  <rdfs:comment>
+    A family named in a GEDCOM file.
+  </rdfs:comment>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#marriage"/>
+      <owl:allValuesFrom rdf:resource="#Marriage"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#divorce"/>
+      <owl:allValuesFrom rdf:resource="#Divorce"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="Event">
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#date"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#date"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#place"/>
+      <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="#place"/>
+      <owl:maxCardinality>1</owl:maxCardinality>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="IndividualEvent">
+  <rdfs:subClassOf rdf:resource="#Event"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="Birth">
+  <rdfs:subClassOf rdf:resource="#IndividualEvent"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="Death">
+  <rdfs:subClassOf rdf:resource="#IndividualEvent"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="FamilyEvent">
+  <rdfs:subClassOf rdf:resource="#Event"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="Marriage">
+  <rdfs:subClassOf rdf:resource="#FamilyEvent"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="Divorce">
+  <rdfs:subClassOf rdf:resource="#FamilyEvent"/>
+</rdfs:Class>
+
+<owl:ObjectProperty rdf:ID="spouseIn"/>
+<owl:ObjectProperty rdf:ID="childIn"/>
+<owl:DatatypeProperty rdf:ID="givenName"/>
+<owl:DatatypeProperty rdf:ID="surname"/>
+<owl:DatatypeProperty rdf:ID="name"/>
+<owl:DatatypeProperty rdf:ID="sex"/>
+<owl:DatatypeProperty rdf:ID="title"/>
+<owl:DatatypeProperty rdf:ID="date"/>
+<owl:DatatypeProperty rdf:ID="place"/>
+
+<owl:ObjectProperty rdf:ID="eventProperty"/>
+<owl:ObjectProperty rdf:ID="individualEventProperty">
+  <rdfs:subPropertyOf rdf:resource="#eventProperty"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:ID="familyEventProperty">
+  <rdfs:subPropertyOf rdf:resource="#eventProperty"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:ID="birth">
+  <rdfs:subPropertyOf rdf:resource="#individualEventProperty"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:ID="death">
+  <rdfs:subPropertyOf rdf:resource="#individualEventProperty"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:ID="marriage">
+  <rdfs:subPropertyOf rdf:resource="#familyEventProperty"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:ID="divorce">
+  <rdfs:subPropertyOf rdf:resource="#familyEventProperty"/>
+</owl:ObjectProperty>
+
+</rdf:RDF>
