@@ -1,5 +1,6 @@
-package com.github.anno4j.model;
+package com.github.anno4j.recommendation.model;
 
+import com.github.anno4j.model.Body;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.ontologies.RDF;
 import org.openrdf.annotations.Iri;
@@ -17,7 +18,7 @@ import org.openrdf.model.impl.URIImpl;
  * rdf:predicate, rdf:subject and rdf:object properties.
  */
 @Iri(RDF.STATEMENT)
-public class Statement extends ResourceObject {
+public class Statement extends Body {
 
     @Iri(RDF.SUBJECT)   private ResourceObject subject;
     @Iri(RDF.PREDICATE) private Resource predicate;
