@@ -47,8 +47,8 @@
     </developers>
     
     <modules>
-        <module>anno4-core</module>
         <module>anno4j-alibaba</module>
+        <module>anno4j-core</module>
         <module>anno4j-recommendation</module>
     </modules>
     
@@ -99,6 +99,42 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Anno4j Dependencies -->
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>anno4j-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>anno4j-alibaba</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>anno4j-recommendation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>alibaba-composition-object</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>alibaba-repository-object</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>alibaba-store-blob</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     
     <build>
         <plugins>

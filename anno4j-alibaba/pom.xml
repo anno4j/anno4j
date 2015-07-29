@@ -55,6 +55,14 @@ AliBaba is a collection of modules that provide simplified RDF store abstraction
         </developer>
     </developers>
 
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/anno4j/anno4j-alibaba/issues</url>
+    </issueManagement>
+    <scm>
+        <url>https://github.com/anno4j/anno4j-alibaba.git</url>
+    </scm>
+
 	<distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -74,44 +82,8 @@ AliBaba is a collection of modules that provide simplified RDF store abstraction
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-jdk14</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.2</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 	<dependencyManagement>
 		<dependencies>
-			<!-- AliBaba Dependencies -->
-			<dependency>
-				<groupId>com.github.anno4j</groupId>
-				<artifactId>alibaba-composition-object</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.github.anno4j</groupId>
-				<artifactId>alibaba-repository-object</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.github.anno4j</groupId>
-				<artifactId>alibaba-store-blob</artifactId>
-				<version>${project.version}</version>
-			</dependency>
 			<!-- Sesame Dependencies -->
 			<dependency>
 				<groupId>org.openrdf.sesame</groupId>
@@ -234,13 +206,6 @@ AliBaba is a collection of modules that provide simplified RDF store abstraction
             </dependency>
 		</dependencies>
 	</dependencyManagement>
-   <issueManagement>
-        <system>Github</system>
-        <url>https://github.com/anno4j/anno4j-alibaba/issues</url>
-    </issueManagement>
-  	<scm>
-        <url>https://github.com/anno4j/anno4j-alibaba.git</url>
-    </scm>
 
 	<build>
 		<plugins>
