@@ -5,6 +5,7 @@ import com.github.anno4j.querying.Criteria;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.*;
+import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueDouble;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import org.apache.marmotta.ldpath.model.tests.LiteralTypeTest;
@@ -59,13 +60,13 @@ public class EvalComparison {
             Expr expr = new E_Equals(new ExprVar(variable.asNode()), new ExprVar(criteria.getConstraint()));
 
             if (criteria.getComparison().equals(Comparison.GT)) {
-                expr = new E_GreaterThan(new ExprVar(variable.asNode()), new ExprVar(criteria.getConstraint()));
+                expr = new E_GreaterThan(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
             } else if (criteria.getComparison().equals(Comparison.GTE)) {
-                expr = new E_GreaterThanOrEqual(new ExprVar(variable.asNode()), new ExprVar(criteria.getConstraint()));
+                expr = new E_GreaterThanOrEqual(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
             } else if (criteria.getComparison().equals(Comparison.LT)) {
-                expr = new E_LessThan(new ExprVar(variable.asNode()), new ExprVar(criteria.getConstraint()));
+                expr = new E_LessThan(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
             } else if (criteria.getComparison().equals(Comparison.LTE)) {
-                expr = new E_LessThanOrEqual(new ExprVar(variable.asNode()), new ExprVar(criteria.getConstraint()));
+                expr = new E_LessThanOrEqual(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
             }
 
             ElementFilter filter = new ElementFilter(expr);
