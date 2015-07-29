@@ -82,6 +82,7 @@ AliBaba is a collection of modules that provide simplified RDF store abstraction
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<!-- Sesame Dependencies -->

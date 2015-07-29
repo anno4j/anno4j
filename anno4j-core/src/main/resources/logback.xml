@@ -1,0 +1,20 @@
+<configuration>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="ch.qos.logback" level="FATAL"/>
+    <logger name="org.hibernate.validator" level="WARN"/>
+    <logger name="org.eclipse.jetty" level="WARN"/>
+    <logger name="org.reflections" level="ERROR"/>
+    <logger name="org.openrdf.repository.object" level="WARN" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%date{YYYY-MM-dd HH:mm:ss} %level [%thread] %logger [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
