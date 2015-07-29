@@ -3,8 +3,8 @@ package com.github.anno4j;
 import com.github.anno4j.persistence.IDGenerator;
 import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.persistence.impl.IDGeneratorAnno4jURN;
-import com.github.anno4j.querying.QueryOptimizer;
 import com.github.anno4j.querying.QueryService;
+import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -14,6 +14,7 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/).
@@ -66,18 +67,41 @@ public class Anno4j {
         }
     }
 
+    /**
+     * Create persistence object
+     * @return persistence object
+     */
     public PersistenceService createPersistenceService() {
         return new PersistenceService(objectRepository);
     }
 
+    /**
+     * Create persistence object
+     * @param graph Graph context to query
+     * @return persistence object
+     */
+    public PersistenceService createPersistenceService(URI graph) {
+        return new PersistenceService(objectRepository, graph);
+    }
+
+    /**
+     * Create query service
+     * @param clazz Result type
+     * @return query service object for specified type
+     */
     public QueryService createQueryService(Class clazz) {
         return new QueryService(clazz, objectRepository);
     }
 
-    public QueryOptimizer getQueryOptimizer() {
-        return QueryOptimizer.getInstance();
+    /**
+     * Create query service
+     * @param clazz Result type
+     * @param graph Graph context to query
+     * @return query service object for specified type
+     */
+    public QueryService createQueryService(Class clazz, URI graph) {
+        return new QueryService(clazz, objectRepository, graph);
     }
-
 
     /**
      * Getter for the configured IDGenerator intance.

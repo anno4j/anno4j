@@ -1,13 +1,11 @@
 package com.github.anno4j.querying;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Body;
 import com.github.anno4j.model.ontologies.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
 import com.hp.hpl.jena.query.Query;
-import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.parser.ParseException;
+import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.SKOS;
@@ -36,6 +34,7 @@ import java.util.Map;
 public class QueryService<T extends Annotation> {
 
     private final Logger logger = LoggerFactory.getLogger(QueryService.class);
+    private final URI graph;
 
     /**
      * The type of the result set.
@@ -116,7 +115,12 @@ public class QueryService<T extends Annotation> {
      */
     private int varIndex = 0;
 
+
     public QueryService(Class<T> type, ObjectRepository objectRepository) {
+       this(type, objectRepository, null);
+    }
+
+    public QueryService(Class<T> type, ObjectRepository objectRepository, URI graph) {
         this.type = type;
         this.objectRepository = objectRepository;
         // Setting some standard name spaces
@@ -132,7 +136,8 @@ public class QueryService<T extends Annotation> {
         addPrefix(RDFS.PREFIX, RDFS.NAMESPACE);
         addPrefix(SKOS.PREFIX, SKOS.NAMESPACE);
 
-        this.queryOptimizer = Anno4j.getInstance().getQueryOptimizer();
+        this.queryOptimizer = QueryOptimizer.getInstance();
+        this.graph = graph;
     }
 
 
@@ -453,6 +458,12 @@ public class QueryService<T extends Annotation> {
     public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         ObjectConnection con = objectRepository.getConnection();
 
+        if(graph != null) {
+            con.setReadContexts(graph);
+            con.setInsertContext(graph);
+            con.setRemoveContexts(graph);
+        }
+
         Query sparql = EvalQuery.evaluate(criteria, prefixes);
 
         if (limit != null) {
@@ -463,22 +474,31 @@ public class QueryService<T extends Annotation> {
             sparql.setOffset(offset);
         }
 
-//        // Print with line numbers
+        // Print with line numbers
 //        sparql.serialize(new IndentedWriter(System.out, true));
 //        System.out.println();
 
         String q = sparql.serialize();
-        logger.info("Created query:\n" + queryOptimizer.prettyPrint(q));
+        logger.debug("Created query:\n" + queryOptimizer.prettyPrint(q));
 
         // Optimize the join order
         q = queryOptimizer.optimizeJoinOrder(q);
-        logger.info("Join order optimized:\n " + q);
+        logger.debug("Join order optimized:\n " + q);
 
         // Optimize the FILTER placement
         q = queryOptimizer.optimizeFilters(q);
-        logger.info("FILTERs optimized:\n " + q);
+        logger.debug("FILTERs optimized:\n " + q);
 
         ObjectQuery query = con.prepareObjectQuery(q);
-        return (List<T>) query.evaluate(this.type).asList();
+
+        if (query.getDataset() != null) {
+            logger.info("\nGRAPH CONTEXT = " + query.getDataset().getDefaultGraphs() + "\nFINAL QUERY :\n" + q);
+        } else {
+            logger.info("\nFINAL QUERY :\n" + q);
+        }
+
+        List<T> resultList = (List<T>) query.evaluate(this.type).asList();
+
+        return resultList;
     }
 }
