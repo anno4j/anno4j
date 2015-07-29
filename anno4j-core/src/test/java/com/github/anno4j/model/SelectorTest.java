@@ -1,9 +1,9 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.selector.FragmentSelector;
 import com.github.anno4j.model.impl.selector.FragmentSpecification;
 import com.github.anno4j.model.impl.target.SpecificResource;
-import com.github.anno4j.model.mock.TestTarget;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +29,8 @@ public class SelectorTest {
     Repository repository;
     ObjectConnection connection;
 
+    public final static String SOME_PAGE = "http://example.org/";
+
     @Before
     public void setUp() throws Exception {
         repository = new SailRepository(new MemoryStore());
@@ -49,8 +51,7 @@ public class SelectorTest {
         // Create annotation
         Annotation annotation = new Annotation();
 
-        // Create a test target
-        Target target = new TestTarget();
+        ResourceObject randomObject = new ResourceObject(SOME_PAGE + "randomobject");
 
         // Create specific resource and selector
         SpecificResource specificResource = new SpecificResource();
@@ -61,7 +62,7 @@ public class SelectorTest {
         fragmentSelector.setValue("#xywh=50,50,640,480");
 
         // Connect all entities
-        specificResource.setSource(target);
+        specificResource.setSource(randomObject);
         specificResource.setSelector(fragmentSelector);
 
         annotation.setTarget(specificResource);
