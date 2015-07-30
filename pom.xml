@@ -18,7 +18,7 @@
     <scm>
         <url>https://github.com/anno4j/anno4j.git</url>
     </scm>
-    
+
     <organization>
         <name>Chair of Distributed Information Systems - University of Passau</name>
         <url>http://www.fim.uni-passau.de/en/distributed-information-systems/</url>
@@ -30,7 +30,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <developers>
         <developer>
             <name>Kai Schlegel</name>
@@ -48,10 +48,11 @@
     
     <modules>
         <module>anno4j-alibaba</module>
+        <module>anno4j-ontologies</module>
         <module>anno4j-core</module>
         <module>anno4j-recommendation</module>
     </modules>
-    
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -79,13 +80,13 @@
             </snapshots>
         </repository>
     </repositories>
-    
+
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-    
+
     <dependencies>
 
         <dependency>
@@ -148,6 +149,21 @@
             <dependency>
                 <groupId>com.github.anno4j</groupId>
                 <artifactId>alibaba-store-blob</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>anno4j-ontologies</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>anno4j-ontologies-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.anno4j</groupId>
+                <artifactId>anno4j-ontologies-mico</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

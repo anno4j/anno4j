@@ -14,3 +14,6 @@ anno4j.iml
 anno4j-core/target
 anno4j-alibaba/target
 anno4j-recommendation/target
+anno4j-ontologies/target
+anno4j-ontologies/ontologies-core/target
+anno4j-ontologies/ontologies-mico/target

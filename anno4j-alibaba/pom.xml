@@ -11,7 +11,6 @@
     </parent>
     
 	<artifactId>anno4j-alibaba</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
     <modules>
@@ -25,62 +24,10 @@
 AliBaba is a collection of modules that provide simplified RDF store abstractions to accelerate development and facilitate application maintenance.
 ]]>
 	</description>
-	<url>https://github.com/anno4j/anno4j-alibaba/</url>
-	<inceptionYear>2015</inceptionYear>
-    <organization>
-        <name>Chair of Distributed Information Systems - University of Passau</name>
-        <url>http://www.fim.uni-passau.de/en/distributed-information-systems/</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-        <developers>
-        <developer>
-            <name>Kai Schlegel</name>
-            <email>kai.schlegel@googlemail.com</email>
-        </developer>
-        <developer>
-            <name>Andreas Eisenkolb</name>
-            <email>andreas.eisenkolb@gmail.com</email>
-        </developer>
-        <developer>
-            <name>Emanuel Berndl</name>
-            <email>emanuel.berndl@gmail.com</email>
-        </developer>
-    </developers>
-
-    <issueManagement>
-        <system>Github</system>
-        <url>https://github.com/anno4j/anno4j-alibaba/issues</url>
-    </issueManagement>
-    <scm>
-        <url>https://github.com/anno4j/anno4j-alibaba.git</url>
-    </scm>
-
-	<distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
 	<properties>
 		<sesame.version>2.7.12</sesame.version>
-		<slf4j.version>1.7.10</slf4j.version>
 		<javassist.version>3.11.0.GA</javassist.version>
-        <java.version>1.7</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<dependencyManagement>
@@ -207,93 +154,4 @@ AliBaba is a collection of modules that provide simplified RDF store abstraction
             </dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<forkMode>always</forkMode>
-					<trimStackTrace>false</trimStackTrace>
-					<systemProperties>
-						<property>
-							<name>java.io.tmpdir</name>
-							<value>${basedir}/target/tmp</value>
-						</property>
-					</systemProperties>
-				</configuration>
-			</plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.3</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-                <configuration>
-                    <failOnError>false</failOnError>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-		</plugins>
-	</build>
 </project>

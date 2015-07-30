@@ -13,57 +13,13 @@
 
 	<artifactId>alibaba-repository-object</artifactId>
 
-	<name>Object Repository</name>
+	<name>Anno4j Alibaba Object Repository (forked)</name>
 	<description><![CDATA[
 The Object Repository maps Java objects to and from RDF resources and OWL classes to Java classes in a non-intrusive manner that enables developers to work at the object level.
 ]]>
 	</description>
-	<build>
-		<plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
-                <configuration>
-                    <failOnError>false</failOnError>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.openrdf.repository.object.compiler.Compiler</mainClass>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-		</plugins>
-	</build>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
