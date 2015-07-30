@@ -19,7 +19,6 @@
     <description></description>
     
     <modules>
-        <module>ontologies-core</module>
         <module>ontologies-mico</module>
     </modules>
     

@@ -19,5 +19,9 @@
     
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.anno4j</groupId>
+            <artifactId>anno4j-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

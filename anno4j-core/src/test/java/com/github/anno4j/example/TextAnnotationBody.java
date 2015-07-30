@@ -1,8 +1,8 @@
 package com.github.anno4j.example;
 
 import com.github.anno4j.model.Body;
-import com.github.anno4j.model.ontologies.DC;
-import com.github.anno4j.model.ontologies.RDF;
+import com.github.anno4j.model.namespaces.DC;
+import com.github.anno4j.model.namespaces.RDF;
 import org.openrdf.annotations.Iri;
 
 /**

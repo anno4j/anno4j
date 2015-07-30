@@ -1,4 +1,4 @@
-package com.github.anno4j.model.ontologies;
+package com.github.anno4j.model.namespaces;
 
 /**
  * Ontology class for the Dublin Core Terms ontology (dcterms:).
@@ -21,4 +21,6 @@ public class DCTERMS {
      * An established standard to which the described resource conforms.
      */
     public final static String CONFORMS_TO = NS + "conformsTo";
+
+    public final static String FORMAT = NS + "format";
 }

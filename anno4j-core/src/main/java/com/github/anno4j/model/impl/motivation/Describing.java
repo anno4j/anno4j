@@ -1,7 +1,7 @@
 package com.github.anno4j.model.impl.motivation;
 
 import com.github.anno4j.model.Motivation;
-import com.github.anno4j.model.ontologies.OADM;
+import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
 
 /**

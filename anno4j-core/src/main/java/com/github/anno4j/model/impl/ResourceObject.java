@@ -1,7 +1,7 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.ontologies.RDFS;
+import com.github.anno4j.model.namespaces.RDFS;
 import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;

@@ -1,12 +1,8 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.model.ontologies.FOAF;
+import com.github.anno4j.model.namespaces.FOAF;
 import org.openrdf.annotations.Iri;
-import org.openrdf.model.Resource;
-import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.RDFObject;
 
 /**
  * Conforms to http://www.w3.org/ns/prov#Agent

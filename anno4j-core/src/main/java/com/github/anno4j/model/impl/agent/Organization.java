@@ -1,7 +1,7 @@
 package com.github.anno4j.model.impl.agent;
 
 import com.github.anno4j.model.Agent;
-import com.github.anno4j.model.ontologies.FOAF;
+import com.github.anno4j.model.namespaces.FOAF;
 import org.openrdf.annotations.Iri;
 
 /**

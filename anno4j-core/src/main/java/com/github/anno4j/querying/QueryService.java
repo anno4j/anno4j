@@ -1,7 +1,7 @@
 package com.github.anno4j.querying;
 
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.ontologies.*;
+import com.github.anno4j.model.namespaces.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
 import com.hp.hpl.jena.query.Query;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -142,7 +142,7 @@ public class QueryService<T extends Annotation> {
 
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects.
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
      *
      * @param ldpath     Syntax similar to XPath. Beginning from the Body object
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
@@ -155,7 +155,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects.
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
      *
      * @param ldpath     Syntax similar to XPath. Beginning from the Body object
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
@@ -168,7 +168,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects. Compared to the
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects. Compared to the
      * other <i>setBodyCriteria</i> function, this function does not need a <b>Comparison</b> statement. Hence,
      * the Comparison.EQ statement ("=") will be used automatically.
      *
@@ -181,7 +181,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects. Compared to the
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects. Compared to the
      * other <i>setBodyCriteria</i> function, this function does not need a <b>Comparison</b> statement. Hence,
      * the Comparison.EQ statement ("=") will be used automatically.
      *
@@ -194,7 +194,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.BodyImpl.* objects.
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
      *
      * @param ldpath Syntax similar to XPath. Beginning from the Body object
      * @return itself to allow chaining.
@@ -268,7 +268,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.SelectorImpl.* objects.
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
      *
      * @param ldpath     Syntax similar to XPath. Beginning from the Selector object
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
@@ -282,7 +282,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.SelectorImpl.* objects.
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
      *
      * @param ldpath     Syntax similar to XPath. Beginning from the Selector object
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
@@ -295,7 +295,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.SelectorImpl.* objects. Compared to the
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects. Compared to the
      * other <i>setSelectorCriteria</i> function, this function does not need a Comparison statement. Hence, the
      * <b>Comparison.EQ</b> statement ("=") will be used automatically.
      *
@@ -308,7 +308,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.SelectorImpl.* objects. Compared to the
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects. Compared to the
      * other <i>setSelectorCriteria</i> function, this function does not need a Comparison statement. Hence, the
      * <b>Comparison.EQ</b> statement ("=") will be used automatically.
      *
@@ -321,7 +321,7 @@ public class QueryService<T extends Annotation> {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.SelectorImpl.* objects.
+     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
      *
      * @param ldpath Syntax similar to XPath. Beginning from the Selector object
      * @return itself to allow chaining.

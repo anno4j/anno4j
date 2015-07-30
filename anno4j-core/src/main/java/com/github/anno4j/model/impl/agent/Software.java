@@ -1,8 +1,8 @@
 package com.github.anno4j.model.impl.agent;
 
 import com.github.anno4j.model.Agent;
-import com.github.anno4j.model.ontologies.FOAF;
-import com.github.anno4j.model.ontologies.PROV;
+import com.github.anno4j.model.namespaces.FOAF;
+import com.github.anno4j.model.namespaces.PROV;
 import org.openrdf.annotations.Iri;
 
 /**

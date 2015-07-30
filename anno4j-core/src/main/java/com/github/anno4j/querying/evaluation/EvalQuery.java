@@ -1,10 +1,9 @@
 package com.github.anno4j.querying.evaluation;
 
-import com.github.anno4j.model.ontologies.OADM;
+import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.Criteria;
 import com.github.anno4j.querying.evaluation.ldpath.LDPathEvaluator;
 import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Node_URI;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;

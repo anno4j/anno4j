@@ -1,29 +1,19 @@
 package com.github.anno4j.querying.evaluation.ldpath;
 
-import com.github.anno4j.model.ontologies.OADM;
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.expr.*;
 import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueString;
-import com.hp.hpl.jena.sparql.function.FunctionEnv;
-import com.hp.hpl.jena.sparql.graph.NodeTransform;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.XSD;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.IsATest;
 import org.apache.marmotta.ldpath.model.tests.LiteralLanguageTest;
 import org.apache.marmotta.ldpath.model.tests.LiteralTypeTest;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
 
 public class EvalTestingSelector {
 

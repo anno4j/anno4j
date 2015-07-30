@@ -1,4 +1,4 @@
-package com.github.anno4j.model.ontologies;
+package com.github.anno4j.model.namespaces;
 
 /**
  * Ontology Class for the Resource Description Framework (rdf:).

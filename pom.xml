@@ -158,11 +158,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.anno4j</groupId>
-                <artifactId>anno4j-ontologies-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.anno4j</groupId>
                 <artifactId>anno4j-ontologies-mico</artifactId>
                 <version>${project.version}</version>
             </dependency>

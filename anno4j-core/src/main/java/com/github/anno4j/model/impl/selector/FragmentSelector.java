@@ -1,9 +1,9 @@
 package com.github.anno4j.model.impl.selector;
 
 import com.github.anno4j.model.Selector;
-import com.github.anno4j.model.ontologies.DCTERMS;
-import com.github.anno4j.model.ontologies.OADM;
-import com.github.anno4j.model.ontologies.RDF;
+import com.github.anno4j.model.namespaces.DCTERMS;
+import com.github.anno4j.model.namespaces.OADM;
+import com.github.anno4j.model.namespaces.RDF;
 import org.openrdf.annotations.Iri;
 
 /**
