@@ -16,6 +16,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test inheritance of annotated classes. RDF of Superclass should be mapped to a Subclass. Subclass can add more functionality and access superclass information.
@@ -60,12 +61,15 @@ public class InheritanceTest {
         Annotation resultObject = result.get(0);
         Body resultBody = resultObject.getBody();
 
-        assertEquals("myValue", ((Superclass)resultBody).getValue());
+        assertTrue(resultBody instanceof  Superclass);
+        assertEquals("myValue", ((Superclass) resultBody).getValue());
+        assertTrue(resultBody instanceof Subclass);
         assertEquals("myValueCUSTOM", ((Subclass) resultBody).getCustomValue());
     }
 
     @Iri("http://www.example.com/Superclass")
     public static class Superclass extends Body {
+
         @Iri("http://www.example.com/Superclass/value")
         private String value;
 
@@ -82,7 +86,7 @@ public class InheritanceTest {
         }
     }
 
-    @Iri("http://www.example.com/Subclass")
+    @Iri("http://www.example.com/Superclass")
     public static class Subclass extends Superclass{
 
         public Subclass() {
