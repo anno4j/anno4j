@@ -1,0 +1,9 @@
+
+// test release prepare
+mvn release:prepare -DignoreSnapshots=true -DpushChanges=false -DreleaseVersion=1.1.0 -DdevelopmentVersion=1.2.0-SNAPSHOT -DdryRun=true -Dresume=false -Darguments="-DskipTests"
+
+// release prepare
+mvn release:prepare -DignoreSnapshots=true -DpushChanges=false -DreleaseVersion=1.1.0 -DdevelopmentVersion=1.1.1-SNAPSHOT -Dresume=false
+
+// release perform
+mvn release:perform -DlocalCheckout=true
