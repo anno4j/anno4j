@@ -41,7 +41,7 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
       <dependency>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-core</artifactId>
-        <version>1.0.5</version>
+        <version>1.1.0</version>
       </dependency>
 ```     
 2. Add an empty concept file "org.openrdf.concepts" under your META-INF directory
