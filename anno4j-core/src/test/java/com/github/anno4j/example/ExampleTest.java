@@ -2,7 +2,6 @@ package com.github.anno4j.example;
 
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.model.impl.StringURLResource;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
 import com.github.anno4j.model.impl.motivation.Commenting;
@@ -11,9 +10,7 @@ import com.github.anno4j.model.impl.target.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
