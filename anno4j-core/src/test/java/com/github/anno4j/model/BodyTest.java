@@ -56,7 +56,7 @@ public class BodyTest {
     }
 
     @Iri("http://www.example.com/schema#bodyType")
-    public class TestBody extends Body {
+    public static class TestBody extends Body {
 
         public TestBody() {
         }
