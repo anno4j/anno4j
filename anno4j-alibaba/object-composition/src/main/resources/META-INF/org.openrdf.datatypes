@@ -1,0 +1,20 @@
+# Object Literals
+org.openrdf.repository.object.LangString	=	http://www.w3.org/1999/02/22-rdf-syntax-ns#langString
+java.lang.CharSequence	=	http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral
+java.lang.String		=	http://www.w3.org/2001/XMLSchema#string http://www.w3.org/2001/XMLSchema#normalizedString http://www.w3.org/2001/XMLSchema#token http://www.w3.org/2001/XMLSchema#Name http://www.w3.org/2001/XMLSchema#NMTOKEN http://www.w3.org/2001/XMLSchema#NCName http://www.w3.org/2001/XMLSchema#ID http://www.w3.org/2001/XMLSchema#IDREF http://www.w3.org/2001/XMLSchema#ENTITY
+java.lang.Integer		=	http://www.w3.org/2001/XMLSchema#int http://www.w3.org/2001/XMLSchema#unsignedInt
+java.math.BigInteger	=	http://www.w3.org/2001/XMLSchema#integer http://www.w3.org/2001/XMLSchema#nonPositiveInteger http://www.w3.org/2001/XMLSchema#negativeInteger http://www.w3.org/2001/XMLSchema#nonNegativeInteger http://www.w3.org/2001/XMLSchema#positiveInteger
+java.lang.Boolean		=	http://www.w3.org/2001/XMLSchema#boolean
+java.lang.Byte			=	http://www.w3.org/2001/XMLSchema#byte http://www.w3.org/2001/XMLSchema#unsignedByte
+java.lang.Double		=	http://www.w3.org/2001/XMLSchema#double
+java.math.BigDecimal	=	http://www.w3.org/2001/XMLSchema#decimal
+java.lang.Float			=	http://www.w3.org/2001/XMLSchema#float
+java.lang.Long			=	http://www.w3.org/2001/XMLSchema#long http://www.w3.org/2001/XMLSchema#unsignedLong
+java.lang.Short			=	http://www.w3.org/2001/XMLSchema#short http://www.w3.org/2001/XMLSchema#unsignedShort
+java.util.Locale		=	http://www.w3.org/2001/XMLSchema#language
+java.net.URI			=	http://www.w3.org/2001/XMLSchema#anyURI
+[B						= 	http://www.w3.org/2001/XMLSchema#hexBinary http://www.w3.org/2001/XMLSchema#base64Binary
+javax.xml.datatype.XMLGregorianCalendar	=	http://www.w3.org/2001/XMLSchema#dateTime http://www.w3.org/2001/XMLSchema#date http://www.w3.org/2001/XMLSchema#time http://www.w3.org/2001/XMLSchema#gYearMonth http://www.w3.org/2001/XMLSchema#gMonthDay http://www.w3.org/2001/XMLSchema#gYear http://www.w3.org/2001/XMLSchema#gMonth http://www.w3.org/2001/XMLSchema#gDay
+javax.xml.datatype.Duration				=	http://www.w3.org/2001/XMLSchema#duration http://www.w3.org/2001/XMLSchema#dayTimeDuration http://www.w3.org/2001/XMLSchema#yearMonthDuration
+javax.xml.namespace.QName				=	http://www.w3.org/2001/XMLSchema#QName http://www.w3.org/2001/XMLSchema#NOTATION
+org.w3c.dom.DocumentFragment			=	http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral

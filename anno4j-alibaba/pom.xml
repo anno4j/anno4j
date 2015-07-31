@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.github.anno4j</groupId>
+        <artifactId>anno4j-parent</artifactId>
+        <version>1.1.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    
+	<artifactId>anno4j-alibaba</artifactId>
+	<packaging>pom</packaging>
+
+    <modules>
+		<module>object-composition</module>
+		<module>object-repository</module>
+		<module>blob-store</module>
+	</modules>
+
+	<name>Anno4j AliBaba (forked)</name>
+	<description><![CDATA[
+AliBaba is a collection of modules that provide simplified RDF store abstractions to accelerate development and facilitate application maintenance.
+]]>
+	</description>
+
+	<properties>
+		<sesame.version>2.7.12</sesame.version>
+		<javassist.version>3.11.0.GA</javassist.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Sesame Dependencies -->
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-model</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-core</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryparser-sparql</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryresultio-sparqlxml</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryresultio-sparqljson</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-queryalgebra-evaluation</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-rio-turtle</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-rio-rdfxml</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-sail-inferencer</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-sail-nativerdf</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-repository-sail</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-repository-manager</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-repository-contextaware</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-store-testsuite</artifactId>
+				<version>${sesame.version}</version>
+				<scope>test</scope>
+			</dependency>
+		    <dependency>
+			    <groupId>org.openrdf.sesame</groupId>
+			    <artifactId>sesame-sail-api</artifactId>
+				<version>${sesame.version}</version>
+		    </dependency>
+		    <dependency>
+			    <groupId>org.openrdf.sesame</groupId>
+			    <artifactId>sesame-sail-memory</artifactId>
+				<version>${sesame.version}</version>
+		    </dependency>
+		    <dependency>
+			    <groupId>org.openrdf.sesame</groupId>
+			    <artifactId>sesame-queryresultio-text</artifactId>
+				<version>${sesame.version}</version>
+		    </dependency>
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-sparql-testsuite</artifactId>
+				<version>${sesame.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<!-- Third Party Dependencies -->
+			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.10</version>
+			</dependency>
+			<dependency>
+				<groupId>javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>${javassist.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.activation</groupId>
+				<artifactId>activation</artifactId>
+				<version>1.1</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+	            <groupId>org.apache.httpcomponents</groupId>
+	            <artifactId>httpasyncclient-cache</artifactId>
+	            <version>4.1-beta1</version>
+            </dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

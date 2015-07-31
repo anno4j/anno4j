@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+   <!ENTITY msg  "http://www.openrdf.org/rdf/2011/messaging#" >
+   <!ENTITY owl  "http://www.w3.org/2002/07/owl#" >
+   <!ENTITY xsd  "http://www.w3.org/2001/XMLSchema#" >
+   <!ENTITY rdf  "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:union="http://example.org/unionOf#"
+	xmlns:msg="&msg;"
+	xml:base="http://example.org/unionOf">
+
+	<owl:Class rdf:ID="start">
+		<rdfs:subClassOf rdf:resource="&msg;Message" />
+		<rdfs:subClassOf>
+			<owl:Restriction>
+				<owl:onProperty rdf:resource="&msg;target" />
+				<owl:allValuesFrom>
+					<owl:Class>
+						<owl:unionOf rdf:parseType="Collection">
+							<owl:Class rdf:about="#Car"/>
+							<owl:Class rdf:about="#Truck"/>
+						</owl:unionOf>
+					</owl:Class>
+				</owl:allValuesFrom>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		<rdfs:subClassOf>
+			<owl:Restriction>
+				<owl:onProperty rdf:resource="&msg;literalSet" />
+				<owl:allValuesFrom rdf:resource="&rdf;PlainLiteral" />
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		<rdfs:subClassOf>
+			<owl:Restriction>
+				<owl:onProperty rdf:resource="&msg;literalSet" />
+				<owl:cardinality>1</owl:cardinality>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+	</owl:Class>
+
+</rdf:RDF>

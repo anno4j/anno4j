@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Defines an instance with a property that has a rdf:List value that is not terminated by rdf:nil.
+-->
+<rdf:RDF xmlns:inst="http://adixon.prototype/inst#" 
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <rdf:List rdf:about="urn:root">
+     <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">one</rdf:first>
+     <rdf:rest>
+       <rdf:List>
+         <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">two</rdf:first>
+         <rdf:rest>
+            <rdf:List>
+              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string">three</rdf:first>
+            </rdf:List>
+         </rdf:rest>
+       </rdf:List>
+    </rdf:rest>
+  </rdf:List>
+</rdf:RDF>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:trip="http://example.org/roundtrip#">
+<owl:Class rdf:about="http://example.org/roundtrip#Round">
+	<rdfs:label>Round</rdfs:label>
+	<rdfs:isDefinedBy rdf:resource="http://example.org/roundtrip#"/>
+</owl:Class>
+<owl:DeprecatedClass rdf:about="http://example.org/roundtrip#Trip">
+	<rdfs:label>Trip</rdfs:label>
+	<rdfs:isDefinedBy rdf:resource="http://example.org/roundtrip#"/>
+</owl:DeprecatedClass>
+<owl:ObjectProperty rdf:about="http://example.org/roundtrip#round">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+	<rdfs:range rdf:resource="http://example.org/roundtrip#Round"/>
+	<rdfs:domain rdf:resource="http://example.org/roundtrip#Trip"/>
+	<rdfs:label>round</rdfs:label>
+	<rdfs:isDefinedBy rdf:resource="http://example.org/roundtrip#"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://example.org/roundtrip#trip">
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DeprecatedProperty"/>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+	<rdfs:range rdf:resource="http://example.org/roundtrip#Trip"/>
+	<rdfs:domain rdf:resource="http://example.org/roundtrip#Round"/>
+	<rdfs:label>trip</rdfs:label>
+	<rdfs:isDefinedBy rdf:resource="http://example.org/roundtrip#"/>
+</owl:ObjectProperty>
+
+</rdf:RDF>

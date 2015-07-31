@@ -1,0 +1,31 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:equivalent="http://example.org/equivalent#"
+    xml:base="http://example.org/equivalent">
+   <rdfs:Class rdf:ID="A"/>
+   <rdfs:Class rdf:ID="B"/>
+   <rdf:Description>
+      <owl:intersectionOf rdf:parseType="Collection">
+          <rdf:Description>
+             <owl:complementOf rdf:resource="#A"/>
+          </rdf:Description>
+          <rdf:Description>
+             <owl:complementOf rdf:resource="#B"/>
+          </rdf:Description>
+      </owl:intersectionOf>
+      <owl:equivalentClass>
+         <rdf:Description>
+           <owl:complementOf>
+             <rdf:Description>
+               <owl:unionOf rdf:parseType="Collection">
+                 <rdf:Description rdf:about="#A"/>
+                 <rdf:Description rdf:about="#B"/>
+               </owl:unionOf>
+             </rdf:Description>
+           </owl:complementOf>
+         </rdf:Description>
+      </owl:equivalentClass>
+   </rdf:Description>   
+</rdf:RDF>

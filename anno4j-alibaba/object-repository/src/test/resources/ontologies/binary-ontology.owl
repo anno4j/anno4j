@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+<!ENTITY owl "http://www.w3.org/2002/07/owl#">
+]>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xml:base="urn:test:base64binary">
+
+<owl:Class rdf:ID="BinaryClass">
+	<rdfs:label>BinaryClass</rdfs:label>
+</owl:Class>
+
+<owl:DatatypeProperty rdf:ID="binary">
+	<rdfs:domain rdf:resource="#BinaryClass"/>
+	<rdfs:range rdf:resource="&xsd;base64Binary"/>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:ID="native">
+	<rdf:type rdf:resource="&owl;FunctionalProperty"/>
+	<rdfs:domain rdf:resource="#BinaryClass"/>
+	<rdfs:range rdf:resource="&xsd;base64Binary"/>
+</owl:DatatypeProperty>
+
+</rdf:RDF>

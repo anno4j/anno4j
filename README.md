@@ -21,6 +21,7 @@
     - [Configuration](#configuration)
     - [Create and save annotations](#create-and-save-annotations)
     - [Query for annotations](#query-for-annotations)
+    - [Graph Context](#graph-context)
 - [Example](#example)
 - [Restrictions](#restrictions)
 - [Contributors](#contributors)
@@ -175,6 +176,20 @@ to be invoked. Because anno4j provides a fluent-interface, the code examples fro
         .addPrefix("ex", "http://www.example.com/schema#")
         .setBodyCriteria("ex:value", "Example Value")
         .execute();
+```
+
+### Graph Context
+
+You can specify a sub-graph instead of the default graph in the Queryservice or Persistenceservice.
+
+```java
+
+    URI subgraph = new URIImpl("http://www.example.com/subgraph");
+    
+    QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class, subgraph);
+    
+    PersistenceService persistenceService = Anno4j.getInstance().createPersistenceService(subgraph);
+    
 ```
 
 ## Example
