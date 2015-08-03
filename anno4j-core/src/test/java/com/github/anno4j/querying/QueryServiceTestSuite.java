@@ -14,7 +14,8 @@ import org.openrdf.sail.memory.MemoryStore;
         LanguageTest.class,
         ConstraintLessTest.class,
         DataTypeTest.class,
-        IsATest.class
+        IsATest.class,
+        ReversePathTest.class
 })
 public class QueryServiceTestSuite {
 

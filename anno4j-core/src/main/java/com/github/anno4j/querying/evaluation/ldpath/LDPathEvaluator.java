@@ -29,6 +29,8 @@ public class LDPathEvaluator {
             return EvalGroupedSelector.evaluate((GroupedSelector) nodeSelector, elementGroup, variable);
         } else if (nodeSelector instanceof UnionSelector) {
             return EvalUnionSelector.evaluate((UnionSelector) nodeSelector, elementGroup, variable);
+        } else if (nodeSelector instanceof ReversePropertySelector) {
+            return EvalReversePropertySelector.evaluate((ReversePropertySelector) nodeSelector, elementGroup, variable);
         } else {
             throw new IllegalStateException(nodeSelector.getClass() + " is not supported.");
         }
