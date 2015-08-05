@@ -4,6 +4,7 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.namespaces.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
 import com.hp.hpl.jena.query.Query;
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
