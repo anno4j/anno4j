@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The QueryService allows to query the MICO triple stores by using criteria. Furthermore
+ * The QueryService allows to query triple stores by using criteria. Furthermore
  * this is provided by simple classes. This is why the user does not need to write SPARQL queries
  * by himself.
  *
