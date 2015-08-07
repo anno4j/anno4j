@@ -29,6 +29,11 @@ public class MICOQueryHelper {
      *
      * @param contentItemId The id (url) of the content item.
      * @return List of annotations related to the given content item.
+     *
+     * @throws RepositoryException
+     * @throws QueryEvaluationException
+     * @throws MalformedQueryException
+     * @throws ParseException
      */
     public List<Annotation> getAnnotationsOfContentItem(String contentItemId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         return Anno4j.getInstance().createQueryService(Annotation.class)
@@ -42,6 +47,11 @@ public class MICOQueryHelper {
      *
      * @param contentPartId The id (url) of the content part.
      * @return The annotation object of the given content part.
+     *
+     * @throws RepositoryException
+     * @throws QueryEvaluationException
+     * @throws MalformedQueryException
+     * @throws ParseException
      */
     public Annotation getAnnotationOfContentPart(String contentPartId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         return (Annotation) Anno4j.getInstance().createQueryService(Annotation.class)
@@ -51,11 +61,16 @@ public class MICOQueryHelper {
     }
 
     /**
-     * Allows to query for all annotations realated to a specific MIME type,
-     * e.g. "images/jpeg" or "video/mp4"
+     * Allows to query for all annotations related to a specific MIME type,
+     * e.g. "images/jpeg" or "video/mp4".
      *
-     * @param mimeType The specific MIME type
+     * @param mimeType The specific MIME type.
      * @return List of annotations related to the specific MIME type.
+     *
+     * @throws RepositoryException
+     * @throws QueryEvaluationException
+     * @throws MalformedQueryException
+     * @throws ParseException
      */
     public List<Annotation> getAnnotationsByMIMEType(String mimeType) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         return Anno4j.getInstance().createQueryService(Annotation.class)
@@ -65,6 +80,18 @@ public class MICOQueryHelper {
                 .execute();
     }
 
+    /**
+     * Allows to query for all annotations, specifying the name of the source,
+     * e.g. the name of the injected image.
+     *
+     * @param sourceName The name of the injected source.
+     * @return List of annotations related to the specific source name.
+     *
+     * @throws RepositoryException
+     * @throws QueryEvaluationException
+     * @throws MalformedQueryException
+     * @throws ParseException
+     */
     public List<Annotation> getAnnotationsBySourceName(String sourceName) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         return Anno4j.getInstance().createQueryService(Annotation.class)
                 .addPrefix(MICO.PREFIX, MICO.NS)

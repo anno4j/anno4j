@@ -6,6 +6,8 @@ public class MICO {
 
     public final static String PREFIX = "mico";
 
+    public final static String INITIAL_TARGET = NS + "InitialTarget";
+
     public final static String BINARY_BODY = NS + "BinaryBody";
 
     public final static String HAS_BODY = NS + "hasBody";
