@@ -41,7 +41,7 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
       <dependency>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-core</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
       </dependency>
 ```     
 2. Add an empty concept file "org.openrdf.concepts" under your META-INF directory
@@ -399,6 +399,22 @@ More precisely, anno4j currently supports only the specific **is-a Test**.
  
     
 For the next version of anno4j it is planned to integrate more of these tests. For examples and a detailed documentation visit: [http://marmotta.apache.org/ldpath/language.html](http://marmotta.apache.org/ldpath/language.html).
+
+**Reverse Property Selections**
+
+This is the reverse/inverse operation of the normal Property Selection.
+
+Select all nodes connected to the current node via an incoming link, aka. go the specified link “backwards”:
+
+    ^<URI>
+
+**Recursive Selections**
+
+Recurseive selection will apply an selectore recursively. 
+
+	(<SELECTOR>)*  //  zero-and-more 
+	(<SELECTOR>)+  //  one-and-more 
+
 
 
 ## Contributors
