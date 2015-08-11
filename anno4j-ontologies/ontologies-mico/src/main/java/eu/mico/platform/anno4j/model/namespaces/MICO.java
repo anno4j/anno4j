@@ -22,6 +22,10 @@ public class MICO {
 
     public final static String HAS_LOCATION = NS + "hasLocation";
 
+    public final static String HAS_WIDTH = NS + "hasWidth";
+
+    public final static String HAS_HEIGHT = NS + "hasHeight";
+
     public final static String HAS_QUEUE_NAME = NS + "hasQueueName";
 
     public final static String HAS_REDEFINED_TYPE = NS + "hasRefinedType";
@@ -57,6 +61,8 @@ public class MICO {
     public final static String MOUTH_DETECTION_BODY = NS + "MouthDetectionBody";
 
     public final static String ANIMAL_DETECTION_BODY = NS + "AnimalDetectionBody";
+
+    public final static String IMAGE_DIMENSION_BODY = NS + "ImageDimensionBody";
 
     public final static String RIGHT_EYE_DETECTION_BODY = NS + "RightEyeDetectionBody";
 
