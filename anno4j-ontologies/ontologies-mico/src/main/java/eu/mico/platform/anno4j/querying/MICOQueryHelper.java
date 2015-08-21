@@ -3,6 +3,7 @@ package eu.mico.platform.anno4j.querying;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.namespaces.DCTERMS;
+import com.github.anno4j.querying.QueryService;
 import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
@@ -25,6 +26,21 @@ public class MICOQueryHelper {
     private static MICOQueryHelper instance = null;
 
     /**
+     * Selector type restriction
+     */
+    private String selectorTypeRestriction;
+
+    /**
+     * Body type restriction
+     */
+    private String bodyTypeRestriction;
+
+    /**
+     * Target type restriction
+     */
+    private String targetTypeRestriction;
+
+    /**
      * Allows to query all annotation objects of a given content item.
      *
      * @param contentItemId The id (url) of the content item.
@@ -36,10 +52,13 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsOfContentItem(String contentItemId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        return Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService<Annotation> qs = Anno4j.getInstance().createQueryService(Annotation.class)
                 .addPrefix(MICO.PREFIX, MICO.NS)
-                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart", contentItemId)
-                .execute();
+                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart", contentItemId);
+
+        processTypeRestriction(qs);
+
+        return qs.execute();
     }
 
     /**
@@ -54,10 +73,13 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public Annotation getAnnotationOfContentPart(String contentPartId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        return (Annotation) Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService<Annotation> qs = Anno4j.getInstance().createQueryService(Annotation.class)
                 .addPrefix(MICO.PREFIX, MICO.NS)
-                .setAnnotationCriteria("^mico:hasContent", contentPartId)
-                .execute().get(0);
+                .setAnnotationCriteria("^mico:hasContent", contentPartId);
+
+        processTypeRestriction(qs);
+
+        return (Annotation) qs.execute().get(0);
     }
 
     /**
@@ -73,11 +95,14 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsByMIMEType(String mimeType) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        return Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService<Annotation> qs =  Anno4j.getInstance().createQueryService(Annotation.class)
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
-                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:type", mimeType)
-                .execute();
+                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:type", mimeType);
+
+        processTypeRestriction(qs);
+
+        return qs.execute();
     }
 
     /**
@@ -93,11 +118,57 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsBySourceName(String sourceName) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        return Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService<Annotation> qs = Anno4j.getInstance().createQueryService(Annotation.class)
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
-                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:source", sourceName)
-                .execute();
+                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:source", sourceName);
+
+        processTypeRestriction(qs);
+
+        return qs.execute();
+    }
+
+    /**
+     * @param type The type of the body as String, i.e. "mico:AVQBody"
+     */
+    public MICOQueryHelper filterBodyType(String type) {
+        this.bodyTypeRestriction = "[is-a "+ type + "]";
+        return getInstance();
+    }
+
+    /**
+     * @param type The type of the selector as String, i.e. "oa:FragmentSelector"
+     */
+    public MICOQueryHelper filterSelectorType(String type) {
+        this.selectorTypeRestriction  = "[is-a "+ type + "]";
+        return getInstance();
+    }
+
+    /**
+     * @param type The type of the target as String, i.e. "mico:IntialTarget"
+     */
+    public MICOQueryHelper filterTargetType(String type) {
+        this.targetTypeRestriction = "[is-a "+ type + "]";
+        return getInstance();
+    }
+
+    /**
+     * Checks if type restrictions were set and adds them to the QueryService object.
+     *
+     * @param qs The anno4j QueryService object
+     */
+    private void processTypeRestriction(QueryService<Annotation> qs) {
+        if(selectorTypeRestriction != null) {
+            qs.setSelectorCriteria(selectorTypeRestriction);
+        }
+
+        if(bodyTypeRestriction != null) {
+            qs.setBodyCriteria(bodyTypeRestriction);
+        }
+
+        if(targetTypeRestriction != null) {
+            qs.setAnnotationCriteria("oa:hasTarget" + targetTypeRestriction);
+        }
     }
 
     /**
