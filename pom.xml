@@ -4,7 +4,7 @@
     
     <groupId>com.github.anno4j</groupId>
     <artifactId>anno4j-parent</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.1.4</version>
     <packaging>pom</packaging>
     <name>Anno4j Parent</name>
     <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/)</description>
@@ -16,7 +16,7 @@
     <scm>
         <developerConnection>scm:git:https://schlegel@github.com/anno4j/anno4j.git</developerConnection>
         <url>https://github.com/anno4j/anno4j.git</url>
-      <tag>HEAD</tag>
+      <tag>v1.1.4</tag>
   </scm>
 
     <organization>
