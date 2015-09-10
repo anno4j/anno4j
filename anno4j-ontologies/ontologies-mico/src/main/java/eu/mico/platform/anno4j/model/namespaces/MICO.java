@@ -82,6 +82,8 @@ public class MICO {
 
     public final static String TVS_SHOT_BODY = NS + "TVSShotBody";
 
+    public final static String TVS_SHOT_BOUNDARY_FRAME_BODY = NS + "TVSShotBoundaryFrameBody";
+
     public final static String VSI_BODY = NS + "VSIBody";
 
     public final static String SMD_BODY = NS + "SMDBody";
