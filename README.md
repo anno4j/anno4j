@@ -2,6 +2,8 @@
 
 > This library provides programmatic access to read and write [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) / [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/) from and to local/remote SPARQL endpoints. An easy-to-use and extensible Java API allows creation and querying of annotations even for non-experts.  
 
+[![Build Status](https://travis-ci.org/anno4j/anno4j.svg)](https://travis-ci.org/anno4j/anno4j)
+
 ## Features:
 
 - Extensible creation of Web/Open Annotations based on Java Annotations syntax.
