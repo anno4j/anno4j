@@ -3,7 +3,7 @@ notifications:
   email:
   - kai.schlegel@googlemail.com
 test : mvn test -Dmaven.javadoc.skip=true --settings settings.xml
-install: mvn install -DskipTests=true --settings settings.xml
+install: mvn install -DskipTests=true -Dgpg.skip=true --settings settings.xml
 
 #script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean install --settings settings.xml || mvn clean verify --settings settings.xml"
 branches:
