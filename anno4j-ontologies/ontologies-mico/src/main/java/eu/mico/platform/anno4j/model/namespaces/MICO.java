@@ -44,7 +44,7 @@ public class MICO {
 
     public final static String FACE_RECOGNITION_BODY = NS + "FaceRecognitionBody";
 
-    public final static String ANNOTATION_BODY = NS + "AnnotatinBody";
+    public final static String ANNOTATION_BODY = NS + "AnnotationBody";
 
     public final static String MULTIMEDIA_BODY = NS + "MultimediaBody";
 
@@ -52,7 +52,7 @@ public class MICO {
 
     public final static String DETECTION_BODY = NS + "DetectionBody";
 
-    public final static String FACE_DETECTION_BODY = NS + "FaceRecognitionBody";
+    public final static String FACE_DETECTION_BODY = NS + "FaceDetectionBody";
 
     public final static String EYE_DETECTION_BODY = NS + "EyeDetectionBody";
 
