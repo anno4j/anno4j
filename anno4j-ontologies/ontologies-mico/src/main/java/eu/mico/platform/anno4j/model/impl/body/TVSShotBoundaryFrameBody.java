@@ -5,15 +5,15 @@ import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.openrdf.annotations.Iri;
 
 /**
- * Class represents a KeyFrame of a given TVS analysis.
+ * Class represents a Shot Boundary Frame of a given TVS analysis.
  */
-@Iri(MICO.TVS_KEY_FRAME_BODY)
-public class TVSKeyFrameBody extends TVSBody {
+@Iri(MICO.TVS_SHOT_BOUNDARY_FRAME_BODY)
+public class TVSShotBoundaryFrameBody  extends TVSBody{
 
     @Iri(DC.FORMAT)
     private String format;
 
-    public TVSKeyFrameBody() {
+    public TVSShotBoundaryFrameBody() {
     }
 
     public String getFormat() {
