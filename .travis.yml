@@ -2,11 +2,11 @@ language: java
 notifications:
   email:
   - kai.schlegel@googlemail.com
+#  - andreas.eisenkolb@gmail.com
+#  - emanuel.berndl@gmail.com
 test : mvn test -Dmaven.javadoc.skip=true -Dgpg.skip=true --settings settings.xml
 install: mvn install -DskipTests=true -Dgpg.skip=true --settings settings.xml
-script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings settings.xml || mvn clean verify --settings settings.xml"
-
-#&& [ ${TRAVIS_BRANCH} == 'master' ]
+script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} == 'develop' ] && mvn clean deploy -Dgpg.skip=true --settings settings.xml || mvn clean verify -Dgpg.skip=true --settings settings.xml"
 branches:
   only:
   - master

@@ -22,7 +22,6 @@
             </activation>
             <properties>
                 <gpg.executable>gpg</gpg.executable>
-                <gpg.passphrase>${env.CI_GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
         </profile>
     </profiles>

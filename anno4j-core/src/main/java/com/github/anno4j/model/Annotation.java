@@ -4,6 +4,9 @@ import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Conforms to oa:Annotation (http://www.openannotation.org/spec/core/core.html)
  */
@@ -17,7 +20,7 @@ public class Annotation extends ResourceObject {
     /**
      * Refers to http://www.w3.org/ns/oa#hasTarget
      */
-    @Iri(OADM.HAS_TARGET)    private Target target;
+    @Iri(OADM.HAS_TARGET)    private Set<Target> targets;
     /**
      * Refers to http://www.w3.org/ns/oa#motivatedBy
      */
@@ -42,7 +45,9 @@ public class Annotation extends ResourceObject {
     /**
      * Constructor.
      */
-    public Annotation() {}
+    public Annotation() {
+        this.targets = new HashSet<>();
+    }
 
     /**
      * Gets http:www.w3.org/ns/oa#hasBody relationship.
@@ -63,21 +68,59 @@ public class Annotation extends ResourceObject {
     }
 
     /**
-     * Gets http:www.w3.org/ns/oa#hasTarget relationship.
+     * Gets http:www.w3.org/ns/oa#hasTarget relationship. DEPRECATED: Use getTargets() instead. The result of this implementation may vary with mutliple targets.
      *
      * @return Value of http:www.w3.org/ns/oa#hasTarget.
      */
+    @Deprecated
     public Target getTarget() {
-        return target;
+        if(this.targets != null && this.targets.size() > 0) {
+            return this.targets.iterator().next();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets http:www.w3.org/ns/oa#hasTarget relationships.
+     *
+     * @return Values of http:www.w3.org/ns/oa#hasTarget.
+     */
+    public Set<Target> getTargets() {
+        return this.targets;
+    }
+
+    /**
+     * Sets http:www.w3.org/ns/oa#hasTarget. DEPRECATED: Use setTargets() or addTarget() instead. The current implementation replaces the current targets with the new target.
+     *
+     * @param target New value of http:www.w3.org/ns/oa#hasTarget.
+     */
+    @Deprecated
+    public void setTarget(Target target) {
+        this.targets = new HashSet<>();
+        this.targets.add(target);
     }
 
     /**
      * Sets http:www.w3.org/ns/oa#hasTarget.
      *
-     * @param target New value of http:www.w3.org/ns/oa#hasTarget.
+     * @param targets New value of http:www.w3.org/ns/oa#hasTarget.
      */
-    public void setTarget(Target target) {
-        this.target = target;
+    public void setTargets(Set<Target> targets) {
+        this.targets = targets;
+    }
+
+    /**
+     * Adds a http:www.w3.org/ns/oa#hasTarget relationship.
+     *
+     * @param target New http:www.w3.org/ns/oa#hasTarget relationship.
+     */
+    public void addTarget(Target target) {
+        if(this.targets == null) {
+            this.targets = new HashSet<>();
+        }
+
+        this.targets.add(target);
     }
 
     /**
@@ -175,7 +218,7 @@ public class Annotation extends ResourceObject {
         return "Annotation{" +
                 "resource='" + this.getResource() + "'" +
                 ", body=" + ((body != null) ? body.toString() : "empty") +
-                ", target=" + ((target != null) ? target.toString() : "empty") +
+                ", targets=" + ((targets != null) ? targets.toString() : "empty") +
                 ", motivatedBy=" + motivatedBy +
                 ", serializedBy=" + serializedBy +
                 ", serializedAt='" + serializedAt + '\'' +
