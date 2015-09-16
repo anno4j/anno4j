@@ -94,6 +94,10 @@ public class MICO {
 
     public final static String NER_BODY = NS + "NERBody";
 
+    public final static String STT_BODY_MICO = NS + "STTBody";
+
+    public final static String STT_SILENCE_BODY_MICO = NS + "STTSilenceBody";
+
     public final static String PSP_BODY = NS + "PSPBody";
 
     public final static String ASR_BODY = NS + "ASRDBody";
