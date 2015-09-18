@@ -34,7 +34,7 @@ public class TextQuoteSelector extends Selector {
      * A snippet of text that occurs immediately before the text which is being selected.
      * Each TextQuoteSelector should have exactly 1 oa:prefix property, and must not have more than 1.
      */
-    @Iri(OADM.PREFIX) private String prefix;
+    @Iri(OADM.TEXT_PREFIX) private String prefix;
 
     /**
      * Refers to http://www.w3.org/ns/oa#suffix
