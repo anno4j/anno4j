@@ -126,4 +126,6 @@ public class MICO {
 
     public final static String COLOR_LAYOUT_RAW_BODY = NS + "CLraw";
 
+    public final static String HAS_EXTRACTION_VERSION = NS + "hasExtractionVersion";
+
 }
