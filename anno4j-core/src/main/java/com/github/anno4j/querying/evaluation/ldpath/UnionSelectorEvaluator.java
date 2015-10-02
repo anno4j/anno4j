@@ -1,22 +1,23 @@
 package com.github.anno4j.querying.evaluation.ldpath;
 
+import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
+import com.github.anno4j.querying.extension.QueryEvaluator;
+import com.github.anno4j.querying.extension.annotation.Evaluator;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.model.selectors.UnionSelector;
 
-public class EvalUnionSelector {
+/**
+ * Evaluates an UnionSelector. More precisely, it creates the UNION part of the SPARQL query.
+ */
+@Evaluator(UnionSelector.class)
+public class UnionSelectorEvaluator implements QueryEvaluator {
 
-    /**
-     * Evaluates an UnionSelector. More precisely, it creates the UNION part of the SPARQL query.
-     *
-     * @param unionSelector The UnionSelector to evaluate
-     * @param elementGroup  ElementGroup containing the actual query parts
-     * @param variable      The latest created variable
-     * @return the latest referenced variable name
-     */
-    public static Var evaluate(UnionSelector unionSelector, ElementGroup elementGroup, Var variable) {
+    @Override
+    public Var evaluate(NodeSelector nodeSelector, ElementGroup elementGroup, Var var, LDPathEvaluatorConfiguration evaluatorConfiguration) {
+        UnionSelector unionSelector = (UnionSelector) nodeSelector;
 
         NodeSelector nodeSelectorLeft = unionSelector.getLeft();
         NodeSelector nodeSelectorRight = unionSelector.getRight();
@@ -24,8 +25,8 @@ public class EvalUnionSelector {
         ElementGroup leftGroup = new ElementGroup();
         ElementGroup rightGroup = new ElementGroup();
 
-        Var leftVar = LDPathEvaluator.evaluate(nodeSelectorLeft, leftGroup, variable);
-        LDPathEvaluator.evaluate(nodeSelectorRight, rightGroup, variable);
+        Var leftVar = LDPathEvaluator.evaluate(nodeSelectorLeft, leftGroup, var, evaluatorConfiguration);
+        LDPathEvaluator.evaluate(nodeSelectorRight, rightGroup, var, evaluatorConfiguration);
 
         ElementUnion elementUnion = new ElementUnion();
         elementUnion.addElement(leftGroup.getElements().get(0));

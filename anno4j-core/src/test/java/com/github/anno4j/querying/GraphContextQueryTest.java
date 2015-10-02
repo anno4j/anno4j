@@ -41,12 +41,11 @@ public class GraphContextQueryTest {
         Anno4j.getInstance().createPersistenceService(subgraph).persistAnnotation(annotation);
 
         // Querying for the persisted annotation
-        QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class);
+        QueryService queryService = Anno4j.getInstance().createQueryService();
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")
                 .execute();
-
         assertEquals(1, defaultList.size());
 
         // Testing if the body was persisted correctly
@@ -67,7 +66,7 @@ public class GraphContextQueryTest {
         Anno4j.getInstance().createPersistenceService(subgraph).persistAnnotation(annotation);
 
         // Querying for the persisted annotation
-        QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class, subgraph);
+        QueryService queryService = Anno4j.getInstance().createQueryService(subgraph);
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")
@@ -93,7 +92,7 @@ public class GraphContextQueryTest {
         Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
 
         // Querying for the persisted annotation
-        QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class, subgraph);
+        QueryService queryService = Anno4j.getInstance().createQueryService(subgraph);
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")
