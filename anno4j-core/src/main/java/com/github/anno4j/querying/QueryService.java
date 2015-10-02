@@ -1,22 +1,10 @@
 package com.github.anno4j.querying;
 
+import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.namespaces.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
-import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
-import com.github.anno4j.querying.extension.QueryEvaluator;
-import com.github.anno4j.querying.extension.QueryExtension;
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.core.Var;
-import org.apache.marmotta.ldpath.api.functions.NodeFunction;
-import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
-import org.apache.marmotta.ldpath.api.functions.TestFunction;
-import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
-import org.apache.marmotta.ldpath.api.tests.NodeTest;
-import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
-import org.apache.marmotta.ldpath.model.Constants;
-import org.apache.marmotta.ldpath.parser.Configuration;
-import org.apache.marmotta.ldpath.parser.DefaultConfiguration;
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
@@ -41,13 +29,18 @@ import java.util.Map;
  * this is provided by simple classes. This is why the user does not need to write SPARQL queries
  * by himself.
  *
+ * @param <T>
  * @author Andreas Eisenkolb
  */
-public class QueryService {
+public class QueryService<T extends Annotation> {
 
     private final Logger logger = LoggerFactory.getLogger(QueryService.class);
     private final URI graph;
-    private final LDPathEvaluatorConfiguration evaluatorConfiguration;
+
+    /**
+     * The type of the result set.
+     */
+    private Class<T> type;
 
     /**
      * The repository needed for the actual querying
@@ -56,10 +49,11 @@ public class QueryService {
 
     /**
      * LDPath for the shortcut method setBodyCriteria
-     * <p/>
+     *
      * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
      * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasBody/[is-a ex:exampleType]",
      * if we would append the slash to the BODY_PREFIX constant, which would be simple wrong!
+     *
      */
     private final String BODY_PREFIX = "oa:hasBody";
 
@@ -70,7 +64,7 @@ public class QueryService {
 
     /**
      * LDPath for the shortcut method setSourceCriteria
-     * <p/>
+     *
      * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
      * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSource/[is-a ex:exampleType]",
      * if we would append the slash to the SOURCE_PREFIX constant, which would be simple wrong!
@@ -79,7 +73,7 @@ public class QueryService {
 
     /**
      * LDPath for the shortcut method setSelectorCriteria
-     * <p/>
+     *
      * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
      * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSelector/[is-a ex:exampleType]",
      * if we would append the slash to the SELECTOR_PREFIX constant, which would be simple wrong!
@@ -95,6 +89,12 @@ public class QueryService {
      * All user defined criteria
      */
     private ArrayList<Criteria> criteria = new ArrayList<Criteria>();
+
+    /**
+     * Specifies the ordering of the result set
+     * TODO: evaluate if this is possible with the current implementation, because the user does not know the generated variable names etc...
+     */
+    private Order order = null;
 
     /**
      * Limit value of the query
@@ -116,22 +116,15 @@ public class QueryService {
      */
     private int varIndex = 0;
 
-    Configuration configuration;
 
-    /**
-     * Stores the created variable and the associated criteria.
-     */
-    private Map<Criteria, Var> variableMapping;
-
-    public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration) {
-        this(objectRepository, evaluatorConfiguration, null);
+    public QueryService(Class<T> type, ObjectRepository objectRepository) {
+       this(type, objectRepository, null);
     }
 
-    public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration, URI graph) {
+    public QueryService(Class<T> type, ObjectRepository objectRepository, URI graph) {
+        this.type = type;
         this.objectRepository = objectRepository;
-        this.variableMapping = new HashMap<>();
-
-        // Setting some common name spaces
+        // Setting some standard name spaces
         addPrefix(OADM.PREFIX, OADM.NS);
         addPrefix(CNT.PREFIX, CNT.NS);
         addPrefix(DC.PREFIX, DC.NS);
@@ -146,47 +139,8 @@ public class QueryService {
 
         this.queryOptimizer = QueryOptimizer.getInstance();
         this.graph = graph;
-        this.evaluatorConfiguration = evaluatorConfiguration;
-        this.configuration = createLDPathConfiguration();
     }
 
-    private Configuration createLDPathConfiguration() {
-        DefaultConfiguration config = new DefaultConfiguration();
-        // TODO: Register Functions and Tests
-        for(Map.Entry<Class<? extends TestFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getTestFunctionEvaluators().entrySet()) {
-            try {
-                TestFunction newInstance = entry.getKey().newInstance();
-                config.addTestFunction(Constants.NS_LMF_FUNCS + newInstance.getLocalName(), newInstance);
-                logger.debug("Registering TestFunction " + entry.getKey().getCanonicalName());
-            } catch (Exception e) {
-                throw new IllegalStateException("Could not instantiate TestFunction: " + entry.getKey().getCanonicalName());
-            }
-        }
-
-        for(Map.Entry<Class<? extends SelectorFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getFunctionEvaluators().entrySet()) {
-            try {
-                SelectorFunction newInstance = entry.getKey().newInstance();
-                config.addFunction(Constants.NS_LMF_FUNCS + newInstance.getPathExpression(new SesameValueBackend()), newInstance);
-                logger.debug("Registering Function " + entry.getKey().getCanonicalName());
-            } catch (Exception e) {
-                throw new IllegalStateException("Could not instantiate Function: " + entry.getKey().getCanonicalName());
-            }
-        }
-
-            return config;
-    }
-
-    public Map<String, String> getPrefixes() {
-        return prefixes;
-    }
-
-    public ArrayList<Criteria> getCriteria() {
-        return criteria;
-    }
-
-    public void addMapping(Criteria c, Var v) {
-        variableMapping.put(c, v);
-    }
 
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
@@ -385,7 +339,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService setSourceCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath  : SOURCE_PREFIX + "/" + ldpath, value, comparison));
         return this;
     }
 
@@ -427,6 +381,7 @@ public class QueryService {
         return this;
     }
 
+
     /**
      * Adding a criteria object to the QueryService
      *
@@ -462,6 +417,17 @@ public class QueryService {
     }
 
     /**
+     * Defines the ordering of the result set.
+     *
+     * @param order Defines the order of the result set.
+     * @return itself to allow chaining.
+     */
+    public QueryService orderBy(Order order) {
+        this.order = order;
+        return this;
+    }
+
+    /**
      * Setting the limit value.
      *
      * @param limit The limit value.
@@ -493,13 +459,13 @@ public class QueryService {
     public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         ObjectConnection con = objectRepository.getConnection();
 
-        if (graph != null) {
+        if(graph != null) {
             con.setReadContexts(graph);
             con.setInsertContext(graph);
             con.setRemoveContexts(graph);
         }
 
-        Query sparql = EvalQuery.evaluate(this);
+        Query sparql = EvalQuery.evaluate(criteria, prefixes);
 
         if (limit != null) {
             sparql.setLimit(limit);
@@ -514,15 +480,15 @@ public class QueryService {
 //        System.out.println();
 
         String q = sparql.serialize();
-//        logger.debug("Created query:\n" + queryOptimizer.prettyPrint(q));
+        logger.debug("Created query:\n" + queryOptimizer.prettyPrint(q));
 
         // Optimize the join order
         q = queryOptimizer.optimizeJoinOrder(q);
-//        logger.debug("Join order optimized:\n " + q);
+        logger.debug("Join order optimized:\n " + q);
 
         // Optimize the FILTER placement
         q = queryOptimizer.optimizeFilters(q);
-//        logger.debug("FILTERs optimized:\n " + q);
+        logger.debug("FILTERs optimized:\n " + q);
 
         ObjectQuery query = con.prepareObjectQuery(q);
 
@@ -532,66 +498,8 @@ public class QueryService {
             logger.info("\nFINAL QUERY :\n" + q);
         }
 
-//        for (Map.Entry<Criteria, Var> entry : variableMapping.entrySet()) {
-//            System.out.println("entry.getKey() = " + entry.getKey().getLdpath());
-//            System.out.println("entry.getKey().getConstraint() = " + entry.getKey().getConstraint());
-//            System.out.println("entry.getValue() = " + entry.getValue());
-//        }
+        List<T> resultList = (List<T>) query.evaluate(this.type).asList();
 
-        return (List<T>) query.evaluate().asList();
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public LDPathEvaluatorConfiguration getEvaluatorConfiguration() {
-        return evaluatorConfiguration;
-    }
-
-    /**
-     * Creating and returning an instance of the passed type. This allows the
-     * user to invoke specific methods of the extension class without
-     * loosing convenience of the fluid interface, Anno4j provides.
-     *
-     * @param type the type of the extension.
-     * @param <S>  generic, because the type of the extension class can differ.
-     * @return an instance of the passed class
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     */
-    public <S extends QueryExtension> S useExtension(Class<S> type) throws IllegalAccessException, InstantiationException {
-        QueryExtension q = type.newInstance();
-        q.setQueryService(this);
-        return (S) q;
-    }
-
-    public QueryService addFilterCriteria() {
-        /**
-         * Possible criteria requirements:
-         *      - regex
-         *      - comparison like ?x (< | > | =) (number | date)
-         *      - bound
-         *      - isIRI
-         *      - isBlank
-         *      - isLiteral
-         *      - str
-         *      - lang
-         *      - datatype
-         *      - logical-or, logical-and
-         *      - sameTerm
-         *      - langMatches
-         *      - regex
-         *      - costumFunctions
-         *
-         * Solution Approaches:
-         *      - Provide enum for each function mentioned above and
-         *        translate it to SPARQL
-         *      - Get somehow the variable on which the filter is concerned to
-         *        and let the user pass the specific sparql filter where the
-         *        variable will be replaced using string replacement
-         *
-         */
-        return this;
+        return resultList;
     }
 }

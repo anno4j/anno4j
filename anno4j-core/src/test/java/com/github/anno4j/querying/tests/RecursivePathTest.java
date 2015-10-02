@@ -29,11 +29,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class RecursivePathTest {
 
-    private QueryService queryService = null;
+    private QueryService<Annotation> queryService = null;
 
     @Before
     public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 

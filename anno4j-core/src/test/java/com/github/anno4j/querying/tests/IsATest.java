@@ -3,7 +3,6 @@ package com.github.anno4j.querying.tests;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.QueryService;
 import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -24,11 +23,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class IsATest {
 
-    private QueryService queryService = null;
+    private QueryService<Annotation> queryService = null;
 
     @Before
     public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
@@ -55,29 +54,6 @@ public class IsATest {
 
         assertEquals(1, list.size());
         assertEquals("First Value", ((FirstTestBody) list.get(0).getBody()).getValue());
-    }
-
-
-    @Test
-    /**
-     * Querying for the annotation, that contains the FirstTestBody
-     */
-    public void blablaTest() {
-
-        try {
-//            List<Annotation> list = queryService
-//                    .setAnnotationCriteria("oa:hasBody[fn:leftBesides(ex:firstBodyType)]")
-//                    .execute();
-            queryService.setAnnotationCriteria("fn:getSelector(.)[is-a oa:FragmentSelector]").execute();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
