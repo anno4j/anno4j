@@ -52,7 +52,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsOfContentItem(String contentItemId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService<Annotation> qs = Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService qs = Anno4j.getInstance().createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart", contentItemId);
 
@@ -73,7 +73,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public Annotation getAnnotationOfContentPart(String contentPartId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService<Annotation> qs = Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService qs = Anno4j.getInstance().createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .setAnnotationCriteria("^mico:hasContent", contentPartId);
 
@@ -95,7 +95,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsByMIMEType(String mimeType) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService<Annotation> qs =  Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService qs =  Anno4j.getInstance().createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
                 .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:type", mimeType);
@@ -118,7 +118,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsBySourceName(String sourceName) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService<Annotation> qs = Anno4j.getInstance().createQueryService(Annotation.class)
+        QueryService qs = Anno4j.getInstance().createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
                 .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:source", sourceName);
@@ -157,7 +157,7 @@ public class MICOQueryHelper {
      *
      * @param qs The anno4j QueryService object
      */
-    private void processTypeRestriction(QueryService<Annotation> qs) {
+    private void processTypeRestriction(QueryService qs) {
         if(selectorTypeRestriction != null) {
             qs.setSelectorCriteria(selectorTypeRestriction);
         }

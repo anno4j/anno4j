@@ -1,4 +1,4 @@
-package com.github.anno4j.querying.extension;
+package com.github.anno4j.querying.extensions;
 
 import org.apache.marmotta.ldpath.api.backend.RDFBackend;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;

@@ -57,29 +57,6 @@ public class IsATest {
         assertEquals("First Value", ((FirstTestBody) list.get(0).getBody()).getValue());
     }
 
-
-    @Test
-    /**
-     * Querying for the annotation, that contains the FirstTestBody
-     */
-    public void blablaTest() {
-
-        try {
-//            List<Annotation> list = queryService
-//                    .setAnnotationCriteria("oa:hasBody[fn:leftBesides(ex:firstBodyType)]")
-//                    .execute();
-            queryService.setAnnotationCriteria("fn:getSelector(.)[is-a oa:FragmentSelector]").execute();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Test
     /**
      * Querying for the annotation, that contains the SecondTestBody

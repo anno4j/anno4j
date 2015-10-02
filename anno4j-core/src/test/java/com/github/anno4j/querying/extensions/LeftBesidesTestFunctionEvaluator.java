@@ -1,7 +1,6 @@
-package com.github.anno4j.querying.extension;
+package com.github.anno4j.querying.extensions;
 
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
-import com.github.anno4j.querying.extension.LeftBesidesTestFunction;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.annotation.Evaluator;
 import com.hp.hpl.jena.sparql.core.Var;

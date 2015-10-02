@@ -1,8 +1,9 @@
-package com.github.anno4j.querying.extension;
+package com.github.anno4j.querying.extensions;
 
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.evaluation.ldpath.SelfSelectionEvaluator;
+import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.annotation.Evaluator;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
