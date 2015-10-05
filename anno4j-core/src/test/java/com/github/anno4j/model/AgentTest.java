@@ -52,6 +52,7 @@ public class AgentTest {
         person.setName("TestName");
         person.setMbox("TextMbox");
         person.setOpenID("TestID");
+        person.setNick("testNick");
 
         annotation.setAnnotatedBy(person);
 
@@ -65,6 +66,7 @@ public class AgentTest {
         assertEquals(person.getName(), resultObject.getName());
         assertEquals(person.getMbox(), resultObject.getMbox());
         assertEquals(person.getOpenID(), resultObject.getOpenID());
+        assertEquals(person.getNick(), resultObject.getNick());
     }
 
     @Test

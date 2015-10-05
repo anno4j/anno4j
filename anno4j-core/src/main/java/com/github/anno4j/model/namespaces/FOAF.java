@@ -57,4 +57,10 @@ public class FOAF {
      * The homepage property relates something to a homepage about it.
      */
     public final static String HOMEPAGE = NS + "homepage";
+    
+    /**
+     * Refers to http://xmlns.com/foaf/spec/#term_nick
+     * The nick is short informal nickname characterizing an agent (includes login identifiers, IRC and other chat nicknames
+     */
+    public final static String NICK = NS + "nick";
 }

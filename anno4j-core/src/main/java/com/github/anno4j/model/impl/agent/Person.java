@@ -25,6 +25,12 @@ public class Person extends Agent {
     @Iri(FOAF.OPEN_ID) private String openID;
 
     /**
+     * Refers to http://xmlns.com/foaf/spec/#term_nick
+     * nick - A short informal nickname characterizing an agent (includes login identifiers, IRC and other chat nicknames).
+     */
+    @Iri(FOAF.NICK) private String nick;
+
+    /**
      * Standard constructor.
      */
     public Person() {};
@@ -36,6 +42,7 @@ public class Person extends Agent {
                 ", name='" + this.getName() + "'" +
                 ", mbox='" + mbox + '\'' +
                 ", openID='" + openID + '\'' +
+                ", nick='" + nick + '\'' +
                 "}";
     }
 
@@ -62,6 +69,17 @@ public class Person extends Agent {
     }
 
     /**
+     * Sets new Refers to http://xmlns.com/foaf/spec/#term_nick
+     * nick - A short informal nickname characterizing an agent (includes login identifiers, IRC and other chat nicknames).
+     *
+     * @param nick New value of Refers to http://xmlns.com/foaf/spec/#term_nick
+     *              nick - A short informal nickname characterizing an agent (includes login identifiers, IRC and other chat nicknames).
+     */
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    /**
      * Gets Refers to http:xmlns.comfoafspec#term_mbox
      * personal mailbox - A personal mailbox, ie. an Internet mailbox associated with exactly one owner, the first owner of this mailbox. This is a 'static inverse functional property', in that there is across time and change at most one individual that ever has any particular value for foaf:mbox..
      *
@@ -81,5 +99,16 @@ public class Person extends Agent {
      */
     public String getOpenID() {
         return openID;
+    }
+
+    /**
+     * Gets Refers to http://xmlns.com/foaf/spec/#term_nick
+     * nick - A nick for the Agent..
+     *
+     * @return Value of Refers to http://xmlns.com/foaf/spec/#term_nick
+     * nick - A nick for the Agent..
+     */
+    public String getNick() {
+        return nick;
     }
 }
