@@ -5,7 +5,7 @@ import org.apache.marmotta.ldpath.api.functions.TestFunction;
 
 import java.util.Collection;
 
-public class LeftBesidesTestFunction<Node> extends TestFunction<Node> {
+public class LeftBesidesTest<Node> extends TestFunction<Node> {
 
     @Override
     public String getLocalName() {

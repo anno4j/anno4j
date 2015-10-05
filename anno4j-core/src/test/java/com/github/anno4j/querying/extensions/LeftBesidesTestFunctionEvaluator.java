@@ -9,14 +9,14 @@ import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.FunctionTest;
 
-@Evaluator(LeftBesidesTestFunction.class)
+@Evaluator(LeftBesidesTest.class)
 public class LeftBesidesTestFunctionEvaluator implements QueryEvaluator {
 
     @Override
     public Var evaluate(NodeSelector nodeSelector, ElementGroup elementGroup, Var var, LDPathEvaluatorConfiguration evaluatorConfiguration) {
         TestingSelector testingSelector = (TestingSelector) nodeSelector;
         FunctionTest functionTest = (FunctionTest) testingSelector.getTest();
-        LeftBesidesTestFunction leftBesidesTestFunction = (LeftBesidesTestFunction) functionTest.getTest();
+        LeftBesidesTest leftBesidesTest = (LeftBesidesTest) functionTest.getTest();
 
         System.out.println("inside leftBesides.evaluate()");
         return null;

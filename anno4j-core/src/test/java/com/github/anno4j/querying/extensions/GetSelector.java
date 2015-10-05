@@ -7,7 +7,7 @@ import javax.xml.soap.Node;
 import java.util.Collection;
 
 
-public class GetSelectorFunction extends SelectorFunction<Node> {
+public class GetSelector extends SelectorFunction<Node> {
 
     @Override
     protected String getLocalName() {

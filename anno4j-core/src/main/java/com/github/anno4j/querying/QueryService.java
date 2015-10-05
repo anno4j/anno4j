@@ -5,14 +5,11 @@ import com.github.anno4j.querying.evaluation.EvalQuery;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.QueryExtension;
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Var;
-import org.apache.marmotta.ldpath.api.functions.NodeFunction;
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
-import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
-import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.model.Constants;
 import org.apache.marmotta.ldpath.parser.Configuration;
@@ -41,7 +38,7 @@ import java.util.Map;
  * this is provided by simple classes. This is why the user does not need to write SPARQL queries
  * by himself.
  *
- * @author Andreas Eisenkolb
+ * @author Andreas Eisenkolb (andreas.eisenkolb@gmail.com)
  */
 public class QueryService {
 
@@ -116,7 +113,7 @@ public class QueryService {
      */
     private int varIndex = 0;
 
-    Configuration configuration;
+    private Configuration configuration;
 
     /**
      * Stores the created variable and the associated criteria.
@@ -152,8 +149,8 @@ public class QueryService {
 
     private Configuration createLDPathConfiguration() {
         DefaultConfiguration config = new DefaultConfiguration();
-        // TODO: Register Functions and Tests
-        for(Map.Entry<Class<? extends TestFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getTestFunctionEvaluators().entrySet()) {
+
+        for (Map.Entry<Class<? extends TestFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getTestFunctionEvaluators().entrySet()) {
             try {
                 TestFunction newInstance = entry.getKey().newInstance();
                 config.addTestFunction(Constants.NS_LMF_FUNCS + newInstance.getLocalName(), newInstance);
@@ -163,7 +160,7 @@ public class QueryService {
             }
         }
 
-        for(Map.Entry<Class<? extends SelectorFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getFunctionEvaluators().entrySet()) {
+        for (Map.Entry<Class<? extends SelectorFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getFunctionEvaluators().entrySet()) {
             try {
                 SelectorFunction newInstance = entry.getKey().newInstance();
                 config.addFunction(Constants.NS_LMF_FUNCS + newInstance.getPathExpression(new SesameValueBackend()), newInstance);
@@ -173,7 +170,7 @@ public class QueryService {
             }
         }
 
-            return config;
+        return config;
     }
 
     public Map<String, String> getPrefixes() {
@@ -532,12 +529,6 @@ public class QueryService {
             logger.info("\nFINAL QUERY :\n" + q);
         }
 
-//        for (Map.Entry<Criteria, Var> entry : variableMapping.entrySet()) {
-//            System.out.println("entry.getKey() = " + entry.getKey().getLdpath());
-//            System.out.println("entry.getKey().getConstraint() = " + entry.getKey().getConstraint());
-//            System.out.println("entry.getValue() = " + entry.getValue());
-//        }
-
         return (List<T>) query.evaluate().asList();
     }
 
@@ -564,34 +555,5 @@ public class QueryService {
         QueryExtension q = type.newInstance();
         q.setQueryService(this);
         return (S) q;
-    }
-
-    public QueryService addFilterCriteria() {
-        /**
-         * Possible criteria requirements:
-         *      - regex
-         *      - comparison like ?x (< | > | =) (number | date)
-         *      - bound
-         *      - isIRI
-         *      - isBlank
-         *      - isLiteral
-         *      - str
-         *      - lang
-         *      - datatype
-         *      - logical-or, logical-and
-         *      - sameTerm
-         *      - langMatches
-         *      - regex
-         *      - costumFunctions
-         *
-         * Solution Approaches:
-         *      - Provide enum for each function mentioned above and
-         *        translate it to SPARQL
-         *      - Get somehow the variable on which the filter is concerned to
-         *        and let the user pass the specific sparql filter where the
-         *        variable will be replaced using string replacement
-         *
-         */
-        return this;
     }
 }
