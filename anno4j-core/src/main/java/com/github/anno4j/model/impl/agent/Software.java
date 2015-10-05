@@ -24,6 +24,16 @@ public class Software extends Agent {
      */
     public Software() {};
 
+    /**
+     * Constructor also setting the resource, which is supported by the
+     * corresponding String.
+     *
+     * @param resource String representation of the resource to set.
+     */
+    public Software(String resource) {
+        super(resource);
+    }
+
     @Override
     public String toString() {
         return "Software{" +

@@ -35,6 +35,16 @@ public class Person extends Agent {
      */
     public Person() {};
 
+    /*
+     * Constructor also setting the resource, which is supported by the
+     * corresponding String.
+     *
+     * @param resource String representation of the resource to set.
+     */
+    public Person(String resource) {
+        super(resource);
+    }
+
     @Override
     public String toString() {
         return "Person{" +

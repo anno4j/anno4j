@@ -17,6 +17,16 @@ public class Organization extends Agent {
      */
     public Organization() {}
 
+    /**
+     * Constructor also setting the resource, which is supported by the
+     * corresponding String.
+     *
+     * @param resource String representation of the resource to set.
+     */
+    public Organization(String resource) {
+        super(resource);
+    }
+
     @Override
     public String toString() {
         return "Organization{" +
