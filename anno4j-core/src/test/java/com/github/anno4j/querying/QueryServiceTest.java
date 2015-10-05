@@ -7,7 +7,6 @@ import com.github.anno4j.model.impl.selector.FragmentSelector;
 import com.github.anno4j.model.impl.selector.SvgSelector;
 import com.github.anno4j.model.impl.target.SpecificResource;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -26,14 +25,11 @@ public class QueryServiceTest {
     private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
         this.anno4j = new Anno4j();
         queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
-    }
 
-    @BeforeClass
-    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation =  anno4j.createObject(Annotation.class);
         HashSet<Target> targets = new HashSet<>();

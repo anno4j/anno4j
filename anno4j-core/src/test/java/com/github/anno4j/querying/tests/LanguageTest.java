@@ -6,7 +6,6 @@ import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
@@ -28,14 +27,11 @@ public class LanguageTest {
     private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
         this.anno4j = new Anno4j();
         queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
-    }
 
-    @BeforeClass
-    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
