@@ -18,7 +18,11 @@ import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.RDFObject;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.sail.memory.MemoryStore;
+
+import java.io.StringWriter;
 
 /**
  * Class to implement RDF in order to create a baseline for every object that we use in Anno4j.
@@ -89,7 +93,8 @@ public class ResourceObject implements RDFObject {
     }
 
     public String getNTriples(){
-        StringBuilder sb = new StringBuilder();
+        StringWriter stringWriter = new StringWriter();
+        NTriplesWriter rdfWriter = new NTriplesWriter(stringWriter);
         try {
             MemoryStore store = new MemoryStore();
             Repository sailRepository = new SailRepository(store);
@@ -98,20 +103,18 @@ public class ResourceObject implements RDFObject {
             ObjectConnection connection = objectRepository.getConnection();
             connection.addObject(this);
             GraphQueryResult result = sailRepository.getConnection().prepareGraphQuery(QueryLanguage.SPARQL, "CONSTRUCT { ?s ?p ?o. } WHERE { ?s ?p ?o. } ").evaluate();
+
+            rdfWriter.startRDF();
+
             while (result.hasNext()) {
                 Statement item = result.next();
-
-                sb
-                        .append(item.getSubject())
-                        .append(" ")
-                        .append(item.getPredicate())
-                        .append(" ")
-                        .append(item.getObject())
-                        .append(".")
-                        .append(System.getProperty("line.separator"));
+                rdfWriter.handleStatement(item);
             }
+
             result.close();
             connection.close();
+            rdfWriter.endRDF();
+
         } catch (RepositoryException e) {
             e.printStackTrace();
         } catch (RepositoryConfigException e) {
@@ -120,8 +123,10 @@ public class ResourceObject implements RDFObject {
             e.printStackTrace();
         } catch (QueryEvaluationException e) {
             e.printStackTrace();
+        } catch (RDFHandlerException e) {
+            e.printStackTrace();
         }
 
-        return sb.toString();
+        return stringWriter.toString();
     }
 }
