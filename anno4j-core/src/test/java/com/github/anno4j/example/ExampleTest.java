@@ -1,5 +1,6 @@
 package com.github.anno4j.example;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.agent.Person;
@@ -10,12 +11,7 @@ import com.github.anno4j.model.impl.target.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -26,17 +22,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExampleTest {
 
-    Repository repository;
-    ObjectConnection connection;
+    private Anno4j anno4j;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        ObjectRepository objectRepository = factory.createRepository(repository);
-        connection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
     @After
@@ -46,43 +38,48 @@ public class ExampleTest {
 
     @Test
     public void exampleTest() throws Exception {
+
         // Create the base annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
         annotation.setSerializedAt("2013-02-04T12:00:00Z");
-        annotation.setMotivatedBy(new Commenting());
+        annotation.setMotivatedBy(anno4j.createObject(Commenting.class));
 
         // Create the person agent for the annotation
-        Person person = new Person();
+        Person person = anno4j.createObject(Person.class);
         person.setName("A. Person");
         person.setOpenID("http://example.org/agent1/openID1");
 
         annotation.setAnnotatedBy(person);
 
         // Create the software agent for the annotation
-        Software software = new Software();
+        Software software = anno4j.createObject(Software.class);
         software.setName("Code v2.1");
         software.setHomepage("http://example.org/agent2/homepage1");
 
         annotation.setSerializedBy(software);
-
         // Create the body
-        TextAnnotationBody body = new TextAnnotationBody("text/plain", "One of my favourite cities", "en");
+        TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
+        body.setFormat("text/plain");
+        body.setValue("One of my favourite cities");
+        body.setLanguage("en");
         annotation.setBody(body);
 
         // Create the selector
-        SpecificResource specificResource = new SpecificResource();
+        SpecificResource specificResource = anno4j.createObject(SpecificResource.class);
 
-        TextPositionSelector textPositionSelector = new TextPositionSelector(4096, 4104);
+        TextPositionSelector textPositionSelector = anno4j.createObject(TextPositionSelector.class);
+        textPositionSelector.setStart(4096);
+        textPositionSelector.setEnd(4104);
 
         specificResource.setSelector(textPositionSelector);
 
         // Create the actual target
-        ResourceObject source = new ResourceObject();
+        ResourceObject source = anno4j.createObject(ResourceObject.class);
         source.setResourceAsString("http://example.org/source1");
         specificResource.setSource(source);
 
-        annotation.setTarget(specificResource);
+        annotation.addTarget(specificResource);
 
         // Persist annotation
         connection.addObject(annotation);
@@ -95,8 +92,5 @@ public class ExampleTest {
         Annotation resultObject = result.get(0);
 
         assertEquals(annotation.getResource(), resultObject.getResource());
-
-        // Test print method
-        System.out.println(annotation);
     }
 }

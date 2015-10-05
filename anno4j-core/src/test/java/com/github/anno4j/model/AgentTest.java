@@ -1,17 +1,13 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.agent.Organization;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -24,17 +20,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class AgentTest {
 
-    Repository repository;
-    ObjectConnection connection;
+    private Anno4j anno4j;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        ObjectRepository objectRepository = factory.createRepository(repository);
-        connection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
     @After
@@ -45,10 +37,10 @@ public class AgentTest {
     @Test
     public void testAgentPerson() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
 
         // Create and add the agent
-        Person person = new Person();
+        Person person = anno4j.createObject(Person.class);
         person.setName("TestName");
         person.setMbox("TextMbox");
         person.setOpenID("TestID");
@@ -70,10 +62,10 @@ public class AgentTest {
     @Test
     public void testAgentOrganization() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
 
         // Create and add the agent
-        Organization organization = new Organization();
+        Organization organization = anno4j.createObject(Organization.class);
         organization.setName("TestName");
 
         annotation.setAnnotatedBy(organization);
@@ -91,10 +83,10 @@ public class AgentTest {
     @Test
     public void testAgentSoftware() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
 
         // Create and add the agent
-        Software software = new Software();
+        Software software = anno4j.createObject(Software.class);
         software.setName("TestName");
         software.setHomepage("TestPage");
 

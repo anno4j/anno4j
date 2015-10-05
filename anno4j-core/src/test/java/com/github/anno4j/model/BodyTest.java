@@ -1,16 +1,12 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.Anno4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.LangString;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,17 +15,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class BodyTest {
 
-    Repository repository;
-    ObjectConnection connection;
+    private Anno4j anno4j;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        ObjectRepository objectRepository = factory.createRepository(repository);
-        connection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
     @After
@@ -40,10 +32,10 @@ public class BodyTest {
     @Test
     public void testPersistAnnotation() throws Exception {
         // Create test annotation
-        TestBody body = new TestBody();
+        TestBody body = anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
 
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setBody(body);
 
 
@@ -56,50 +48,23 @@ public class BodyTest {
     }
 
     @Iri("http://www.example.com/schema#bodyType")
-    public static class TestBody extends Body {
-
-        public TestBody() {
-        }
-
-        @Iri("http://www.example.com/schema#value")
-        private String value;
-
-        @Iri("http://www.example.com/schema#langValue")
-        private LangString langValue;
+    public static interface TestBody extends Body {
+        @Iri("http://www.example.com/schema#doubleValue")
+        Double getDoubleValue();
 
         @Iri("http://www.example.com/schema#doubleValue")
-        private Double doubleValue;
+        void setDoubleValue(Double doubleValue);
 
-        public Double getDoubleValue() {
-            return doubleValue;
-        }
+        @Iri("http://www.example.com/schema#langValue")
+        LangString getLangValue();
 
-        public void setDoubleValue(Double doubleValue) {
-            this.doubleValue = doubleValue;
-        }
+        @Iri("http://www.example.com/schema#langValue")
+        void setLangValue(LangString langValue);
 
-        public LangString getLangValue() {
-            return langValue;
-        }
+        @Iri("http://www.example.com/schema#value")
+        String getValue();
 
-        public void setLangValue(LangString langValue) {
-            this.langValue = langValue;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return "TestBody{" +
-                    "value='" + value + '\'' +
-                    '}';
-        }
+        @Iri("http://www.example.com/schema#value")
+        void setValue(String value);
     }
-
 }

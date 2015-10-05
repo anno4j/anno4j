@@ -10,16 +10,6 @@ import org.openrdf.annotations.Iri;
  * The motivation that represents asking a question about the target resource(s). For example to ask for assistance with a particular section of text, or question its veracity.
  */
 @Iri(OADM.MOTIVATION_QUESTIONING)
-public class Questioning extends Motivation{
+public interface Questioning extends Motivation{
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
-    @Override
-    public String toString() {
-        return "Questioning{}" +
-                ", resource='" + getResource() + "'";
-    }
 }

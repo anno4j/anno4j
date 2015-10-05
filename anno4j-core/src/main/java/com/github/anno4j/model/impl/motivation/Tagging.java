@@ -10,16 +10,6 @@ import org.openrdf.annotations.Iri;
  * The motivation that represents adding a Tag on the target resource(s). One or more of the bodies of the annotation should be typed as a oa:Tag or oa:SemanticTag.
  */
 @Iri(OADM.MOTIVATION_TAGGING)
-public class Tagging extends Motivation{
+public interface Tagging extends Motivation{
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
-    @Override
-    public String toString() {
-        return "Tagging{}" +
-                ", resource='" + getResource() + "'";
-    }
 }

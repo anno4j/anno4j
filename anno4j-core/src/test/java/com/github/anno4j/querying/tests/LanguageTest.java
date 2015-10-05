@@ -4,7 +4,6 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
-import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,6 +12,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.LangString;
 
 import java.util.List;
@@ -25,25 +25,31 @@ import static org.junit.Assert.assertEquals;
 public class LanguageTest {
 
     private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @BeforeClass
-    public static void setUp() throws RepositoryException {
+    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
-        annotation.setBody(new LangTestBody(new LangString("First Value", "en")));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        LangTestBody langTestBody = anno4j.createObject(LangTestBody.class);
+        langTestBody.setLangString(new LangString("First Value", "en"));
+        annotation.setBody(langTestBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
-        Annotation annotation1 = new Annotation();
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
-        annotation1.setBody(new LangTestBody(new LangString("Zweiter Wert", "de")));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
+        LangTestBody langTestBody2 = anno4j.createObject(LangTestBody.class);
+        langTestBody2.setLangString(new LangString("Zweiter Wert", "de"));
+        annotation1.setBody(langTestBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
 
     @Test
@@ -56,8 +62,8 @@ public class LanguageTest {
                 .execute();
 
         LangTestBody testBody = (LangTestBody) list.get(0).getBody();
-        assertEquals("en", testBody.getValue().getLang());
-        assertEquals("First Value", testBody.getValue().toString());
+        assertEquals("en", testBody.getLangString().getLang());
+        assertEquals("First Value", testBody.getLangString().toString());
     }
 
     @Test
@@ -72,8 +78,8 @@ public class LanguageTest {
         assertEquals(1, list.size());
 
         LangTestBody testBody = (LangTestBody) list.get(0).getBody();
-        assertEquals("de", testBody.getValue().getLang());
-        assertEquals("Zweiter Wert", testBody.getValue().toString());
+        assertEquals("de", testBody.getLangString().getLang());
+        assertEquals("Zweiter Wert", testBody.getLangString().toString());
     }
 
     @Test
@@ -89,30 +95,12 @@ public class LanguageTest {
     }
 
     @Iri("http://www.example.com/schema#langBody")
-    public static class LangTestBody extends Body {
+    public static interface LangTestBody extends Body {
+        @Iri("http://www.example.com/schema#languageValue")
+        LangString getLangString();
 
         @Iri("http://www.example.com/schema#languageValue")
-        private LangString langString;
-
-        public LangTestBody() {
-        }
-
-        public LangTestBody(LangString value) {
-            this.langString = value;
-        }
-
-        public LangString getValue() {
-            return langString;
-        }
-
-        public void setValue(LangString value) {
-            this.langString = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        void setLangString (LangString value);
     }
 
 }

@@ -10,16 +10,6 @@ import org.openrdf.annotations.Iri;
  * The motivation that represents a commentary about or review of the target resource(s). For example to provide a commentary about a particular PDF.
  */
 @Iri(OADM.MOTIVATION_COMMENTING)
-public class Commenting extends Motivation {
+public interface Commenting extends Motivation {
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
-    @Override
-    public String toString() {
-        return "Commenting{}" +
-            ", resource='" + getResource() + "'";
-    }
 }

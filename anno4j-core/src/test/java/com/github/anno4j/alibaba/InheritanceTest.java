@@ -1,17 +1,13 @@
 package com.github.anno4j.alibaba;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -22,17 +18,13 @@ import static org.junit.Assert.assertTrue;
  * Test inheritance of annotated classes. RDF of Superclass should be mapped to a Subclass. Subclass can add more functionality and access superclass information.
  */
 public class InheritanceTest {
-    Repository repository;
-    ObjectConnection connection;
+    private Anno4j anno4j;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        ObjectRepository objectRepository = factory.createRepository(repository);
-        connection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
     @After
@@ -43,10 +35,10 @@ public class InheritanceTest {
     @Test
     public void inheritanceTest() throws Exception {
         // Create the base annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
 
         // Create the body
-        Superclass body = new Superclass();
+        Superclass body = anno4j.createObject(Superclass.class);
         body.setValue("myValue");
         annotation.setBody(body);
 
@@ -68,30 +60,20 @@ public class InheritanceTest {
     }
 
     @Iri("http://www.example.com/Superclass")
-    public static class Superclass extends Body {
+    public static interface Superclass extends Body {
+        @Iri("http://www.example.com/Superclass/value")
+        public String getValue();
 
         @Iri("http://www.example.com/Superclass/value")
-        private String value;
-
-        public Superclass() {
-        }
-
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
+        public void setValue(String value);
     }
 
     @Iri("http://www.example.com/Superclass")
-    public static class Subclass extends Superclass{
+    public static interface Subclass extends Superclass{
+        String getCustomValue();
+    }
 
-        public Subclass() {
-        }
-
+    public static abstract class SubclassSupport implements Subclass{
         public String getCustomValue(){
             return this.getValue() + "CUSTOM";
         }

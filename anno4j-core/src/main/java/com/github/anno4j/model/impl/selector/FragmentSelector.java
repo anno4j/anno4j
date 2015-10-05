@@ -18,47 +18,7 @@ import org.openrdf.annotations.Iri;
  * The Fragment Selector SHOULD have a dcterms:conformsTo relationship with the object being the specification that defines the syntax of the fragment, for instance <http://tools.ietf.org/rfc/rfc3236> for HTML fragments.
  */
 @Iri(OADM.SELECTOR_FRAGMENT)
-public class FragmentSelector extends Selector {
-
-    /**
-     * Refers to http://www.w3.org/TR/rdf-schema/#ch_value
-     *
-     * rdf:value is an instance of rdf:Property that may be used in describing structured values.
-     */
-    @Iri(RDF.VALUE)           private String value;
-
-    /**
-     * http://dublincore.org/documents/dcmi-terms/#terms-conformsTo
-     *
-     * An established standard to which the described resource conforms.
-     */
-    @Iri(DCTERMS.CONFORMS_TO) private String conformsTo;
-
-    /**
-     * Basic constructor.
-     */
-    public FragmentSelector() {};
-
-    /**
-     * Constructor setting the value and the conformsTo variables.
-     *
-     * @param value         Contains the value of the selector.
-     * @param conformsTo    Contains string representation of the referenced standard.
-     */
-    public FragmentSelector(String value, String conformsTo) {
-        this.value = value;
-        this.conformsTo = conformsTo;
-    }
-
-    /**
-     * Sets new http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo.
-     * <p/>
-     * An established standard to which the described resource conforms.
-     * @param fragmentSpecification New value of http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
-     */
-    public void setConformsToFragmentSpecification(FragmentSpecification fragmentSpecification) {
-        this.conformsTo = fragmentSpecification.toString();
-    }
+public interface FragmentSelector extends Selector {
 
     /**
      * Sets new http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
@@ -69,22 +29,8 @@ public class FragmentSelector extends Selector {
      *                   <p/>
      *                   An established standard to which the described resource conforms..
      */
-    public void setConformsTo(String conformsTo) {
-        this.conformsTo = conformsTo;
-    }
-
-    /**
-     * Gets Refers to http:www.w3.orgTRrdf-schema#ch_value
-     * <p/>
-     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
-     *
-     * @return Value of Refers to http:www.w3.orgTRrdf-schema#ch_value
-     * <p/>
-     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
-     */
-    public String getValue() {
-        return value;
-    }
+    @Iri(DCTERMS.CONFORMS_TO)
+    void setConformsTo(String conformsTo);
 
     /**
      * Gets http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
@@ -95,9 +41,19 @@ public class FragmentSelector extends Selector {
      * <p/>
      * An established standard to which the described resource conforms..
      */
-    public String getConformsTo() {
-        return conformsTo;
-    }
+    String getConformsTo();
+
+    /**
+     * Gets Refers to http:www.w3.orgTRrdf-schema#ch_value
+     * <p/>
+     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
+     *
+     * @return Value of Refers to http:www.w3.orgTRrdf-schema#ch_value
+     * <p/>
+     * rdf:value is an instance of rdf:Property that may be used in describing structured values..
+     */
+    @Iri(RDF.VALUE)
+    String getValue();
 
     /**
      * Sets new Refers to http:www.w3.orgTRrdf-schema#ch_value
@@ -108,16 +64,6 @@ public class FragmentSelector extends Selector {
      *              <p/>
      *              rdf:value is an instance of rdf:Property that may be used in describing structured values..
      */
-    public void setValue(String value) {
-        this.value = value;
+    @Iri(RDF.VALUE)
+    void setValue(String value);
     }
-
-    @Override
-    public String toString() {
-        return "FragmentSelector{" +
-                "resource='" + this.getResource() + "'" +
-                ", value='" + value + '\'' +
-                ", conformsTo='" + conformsTo + '\'' +
-                "}'";
-    }
-}

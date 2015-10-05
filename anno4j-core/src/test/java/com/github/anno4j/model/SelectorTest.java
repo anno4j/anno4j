@@ -1,22 +1,17 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.selector.FragmentSelector;
-import com.github.anno4j.model.impl.selector.FragmentSpecification;
 import com.github.anno4j.model.impl.target.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test suite for the selectors of an annotation.
@@ -25,20 +20,15 @@ import static org.junit.Assert.*;
  * A simple annotation is set up, provided with a respective selector, then persisted and queried.
  */
 public class SelectorTest {
-
-    Repository repository;
-    ObjectConnection connection;
-
     public final static String SOME_PAGE = "http://example.org/";
+
+    private Anno4j anno4j;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        ObjectRepository objectRepository = factory.createRepository(repository);
-        connection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
     @After
@@ -49,23 +39,23 @@ public class SelectorTest {
     @Test
     public void testSelector() throws Exception {
         // Create annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
 
-        ResourceObject randomObject = new ResourceObject(SOME_PAGE + "randomobject");
+        ResourceObject randomObject = anno4j.createObject(ResourceObject.class);
+        randomObject.setResourceAsString(SOME_PAGE + "randomobject");
 
         // Create specific resource and selector
-        SpecificResource specificResource = new SpecificResource();
+        SpecificResource specificResource = anno4j.createObject(SpecificResource.class);
 
         // Create selector
-        FragmentSelector fragmentSelector = new FragmentSelector();
-        fragmentSelector.setConformsToFragmentSpecification(FragmentSpecification.W3C_MEDIA_FRAGMENTS);
+        FragmentSelector fragmentSelector = anno4j.createObject(FragmentSelector.class);
         fragmentSelector.setValue("#xywh=50,50,640,480");
 
         // Connect all entities
         specificResource.setSource(randomObject);
         specificResource.setSelector(fragmentSelector);
 
-        annotation.setTarget(specificResource);
+        annotation.addTarget(specificResource);
 
         // Persist annotation
         connection.addObject(annotation);

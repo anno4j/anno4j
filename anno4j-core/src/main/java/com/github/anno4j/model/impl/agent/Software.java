@@ -11,28 +11,7 @@ import org.openrdf.annotations.Iri;
  * A software agent is running software.
  */
 @Iri(PROV.SOFTWARE_AGENT)
-public class Software extends Agent {
-
-    /**
-     * Refers to http://xmlns.com/foaf/spec/#term_homepage
-     * homepage - A homepage for some thing.
-     */
-    @Iri(FOAF.HOMEPAGE) private String homepage;
-
-    /**
-     * Standard constructor.
-     */
-    public Software() {};
-
-    @Override
-    public String toString() {
-        return "Software{" +
-                "resource='" + this.getResource() + "'" +
-                ", name='" + this.getName() + "'" +
-                ", homepage='" + homepage + '\'' +
-                "}";
-    }
-
+public interface Software extends Agent {
     /**
      * Sets new Refers to http:xmlns.comfoafspec#term_homepage
      * homepage - A homepage for some thing..
@@ -40,9 +19,8 @@ public class Software extends Agent {
      * @param homepage New value of Refers to http:xmlns.comfoafspec#term_homepage
      *                 homepage - A homepage for some thing..
      */
-    public void setHomepage(String homepage) {
-        this.homepage = homepage;
-    }
+    @Iri(FOAF.HOMEPAGE)
+    void setHomepage(String homepage);
 
     /**
      * Gets Refers to http:xmlns.comfoafspec#term_homepage
@@ -51,7 +29,6 @@ public class Software extends Agent {
      * @return Value of Refers to http:xmlns.comfoafspec#term_homepage
      * homepage - A homepage for some thing..
      */
-    public String getHomepage() {
-        return homepage;
-    }
+    @Iri(FOAF.HOMEPAGE)
+    String getHomepage();
 }

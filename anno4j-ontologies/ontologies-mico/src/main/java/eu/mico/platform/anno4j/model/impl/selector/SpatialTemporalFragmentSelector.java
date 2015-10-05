@@ -1,7 +1,7 @@
 package eu.mico.platform.anno4j.model.impl.selector;
 
 import com.github.anno4j.model.impl.selector.FragmentSelector;
-import com.github.anno4j.model.impl.selector.FragmentSpecification;
+import com.github.anno4j.model.impl.selector.enums.FragmentSpecification;
 
 import java.util.Locale;
 import java.util.regex.Matcher;

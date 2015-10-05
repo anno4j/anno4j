@@ -5,7 +5,6 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.Comparison;
 import com.github.anno4j.querying.QueryService;
-import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,6 +13,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -25,23 +25,29 @@ import static org.junit.Assert.assertEquals;
 public class DataTypeTest {
 
     private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @BeforeClass
-    public static void setUp() throws RepositoryException {
+    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation = new Annotation();
-        annotation.setBody(new DataTypeBody(2.0));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        DataTypeBody dataTypeBody = anno4j.createObject(DataTypeBody.class);
+        dataTypeBody.setDoubleValue(2.0);
+        annotation.setBody(dataTypeBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
-        Annotation annotation1 = new Annotation();
-        annotation1.setBody(new DataTypeBody("3.0"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
+        DataTypeBody dataTypeBody2 = anno4j.createObject(DataTypeBody.class);
+        dataTypeBody2.setStringValue("3.0");
+        annotation1.setBody(dataTypeBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
 
     @Test
@@ -103,49 +109,18 @@ public class DataTypeTest {
     }
 
     @Iri("http://www.example.com/schema#datatTypeBody")
-    public static class DataTypeBody extends Body {
+    public static interface DataTypeBody extends Body {
+        @Iri("http://www.example.com/schema#doubleValue")
+        Double getDoubleValue();
 
         @Iri("http://www.example.com/schema#doubleValue")
-        private Double doubleValue;
+        void setDoubleValue(Double doubleValue);
 
         @Iri("http://www.example.com/schema#stringValue")
-        private String stringValue;
+        String getStringValue();
 
-        public DataTypeBody() {
-        }
-
-        public DataTypeBody(Double value) {
-            this.doubleValue = value;
-        }
-
-        public DataTypeBody(String value) {
-            this.stringValue = value;
-        }
-
-        public Double getDoubleValue() {
-            return doubleValue;
-        }
-
-        public void setDoubleValue(double doubleValue) {
-            this.doubleValue = doubleValue;
-        }
-
-        public void setDoubleValue(Double doubleValue) {
-            this.doubleValue = doubleValue;
-        }
-
-        public String getStringValue() {
-            return stringValue;
-        }
-
-        public void setStringValue(String stringValue) {
-            this.stringValue = stringValue;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        @Iri("http://www.example.com/schema#stringValue")
+        void setStringValue(String stringValue);
     }
 
 }

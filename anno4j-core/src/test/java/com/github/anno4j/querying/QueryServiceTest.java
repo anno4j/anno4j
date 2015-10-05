@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,27 +23,29 @@ import static org.junit.Assert.assertEquals;
 public class QueryServiceTest {
 
     private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @BeforeClass
-    public static void setUp() throws RepositoryException {
+    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation = new Annotation();
+        Annotation annotation =  anno4j.createObject(Annotation.class);
         HashSet<Target> targets = new HashSet<>();
-        SpecificResource specificResource = new SpecificResource();
-        SpecificResource resource2 = new SpecificResource();
-        resource2.setSelector(new SvgSelector());
-        specificResource.setSelector(new FragmentSelector());
+        SpecificResource specificResource =  anno4j.createObject(SpecificResource.class);
+        SpecificResource resource2 =  anno4j.createObject(SpecificResource.class);
+        resource2.setSelector( anno4j.createObject(SvgSelector.class));
+        specificResource.setSelector(anno4j.createObject(FragmentSelector.class));
         targets.add(specificResource);
         targets.add(resource2);
-        annotation.setTargets(targets);
+        annotation.setTarget(targets);
 
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
     }
 
     @Test

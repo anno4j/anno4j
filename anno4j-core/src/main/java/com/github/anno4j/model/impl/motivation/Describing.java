@@ -10,16 +10,6 @@ import org.openrdf.annotations.Iri;
  * The motivation that represents a description of the target resource(s), as opposed to a comment about them. For example describing the above PDF's contents, rather than commenting on their accuracy.
  */
 @Iri(OADM.MOTIVATION_DESCRIBING)
-public class Describing extends Motivation {
+public interface Describing extends Motivation {
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
-    @Override
-    public String toString() {
-        return "Describing{}" +
-                ", resource='" + getResource() + "'";
-    }
 }

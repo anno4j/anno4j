@@ -10,18 +10,6 @@ import org.openrdf.annotations.Iri;
  * An organization.
  */
 @Iri(FOAF.ORGANIZATION)
-public class Organization extends Agent {
+public interface Organization extends Agent {
 
-    /**
-     * Standard constructor.
-     */
-    public Organization() {}
-
-    @Override
-    public String toString() {
-        return "Organization{" +
-                "resource='" + this.getResource() + "'" +
-                ", name='" + this.getName() +
-                "'}";
-    }
 }

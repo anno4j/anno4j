@@ -10,16 +10,6 @@ import org.openrdf.annotations.Iri;
  * The motivation that represents an untyped link to a resource related to the target.
  */
 @Iri(OADM.MOTIVATION_LINKING)
-public class Linking extends Motivation {
+public interface Linking extends Motivation {
 
-    /**
-     * Print method.
-     *
-     * @return Returns a textual representation of this class.
-     */
-    @Override
-    public String toString() {
-        return "Linking{}" +
-                ", resource='" + getResource() + "'";
-    }
 }

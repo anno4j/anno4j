@@ -1,15 +1,11 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.motivation.Bookmarking;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -22,17 +18,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class MotivationTest {
 
-    Repository repository;
-    ObjectConnection connection;
+    private Anno4j anno4j;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-
-        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
-        ObjectRepository objectRepository = factory.createRepository(repository);
-        connection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
     @After
@@ -43,10 +35,10 @@ public class MotivationTest {
     @Test
     public void testMotivationBookmarking() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
 
         // Create and add motivation
-        Motivation motivation = new Bookmarking();
+        Motivation motivation = anno4j.createObject(Bookmarking.class);
         annotation.setMotivatedBy(motivation);
 
         // Persist annotation

@@ -5,7 +5,6 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
-import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,6 +13,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -25,25 +25,31 @@ import static org.junit.Assert.assertEquals;
 public class PathTest {
 
     private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @BeforeClass
-    public static void setUp() throws RepositoryException {
+    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
-        annotation.setBody(new PathTestBody("Value1"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        PathTestBody pathTestBody = anno4j.createObject(PathTestBody.class);
+        pathTestBody.setValue("Value1");
+        annotation.setBody(pathTestBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
-        Annotation annotation1 = new Annotation();
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
-        annotation1.setBody(new PathTestBody("Value2"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
+        PathTestBody pathTestBody2 = anno4j.createObject(PathTestBody.class);
+        pathTestBody2.setValue("Value2");
+        annotation1.setBody(pathTestBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
 
     @Test
@@ -90,29 +96,11 @@ public class PathTest {
     }
 
     @Iri("http://www.example.com/schema#pathBody")
-    public static class PathTestBody extends Body {
+    public static interface PathTestBody extends Body {
+        @Iri("http://www.example.com/schema#value")
+        String getValue();
 
         @Iri("http://www.example.com/schema#value")
-        private String value;
-
-        public PathTestBody() {
-        }
-
-        public PathTestBody(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        void setValue(String value);
     }
 }

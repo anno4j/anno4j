@@ -16,40 +16,7 @@ import org.openrdf.annotations.Iri;
  * Each oa:TextPositionSelector MUST have exactly 1 oa:end property.
  */
 @Iri(OADM.SELECTOR_TEXT_POSITION)
-public class TextPositionSelector extends Selector {
-
-    /**
-     * Refers to http://www.w3.org/ns/oa#start
-     *
-     * The starting position of the segment of text. The first character in the full text is character position 0, and the character is included within the segment.
-     * Each TextPositionSelector must have exactly 1 oa:start property.
-     */
-    @Iri(OADM.START) private long start;
-
-    /**
-     * Refers to http://www.w3.org/ns/oa#end
-     *
-     * The end position of the segment of text. The last character is not included within the segment.
-     * Each TextPositionSelector must have exactly 1 oa:end property.
-     */
-    @Iri(OADM.END)   private long end;
-
-    /**
-     * Standard constructor.
-     */
-    public TextPositionSelector() {};
-
-    /**
-     * Constructor setting the start and end variables.
-     *
-     * @param start     Specifies the startposition in the text.
-     * @param end       Specifies the endposition in the text.
-     */
-    public TextPositionSelector(long start, long end) {
-        this.start = start;
-        this.end = end;
-    }
-
+public interface TextPositionSelector extends Selector {
     /**
      * Gets Refers to http:www.w3.orgnsoa#start
      * <p/>
@@ -61,9 +28,8 @@ public class TextPositionSelector extends Selector {
      * The starting position of the segment of text. The first character in the full text is character position 0, and the character is included within the segment.
      * Each TextPositionSelector must have exactly 1 oa:start property..
      */
-    public long getStart() {
-        return start;
-    }
+    @Iri(OADM.START)
+    long getStart();
 
     /**
      * Sets new Refers to http:www.w3.orgnsoa#end
@@ -76,9 +42,8 @@ public class TextPositionSelector extends Selector {
      *            The end position of the segment of text. The last character is not included within the segment.
      *            Each TextPositionSelector must have exactly 1 oa:end property..
      */
-    public void setEnd(long end) {
-        this.end = end;
-    }
+    @Iri(OADM.END)
+    void setEnd(long end);
 
     /**
      * Sets new Refers to http:www.w3.orgnsoa#start
@@ -91,9 +56,8 @@ public class TextPositionSelector extends Selector {
      *              The starting position of the segment of text. The first character in the full text is character position 0, and the character is included within the segment.
      *              Each TextPositionSelector must have exactly 1 oa:start property..
      */
-    public void setStart(long start) {
-        this.start = start;
-    }
+    @Iri(OADM.START)
+    void setStart(long start);
 
     /**
      * Gets Refers to http:www.w3.orgnsoa#end
@@ -106,16 +70,6 @@ public class TextPositionSelector extends Selector {
      * The end position of the segment of text. The last character is not included within the segment.
      * Each TextPositionSelector must have exactly 1 oa:end property..
      */
-    public long getEnd() {
-        return end;
-    }
-
-    @Override
-    public String toString() {
-        return "TextPositionSelector{" +
-                "resource='" + this.getResource() + "'" +
-                ", start=" + start +
-                ", end=" + end +
-                "}'";
-    }
+    @Iri(OADM.END)
+    long getEnd();
 }

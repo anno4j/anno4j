@@ -4,10 +4,6 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
-import com.google.gson.Gson;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,31 +26,37 @@ import static org.junit.Assert.assertEquals;
 public class RecursivePathTest {
 
     private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @BeforeClass
-    public static void setUp() throws RepositoryException, RepositoryConfigException {
+    public void setUp() throws RepositoryException, RepositoryConfigException, InstantiationException, IllegalAccessException {
         // getting a new respository instance for the following tests
         SailRepository repository = new SailRepository(new MemoryStore());
         repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
+        anno4j.setRepository(repository);
 
 
         // Persisting some data
-        Annotation annotation = new Annotation();
+        Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
-        annotation.setBody(new RecursiveBody("Some Testing Value"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
+        recursiveBody.setValue("Some Testing Value");
+        annotation.setBody(recursiveBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
-        Annotation annotation1 = new Annotation();
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
-        annotation1.setBody(new RecursiveBody("Another Testing Value"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
+        RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
+        recursiveBody2.setValue("Another Testing Value");
+        annotation1.setBody(recursiveBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
 
 
@@ -64,7 +66,7 @@ public class RecursivePathTest {
      *
      * @see <a href="http://www.w3.org/TR/sparql11-query/#pp-language">http://www.w3.org/TR/sparql11-query/#pp-language</a>
      */
-    public void oneOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void oneOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException {
         List<Annotation> annotations = queryService
                 .setAnnotationCriteria("(oa:hasTarget)+")
                 .execute();
@@ -86,7 +88,7 @@ public class RecursivePathTest {
      *
      * @see <a href="http://www.w3.org/TR/sparql11-query/#pp-language">http://www.w3.org/TR/sparql11-query/#pp-language</a>
      */
-    public void zeroOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void zeroOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException {
         List<Annotation> annotations = queryService.setAnnotationCriteria("(oa:hasBody/ex:recursiveBodyValue)*", "Some Testing Value").execute();
         assertEquals(1, annotations.size());
         assertEquals("Some Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());
@@ -98,29 +100,11 @@ public class RecursivePathTest {
     }
 
     @Iri("http://www.example.com/schema#recursiveBody")
-    public static class RecursiveBody extends Body {
+    public static interface RecursiveBody extends Body {
+        @Iri("http://www.example.com/schema#recursiveBodyValue")
+        String getValue();
 
         @Iri("http://www.example.com/schema#recursiveBodyValue")
-        private String value;
-
-        public RecursiveBody() {
-        }
-
-        public RecursiveBody(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        void setValue(String value);
     }
 }

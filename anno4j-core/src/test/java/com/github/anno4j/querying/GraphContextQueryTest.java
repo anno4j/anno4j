@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -21,27 +19,26 @@ import static org.junit.Assert.assertEquals;
 public class GraphContextQueryTest {
 
     URI subgraph = new URIImpl("http://www.example.com/TESTGRAPH");
+    private Anno4j anno4j;
 
     @Before
     public void setUp() throws Exception {
-        SailRepository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
+        this.anno4j = new Anno4j();
     }
 
     @Test
      public void persistInSubGraphQueryDefaultGraphTest() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
-        TestBody body = new TestBody();
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        TestBody body =  anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
         annotation.setBody(body);
 
         // persist annotation
-        Anno4j.getInstance().createPersistenceService(subgraph).persistAnnotation(annotation);
+        anno4j.createPersistenceService(subgraph).persistAnnotation(annotation);
 
         // Querying for the persisted annotation
-        QueryService queryService = Anno4j.getInstance().createQueryService();
+        QueryService queryService = anno4j.createQueryService();
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")
@@ -57,16 +54,16 @@ public class GraphContextQueryTest {
     @Test
     public void persistInSubGraphQuerySubGraphTest() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
-        TestBody body = new TestBody();
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        TestBody body =  anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
         annotation.setBody(body);
 
         // persist annotation
-        Anno4j.getInstance().createPersistenceService(subgraph).persistAnnotation(annotation);
+        anno4j.createPersistenceService(subgraph).persistAnnotation(annotation);
 
         // Querying for the persisted annotation
-        QueryService queryService = Anno4j.getInstance().createQueryService(subgraph);
+        QueryService queryService = anno4j.createQueryService(subgraph);
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")
@@ -83,16 +80,16 @@ public class GraphContextQueryTest {
     @Test
     public void persistInDefaultGraphQuerySubGraphTest() throws Exception {
         // Create test annotation
-        Annotation annotation = new Annotation();
-        TestBody body = new TestBody();
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        TestBody body = anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
         annotation.setBody(body);
 
         // persist annotation
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
         // Querying for the persisted annotation
-        QueryService queryService = Anno4j.getInstance().createQueryService(subgraph);
+        QueryService queryService = anno4j.createQueryService(subgraph);
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
                 .setBodyCriteria("ex:value", "Example Value")
@@ -102,17 +99,11 @@ public class GraphContextQueryTest {
     }
 
     @Iri("http://www.example.com/schema#GraphTestBody")
-    public static class TestBody extends Body {
+    public static interface TestBody extends Body {
+        @Iri("http://www.example.com/schema#value")
+        String getValue();
 
         @Iri("http://www.example.com/schema#value")
-        String value;
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
+        void setValue(String value);
     }
 }

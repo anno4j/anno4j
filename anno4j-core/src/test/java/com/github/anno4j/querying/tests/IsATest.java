@@ -3,9 +3,7 @@ package com.github.anno4j.querying.tests;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.QueryService;
-import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,6 +12,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -25,23 +24,29 @@ import static org.junit.Assert.assertEquals;
 public class IsATest {
 
     private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService();
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @BeforeClass
-    public static void setUp() throws RepositoryException {
+    public void setUp() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation = new Annotation();
-        annotation.setBody(new FirstTestBody("First Value"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        FirstTestBody firstTestBody = anno4j.createObject(FirstTestBody.class);
+        firstTestBody.setValue("First Value");
+        annotation.setBody(firstTestBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
-        Annotation annotation1 = new Annotation();
-        annotation1.setBody(new SecondTestBody("Second Value"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
+        SecondTestBody secondTestBody = anno4j.createObject(SecondTestBody.class);
+        secondTestBody.setValue("Second Value");
+        annotation1.setBody(secondTestBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
 
     @Test
@@ -85,56 +90,21 @@ public class IsATest {
     }
 
     @Iri("http://www.example.com/schema#firstBodyType")
-    public static class FirstTestBody extends Body {
+    public static interface FirstTestBody extends Body {
+        @Iri("http://www.example.com/schema#firstValue")
+        String getValue();
 
         @Iri("http://www.example.com/schema#firstValue")
-        private String value;
-
-        public FirstTestBody() {
-        }
-
-        public FirstTestBody(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        void setValue(String value);
     }
 
     @Iri("http://www.example.com/schema#secondBodyType")
-    public static class SecondTestBody extends Body {
+    public static interface SecondTestBody extends Body {
+        @Iri("http://www.example.com/schema#secondValue")
+        String getValue();
 
         @Iri("http://www.example.com/schema#secondValue")
-        private String value;
+        void setValue(String value);
 
-        public SecondTestBody() {
-        }
-
-        public SecondTestBody(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
     }
 }

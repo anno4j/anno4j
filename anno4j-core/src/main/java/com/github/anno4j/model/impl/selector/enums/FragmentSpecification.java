@@ -1,4 +1,4 @@
-package com.github.anno4j.model.impl.selector;
+package com.github.anno4j.model.impl.selector.enums;
 
 /**
  * Enum contains the specifications that a FragmentSelector can be conform to.
