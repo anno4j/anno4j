@@ -94,6 +94,10 @@ public class MICO {
 
     public final static String NER_BODY = NS + "NERBody";
 
+    public final static String STT_BODY_MICO = NS + "STTBody";
+
+    public final static String STT_SILENCE_BODY_MICO = NS + "STTSilenceBody";
+
     public final static String PSP_BODY = NS + "PSPBody";
 
     public final static String ASR_BODY = NS + "ASRDBody";
@@ -121,5 +125,7 @@ public class MICO {
     public final static String YACCOEFF = NS + "YACCoeff5";
 
     public final static String COLOR_LAYOUT_RAW_BODY = NS + "CLraw";
+
+    public final static String HAS_EXTRACTION_VERSION = NS + "hasExtractionVersion";
 
 }
