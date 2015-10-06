@@ -12,8 +12,6 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -32,12 +30,6 @@ public class RecursivePathTest {
         this.anno4j = new Anno4j();
         queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
-
-        // getting a new respository instance for the following tests
-        SailRepository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-        anno4j.setRepository(repository);
-
 
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
