@@ -5,21 +5,33 @@ import com.github.anno4j.model.namespaces.FOAF;
 import org.openrdf.annotations.Iri;
 
 /**
- * Conforms to http://www.w3.org/ns/prov#Agent
- * An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity.
+ * Conforms to http://www.w3.org/ns/prov#Agent An agent is something that bears
+ * some form of responsibility for an activity taking place, for the existence
+ * of an entity, or for another agent's activity.
  */
 public abstract class Agent extends ResourceObject {
 
     /**
      * Refers to http://xmlns.com/foaf/spec/#term_name. The name of the agent.
      */
-    @Iri(FOAF.NAME) private String name;
+    @Iri(FOAF.NAME)
+    private String name;
 
     /**
      * Constructor.
      */
     public Agent() {
 
+    }
+
+    /**
+     * Constructor also setting the resource, which is supported by the
+     * corresponding String.
+     *
+     * @param resource String representation of the resource to set.
+     */
+    public Agent(String resource) {
+        super(resource);
     }
 
     /**
@@ -42,9 +54,9 @@ public abstract class Agent extends ResourceObject {
 
     @Override
     public String toString() {
-        return "Agent{" +
-                "resource='" + this.getResource() + "'" +
-                ", name='" + name + '\'' +
-                '}';
+        return "Agent{"
+                + "resource='" + this.getResource() + "'"
+                + ", name='" + name + '\''
+                + '}';
     }
 }
