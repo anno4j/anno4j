@@ -112,47 +112,20 @@ public class ObjectParserTest {
      * Inner class to represent a sound media item.
      */
     @Iri(DCTYPES.SOUND)
-    public static class Sound extends Body {
-
-        public Sound() {}
+    public static interface Sound extends Body {
 
         @Iri(RDF.VALUE)
-        private String value;
+        String getValue();
 
-        /**
-         * Sets new value.
-         *
-         * @param value New value of value.
-         */
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Gets value.
-         *
-         * @return Value of value.
-         */
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return "Sound{" +
-                    "value='" + value + '\'' +
-                    '}';
-        }
+        @Iri(RDF.VALUE)
+        void setValue(String value);
     }
 
     /**
      * Inner class to represent an image media file as body.
      */
     @Iri(DCTYPES.IMAGE)
-    public static class Image extends Target {
-
-        public Image() {}
-    }
+    public static interface Image extends Target {}
 
     private final static String TURTLE = "@prefix oa: <http://www.w3.org/ns/oa#> ." +
             "@prefix ex: <http://www.example.com/ns#> ." +
