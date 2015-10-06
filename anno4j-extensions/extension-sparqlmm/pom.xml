@@ -9,7 +9,7 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>anno4j-ontologies-mico</artifactId>
+    <artifactId>anno4j-extension-sparqlmm</artifactId>
     <packaging>jar</packaging>
 
     <name>Anno4j SPARQLMM Extension</name>
