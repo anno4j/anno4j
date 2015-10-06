@@ -10,16 +10,17 @@
     </parent>
 
 
-    <artifactId>anno4j-ontologies</artifactId>
+    <artifactId>anno4j-extensions</artifactId>
     <packaging>pom</packaging>
-    <name>Anno4j Ontologies</name>
+    <name>Anno4j Extensions</name>
 
-    <description />
+    <description/>
 
     <modules>
-        <module>ontologies-mico</module>
+        <module>extension-sparqlmm</module>
     </modules>
 
     <dependencies>
     </dependencies>
+
 </project>

@@ -51,6 +51,7 @@
         <module>anno4j-ontologies</module>
         <module>anno4j-core</module>
         <module>anno4j-recommendation</module>
+        <module>anno4j-extensions</module>
     </modules>
 
     <distributionManagement>

@@ -51,6 +51,23 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>eu.fbk.rdfpro</groupId>
+            <artifactId>rdfpro-jsonld</artifactId>
+            <version>0.4.1</version>
+        </dependency>
+
+        <!-- json-ld -->
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java</artifactId>
+            <version>0.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java-sesame</artifactId>
+            <version>0.5.1</version>
+        </dependency>
     </dependencies>
 
 </project>
