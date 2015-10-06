@@ -11,6 +11,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.parser.LdPathParser;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -42,7 +43,6 @@ public class EvalQuery {
 
             LdPathParser parser = new LdPathParser(backend, queryService.getConfiguration(), new StringReader(c.getLdpath()));
             Var var = LDPathEvaluator.evaluate(parser.parseSelector(queryService.getPrefixes()), elementGroup, annotationVar, queryService.getEvaluatorConfiguration());
-
             if (c.getConstraint() != null) {
                 EvalComparison.evaluate(elementGroup, c, var);
             }
@@ -53,6 +53,7 @@ public class EvalQuery {
 
         // Choose what we want so select - SELECT ?annotation in this case
         query.addResultVar(annotationVar);
+
         // Setting the default prefixes, like rdf: or dc:
         query.getPrefixMapping().setNsPrefixes(queryService.getPrefixes());
 

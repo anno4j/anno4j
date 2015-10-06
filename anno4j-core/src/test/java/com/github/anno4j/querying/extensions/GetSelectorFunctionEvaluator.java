@@ -12,7 +12,7 @@ import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 
 
-@Evaluator(GetSelectorFunction.class)
+@Evaluator(GetSelector.class)
 public class GetSelectorFunctionEvaluator implements QueryEvaluator {
     @Override
     public Var evaluate(NodeSelector nodeSelector, ElementGroup elementGroup, Var var, LDPathEvaluatorConfiguration evaluatorConfiguration) {

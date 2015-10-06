@@ -107,11 +107,9 @@ public class Anno4j {
         Set<Class<?>> defaultEvaluatorAnnotations = reflections.getTypesAnnotatedWith(Evaluator.class, true);
 
         Map<Class<? extends TestFunction>, Class<QueryEvaluator>> testFunctionEvaluators = new HashMap<>();
-        ;
         Map<Class<? extends NodeSelector>, Class<QueryEvaluator>> defaultEvaluators = new HashMap<>();
         Map<Class<? extends NodeTest>, Class<QueryEvaluator>> testEvaluators = new HashMap<>();
         Map<Class<? extends SelectorFunction>, Class<QueryEvaluator>> functionEvaluators = new HashMap<>();
-
 
         for (Class clazz : defaultEvaluatorAnnotations) {
             Evaluator evaluator = (Evaluator) clazz.getAnnotation(Evaluator.class);
