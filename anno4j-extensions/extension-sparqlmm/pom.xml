@@ -4,22 +4,16 @@
 
     <parent>
         <groupId>com.github.anno4j</groupId>
-        <artifactId>anno4j-parent</artifactId>
+        <artifactId>anno4j-extensions</artifactId>
         <version>1.1.6-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
+    <artifactId>anno4j-ontologies-mico</artifactId>
+    <packaging>jar</packaging>
 
-    <artifactId>anno4j-ontologies</artifactId>
-    <packaging>pom</packaging>
-    <name>Anno4j Ontologies</name>
+    <name>Anno4j SPARQLMM Extension</name>
+    <description></description>
 
-    <description />
-
-    <modules>
-        <module>ontologies-mico</module>
-    </modules>
-
-    <dependencies>
-    </dependencies>
+    <dependencies></dependencies>
 </project>
