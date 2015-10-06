@@ -11,6 +11,8 @@ import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
+import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -22,7 +24,6 @@ import org.openrdf.repository.object.config.ObjectRepositoryConfig;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
-import org.openrdf.sail.memory.model.MemValueFactory;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -51,6 +52,7 @@ public class Anno4j {
      * Logger of this class.
      */
     private static final Logger logger = LoggerFactory.getLogger(Anno4j.class);
+    private IDGenerator idGenerator;
 
     /**
      * Configured openrdf/sesame repository for connecting a local/remote SPARQL endpoint.
@@ -72,7 +74,17 @@ public class Anno4j {
         this(new SailRepository(new MemoryStore()));
     }
 
-    public Anno4j(Repository repository) throws RepositoryConfigException, RepositoryException {
+    public Anno4j(IDGenerator idGenerator) throws RepositoryException, RepositoryConfigException {
+        this(new SailRepository(new MemoryStore()), idGenerator);
+    }
+
+    public Anno4j(Repository repository) throws RepositoryException, RepositoryConfigException {
+        this(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN());
+    }
+
+    public Anno4j(Repository repository, IDGenerator idGenerator) throws RepositoryConfigException, RepositoryException {
+        this.idGenerator = idGenerator;
+
         Set<URL> classpath = new HashSet<>();
         classpath.addAll(ClasspathHelper.forClassLoader());
         classpath.addAll(ClasspathHelper.forJavaClassPath());
@@ -204,6 +216,7 @@ public class Anno4j {
         }
 
         this.objectRepository = new ObjectRepositoryFactory().createRepository(config, repository);
+        this.objectRepository.setIdGenerator(idGenerator);
     }
 
     /**
@@ -218,9 +231,18 @@ public class Anno4j {
     public <T> T createObject (Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException {
         ObjectConnection con = getObjectRepository().getConnection();
         ObjectFactory objectFactory = con.getObjectFactory();
-        T result = objectFactory.createObject(new MemValueFactory().createURI("urn:anno4j:BLANK"), clazz);
+        T result = objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
 
         return result;
 
+    }
+
+    public IDGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IDGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+        this.objectRepository.setIdGenerator(idGenerator);
     }
 }

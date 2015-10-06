@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2007-2009, James Leigh All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * - Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution. 
+ *   and/or other materials provided with the distribution.
  * - Neither the name of the openrdf.org nor the names of its contributors may
  *   be used to endorse or promote products derived from this software without
  *   specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -24,31 +24,14 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 package org.openrdf.repository.object;
 
-import static org.openrdf.query.QueryLanguage.SPARQL;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.LookAheadIteration;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
+import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.model.*;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -71,6 +54,11 @@ import org.openrdf.store.blob.BlobStore;
 import org.openrdf.store.blob.BlobVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.*;
+
+import static org.openrdf.query.QueryLanguage.SPARQL;
 
 /**
  * Primary interface for object retrieval and persistence.
@@ -112,6 +100,19 @@ public class ObjectConnection extends ContextAwareConnection {
 		types.setConnection(this);
 		factory.setObjectConnection(this);
 	}
+
+    protected ObjectConnection(ObjectRepository repository,
+                               RepositoryConnection connection, ObjectFactory factory,
+                               TypeManager types, BlobStore blobs, IDGenerator idGenerator) throws RepositoryException {
+        super(repository, connection);
+        this.repository = repository;
+        this.of = factory;
+        this.of.setIdGenerator(idGenerator);
+        this.types = types;
+        this.blobs = blobs;
+        types.setConnection(this);
+        factory.setObjectConnection(this);
+    }
 
 	@Override
 	public ObjectRepository getRepository() {
@@ -803,4 +804,11 @@ public class ObjectConnection extends ContextAwareConnection {
 		set.add(type);
 		return set;
 	}
+
+
+    public void setIdGenerator(IDGenerator idGenerator) {
+        if(this.of != null) {
+            of.setIdGenerator(idGenerator);
+        }
+    }
 }

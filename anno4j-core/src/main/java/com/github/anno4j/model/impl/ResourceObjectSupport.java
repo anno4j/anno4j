@@ -1,8 +1,8 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.persistence.annotation.Partial;
-import com.github.anno4j.persistence.impl.StaticIDGenerator;
 import org.openrdf.annotations.ParameterTypes;
+import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
@@ -22,14 +22,13 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.sail.memory.MemoryStore;
-import org.openrdf.sail.memory.model.MemValueFactory;
 
 import java.io.StringWriter;
 
 @Partial
 public abstract class ResourceObjectSupport implements ResourceObject, RDFObject {
 
-    private Resource resource = StaticIDGenerator.getInstance().getIdGenerator().generateID();;
+    private Resource resource = IDGenerator.BLANK_RESOURCE;
 
     @Override
     public String getNTriples(){
@@ -93,7 +92,7 @@ public abstract class ResourceObjectSupport implements ResourceObject, RDFObject
 
         if(proceed == null ) {
             return this.resource;
-        } else if (proceed.equals(new MemValueFactory().createURI("urn:anno4j:BLANK"))) {
+        } else if(!IDGenerator.BLANK_RESOURCE.equals(this.resource)) {
             return this.resource;
         } else  {
             return proceed;

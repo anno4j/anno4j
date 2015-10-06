@@ -29,6 +29,7 @@
  */
 package org.openrdf.repository.object;
 
+import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.*;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.object.advisers.helpers.ObjectQueryFactory;
@@ -54,6 +55,7 @@ public class ObjectFactory {
 	private ClassResolver resolver;
 	private ObjectConnection connection;
 	private Map<Class<?>, ObjectQueryFactory> factories;
+    private IDGenerator idGenerator;
 
 	protected ObjectFactory(ClassResolver resolver, LiteralManager lm) {
 		assert lm != null;
@@ -201,6 +203,16 @@ public class ObjectFactory {
 	 */
 	public RDFObject createObject(Resource resource, Set<URI> types) {
 		assert resource != null;
+
+        // generate a new id in the case of a initial resource
+        if(IDGenerator.BLANK_RESOURCE.equals(resource)) {
+            if(idGenerator == null) {
+                throw new IllegalStateException("No ID generator available");
+            } else {
+                resource = idGenerator.generateID(types);
+            }
+        }
+
 		return createBean(resource, getObjectClass(resource, types));
 	}
 
@@ -394,4 +406,12 @@ public class ObjectFactory {
 			return proxy.newInstance();
 		}
 	}
+
+    public IDGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IDGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
 }

@@ -30,10 +30,8 @@
  */
 package org.openrdf.repository.object;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
+import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -41,6 +39,10 @@ import org.openrdf.repository.contextaware.ContextAwareRepository;
 import org.openrdf.repository.object.exceptions.ObjectStoreConfigException;
 import org.openrdf.store.blob.BlobStore;
 import org.openrdf.store.blob.BlobStoreFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Creates the {@link ObjectConnection} used to interact with the repository.
@@ -55,6 +57,7 @@ public class ObjectRepository extends ContextAwareRepository {
 	private String blobStoreUrl;
 	private Map<String, String> blobStoreParameters;
 	private BlobStore blobs;
+    private IDGenerator idGenerator = new IDGeneratorAnno4jURN();
 
 	public ObjectRepository() throws ObjectStoreConfigException {
 		this.service = new ObjectServiceImpl();
@@ -161,7 +164,7 @@ public class ObjectRepository extends ContextAwareRepository {
 		ObjectFactory factory = service.createObjectFactory();
 		RepositoryConnection conn = getDelegate().getConnection();
 		ObjectConnection con = new ObjectConnection(this, conn, factory,
-				createTypeManager(), blobs);
+				createTypeManager(), blobs, idGenerator);
 		con.setIncludeInferred(isIncludeInferred());
 		con.setMaxQueryTime(getMaxQueryTime());
 		// con.setQueryResultLimit(getQueryResultLimit());
@@ -177,4 +180,11 @@ public class ObjectRepository extends ContextAwareRepository {
 		return new TypeManager(true);
 	}
 
+    public IDGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IDGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
 }
