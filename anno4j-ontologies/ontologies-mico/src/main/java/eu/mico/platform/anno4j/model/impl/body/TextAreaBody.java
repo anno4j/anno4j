@@ -1,46 +1,105 @@
 package eu.mico.platform.anno4j.model.impl.body;
 
 import com.github.anno4j.model.Body;
-import com.github.anno4j.model.namespaces.CNT;
-import com.github.anno4j.model.namespaces.DCTERMS;
-import com.github.anno4j.model.namespaces.DCTYPES;
-import com.github.anno4j.model.namespaces.RDF;
+import com.github.anno4j.model.namespaces.*;
 import com.hp.hpl.jena.ontology.Ontology;
 import org.openrdf.annotations.Iri;
 
 @Iri(DCTYPES.TEXT)
 public class TextAreaBody extends Body {
 
-    @Iri(DCTERMS.FORMAT)
-    private String format;
-    
-    @Iri(CNT.CHARS)
-    private String value;
-    
-    @Iri(RDF.VALUE)
-    private final String TYPE = CNT.CONTENT_AS_TEXT;
+    /**
+     * The format that the given text annotation is supported in.
+     */
+    @Iri(DC.FORMAT)   private String format;
 
-    public TextAreaBody() {
-    }
+    /**
+     * The actual textual content.
+     */
+    @Iri(RDF.VALUE)   private String value;
 
-    public TextAreaBody(String format, String value) {
+    /**
+     * The language of the supported text annotation.
+     */
+    @Iri(DC.LANGUAGE) private String language;
+
+    /**
+     * Standard constructor.
+     */
+    public TextAreaBody() {};
+
+    /**
+     * Constructor setting the format, value, and language members.
+     * @param format    The format of the text annotation.
+     * @param value     The actual text of the annotation.
+     * @param language  The language of the text.
+     */
+    public TextAreaBody(String format, String value, String language) {
         this.format = format;
         this.value = value;
+        this.language = language;
     }
 
+    /**
+     * Gets The format that the given text annotation is supported in..
+     *
+     * @return Value of The format that the given text annotation is supported in..
+     */
     public String getFormat() {
         return format;
     }
 
+    /**
+     * Sets new The actual textual content..
+     *
+     * @param value New value of The actual textual content..
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    /**
+     * Gets The language of the supported text annotation..
+     *
+     * @return Value of The language of the supported text annotation..
+     */
+    public String getLanguage() {
+        return language;
+    }
+
+    /**
+     * Sets new The language of the supported text annotation..
+     *
+     * @param language New value of The language of the supported text annotation..
+     */
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    /**
+     * Sets new The format that the given text annotation is supported in..
+     *
+     * @param format New value of The format that the given text annotation is supported in..
+     */
     public void setFormat(String format) {
         this.format = format;
     }
 
+    /**
+     * Gets The actual textual content..
+     *
+     * @return Value of The actual textual content..
+     */
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    @Override
+    public String toString() {
+        return "TextAnnotationBody{" +
+                "format='" + format + '\'' +
+                ", value='" + value + '\'' +
+                ", language='" + language + '\'' +
+                '}';
     }
 }
