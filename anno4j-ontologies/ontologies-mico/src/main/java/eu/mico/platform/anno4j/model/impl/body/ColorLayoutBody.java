@@ -5,83 +5,41 @@ import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.openrdf.annotations.Iri;
 
 @Iri(MICO.COLORLAYOUT_BODY)
-public class ColorLayoutBody extends Body {
+public interface ColorLayoutBody extends Body {
 
     @Iri(MICO.YDCCOEFF)
-    private String YDC;
+    String getYDC();
+
+    @Iri(MICO.YDCCOEFF)
+    void setYDC(String YDC);
 
     @Iri(MICO.CBDCCOEFF)
-    private String CbDC;
+    String getCbDC();
+
+    @Iri(MICO.CBDCCOEFF)
+    void setCbDC(String cbDC);
 
     @Iri(MICO.CRDCCOEFF)
-    private String CrDC;
+    String getCrDC();
+
+    @Iri(MICO.CRDCCOEFF)
+    void setCrDC(String crDC);
 
     @Iri(MICO.CBACCOEFF)
-    private String CbAC;
+    String getCbAC();
+
+    @Iri(MICO.CBACCOEFF)
+    void setCbAC(String cbAC);
 
     @Iri(MICO.CRACCOEFF)
-    private String CrAC;
+    String getCrAC();
+
+    @Iri(MICO.CRACCOEFF)
+    void setCrAC(String crAC);
 
     @Iri(MICO.YACCOEFF)
-    private String YAC;
+    String getYAC();
 
-    public ColorLayoutBody() {
-    }
-
-    public ColorLayoutBody(String YDC, String CbDC, String CrDC, String CbAC, String CrAC, String YAC) {
-        this.YDC = YDC;
-        this.CbDC = CbDC;
-        this.CrDC = CrDC;
-        this.CbAC = CbAC;
-        this.CrAC = CrAC;
-        this.YAC = YAC;
-    }
-
-    public String getYDC() {
-        return YDC;
-    }
-
-    public void setYDC(String YDC) {
-        this.YDC = YDC;
-    }
-
-    public String getCbDC() {
-        return CbDC;
-    }
-
-    public void setCbDC(String cbDC) {
-        CbDC = cbDC;
-    }
-
-    public String getCrDC() {
-        return CrDC;
-    }
-
-    public void setCrDC(String crDC) {
-        CrDC = crDC;
-    }
-
-    public String getCbAC() {
-        return CbAC;
-    }
-
-    public void setCbAC(String cbAC) {
-        CbAC = cbAC;
-    }
-
-    public String getCrAC() {
-        return CrAC;
-    }
-
-    public void setCrAC(String crAC) {
-        CrAC = crAC;
-    }
-
-    public String getYAC() {
-        return YAC;
-    }
-
-    public void setYAC(String YAC) {
-        this.YAC = YAC;
-    }
+    @Iri(MICO.YACCOEFF)
+    void setYAC(String YAC);
 }

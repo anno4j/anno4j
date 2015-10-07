@@ -9,38 +9,24 @@ import com.hp.hpl.jena.ontology.Ontology;
 import org.openrdf.annotations.Iri;
 
 @Iri(DCTYPES.TEXT)
-public class TextAreaBody extends Body {
+public interface TextAreaBody extends Body {
+
+
+    @Iri(RDF.VALUE)
+    String getType();
+
+    @Iri(RDF.VALUE)
+    void setType(String type);
 
     @Iri(DCTERMS.FORMAT)
-    private String format;
-    
+    String getFormat();
+
+    @Iri(DCTERMS.FORMAT)
+    void setFormat(String format);
+
     @Iri(CNT.CHARS)
-    private String value;
-    
-    @Iri(RDF.VALUE)
-    private final String TYPE = CNT.CONTENT_AS_TEXT;
+    String getValue();
 
-    public TextAreaBody() {
-    }
-
-    public TextAreaBody(String format, String value) {
-        this.format = format;
-        this.value = value;
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
+    @Iri(CNT.CHARS)
+    void setValue(String value);
 }

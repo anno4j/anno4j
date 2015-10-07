@@ -10,6 +10,6 @@ import org.openrdf.annotations.Iri;
  * respective selector. The body itself contains nothing but represents the silence in the annotated time period.
  */
 @Iri(MICO.STT_SILENCE_BODY_MICO)
-public class SpeechSilenceBody extends Body {
+public interface SpeechSilenceBody extends Body {
 
 }

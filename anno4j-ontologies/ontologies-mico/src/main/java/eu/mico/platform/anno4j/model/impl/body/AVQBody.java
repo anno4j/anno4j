@@ -10,36 +10,21 @@ import org.openrdf.annotations.Iri;
  * Has two subclasses {@link AVQShotBody} and {@link AVQKeyFrameBody}.
  */
 @Iri(MICO.AVQ_BODY)
-public class AVQBody extends Body {
-
-    /**
-     * Confidence value for the detected shot/keyframe
-     */
-    @Iri(MICO.HAS_CONFIDENCE)
-    private Double confidence;
-
-    public AVQBody() {
-    }
-
-    public AVQBody(Double confidence) {
-        this.confidence = confidence;
-    }
+public interface AVQBody extends Body {
 
     /**
      * Sets new Confidence value for the detected shotkeyframe.
      *
      * @param confidence New value of Confidence value for the detected shotkeyframe.
      */
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
-    }
+    @Iri(MICO.HAS_CONFIDENCE)
+    void setConfidence(Double confidence);
 
     /**
      * Gets Confidence value for the detected shotkeyframe.
      *
      * @return Value of Confidence value for the detected shotkeyframe.
      */
-    public Double getConfidence() {
-        return confidence;
-    }
+    @Iri(MICO.HAS_CONFIDENCE)
+    Double getConfidence();
 }

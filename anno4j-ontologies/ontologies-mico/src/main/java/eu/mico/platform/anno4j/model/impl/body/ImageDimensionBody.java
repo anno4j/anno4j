@@ -18,45 +18,24 @@ import org.openrdf.annotations.Iri;import java.lang.Double;import java.lang.Long
  * limitations under the License.
  */
 @Iri(MICO.IMAGE_DIMENSION_BODY)
-public class ImageDimensionBody extends Body {
-
-    @Iri(MICO.HAS_CONFIDENCE)
-    private Double confidence;
-
-    @Iri(MICO.HAS_WIDTH)
-    private Long width;
+public interface ImageDimensionBody extends Body {
 
     @Iri(MICO.HAS_HEIGHT)
-    private Long height;
+    public Long getHeight();
 
+    @Iri(MICO.HAS_HEIGHT)
+    public void setHeight(Long height);
 
-    public Long getHeight() {
-        return height;
-    }
+    @Iri(MICO.HAS_CONFIDENCE)
+    public Double getConfidence();
 
-    public void setHeight(Long height) {
-        this.height = height;
-    }
+    @Iri(MICO.HAS_CONFIDENCE)
+    public void setConfidence(Double confidence);
 
-    public Double getConfidence() {
-        return confidence;
-    }
+    @Iri(MICO.HAS_WIDTH)
+    public Long getWidth();
 
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
-    }
-
-    public Long getWidth() {
-        return width;
-    }
-
-    public void setWidth(Long width) {
-        this.width = width;
-    }
-
-
-
-
-
+    @Iri(MICO.HAS_WIDTH)
+    public void setWidth(Long width);
 
 }

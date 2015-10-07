@@ -7,19 +7,11 @@ import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.openrdf.annotations.Iri;
 
 @Iri(MICO.MULTIMEDIA_BODY)
-public class MultiMediaBody extends Body {
+public interface MultiMediaBody extends Body {
 
     @Iri(DC.FORMAT)
-    private String format;
+    String getFormat();
 
-    public MultiMediaBody() {
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
+    @Iri(DC.FORMAT)
+    void setFormat(String format);
 }

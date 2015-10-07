@@ -6,26 +6,12 @@ import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.openrdf.annotations.Iri;
 
 @Iri(MICO.FACE_DETECTION_BODY)
-public class FaceDetectionBody extends Body {
+public interface FaceDetectionBody extends Body {
 
-    /**
-     * Confidence value for the detected face
-     */
+
     @Iri(MICO.HAS_CONFIDENCE)
-    private Double confidence;
+    Double getConfidence();
 
-    public FaceDetectionBody() {
-    }
-
-    public FaceDetectionBody(Double confidence) {
-        this.confidence = confidence;
-    }
-
-    public Double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
-    }
+    @Iri(MICO.HAS_CONFIDENCE)
+    void setConfidence(Double confidence);
 }

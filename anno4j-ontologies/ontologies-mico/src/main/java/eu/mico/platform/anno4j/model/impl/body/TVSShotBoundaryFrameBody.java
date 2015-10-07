@@ -8,19 +8,11 @@ import org.openrdf.annotations.Iri;
  * Class represents a Shot Boundary Frame of a given TVS analysis.
  */
 @Iri(MICO.TVS_SHOT_BOUNDARY_FRAME_BODY)
-public class TVSShotBoundaryFrameBody  extends TVSBody{
+public interface TVSShotBoundaryFrameBody  extends TVSBody{
 
     @Iri(DC.FORMAT)
-    private String format;
+    String getFormat();
 
-    public TVSShotBoundaryFrameBody() {
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
+    @Iri(DC.FORMAT)
+    void setFormat(String format);
 }

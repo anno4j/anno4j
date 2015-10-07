@@ -8,19 +8,11 @@ import org.openrdf.annotations.Iri;
  * Class represents a KeyFrame of a given TVS analysis.
  */
 @Iri(MICO.TVS_KEY_FRAME_BODY)
-public class TVSKeyFrameBody extends TVSBody {
+public interface TVSKeyFrameBody extends TVSBody {
 
     @Iri(DC.FORMAT)
-    private String format;
+    String getFormat();
 
-    public TVSKeyFrameBody() {
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
+    @Iri(DC.FORMAT)
+    void setFormat(String format);
 }

@@ -21,11 +21,6 @@ import java.util.List;
 public class MICOQueryHelper {
 
     /**
-     * Singleton instance of this class.
-     */
-    private static MICOQueryHelper instance = null;
-
-    /**
      * Selector type restriction
      */
     private String selectorTypeRestriction;
@@ -41,6 +36,16 @@ public class MICOQueryHelper {
     private String targetTypeRestriction;
 
     /**
+     * A configured instance of anno4j
+     */
+    private Anno4j anno4j;
+
+    public MICOQueryHelper(Anno4j anno4j) {
+        this.anno4j = anno4j;
+    }
+
+
+    /**
      * Allows to query all annotation objects of a given content item.
      *
      * @param contentItemId The id (url) of the content item.
@@ -52,7 +57,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsOfContentItem(String contentItemId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService qs = Anno4j.getInstance().createQueryService()
+        QueryService qs = anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart", contentItemId);
 
@@ -73,7 +78,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public Annotation getAnnotationOfContentPart(String contentPartId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService qs = Anno4j.getInstance().createQueryService()
+        QueryService qs = anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .setAnnotationCriteria("^mico:hasContent", contentPartId);
 
@@ -95,7 +100,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsByMIMEType(String mimeType) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService qs =  Anno4j.getInstance().createQueryService()
+        QueryService qs =  anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
                 .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:type", mimeType);
@@ -118,7 +123,7 @@ public class MICOQueryHelper {
      * @throws ParseException
      */
     public List<Annotation> getAnnotationsBySourceName(String sourceName) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
-        QueryService qs = Anno4j.getInstance().createQueryService()
+        QueryService qs = anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
                 .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:source", sourceName);
@@ -133,7 +138,7 @@ public class MICOQueryHelper {
      */
     public MICOQueryHelper filterBodyType(String type) {
         this.bodyTypeRestriction = "[is-a "+ type + "]";
-        return getInstance();
+        return this;
     }
 
     /**
@@ -141,7 +146,7 @@ public class MICOQueryHelper {
      */
     public MICOQueryHelper filterSelectorType(String type) {
         this.selectorTypeRestriction  = "[is-a "+ type + "]";
-        return getInstance();
+        return this;
     }
 
     /**
@@ -149,7 +154,7 @@ public class MICOQueryHelper {
      */
     public MICOQueryHelper filterTargetType(String type) {
         this.targetTypeRestriction = "[is-a "+ type + "]";
-        return getInstance();
+        return this;
     }
 
     /**
@@ -169,21 +174,5 @@ public class MICOQueryHelper {
         if(targetTypeRestriction != null) {
             qs.setAnnotationCriteria("oa:hasTarget" + targetTypeRestriction);
         }
-    }
-
-    /**
-     * Getter for the Anno4j getter instance.
-     *
-     * @return singleton Anno4j instance.
-     */
-    public static MICOQueryHelper getInstance() {
-        if (instance == null) {
-            synchronized (MICOQueryHelper.class) {
-                if (instance == null) {
-                    instance = new MICOQueryHelper();
-                }
-            }
-        }
-        return instance;
     }
 }

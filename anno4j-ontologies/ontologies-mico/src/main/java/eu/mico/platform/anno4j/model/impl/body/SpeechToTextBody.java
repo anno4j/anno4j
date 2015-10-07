@@ -11,43 +11,15 @@ import org.openrdf.repository.object.LangString;
  * respective selector. The body itself contains which word has been detected.
  */
 @Iri(MICO.STT_BODY_MICO)
-public class SpeechToTextBody extends Body {
+public interface SpeechToTextBody extends Body {
+
+    @Iri(RDF.VALUE)
+    LangString getValue();
 
     /**
      * The value of the body corresponds to the word that is detected.
      */
     @Iri(RDF.VALUE)
-    private LangString value;
-
-    /**
-     * Default constructor.
-     */
-    public SpeechToTextBody() {};
-
-    /**
-     * Constructor also setting the value.
-     * @param value The word that is detected.
-     */
-    public SpeechToTextBody(LangString value) {
-        this.value = value;
-    }
-
-    /**
-     * Gets value.
-     *
-     * @return Value of value.
-     */
-    public LangString getValue() {
-        return value;
-    }
-
-    /**
-     * Sets new value.
-     *
-     * @param value New value of value.
-     */
-    public void setValue(LangString value) {
-        this.value = value;
-    }
+    void setValue(LangString value);
 
 }

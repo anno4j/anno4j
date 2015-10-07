@@ -6,35 +6,17 @@ import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.openrdf.annotations.Iri;
 
 @Iri(MICO.COLOR_LAYOUT_RAW_BODY)
-public class ColorLayoutRawBody extends Body {
-    
+public interface ColorLayoutRawBody extends Body {
+
     @Iri(MICO.HAS_LOCATION)
-    private String layoutLocation;
-    
+    String getLayoutLocation();
+
+    @Iri(MICO.HAS_LOCATION)
+    void setLayoutLocation(String layoutLocation);
+
     @Iri(DCTERMS.FORMAT)
-    private String format;
+    String getFormat();
 
-    public ColorLayoutRawBody() {
-    }
-
-    public ColorLayoutRawBody(String layoutLocation, String format) {
-        this.layoutLocation = layoutLocation;
-        this.format = format;
-    }
-
-    public String getLayoutLocation() {
-        return layoutLocation;
-    }
-
-    public void setLayoutLocation(String layoutLocation) {
-        this.layoutLocation = layoutLocation;
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
-    }
+    @Iri(DCTERMS.FORMAT)
+    void setFormat(String format);
 }

@@ -7,5 +7,5 @@ import org.openrdf.annotations.Iri;
  * Class represents a Shot of a given AVQ analysis.
  */
 @Iri(MICO.AVQ_SHOT_BODY)
-public class AVQShotBody extends AVQBody {
+public interface AVQShotBody extends AVQBody {
 }

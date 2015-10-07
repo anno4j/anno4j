@@ -6,50 +6,23 @@ import eu.mico.platform.anno4j.model.namespaces.MICO;
 import org.openrdf.annotations.Iri;
 
 @Iri(MICO.ANIMAL_DETECTION_BODY)
-public class AnimalDetectionBody extends Body {
+public interface AnimalDetectionBody extends Body {
 
-    /**
-     * Confidence value for the detected animal
-     */
     @Iri(MICO.HAS_CONFIDENCE)
-    private Double confidence;
+    void setConfidence(Double confidence);
 
-    /**
-     * Type of the animal
-     */
+    @Iri(MICO.HAS_CONFIDENCE)
+    String getConfidence();
+
     @Iri(RDF.VALUE)
-    private String value;
+    void setValue(String value);
 
-    /**
-     * Version of the executed extractor
-     */
+    @Iri(RDF.VALUE)
+    String getValue();
+
     @Iri(MICO.HAS_EXTRACTION_VERSION)
-    private String extractionVersion;
+    void setExtractionVersion(String extractionVersion);
 
-    public AnimalDetectionBody() {
-    }
-
-    public Double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getExtractionVersion() {
-        return extractionVersion;
-    }
-
-    public void setExtractionVersion(String extractionVersion) {
-        this.extractionVersion = extractionVersion;
-    }
+    @Iri(MICO.HAS_EXTRACTION_VERSION)
+    String getExtractionVersion();
 }
