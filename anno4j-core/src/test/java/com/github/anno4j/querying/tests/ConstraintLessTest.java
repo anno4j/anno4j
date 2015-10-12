@@ -58,7 +58,7 @@ public class ConstraintLessTest {
      */
     public void retrieveAll() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("ex:constraintLessValue")
+                .setBodyCriteria("/ex:constraintLessValue")
                 .execute();
 
         assertEquals(2, list.size());

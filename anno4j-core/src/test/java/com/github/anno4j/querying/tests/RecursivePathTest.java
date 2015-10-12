@@ -5,9 +5,6 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
 import com.google.gson.Gson;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -74,7 +71,7 @@ public class RecursivePathTest {
 
         annotations = queryService
                 .setAnnotationCriteria("(oa:hasBody)+")
-                .setBodyCriteria("ex:recursiveBodyValue", "Another Testing Value")
+                .setBodyCriteria("/ex:recursiveBodyValue", "Another Testing Value")
                 .execute();
         assertEquals(1, annotations.size());
         assertEquals("Another Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());

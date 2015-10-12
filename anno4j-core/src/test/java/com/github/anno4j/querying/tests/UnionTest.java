@@ -44,9 +44,9 @@ public class UnionTest {
         Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
 
         List<Annotation> annotations = queryService
-                .setBodyCriteria("ex:hasBody | ex:hasTarget")
+                .setAnnotationCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
                 .execute();
-        
+
         assertEquals(2, annotations.size());
     }
 

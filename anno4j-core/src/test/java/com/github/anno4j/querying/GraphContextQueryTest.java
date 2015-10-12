@@ -44,7 +44,7 @@ public class GraphContextQueryTest {
         QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class);
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
-                .setBodyCriteria("ex:value", "Example Value")
+                .setBodyCriteria("/ex:value", "Example Value")
                 .execute();
 
         assertEquals(1, defaultList.size());
@@ -70,7 +70,7 @@ public class GraphContextQueryTest {
         QueryService<Annotation> queryService = Anno4j.getInstance().createQueryService(Annotation.class, subgraph);
         List<Annotation> defaultList = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
-                .setBodyCriteria("ex:value", "Example Value")
+                .setBodyCriteria("/ex:value", "Example Value")
                 .execute();
 
         assertEquals(1, defaultList.size());

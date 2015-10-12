@@ -66,7 +66,7 @@ public class PathTest {
     @Test
     public void testSecondBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setBodyCriteria("ex:value", "Value2")
+                .setBodyCriteria("/ex:value", "Value2")
                 .execute();
 
         assertEquals(1, annotations.size());

@@ -51,7 +51,7 @@ public class DataTypeTest {
     public void doubleEqualTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
-                .setBodyCriteria("ex:doubleValue[^^xsd:double]")
+                .setBodyCriteria("/ex:doubleValue[^^xsd:double]")
                 .execute();
 
         assertEquals(1, list.size());
@@ -65,7 +65,7 @@ public class DataTypeTest {
     public void doubleLtTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
-                .setBodyCriteria("ex:doubleValue[^^xsd:double]", 4.0, Comparison.LT)
+                .setBodyCriteria("/ex:doubleValue[^^xsd:double]", 4.0, Comparison.LT)
                 .execute();
 
         assertEquals(1, list.size());
@@ -94,7 +94,7 @@ public class DataTypeTest {
 
         List<Annotation> list = queryService
                 .addPrefix("ex", "http://www.example.com/schema#")
-                .setBodyCriteria("ex:stringValue[^^xsd:string]")
+                .setBodyCriteria("/ex:stringValue[^^xsd:string]")
                 .execute();
 
         assertEquals(1, list.size());

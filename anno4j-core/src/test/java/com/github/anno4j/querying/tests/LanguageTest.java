@@ -52,7 +52,7 @@ public class LanguageTest {
      */
     public void testFirstBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("ex:languageValue[@en]", "First Value")
+                .setBodyCriteria("/ex:languageValue[@en]", "First Value")
                 .execute();
 
         LangTestBody testBody = (LangTestBody) list.get(0).getBody();
@@ -66,7 +66,7 @@ public class LanguageTest {
      */
     public void testSecondBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("ex:languageValue[@de]")
+                .setBodyCriteria("/ex:languageValue[@de]")
                 .execute();
 
         assertEquals(1, list.size());

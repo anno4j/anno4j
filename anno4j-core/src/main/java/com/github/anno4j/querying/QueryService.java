@@ -4,7 +4,6 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.namespaces.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
 import com.hp.hpl.jena.query.Query;
-import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.OWL;
@@ -60,7 +59,7 @@ public class QueryService<T extends Annotation> {
     /**
      * LDPath for the shortcut method setTargetCriteria
      */
-    private final String TARGET_PREFIX = "oa:hasTarget/";
+    private final String TARGET_PREFIX = "oa:hasTarget";
 
     /**
      * LDPath for the shortcut method setSourceCriteria
@@ -69,7 +68,7 @@ public class QueryService<T extends Annotation> {
      * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSource/[is-a ex:exampleType]",
      * if we would append the slash to the SOURCE_PREFIX constant, which would be simple wrong!
      */
-    private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource";
+    private final String SOURCE_PREFIX = TARGET_PREFIX + "/" + "oa:hasSource";
 
     /**
      * LDPath for the shortcut method setSelectorCriteria
@@ -78,7 +77,7 @@ public class QueryService<T extends Annotation> {
      * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSelector/[is-a ex:exampleType]",
      * if we would append the slash to the SELECTOR_PREFIX constant, which would be simple wrong!
      */
-    private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector";
+    private final String SELECTOR_PREFIX = TARGET_PREFIX + "/" + "oa:hasSelector";
 
     /**
      * All user defined name spaces
@@ -111,12 +110,6 @@ public class QueryService<T extends Annotation> {
      */
     private QueryOptimizer queryOptimizer = null;
 
-    /**
-     * Required to have an ongoing variable name when creating the SPARQL query
-     */
-    private int varIndex = 0;
-
-
     public QueryService(Class<T> type, ObjectRepository objectRepository) {
        this(type, objectRepository, null);
     }
@@ -145,26 +138,28 @@ public class QueryService<T extends Annotation> {
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
      *
-     * @param ldpath     Syntax similar to XPath. Beginning from the Body object
+     * @param ldpath     Syntax similar to XPath. Beginning from the Body object. You have to start with a "/" to continue with the body path.
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setBodyCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
         return this;
     }
 
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
      *
-     * @param ldpath     Syntax similar to XPath. Beginning from the Body object
+     * @param ldpath     Syntax similar to XPath. Beginning from the Body object. You have to start with a "/" to continue with the body path.
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setBodyCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria(BODY_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -173,10 +168,11 @@ public class QueryService<T extends Annotation> {
      * other <i>setBodyCriteria</i> function, this function does not need a <b>Comparison</b> statement. Hence,
      * the Comparison.EQ statement ("=") will be used automatically.
      *
-     * @param ldpath Syntax similar to XPath. Beginning from the Body object
+     * @param ldpath Syntax similar to XPath. Beginning from the Body object. You have to start with a "/" to continue with the body path.
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setBodyCriteria(String ldpath, String value) {
         return setBodyCriteria(ldpath, value, Comparison.EQ);
     }
@@ -186,10 +182,11 @@ public class QueryService<T extends Annotation> {
      * other <i>setBodyCriteria</i> function, this function does not need a <b>Comparison</b> statement. Hence,
      * the Comparison.EQ statement ("=") will be used automatically.
      *
-     * @param ldpath Syntax similar to XPath. Beginning from the Body object
+     * @param ldpath Syntax similar to XPath. Beginning from the Body object. You have to start with a "/" to continue with the body path.
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setBodyCriteria(String ldpath, Number value) {
         return setBodyCriteria(ldpath, value, Comparison.EQ);
     }
@@ -197,11 +194,12 @@ public class QueryService<T extends Annotation> {
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
      *
-     * @param ldpath Syntax similar to XPath. Beginning from the Body object
+     * @param ldpath Syntax similar to XPath. Beginning from the Body object. You have to start with a "/" to continue with the body path.
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setBodyCriteria(String ldpath) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, Comparison.EQ));
+        criteria.add(new Criteria(BODY_PREFIX + ldpath, Comparison.EQ));
         return this;
     }
 
@@ -268,6 +266,7 @@ public class QueryService<T extends Annotation> {
         return this;
     }
 
+
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
      *
@@ -276,9 +275,10 @@ public class QueryService<T extends Annotation> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSelectorCriteria(String ldpath, String value, Comparison comparison) {
 
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -290,8 +290,9 @@ public class QueryService<T extends Annotation> {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSelectorCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -304,6 +305,7 @@ public class QueryService<T extends Annotation> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSelectorCriteria(String ldpath, String value) {
         return setSelectorCriteria(ldpath, value, Comparison.EQ);
     }
@@ -317,6 +319,7 @@ public class QueryService<T extends Annotation> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSelectorCriteria(String ldpath, Number value) {
         return setSelectorCriteria(ldpath, value, Comparison.EQ);
     }
@@ -327,8 +330,9 @@ public class QueryService<T extends Annotation> {
      * @param ldpath Syntax similar to XPath. Beginning from the Selector object
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSelectorCriteria(String ldpath) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, Comparison.EQ));
+        criteria.add(new Criteria(SELECTOR_PREFIX + ldpath, Comparison.EQ));
         return this;
     }
 
@@ -338,8 +342,9 @@ public class QueryService<T extends Annotation> {
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSourceCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath  : SOURCE_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -349,8 +354,9 @@ public class QueryService<T extends Annotation> {
      * @param comparison The comparison mode, e.g. Comparison.EQ (=)
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSourceCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, value, comparison));
+        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, value, comparison));
         return this;
     }
 
@@ -359,6 +365,7 @@ public class QueryService<T extends Annotation> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSourceCriteria(String ldpath, String value) {
         return setSourceCriteria(ldpath, value, Comparison.EQ);
     }
@@ -368,6 +375,7 @@ public class QueryService<T extends Annotation> {
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSourceCriteria(String ldpath, Number value) {
         return setSourceCriteria(ldpath, value, Comparison.EQ);
     }
@@ -376,8 +384,9 @@ public class QueryService<T extends Annotation> {
      * @param ldpath Syntax similar to XPath. Beginning from the Source object
      * @return itself to allow chaining.
      */
+    @Deprecated
     public QueryService setSourceCriteria(String ldpath) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, Comparison.EQ));
+        criteria.add(new Criteria(SOURCE_PREFIX + ldpath, Comparison.EQ));
         return this;
     }
 
