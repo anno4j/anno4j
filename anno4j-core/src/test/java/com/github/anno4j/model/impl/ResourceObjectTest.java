@@ -1,6 +1,7 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.Annotation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.openrdf.repository.object.ObjectConnection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by schlegel on 05/10/15.
@@ -48,5 +50,18 @@ public class ResourceObjectTest {
 
         ResourceObject resourceResult = (ResourceObject) connection.getObject(resourceObject.getResource());
         assertEquals(resourceObject.getResourceAsString(), resourceResult.getResourceAsString());
+    }
+
+    @Test
+    public void testGetNTriples() throws Exception {
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        annotation.setAnnotatedAt("" + System.currentTimeMillis());
+        annotation.setSerializedAt("" + System.currentTimeMillis());
+
+        String output = annotation.getNTriples();
+
+        assertTrue(output.contains("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/oa#Annotation>"));
+        assertTrue(output.contains(" <http://www.w3.org/ns/oa#annotatedAt> "));
+        assertTrue(output.contains(" <http://www.w3.org/ns/oa#serializedAt> "));
     }
 }
