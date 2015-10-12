@@ -19,8 +19,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * ObjectParser class to parse annotations from different serializations, e.g. JSONLD, Turtle, ...
- * A parsed Annotation object is NOT PERSISTED in the corresponding Anno4j.
+ * ObjectParser class to parse annotations from different serializations, e.g.
+ * JSONLD, Turtle, ... A parsed Annotation object is NOT PERSISTED in the
+ * corresponding Anno4j.
  */
 public class ObjectParser {
 
@@ -31,6 +32,7 @@ public class ObjectParser {
 
     /**
      * Basic constructor, which sets up all the necessary repositories.
+     *
      * @throws RepositoryException
      * @throws RepositoryConfigException
      */
@@ -43,7 +45,9 @@ public class ObjectParser {
     }
 
     /**
-     * Shutdown method, closing all repositories and corresponding connection objects.
+     * Shutdown method, closing all repositories and corresponding connection
+     * objects.
+     *
      * @throws RepositoryException
      */
     public void shutdown() throws RepositoryException {
@@ -54,9 +58,11 @@ public class ObjectParser {
     }
 
     /**
-     * Method to return all annotations that have been parsed with this ObjectParser.
+     * Method to return all annotations that have been parsed with this
+     * ObjectParser.
      *
-     * @return  A list of annotations, created by parsing (different) serializations of annotations.
+     * @return A list of annotations, created by parsing (different)
+     * serializations of annotations.
      */
     private List<Annotation> getAnnotations() {
 
@@ -72,47 +78,31 @@ public class ObjectParser {
     }
 
     /**
-     * Used to parse a given text content, supported in a given serialization format.
+     * Used to parse a given text content, supported in a given serialization
+     * format.
      *
-     * @param content       The String representation of the textcontent.
-     * @param documentURL   The basic URL used for namespaces.
-     * @param format        The format of the given serialization. Needs to be supported of an instance of RDFFormat.
+     * @param content The String representation of the textcontent.
+     * @param documentURL The basic URL used for namespaces.
+     * @param format The format of the given serialization. Needs to be
+     * supported of an instance of RDFFormat.
+     * @return A list of annotations
      */
     public List<Annotation> parse(String content, URL documentURL, RDFFormat format) {
         File file;
+        RDFParser parser = Rio.createParser(format);
         try {
-            file = File.createTempFile("temp", format.getDefaultFileExtension());
-            FileUtils.writeStringToFile(file, content);
 
-            parse(file, documentURL, format);
-        } catch (IOException e) {
+            StatementSailHandler handler = new StatementSailHandler(sailConnection);
+
+            parser.setRDFHandler(handler);
+            byte[] bytes = content.getBytes("UTF-8");
+            try (InputStream stream = new ByteArrayInputStream(bytes)) {
+                parser.parse(stream, documentURL.toString());
+            }
+        } catch (RDFHandlerException | RDFParseException | IOException e) {
             e.printStackTrace();
         }
 
         return getAnnotations();
-    }
-
-    /**
-     * Method wraps the Sesame Rio function to read a file of a given serialization.
-     *
-     * @param file          The file to read.
-     * @param documentURL   The basic URL used for namespaces.
-     * @param format        The format of the given serialization. Needs to be supported of an instance of RDFFormat.
-     */
-    private void parse(File file, URL documentURL, RDFFormat format) {
-        RDFParser parser = Rio.createParser(format);
-
-        try {
-            StatementSailHandler handler = new StatementSailHandler(sailConnection);
-
-            parser.setRDFHandler(handler);
-
-            InputStream stream = new FileInputStream(file);
-            parser.parse(stream, documentURL.toString());
-
-            stream.close();
-        } catch (RDFHandlerException | RDFParseException | IOException e) {
-            e.printStackTrace();
-        }
     }
 }
