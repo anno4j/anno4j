@@ -4,7 +4,6 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
-import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +11,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -22,85 +22,56 @@ import static org.junit.Assert.assertEquals;
  */
 public class UnionTest {
 
-    private QueryService<Annotation> queryService = null;
+    private QueryService queryService = null;
+    private Anno4j anno4j;
 
     @Before
-    public void resetQueryService() throws RepositoryException {
-        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
+    public void resetQueryService() throws RepositoryException, RepositoryConfigException {
+        this.anno4j = new Anno4j();
+        queryService = anno4j.createQueryService();
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }
 
     @Test
-    public void testUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void testUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation = new Annotation();
+        Annotation annotation =  anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
-        annotation.setBody(new UnionTestBody1("Value1"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+        UnionTestBody1 unionTestBody1 = anno4j.createObject(UnionTestBody1.class);
+        unionTestBody1.setValue("Value1");
+        annotation.setBody(unionTestBody1);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
 
-        Annotation annotation1 = new Annotation();
+        Annotation annotation1 =  anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
-        annotation1.setBody(new UnionTestBody2("Value2"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
+        UnionTestBody2 unionTestBody2 = anno4j.createObject(UnionTestBody2.class);
+        unionTestBody2.setValue("Value2");
+        annotation1.setBody(unionTestBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
 
         List<Annotation> annotations = queryService
-                .setBodyCriteria("ex:hasBody | ex:hasTarget")
+                .addCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
                 .execute();
         
         assertEquals(2, annotations.size());
     }
 
     @Iri("http://www.example.com/schema#unionBody1")
-    public static class UnionTestBody1 extends Body {
+    public static interface UnionTestBody1 extends Body {
 
         @Iri("http://www.example.com/schema#value")
-        private String value;
+        String getValue();
 
-        public UnionTestBody1() {
-        }
-
-        public UnionTestBody1(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        @Iri("http://www.example.com/schema#value")
+        void setValue(String value);
     }
 
     @Iri("http://www.example.com/schema#unionBody2")
-    public static class UnionTestBody2 extends Body {
+    public static interface UnionTestBody2 extends Body {
+        @Iri("http://www.example.com/schema#value")
+        String getValue();
 
         @Iri("http://www.example.com/schema#value")
-        private String value;
-
-        public UnionTestBody2() {
-        }
-
-        public UnionTestBody2(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return new Gson().toJson(this);
-        }
+        void setValue(String value);
     }
 }

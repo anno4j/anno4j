@@ -62,7 +62,7 @@ public class ConstraintLessTest {
      */
     public void retrieveAll() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("ex:constraintLessValue")
+                .addCriteria("oa:hasBody/ex:constraintLessValue")
                 .execute();
 
         assertEquals(2, list.size());
@@ -82,7 +82,7 @@ public class ConstraintLessTest {
      */
     public void falseTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("ex:nonExistingVaue")
+                .addCriteria("oa:hasBody/ex:nonExistingVaue")
                 .execute();
 
         assertEquals(0, list.size());

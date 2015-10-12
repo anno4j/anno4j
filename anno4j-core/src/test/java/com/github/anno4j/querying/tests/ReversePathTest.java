@@ -48,7 +48,7 @@ public class ReversePathTest {
     @Test
     public void testFirstBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setAnnotationCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:serializedAt", "07.05.2015")
+                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:serializedAt", "07.05.2015")
                 .execute();
 
         assertEquals(1, annotations.size());
@@ -64,7 +64,7 @@ public class ReversePathTest {
     @Test
     public void testSecondBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setAnnotationCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:annotatedAt", "01.01.2011")
+                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:annotatedAt", "01.01.2011")
                 .execute();
 
         assertEquals(1, annotations.size());
@@ -80,7 +80,7 @@ public class ReversePathTest {
     @Test
     public void falseTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setAnnotationCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:serzializedAt", "01.01.2011")
+                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:serzializedAt", "01.01.2011")
                 .execute();
 
         assertEquals(0, annotations.size());

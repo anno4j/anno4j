@@ -51,7 +51,7 @@ public class IsATest {
      */
     public void firstBodyTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("[is-a ex:firstBodyType]")
+                .addCriteria("oa:hasBody[is-a ex:firstBodyType]")
                 .execute();
 
         assertEquals(1, list.size());
@@ -64,7 +64,7 @@ public class IsATest {
      */
     public void secondBodyTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> list = queryService
-                .setBodyCriteria("[is-a ex:secondBodyType]")
+                .addCriteria("oa:hasBody[is-a ex:secondBodyType]")
                 .execute();
 
         assertEquals(1, list.size());
@@ -79,7 +79,7 @@ public class IsATest {
     public void falseTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
 
         List<Annotation> list = queryService
-                .setBodyCriteria("[is-a ex:thirdBodyType]")
+                .addCriteria("oa:hasBody[is-a ex:thirdBodyType]")
                 .execute();
 
         assertEquals(0, list.size());

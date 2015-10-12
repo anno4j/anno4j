@@ -57,15 +57,15 @@ public class RecursivePathTest {
      */
     public void oneOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {
         List<Annotation> annotations = queryService
-                .setAnnotationCriteria("(oa:hasTarget)+")
+                .addCriteria("(oa:hasTarget)+")
                 .execute();
         assertEquals(0, annotations.size());
 
         resetQueryService();
 
         annotations = queryService
-                .setAnnotationCriteria("(oa:hasBody)+")
-                .setBodyCriteria("ex:recursiveBodyValue", "Another Testing Value")
+                .addCriteria("(oa:hasBody)+")
+                .addCriteria("oa:hasBody/ex:recursiveBodyValue", "Another Testing Value")
                 .execute();
         assertEquals(1, annotations.size());
         assertEquals("Another Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());
@@ -78,13 +78,13 @@ public class RecursivePathTest {
      * @see <a href="http://www.w3.org/TR/sparql11-query/#pp-language">http://www.w3.org/TR/sparql11-query/#pp-language</a>
      */
     public void zeroOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {
-        List<Annotation> annotations = queryService.setAnnotationCriteria("(oa:hasBody/ex:recursiveBodyValue)*", "Some Testing Value").execute();
+        List<Annotation> annotations = queryService.addCriteria("(oa:hasBody/ex:recursiveBodyValue)*", "Some Testing Value").execute();
         assertEquals(1, annotations.size());
         assertEquals("Some Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());
 
         resetQueryService();
 
-        annotations = queryService.setAnnotationCriteria("(oa:hasTarget)*").execute();
+        annotations = queryService.addCriteria("(oa:hasTarget)*").execute();
         assertEquals(2, annotations.size());
     }
 

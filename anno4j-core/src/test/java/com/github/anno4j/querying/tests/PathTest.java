@@ -52,7 +52,7 @@ public class PathTest {
     @Test
     public void testFirstBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setAnnotationCriteria("oa:hasBody/ex:value", "Value1")
+                .addCriteria("oa:hasBody/ex:value", "Value1")
                 .execute();
 
         assertEquals(1, annotations.size());
@@ -69,7 +69,7 @@ public class PathTest {
     @Test
     public void testSecondBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setBodyCriteria("ex:value", "Value2")
+                .addCriteria("oa:hasBody/ex:value", "Value2")
                 .execute();
 
         assertEquals(1, annotations.size());
@@ -86,7 +86,7 @@ public class PathTest {
     @Test
     public void falseTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .setBodyCriteria("ex:value", "Value3")
+                .addCriteria("oa:hasBody/ex:value", "Value3")
                 .execute();
 
         assertEquals(0, annotations.size());

@@ -59,7 +59,7 @@ public class MICOQueryHelper {
     public List<Annotation> getAnnotationsOfContentItem(String contentItemId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         QueryService qs = anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
-                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart", contentItemId);
+                .addCriteria("^mico:hasContent/^mico:hasContentPart", contentItemId);
 
         processTypeRestriction(qs);
 
@@ -80,7 +80,7 @@ public class MICOQueryHelper {
     public Annotation getAnnotationOfContentPart(String contentPartId) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         QueryService qs = anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
-                .setAnnotationCriteria("^mico:hasContent", contentPartId);
+                .addCriteria("^mico:hasContent", contentPartId);
 
         processTypeRestriction(qs);
 
@@ -103,7 +103,7 @@ public class MICOQueryHelper {
         QueryService qs =  anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
-                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:type", mimeType);
+                .addCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:type", mimeType);
 
         processTypeRestriction(qs);
 
@@ -126,7 +126,7 @@ public class MICOQueryHelper {
         QueryService qs = anno4j.createQueryService()
                 .addPrefix(MICO.PREFIX, MICO.NS)
                 .addPrefix(DCTERMS.PREFIX, DCTERMS.NS)
-                .setAnnotationCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:source", sourceName);
+                .addCriteria("^mico:hasContent/^mico:hasContentPart/mico:hasContentPart/dct:source", sourceName);
 
         processTypeRestriction(qs);
 
@@ -172,7 +172,7 @@ public class MICOQueryHelper {
         }
 
         if(targetTypeRestriction != null) {
-            qs.setAnnotationCriteria("oa:hasTarget" + targetTypeRestriction);
+            qs.addCriteria("oa:hasTarget" + targetTypeRestriction);
         }
     }
 }

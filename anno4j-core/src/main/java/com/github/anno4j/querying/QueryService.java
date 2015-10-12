@@ -7,7 +7,6 @@ import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.QueryExtension;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Var;
-import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
@@ -186,69 +185,6 @@ public class QueryService {
     }
 
     /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
-     *
-     * @param ldpath     Syntax similar to XPath. Beginning from the Body object
-     * @param comparison The comparison mode, e.g. Comparison.EQ (=)
-     * @param value      The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setBodyCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, value, comparison));
-        return this;
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
-     *
-     * @param ldpath     Syntax similar to XPath. Beginning from the Body object
-     * @param comparison The comparison mode, e.g. Comparison.EQ (=)
-     * @param value      The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setBodyCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, value, comparison));
-        return this;
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects. Compared to the
-     * other <i>setBodyCriteria</i> function, this function does not need a <b>Comparison</b> statement. Hence,
-     * the Comparison.EQ statement ("=") will be used automatically.
-     *
-     * @param ldpath Syntax similar to XPath. Beginning from the Body object
-     * @param value  The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setBodyCriteria(String ldpath, String value) {
-        return setBodyCriteria(ldpath, value, Comparison.EQ);
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects. Compared to the
-     * other <i>setBodyCriteria</i> function, this function does not need a <b>Comparison</b> statement. Hence,
-     * the Comparison.EQ statement ("=") will be used automatically.
-     *
-     * @param ldpath Syntax similar to XPath. Beginning from the Body object
-     * @param value  The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setBodyCriteria(String ldpath, Number value) {
-        return setBodyCriteria(ldpath, value, Comparison.EQ);
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.impl.* objects.
-     *
-     * @param ldpath Syntax similar to XPath. Beginning from the Body object
-     * @return itself to allow chaining.
-     */
-    public QueryService setBodyCriteria(String ldpath) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? BODY_PREFIX + ldpath : BODY_PREFIX + "/" + ldpath, Comparison.EQ));
-        return this;
-    }
-
-    /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.AnnotationImpl objects.
      *
      * @param ldpath     Syntax similar to XPath. Beginning from the Annotation object
@@ -256,7 +192,7 @@ public class QueryService {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryService setAnnotationCriteria(String ldpath, String value, Comparison comparison) {
+    public QueryService addCriteria(String ldpath, String value, Comparison comparison) {
         criteria.add(new Criteria(ldpath, value, comparison));
         return this;
     }
@@ -269,35 +205,35 @@ public class QueryService {
      * @param value      The constraint value
      * @return itself to allow chaining.
      */
-    public QueryService setAnnotationCriteria(String ldpath, Number value, Comparison comparison) {
+    public QueryService addCriteria(String ldpath, Number value, Comparison comparison) {
         criteria.add(new Criteria(ldpath, value, comparison));
         return this;
     }
 
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.AnnotationImpl objects. Compared to the
-     * other <i>setAnnotationCriteria</i> function, this function does not need a Comparison statement. Hence, the
+     * other <i>addCriteria</i> function, this function does not need a Comparison statement. Hence, the
      * <b>Comparison.EQ</b> statement ("=") will be used automatically.
      *
      * @param ldpath Syntax similar to XPath. Beginning from the Annotation object
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryService setAnnotationCriteria(String ldpath, String value) {
-        return setAnnotationCriteria(ldpath, value, Comparison.EQ);
+    public QueryService addCriteria(String ldpath, String value) {
+        return addCriteria(ldpath, value, Comparison.EQ);
     }
 
     /**
      * Setting a criteria for filtering eu.mico.platform.persistence.impl.AnnotationImpl objects. Compared to the
-     * other <i>setAnnotationCriteria</i> function, this function does not need a Comparison statement. Hence, the
+     * other <i>addCriteria</i> function, this function does not need a Comparison statement. Hence, the
      * <b>Comparison.EQ</b> statement ("=") will be used automatically.
      *
      * @param ldpath Syntax similar to XPath. Beginning from the Annotation object
      * @param value  The constraint value
      * @return itself to allow chaining.
      */
-    public QueryService setAnnotationCriteria(String ldpath, Number value) {
-        return setAnnotationCriteria(ldpath, value, Comparison.EQ);
+    public QueryService addCriteria(String ldpath, Number value) {
+        return addCriteria(ldpath, value, Comparison.EQ);
     }
 
     /**
@@ -306,121 +242,8 @@ public class QueryService {
      * @param ldpath Syntax similar to XPath. Beginning from the Annotation object
      * @return itself to allow chaining.
      */
-    public QueryService setAnnotationCriteria(String ldpath) {
+    public QueryService addCriteria(String ldpath) {
         criteria.add(new Criteria(ldpath, Comparison.EQ));
-        return this;
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
-     *
-     * @param ldpath     Syntax similar to XPath. Beginning from the Selector object
-     * @param comparison The comparison mode, e.g. Comparison.EQ (=)
-     * @param value      The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setSelectorCriteria(String ldpath, String value, Comparison comparison) {
-
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, value, comparison));
-        return this;
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
-     *
-     * @param ldpath     Syntax similar to XPath. Beginning from the Selector object
-     * @param comparison The comparison mode, e.g. Comparison.EQ (=)
-     * @param value      The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setSelectorCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, value, comparison));
-        return this;
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects. Compared to the
-     * other <i>setSelectorCriteria</i> function, this function does not need a Comparison statement. Hence, the
-     * <b>Comparison.EQ</b> statement ("=") will be used automatically.
-     *
-     * @param ldpath Syntax similar to XPath. Beginning from the Selector object
-     * @param value  The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setSelectorCriteria(String ldpath, String value) {
-        return setSelectorCriteria(ldpath, value, Comparison.EQ);
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects. Compared to the
-     * other <i>setSelectorCriteria</i> function, this function does not need a Comparison statement. Hence, the
-     * <b>Comparison.EQ</b> statement ("=") will be used automatically.
-     *
-     * @param ldpath Syntax similar to XPath. Beginning from the Selector object
-     * @param value  The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setSelectorCriteria(String ldpath, Number value) {
-        return setSelectorCriteria(ldpath, value, Comparison.EQ);
-    }
-
-    /**
-     * Setting a criteria for filtering eu.mico.platform.persistence.impl.selector.* objects.
-     *
-     * @param ldpath Syntax similar to XPath. Beginning from the Selector object
-     * @return itself to allow chaining.
-     */
-    public QueryService setSelectorCriteria(String ldpath) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SELECTOR_PREFIX + ldpath : SELECTOR_PREFIX + "/" + ldpath, Comparison.EQ));
-        return this;
-    }
-
-    /**
-     * @param ldpath     Syntax similar to XPath. Beginning from the Source object
-     * @param value      The constraint value
-     * @param comparison The comparison mode, e.g. Comparison.EQ (=)
-     * @return itself to allow chaining.
-     */
-    public QueryService setSourceCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, value, comparison));
-        return this;
-    }
-
-    /**
-     * @param ldpath     Syntax similar to XPath. Beginning from the Source object
-     * @param value      The constraint value
-     * @param comparison The comparison mode, e.g. Comparison.EQ (=)
-     * @return itself to allow chaining.
-     */
-    public QueryService setSourceCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, value, comparison));
-        return this;
-    }
-
-    /**
-     * @param ldpath Syntax similar to XPath. Beginning from the Source object
-     * @param value  The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setSourceCriteria(String ldpath, String value) {
-        return setSourceCriteria(ldpath, value, Comparison.EQ);
-    }
-
-    /**
-     * @param ldpath Syntax similar to XPath. Beginning from the Source object
-     * @param value  The constraint value
-     * @return itself to allow chaining.
-     */
-    public QueryService setSourceCriteria(String ldpath, Number value) {
-        return setSourceCriteria(ldpath, value, Comparison.EQ);
-    }
-
-    /**
-     * @param ldpath Syntax similar to XPath. Beginning from the Source object
-     * @return itself to allow chaining.
-     */
-    public QueryService setSourceCriteria(String ldpath) {
-        criteria.add(new Criteria((ldpath.startsWith("[")) ? SOURCE_PREFIX + ldpath : SOURCE_PREFIX + "/" + ldpath, Comparison.EQ));
         return this;
     }
 
