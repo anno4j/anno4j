@@ -12,6 +12,9 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -25,7 +28,11 @@ public class UnionTest {
     private QueryService<Annotation> queryService = null;
 
     @Before
-    public void resetQueryService() throws RepositoryException {
+    public void resetQueryService() throws RepositoryException, RepositoryConfigException {
+        SailRepository repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+        Anno4j.getInstance().setRepository(repository);
+
         queryService = Anno4j.getInstance().createQueryService(Annotation.class);
         queryService.addPrefix("ex", "http://www.example.com/schema#");
     }

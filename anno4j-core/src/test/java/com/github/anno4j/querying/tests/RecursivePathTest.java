@@ -7,7 +7,6 @@ import com.github.anno4j.querying.QueryService;
 import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
@@ -29,18 +28,13 @@ public class RecursivePathTest {
     private QueryService<Annotation> queryService = null;
 
     @Before
-    public void resetQueryService() {
-        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-    }
-
-    @BeforeClass
-    public static void setUp() throws RepositoryException, RepositoryConfigException {
-        // getting a new respository instance for the following tests
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
         SailRepository repository = new SailRepository(new MemoryStore());
         repository.initialize();
         Anno4j.getInstance().setRepository(repository);
 
+        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
+        queryService.addPrefix("ex", "http://www.example.com/schema#");
 
         // Persisting some data
         Annotation annotation = new Annotation();
@@ -54,14 +48,13 @@ public class RecursivePathTest {
         Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
     }
 
-
     @Test
     /**
      * Test method for OneOrMorePath
      *
      * @see <a href="http://www.w3.org/TR/sparql11-query/#pp-language">http://www.w3.org/TR/sparql11-query/#pp-language</a>
      */
-    public void oneOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void oneOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException {
         List<Annotation> annotations = queryService
                 .setAnnotationCriteria("(oa:hasTarget)+")
                 .execute();
@@ -83,7 +76,7 @@ public class RecursivePathTest {
      *
      * @see <a href="http://www.w3.org/TR/sparql11-query/#pp-language">http://www.w3.org/TR/sparql11-query/#pp-language</a>
      */
-    public void zeroOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void zeroOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException {
         List<Annotation> annotations = queryService.setAnnotationCriteria("(oa:hasBody/ex:recursiveBodyValue)*", "Some Testing Value").execute();
         assertEquals(1, annotations.size());
         assertEquals("Some Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());

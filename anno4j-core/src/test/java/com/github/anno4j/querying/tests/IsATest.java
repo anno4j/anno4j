@@ -7,12 +7,14 @@ import com.github.anno4j.querying.QueryService;
 import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -26,13 +28,13 @@ public class IsATest {
     private QueryService<Annotation> queryService = null;
 
     @Before
-    public void resetQueryService() {
+    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
+        SailRepository repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+        Anno4j.getInstance().setRepository(repository);
         queryService = Anno4j.getInstance().createQueryService(Annotation.class);
         queryService.addPrefix("ex", "http://www.example.com/schema#");
-    }
 
-    @BeforeClass
-    public static void setUp() throws RepositoryException {
         // Persisting some data
         Annotation annotation = new Annotation();
         annotation.setBody(new FirstTestBody("First Value"));
