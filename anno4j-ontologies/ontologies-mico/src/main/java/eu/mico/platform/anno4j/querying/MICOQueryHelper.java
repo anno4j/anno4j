@@ -164,11 +164,12 @@ public class MICOQueryHelper {
      */
     private void processTypeRestriction(QueryService qs) {
         if(selectorTypeRestriction != null) {
-            qs.setSelectorCriteria(selectorTypeRestriction);
+
+            qs.addCriteria("oa:hasTarget/oa:hasSelector" + selectorTypeRestriction);
         }
 
         if(bodyTypeRestriction != null) {
-            qs.setBodyCriteria(bodyTypeRestriction);
+            qs.addCriteria("oa:hasBody" + bodyTypeRestriction);
         }
 
         if(targetTypeRestriction != null) {
