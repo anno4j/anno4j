@@ -4,13 +4,14 @@ notifications:
   - kai.schlegel@googlemail.com
 #  - andreas.eisenkolb@gmail.com
 #  - emanuel.berndl@gmail.com
-test : mvn test -Dmaven.javadoc.skip=true -Dgpg.skip=true --settings settings.xml
-install: mvn install -DskipTests=true -Dgpg.skip=true --settings settings.xml
-script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} == 'develop' ] && mvn clean deploy -Dgpg.skip=true --settings settings.xml || mvn clean verify -Dgpg.skip=true --settings settings.xml"
+test : mvn test -Dmaven.javadoc.skip=true --settings settings.xml
+install: mvn install -DskipTests=true --settings settings.xml
+script: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} == 'develop' ] && mvn clean deploy --settings settings.xml || [ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} == 'v2-develop' ] && mvn clean deploy --settings settings.xml ||mvn clean verify --settings settings.xml"
 branches:
   only:
   - master
   - develop
+  - v2-develop
 env:
   global:
   - secure: RriigTSAnRZx+gTRgbNy98Dz42Li6XWJ6iB+Tf6wsf3q7ikt3i9fP0UYQ47qtnmOKU5ALdBhqm/fLEYl/OoS0MkdmCd+SPfjacT2jbq0c3vmUHGGWMbXYhUCUZUmbgN8bODlMJ3KMUCmPA3B2sILYFD2zBlP1HmPrfyhwZnvso8pqSokA/S38SpyZeX3tkBWJHeBA5CqGAiHXRzdszXNErnRAld6v2FSuzst7SFNZd3RajmO+F955kUjMYyiwhRC5nqyRukD39SVa9Uh33fMCfoIVFu4gfvBlmSp2R0YeLNsIZ1fprqGA0SEABnZMf6n9Wbf72eQXBIj+R8KG/qSnU4YV1eZExUsPGaTNYILtmJrbSx77cLTIcVwPqC/9kWtIg9rfT1RU6qobm6X/pKRPmfYjSUoqQffP8tBOJM17Gyd4otLgkvwDZWiw+Kn+DADwqI1+ILBC6qjCsS7PqhXga1pP84FmnFFG8b2oQ9G1EC+/yCcHEYHCaFYnlFLiHXLi6jLvUZASqCPW1zoyzBnw4+vdh2/khy6JJr4n3pDsq5oxNzxtHyrXAdIcQ6We6uvwQp0eAvdmjJFTNyAXXDN5IBa7xOCJ5J0J3bgMQOYw4ioetVQ6r/hkWYTYx7fD4DilluZ8EqlEPoPm6Qp0dqNPfBGbV9KA56K5eeIbVTFhCU=
