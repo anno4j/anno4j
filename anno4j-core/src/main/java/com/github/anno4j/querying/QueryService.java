@@ -495,10 +495,6 @@ public class QueryService<T extends Annotation> {
         q = queryOptimizer.optimizeJoinOrder(q);
         logger.debug("Join order optimized:\n " + q);
 
-        // Optimize the FILTER placement
-        q = queryOptimizer.optimizeFilters(q);
-        logger.debug("FILTERs optimized:\n " + q);
-
         ObjectQuery query = con.prepareObjectQuery(q);
 
         if (query.getDataset() != null) {

@@ -28,8 +28,8 @@ public class EvalUnionSelector {
         LDPathEvaluator.evaluate(nodeSelectorRight, rightGroup, variable);
 
         ElementUnion elementUnion = new ElementUnion();
-        elementUnion.addElement(leftGroup.getElements().get(0));
-        elementUnion.addElement(rightGroup.getElements().get(0));
+        elementUnion.addElement(leftGroup);
+        elementUnion.addElement(rightGroup);
 
         elementGroup.addElement(elementUnion);
 
