@@ -97,6 +97,7 @@
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.root>${basedir}</project.root>
     </properties>
 
     <profiles>
@@ -108,6 +109,15 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.5</version>
+                        <configuration>
+                            <defaultKeyring>false</defaultKeyring>
+                            <homedir>${session.executionRootDirectory}/keyrings</homedir>
+                            <secretKeyring>local.secring.gpg</secretKeyring>
+                            <publicKeyring>local.pubring.gpg</publicKeyring>
+                            <keyname>Anno4j</keyname>
+                            <executable>gpg</executable>
+                            <passphrase></passphrase>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
