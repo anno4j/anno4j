@@ -2,6 +2,8 @@ language: java
 notifications:
   email:
   - kai.schlegel@googlemail.com
+  - andreas.eisenkolb@gmail.com
+  - emanuel.berndl@gmail.com
 before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in keyrings/secring.gpg.enc -out keyrings/local.secring.gpg -d
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in keyrings/pubring.gpg.enc -out keyrings/local.pubring.gpg -d
