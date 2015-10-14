@@ -9,10 +9,7 @@ before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in keyrings/pubring.gpg.enc -out keyrings/local.pubring.gpg -d
 test: mvn test -Dmaven.javadoc.skip=true --settings settings.xml
 install: mvn install -DskipTests=true --settings settings.xml
-script: '[ ${TRAVIS_PULL_REQUEST} = ''false'' ] && [ ${TRAVIS_BRANCH} == ''develop''] && mvn clean deploy --settings settings.xml
-  ||  [ ${TRAVIS_PULL_REQUEST} = ''false''] && [ ${TRAVIS_BRANCH} == ''v2-develop'' ] && mvn clean deploy --settings settings.xml
-  ||  [ ${TRAVIS_PULL_REQUEST} = ''false''] && [ ${TRAVIS_BRANCH} == ''master'' ] && mvn release:prepare release:perform -DignoreSnapshots=true -B --settings settings.xml
-  ||  mvn clean verify --settings settings.xml'
+script: '[ ${TRAVIS_PULL_REQUEST} = ''false'' ] && [ ${TRAVIS_BRANCH} == ''develop''] && mvn clean deploy --settings settings.xml ||  [ ${TRAVIS_PULL_REQUEST} = ''false''] && [ ${TRAVIS_BRANCH} == ''v2-develop'' ] && mvn clean deploy --settings settings.xml || [ ${TRAVIS_PULL_REQUEST} = ''false''] && [ ${TRAVIS_BRANCH} == ''master'' ] && mvn release:prepare release:perform -DignoreSnapshots=true -B --settings settings.xml || mvn clean verify --settings settings.xml'
 branches:
   only:
   - master
