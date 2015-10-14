@@ -7,6 +7,8 @@ notifications:
 before_install:
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in keyrings/secring.gpg.enc -out keyrings/local.secring.gpg -d
   - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in keyrings/pubring.gpg.enc -out keyrings/local.pubring.gpg -d
+before_script:
+ - chmod -R +x scripts
 script: ./scripts/build.sh
 env:
   global:
