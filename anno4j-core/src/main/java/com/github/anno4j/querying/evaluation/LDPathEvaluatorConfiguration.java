@@ -1,6 +1,7 @@
 package com.github.anno4j.querying.evaluation;
 
 import com.github.anno4j.querying.extension.QueryEvaluator;
+import com.github.anno4j.querying.extension.TestEvaluator;
 import com.hp.hpl.jena.graph.Node;
 import org.apache.marmotta.ldpath.api.functions.NodeFunction;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -17,7 +18,7 @@ public class LDPathEvaluatorConfiguration {
 
     private Map<Class<? extends NodeSelector>, Class<QueryEvaluator>> defaultEvaluators;
 
-    private Map<Class<? extends NodeTest>, Class<QueryEvaluator>> testEvaluators;
+    private Map<Class<? extends NodeTest>, Class<TestEvaluator>> testEvaluators;
 
     private Map<Class<? extends SelectorFunction>, Class<QueryEvaluator>> functionEvaluators;
 
@@ -37,11 +38,11 @@ public class LDPathEvaluatorConfiguration {
         this.defaultEvaluators = defaultEvaluators;
     }
 
-    public Map<Class<? extends NodeTest>, Class<QueryEvaluator>> getTestEvaluators() {
+    public Map<Class<? extends NodeTest>, Class<TestEvaluator>> getTestEvaluators() {
         return testEvaluators;
     }
 
-    public void setTestEvaluators(Map<Class<? extends NodeTest>, Class<QueryEvaluator>> testEvaluators) {
+    public void setTestEvaluators(Map<Class<? extends NodeTest>, Class<TestEvaluator>> testEvaluators) {
         this.testEvaluators = testEvaluators;
     }
 

@@ -2,7 +2,9 @@ package com.github.anno4j.querying.evaluation.ldpath;
 
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
+import com.github.anno4j.querying.extension.TestEvaluator;
 import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
@@ -35,7 +37,7 @@ public class LDPathEvaluator {
 
         Map<Class<? extends NodeSelector>, Class<QueryEvaluator>> defaultEvaluators = evaluatorConfiguration.getDefaultEvaluators();
         Map<Class<? extends TestFunction>, Class<QueryEvaluator>> testFunctionEvaluators = evaluatorConfiguration.getTestFunctionEvaluators();
-        Map<Class<? extends NodeTest>, Class<QueryEvaluator>> testEvaluators = evaluatorConfiguration.getTestEvaluators();
+        Map<Class<? extends NodeTest>, Class<TestEvaluator>> testEvaluators = evaluatorConfiguration.getTestEvaluators();
         Map<Class<? extends SelectorFunction>, Class<QueryEvaluator>> functionEvaluators = evaluatorConfiguration.getFunctionEvaluators();
 
         try {
@@ -61,10 +63,10 @@ public class LDPathEvaluator {
                         throw new IllegalStateException("No NodeTest evaluator for " + nodeTest.getClass().getCanonicalName());
                     }
                 }
-            } else if(nodeSelector instanceof FunctionSelector) {
+            } else if (nodeSelector instanceof FunctionSelector) {
                 FunctionSelector functionSelector = (FunctionSelector) nodeSelector;
 
-                if(functionEvaluators.containsKey(functionSelector.getFunction().getClass())) {
+                if (functionEvaluators.containsKey(functionSelector.getFunction().getClass())) {
                     return functionEvaluators.get(functionSelector.getFunction().getClass()).newInstance().evaluate(nodeSelector, elementGroup, variable, evaluatorConfiguration);
                 } else {
                     throw new IllegalStateException("No Function evaluator for " + functionSelector.getClass().getCanonicalName());
@@ -74,6 +76,21 @@ public class LDPathEvaluator {
             }
         } catch (Exception e) {
             throw new IllegalStateException("Could not instantiate evaluator for " + nodeSelector.getClass());
+        }
+    }
+
+    public static Expr evaluate(NodeTest nodeTest, ElementGroup elementGroup, Var variable, LDPathEvaluatorConfiguration evaluatorConfiguration) {
+
+        Map<Class<? extends NodeTest>, Class<TestEvaluator>> testEvaluators = evaluatorConfiguration.getTestEvaluators();
+
+        try {
+            if (testEvaluators.containsKey(nodeTest.getClass())) {
+                return testEvaluators.get(nodeTest.getClass()).newInstance().evaluate(nodeTest, elementGroup, variable, evaluatorConfiguration);
+            } else {
+                throw new IllegalStateException("No NodeTest evaluator for " + nodeTest.getClass().getCanonicalName());
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not instantiate evaluator for NodeTest " + nodeTest.getClass());
         }
     }
 }

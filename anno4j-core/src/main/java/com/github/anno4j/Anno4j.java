@@ -5,6 +5,7 @@ import com.github.anno4j.persistence.annotation.Partial;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
+import com.github.anno4j.querying.extension.TestEvaluator;
 import com.github.anno4j.querying.extension.annotation.Evaluator;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -120,7 +121,7 @@ public class Anno4j {
 
         Map<Class<? extends TestFunction>, Class<QueryEvaluator>> testFunctionEvaluators = new HashMap<>();
         Map<Class<? extends NodeSelector>, Class<QueryEvaluator>> defaultEvaluators = new HashMap<>();
-        Map<Class<? extends NodeTest>, Class<QueryEvaluator>> testEvaluators = new HashMap<>();
+        Map<Class<? extends NodeTest>, Class<TestEvaluator>> testEvaluators = new HashMap<>();
         Map<Class<? extends SelectorFunction>, Class<QueryEvaluator>> functionEvaluators = new HashMap<>();
 
         for (Class clazz : defaultEvaluatorAnnotations) {
