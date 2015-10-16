@@ -1,10 +1,12 @@
 package com.github.anno4j;
 
+import com.github.anno4j.model.Annotation;
 import com.github.anno4j.persistence.IDGenerator;
 import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.persistence.impl.IDGeneratorAnno4jURN;
 import com.github.anno4j.querying.QueryService;
 import org.openrdf.model.URI;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -145,6 +147,17 @@ public class Anno4j {
      */
     public ObjectRepository getObjectRepository() {
         return objectRepository;
+    }
+
+    /**
+     * Get a specific annotation by its URI
+     * @param uri ID of the annotation
+     * @return The annotation object of the given id
+     * @throws RepositoryException
+     * @throws QueryEvaluationException
+     */
+    public Annotation getAnnotation(String uri) throws RepositoryException, QueryEvaluationException {
+        return getObjectRepository().getConnection().getObject(Annotation.class, uri);
     }
 
     /**
