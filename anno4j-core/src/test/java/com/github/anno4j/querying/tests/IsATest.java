@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
@@ -23,27 +24,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Containing all tests, that do query for the rdf:type.
  */
-public class IsATest {
-
-    private QueryService<Annotation> queryService = null;
-
-    @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException {
-        SailRepository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
-        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-
-        // Persisting some data
-        Annotation annotation = new Annotation();
-        annotation.setBody(new FirstTestBody("First Value"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
-
-        Annotation annotation1 = new Annotation();
-        annotation1.setBody(new SecondTestBody("Second Value"));
-        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
-    }
+public class IsATest extends QuerySetup {
 
     @Test
     /**
@@ -83,6 +64,18 @@ public class IsATest {
                 .execute();
 
         assertEquals(0, list.size());
+    }
+
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
+        // Persisting some data
+        Annotation annotation = new Annotation();
+        annotation.setBody(new FirstTestBody("First Value"));
+        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation);
+
+        Annotation annotation1 = new Annotation();
+        annotation1.setBody(new SecondTestBody("Second Value"));
+        Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
     }
 
     @Iri("http://www.example.com/schema#firstBodyType")

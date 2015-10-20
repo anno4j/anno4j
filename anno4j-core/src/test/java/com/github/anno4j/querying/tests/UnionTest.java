@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import com.google.gson.Gson;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
@@ -23,22 +24,20 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by schlegel on 09/10/15.
  */
-public class UnionTest {
-
-    private QueryService<Annotation> queryService = null;
-
-    @Before
-    public void resetQueryService() throws RepositoryException, RepositoryConfigException {
-        SailRepository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
-
-        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-    }
+public class UnionTest extends QuerySetup {
 
     @Test
     public void testUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+
+        List<Annotation> annotations = queryService
+                .setAnnotationCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
+                .execute();
+
+        assertEquals(2, annotations.size());
+    }
+
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = new Annotation();
         annotation.setSerializedAt("07.05.2015");
@@ -49,12 +48,6 @@ public class UnionTest {
         annotation1.setAnnotatedAt("01.01.2011");
         annotation1.setBody(new UnionTestBody2("Value2"));
         Anno4j.getInstance().createPersistenceService().persistAnnotation(annotation1);
-
-        List<Annotation> annotations = queryService
-                .setAnnotationCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
-                .execute();
-
-        assertEquals(2, annotations.size());
     }
 
     @Iri("http://www.example.com/schema#unionBody1")
