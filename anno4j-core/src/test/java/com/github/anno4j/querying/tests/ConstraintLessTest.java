@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,18 +22,10 @@ import static org.junit.Assert.assertEquals;
  * Containing all tests, that do not provide a constraint value
  * when defining a criteria.
  */
-public class ConstraintLessTest {
+public class ConstraintLessTest extends QuerySetup {
 
-    private QueryService queryService = null;
-    private Anno4j anno4j;
-
-    @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
-        this.anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-
-        // Persisting some data
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
 
@@ -87,7 +80,6 @@ public class ConstraintLessTest {
 
         assertEquals(0, list.size());
     }
-
 
     @Iri("http://www.example.com/schema#constraintLessBody")
     public static interface ConstraintLessBody extends Body {

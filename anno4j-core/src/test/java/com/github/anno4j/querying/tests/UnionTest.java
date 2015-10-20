@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,20 +21,20 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by schlegel on 09/10/15.
  */
-public class UnionTest {
+public class UnionTest extends QuerySetup {
 
-    private QueryService queryService = null;
-    private Anno4j anno4j;
-
-    @Before
-    public void resetQueryService() throws RepositoryException, RepositoryConfigException {
-        this.anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-    }
 
     @Test
     public void testUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
+        List<Annotation> annotations = queryService
+                .addCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
+                .execute();
+        
+        assertEquals(2, annotations.size());
+    }
+
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation =  anno4j.createObject(Annotation.class);
         annotation.setSerializedAt("07.05.2015");
@@ -48,12 +49,6 @@ public class UnionTest {
         unionTestBody2.setValue("Value2");
         annotation1.setBody(unionTestBody2);
         anno4j.createPersistenceService().persistAnnotation(annotation1);
-
-        List<Annotation> annotations = queryService
-                .addCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
-                .execute();
-        
-        assertEquals(2, annotations.size());
     }
 
     @Iri("http://www.example.com/schema#unionBody1")

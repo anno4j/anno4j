@@ -5,6 +5,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,17 +20,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PathEqualityTest {
+public class PathEqualityTest extends QuerySetup {
 
-    private QueryService queryService = null;
-    private Anno4j anno4j;
 
-    @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
-        this.anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
         FirstPathEqualityTestBody firstTestBody = anno4j.createObject(FirstPathEqualityTestBody.class);
@@ -45,6 +40,7 @@ public class PathEqualityTest {
         annotation1.setBody(secondTestBody);
         anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
+
 
     @Test
     public void firstBodyTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {

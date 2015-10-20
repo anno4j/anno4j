@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,34 +21,7 @@ import static org.junit.Assert.assertEquals;
 /**
  *  Containing all tests with recursive path expressions.
  */
-public class RecursivePathTest {
-
-    private QueryService queryService = null;
-    private Anno4j anno4j;
-
-    @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
-        this.anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-
-        // Persisting some data
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
-        RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
-        recursiveBody.setValue("Some Testing Value");
-        annotation.setBody(recursiveBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
-
-        Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
-        RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
-        recursiveBody2.setValue("Another Testing Value");
-        annotation1.setBody(recursiveBody2);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
-
-    }
-
+public class RecursivePathTest extends QuerySetup {
 
     @Test
     /**
@@ -61,7 +35,7 @@ public class RecursivePathTest {
                 .execute();
         assertEquals(0, annotations.size());
 
-        resetQueryService();
+        super.setupUpQueryTest();
 
         annotations = queryService
                 .addCriteria("(oa:hasBody)+")
@@ -82,10 +56,29 @@ public class RecursivePathTest {
         assertEquals(1, annotations.size());
         assertEquals("Some Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());
 
-        resetQueryService();
+        super.setupUpQueryTest();
 
         annotations = queryService.addCriteria("(oa:hasTarget)*").execute();
         assertEquals(2, annotations.size());
+    }
+
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
+        // Persisting some data
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        annotation.setSerializedAt("07.05.2015");
+        RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
+        recursiveBody.setValue("Some Testing Value");
+        annotation.setBody(recursiveBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
+
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
+        annotation1.setAnnotatedAt("01.01.2011");
+        RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
+        recursiveBody2.setValue("Another Testing Value");
+        annotation1.setBody(recursiveBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
+
     }
 
     @Iri("http://www.example.com/schema#recursiveBody")

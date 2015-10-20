@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,32 +22,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Containing all tests, that do query for specific lang values.
  */
-public class LanguageTest {
-
-    private QueryService queryService = null;
-    private Anno4j anno4j;
-
-    @Before
-    public void resetQueryService() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
-        this.anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
-
-        // Persisting some data
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
-        LangTestBody langTestBody = anno4j.createObject(LangTestBody.class);
-        langTestBody.setLangString(new LangString("First Value", "en"));
-        annotation.setBody(langTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
-
-        Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
-        LangTestBody langTestBody2 = anno4j.createObject(LangTestBody.class);
-        langTestBody2.setLangString(new LangString("Zweiter Wert", "de"));
-        annotation1.setBody(langTestBody2);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
-    }
+public class LanguageTest extends QuerySetup {
 
     @Test
     /**
@@ -88,6 +64,24 @@ public class LanguageTest {
                 .execute();
 
         assertEquals(0, list.size());
+    }
+
+    @Override
+    public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
+        // Persisting some data
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        annotation.setSerializedAt("07.05.2015");
+        LangTestBody langTestBody = anno4j.createObject(LangTestBody.class);
+        langTestBody.setLangString(new LangString("First Value", "en"));
+        annotation.setBody(langTestBody);
+        anno4j.createPersistenceService().persistAnnotation(annotation);
+
+        Annotation annotation1 = anno4j.createObject(Annotation.class);
+        annotation1.setAnnotatedAt("01.01.2011");
+        LangTestBody langTestBody2 = anno4j.createObject(LangTestBody.class);
+        langTestBody2.setLangString(new LangString("Zweiter Wert", "de"));
+        annotation1.setBody(langTestBody2);
+        anno4j.createPersistenceService().persistAnnotation(annotation1);
     }
 
     @Iri("http://www.example.com/schema#langBody")
