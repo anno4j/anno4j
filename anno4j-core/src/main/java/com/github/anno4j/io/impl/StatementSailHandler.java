@@ -1,5 +1,6 @@
-package com.github.anno4j.persistence.impl;
+package com.github.anno4j.io.impl;
 
+import com.github.anno4j.io.impl.ObjectParser;
 import org.openrdf.model.Statement;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepositoryConnection;

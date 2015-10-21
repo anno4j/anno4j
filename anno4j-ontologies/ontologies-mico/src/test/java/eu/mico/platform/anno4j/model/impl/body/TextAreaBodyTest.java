@@ -1,7 +1,7 @@
 package eu.mico.platform.anno4j.model.impl.body;
 
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.persistence.impl.ObjectParser;
+import com.github.anno4j.io.impl.ObjectParser;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;

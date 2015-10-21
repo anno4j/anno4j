@@ -1,7 +1,6 @@
-package com.github.anno4j.persistence.impl;
+package com.github.anno4j.io.impl;
 
 import com.github.anno4j.model.Annotation;
-import org.apache.commons.io.FileUtils;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -88,7 +87,6 @@ public class ObjectParser {
      * @return A list of annotations
      */
     public List<Annotation> parse(String content, URL documentURL, RDFFormat format) {
-        File file;
         RDFParser parser = Rio.createParser(format);
         try {
 
@@ -105,4 +103,5 @@ public class ObjectParser {
 
         return getAnnotations();
     }
+
 }
