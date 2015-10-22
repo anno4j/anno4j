@@ -104,29 +104,30 @@ public class ResourceObjectTest extends TestCase {
 
         String output = annotation.getTriples(RDFFormat.JSONLD);
 
-        String jsonld = "[ {" +
-            "\"@id\" : \"urn:anno4j:2db454f9-5d2f-4f92-9aba-e276bbca2752\"," +
-            "\"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\" ]," +
-            "\"http://purl.org/dc/elements/1.1/format\" : [ {" +
-            "\"@value\" : \"someFormat\"" +
-            "} ]," +
-            "\"http://purl.org/dc/elements/1.1/language\" : [ {" +
-            "\"@value\" : \"someLanguage\"" +
-            "} ]," +
-            "\"http://www.w3.org/1999/02/22-rdf-syntax-ns#value\" : [ {" +
-            "\"@value\" : \"someValue\"" +
-            "} ]" +
-            "}, {" +
-            "\"@id\" : \"urn:anno4j:e4282b36-af0d-4523-8853-d4af4549f51a\"," +
-            "\"@type\" : [ \"http://www.w3.org/ns/oa#Annotation\" ]," +
-        "\"http://www.w3.org/ns/oa#annotatedAt\" : [ {" +
-                "\"@value\" : \"1445431914729\"" +
-            "} ]," +
-            "\"http://www.w3.org/ns/oa#hasBody\" : [ {" +
-        "\"@id\" : \"urn:anno4j:2db454f9-5d2f-4f92-9aba-e276bbca2752\"" +
-            "} ]" +
-        "} ]";
+        // Create Strings that need to be contained in the JSONLD output (at some place)
+        String jsonldBody = "  \"@id\" : \"" + body.getResourceAsString() + "\",\n" +
+                "  \"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\" ],\n" +
+                "  \"http://purl.org/dc/elements/1.1/format\" : [ {\n" +
+                "    \"@value\" : \"" + body.getFormat() + "\"\n" +
+                "  } ],\n" +
+                "  \"http://purl.org/dc/elements/1.1/language\" : [ {\n" +
+                "    \"@value\" : \"" + body.getLanguage() + "\"\n" +
+                "  } ],\n" +
+                "  \"http://www.w3.org/1999/02/22-rdf-syntax-ns#value\" : [ {\n" +
+                "    \"@value\" : \"" + body.getValue() + "\"";
 
-//        assertEquals(jsonld, output);
+        String jsondldAnnotation = "  \"@id\" : \"" + annotation.getResourceAsString() + "\",\n" +
+                "  \"@type\" : [ \"http://www.w3.org/ns/oa#Annotation\" ],\n" +
+                "  \"http://www.w3.org/ns/oa#annotatedAt\" : [ {\n" +
+                "    \"@value\" : \"" + annotation.getAnnotatedAt() + "\"\n" +
+                "  } ],\n" +
+                "  \"http://www.w3.org/ns/oa#hasBody\" : [ {\n" +
+                "    \"@id\" : \"" + body.getResourceAsString() + "\"";
+
+        // Test if the crucial annotation information is present
+        assertTrue(output.contains(jsondldAnnotation));
+
+        // Test if the crucial body information is present
+        assertTrue(output.contains(jsonldBody));
     }
 }
