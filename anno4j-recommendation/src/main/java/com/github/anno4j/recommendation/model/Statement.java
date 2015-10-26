@@ -18,98 +18,62 @@ import org.openrdf.model.impl.URIImpl;
  * rdf:predicate, rdf:subject and rdf:object properties.
  */
 @Iri(RDF.STATEMENT)
-public class Statement extends Body {
-
-    @Iri(RDF.SUBJECT)   private ResourceObject subject;
-    @Iri(RDF.PREDICATE) private Resource predicate;
-    @Iri(RDF.OBJECT)    private ResourceObject object;
-
-    /**
-     * Default Constructor
-     */
-    public Statement() {};
-
-    /**
-     * Constructor also setting the fields subject, predicate, and object.
-     * @param subject   The subject of the statement.
-     * @param predicate The predicate of the statement.
-     * @param object    The object of the statement.
-     */
-    public Statement(ResourceObject subject, Resource predicate, ResourceObject object) {
-        this.subject = subject;
-        this.predicate = predicate;
-        this.object = object;
-    }
+public interface Statement extends Body {
 
     /**
      * Method to set the predicate of this Statement by a textual representation.
      * @param predicateAsString Textual representation of the resource to set.
      */
-    public void setPredicateAsString(String predicateAsString) {
-        this.setPredicate(new URIImpl(predicateAsString));
-    }
+    public void setPredicateAsString(String predicateAsString);
 
     @Override
-    public String toString() {
-        return "Statement{\n" +
-                "resource='" + this.getResource() + "'\n" +
-                "subject='" + this.getSubject().toString() + "'\n" +
-                "predicate='" + this.getPredicate().toString() + "'\n" +
-                "object='" + this.getObject().toString() + "'\n" +
-                "}";
-    }
-
-    /**
-     * Gets subject.
-     *
-     * @return Value of subject.
-     */
-    public ResourceObject getSubject() {
-        return subject;
-    }
-
-    /**
-     * Sets new predicate.
-     *
-     * @param predicate New value of predicate.
-     */
-    public void setPredicate(Resource predicate) {
-        this.predicate = predicate;
-    }
+    public String toString();
 
     /**
      * Sets new subject.
      *
      * @param subject New value of subject.
      */
-    public void setSubject(ResourceObject subject) {
-        this.subject = subject;
-    }
+    @Iri(RDF.SUBJECT)
+    public void setSubject(ResourceObject subject);
+
+    /**
+     * Gets subject.
+     *
+     * @return Value of subject.
+     */
+    @Iri(RDF.SUBJECT)
+    public ResourceObject getSubject();
+
+    /**
+     * Sets new predicate.
+     *
+     * @param predicate New value of predicate.
+     */
+    @Iri(RDF.PREDICATE)
+    public void setPredicate(Resource predicate);
 
     /**
      * Gets predicate.
      *
      * @return Value of predicate.
      */
-    public Resource getPredicate() {
-        return predicate;
-    }
-
-    /**
-     * Gets object.
-     *
-     * @return Value of object.
-     */
-    public ResourceObject getObject() {
-        return object;
-    }
+    @Iri(RDF.PREDICATE)
+    public Resource getPredicate();
 
     /**
      * Sets new object.
      *
      * @param object New value of object.
      */
-    public void setObject(ResourceObject object) {
-        this.object = object;
-    }
+    @Iri(RDF.OBJECT)
+    public void setObject(ResourceObject object);
+
+    /**
+     * Gets object.
+     *
+     * @return Value of object.
+     */
+    @Iri(RDF.OBJECT)
+    public ResourceObject getObject();
 }

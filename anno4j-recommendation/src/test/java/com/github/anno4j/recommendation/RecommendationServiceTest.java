@@ -28,27 +28,25 @@ public class RecommendationServiceTest {
 
     public final static String SOME_PAGE = "http://example.org/";
 
-    QueryService<Annotation> queryService;
-    PersistenceService persistenceService;
+    private Anno4j anno4j;
+    private QueryService queryService;
 
     @Before
     public void setUp() throws Exception {
-        this.queryService = Anno4j.getInstance().createQueryService(Annotation.class);
-        this.queryService.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
-        this.persistenceService = Anno4j.getInstance().createPersistenceService();
-    }
-
-    @After
-    public void tearDown() throws Exception {
         SailRepository repository = new SailRepository(new MemoryStore());
         repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
+
+        anno4j = new Anno4j();
+
+        anno4j.setRepository(repository);
+        queryService = anno4j.createQueryService();
+        queryService.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
     }
 
     @Test
-    public void testRecommendationService() throws QueryEvaluationException, RepositoryException, ParseException, MalformedQueryException {
+    public void testRecommendationService() throws QueryEvaluationException, RepositoryException, ParseException, MalformedQueryException, InstantiationException, IllegalAccessException {
         // Create a new RecommendationService
-        RecommendationService recommendationService = new RecommendationService();
+        RecommendationService recommendationService = new RecommendationService(this.anno4j);
 
         // Check if there are no algorithms registered yet
         assertEquals(0, recommendationService.getAlgorithms().size());
@@ -61,11 +59,11 @@ public class RecommendationServiceTest {
         assertEquals(1, recommendationService.getAlgorithms().size());
 
         // Create two random annotations, which will be used as being similar
-        Annotation anno1 = new Annotation();
-        Annotation anno2 = new Annotation();
+        Annotation anno1 = anno4j.createObject(Annotation.class);
+        Annotation anno2 = anno4j.createObject(Annotation.class);
 
         // Check if the current repository has no SimilarityStatements yet
-        List<Annotation> result = this.queryService.setBodyCriteria("[is-a rdf:Statement]").execute();
+        List<Annotation> result = this.queryService.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]").execute();
         assertEquals(0, result.size());
 
         // Generate the similarity between the two annotations, using the algorithm with name algo1
@@ -82,9 +80,9 @@ public class RecommendationServiceTest {
     }
 
     @Test
-    public void testRecommendationServiceWithAllAlgorithms() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void testRecommendationServiceWithAllAlgorithms() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
         // Create a new RecommendationService
-        RecommendationService recommendationService = new RecommendationService();
+        RecommendationService recommendationService = new RecommendationService(this.anno4j);
 
         // Check if there are no algorithms registered yet
         assertEquals(0, recommendationService.getAlgorithms().size());
@@ -99,11 +97,11 @@ public class RecommendationServiceTest {
         assertEquals(2, recommendationService.getAlgorithms().size());
 
         // Create two random annotations, which will be used as being similar
-        Annotation anno1 = new Annotation();
-        Annotation anno2 = new Annotation();
+        Annotation anno1 = anno4j.createObject(Annotation.class);
+        Annotation anno2 = anno4j.createObject(Annotation.class);
 
         // Check if the current repository has no SimilarityStatements yet
-        List<Annotation> result = this.queryService.setBodyCriteria("[is-a rdf:Statement]").execute();
+        List<Annotation> result = this.queryService.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]").execute();
         assertEquals(0, result.size());
 
         // Generate the similarity between the two annotations, using the algorithm with name algo1

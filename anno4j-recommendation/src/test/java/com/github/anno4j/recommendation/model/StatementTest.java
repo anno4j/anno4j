@@ -22,29 +22,23 @@ public class StatementTest {
 
     public final static String SOME_PAGE = "http://example.org/";
 
-    private ObjectConnection connection;
+    Anno4j anno4j;
 
     @Before
     public void setUp() throws Exception {
-        SailRepository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
-        this.connection = Anno4j.getInstance().getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        this.connection.close();
+        this.anno4j = new Anno4j();
     }
 
     @Test
     public void testStatement() throws Exception {
         // Create the statement
-        Statement statement = new Statement();
+        Statement statement = anno4j.createObject(Statement.class);
 
         // Create random subject and object
-        ResourceObject subject = new ResourceObject(SOME_PAGE + "subject");
-        ResourceObject object = new ResourceObject(SOME_PAGE + "object");
+        ResourceObject subject = anno4j.createObject(ResourceObject.class);
+        subject.setResourceAsString(SOME_PAGE + "subject");
+        ResourceObject object = anno4j.createObject(ResourceObject.class);
+        object.setResourceAsString(SOME_PAGE + "object");
 
         // Connect the statement with subject and predicate
         statement.setSubject(subject);
@@ -54,10 +48,10 @@ public class StatementTest {
         statement.setPredicateAsString(SOME_PAGE + "predicate");
 
         // Persist annotation
-        connection.addObject(statement);
+        anno4j.getObjectRepository().getConnection().addObject(statement);
 
         // Query object
-        List<Statement> result = connection.getObjects(Statement.class).asList();
+        List<Statement> result = anno4j.getObjectRepository().getConnection().getObjects(Statement.class).asList();
 
         assertEquals(1, result.size());
 

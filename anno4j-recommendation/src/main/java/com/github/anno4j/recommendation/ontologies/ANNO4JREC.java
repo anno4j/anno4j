@@ -11,5 +11,7 @@ public class ANNO4JREC {
 
     public static final String SIMILARITY = NS + "similarity";
 
+    public static final String SIMILARITY_STATEMENT = NS + "SimilarityStatement";
+
 
 }
