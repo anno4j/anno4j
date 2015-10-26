@@ -24,16 +24,23 @@ public class SimilarityStatementTest {
 
     public final static String SOME_PAGE = "http://example.org/";
 
-    private ObjectConnection connection;
+    Repository repository;
+    ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        this.connection = Anno4j.getInstance().getObjectRepository().getConnection();
+        repository = new SailRepository(new MemoryStore());
+        repository.initialize();
+
+        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
+        ObjectRepository objectRepository = factory.createRepository(repository);
+        connection = objectRepository.getConnection();
     }
 
     @After
     public void tearDown() throws Exception {
         connection.close();
+        repository.shutDown();
     }
 
     @Test

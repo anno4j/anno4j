@@ -15,6 +15,7 @@ import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
@@ -95,8 +96,5 @@ public class ExampleTest {
         Annotation resultObject = result.get(0);
 
         assertEquals(annotation.getResource(), resultObject.getResource());
-
-        // Test print method
-        System.out.println(annotation);
     }
 }

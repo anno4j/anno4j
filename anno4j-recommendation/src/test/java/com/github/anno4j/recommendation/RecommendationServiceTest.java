@@ -5,6 +5,7 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
+import com.github.anno4j.recommendation.model.Statement;
 import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
 import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -13,7 +14,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectRepository;
+import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 
@@ -26,23 +32,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class RecommendationServiceTest {
 
-    public final static String SOME_PAGE = "http://example.org/";
-
     QueryService<Annotation> queryService;
-    PersistenceService persistenceService;
 
     @Before
     public void setUp() throws Exception {
-        this.queryService = Anno4j.getInstance().createQueryService(Annotation.class);
-        this.queryService.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
-        this.persistenceService = Anno4j.getInstance().createPersistenceService();
-    }
-
-    @After
-    public void tearDown() throws Exception {
         SailRepository repository = new SailRepository(new MemoryStore());
         repository.initialize();
         Anno4j.getInstance().setRepository(repository);
+        queryService = Anno4j.getInstance().createQueryService(Annotation.class);
     }
 
     @Test
@@ -65,14 +62,14 @@ public class RecommendationServiceTest {
         Annotation anno2 = new Annotation();
 
         // Check if the current repository has no SimilarityStatements yet
-        List<Annotation> result = this.queryService.setBodyCriteria("[is-a rdf:Statement]").execute();
+        List<Annotation> result = queryService.setBodyCriteria("[is-a rdf:Statement]").execute();
         assertEquals(0, result.size());
 
         // Generate the similarity between the two annotations, using the algorithm with name algo1
         recommendationService.generateSimilarity(anno1, anno2, algorithmName);
 
         // Query for the SimilarityObjects again
-        result = this.queryService.execute();
+        result = queryService.execute();
         assertEquals(1, result.size());
 
         // Check if the similarity value is correct (1, as the SimpleAlgorithm always returns 1)
@@ -103,14 +100,14 @@ public class RecommendationServiceTest {
         Annotation anno2 = new Annotation();
 
         // Check if the current repository has no SimilarityStatements yet
-        List<Annotation> result = this.queryService.setBodyCriteria("[is-a rdf:Statement]").execute();
+        List<Annotation> result = queryService.setBodyCriteria("[is-a rdf:Statement]").execute();
         assertEquals(0, result.size());
 
         // Generate the similarity between the two annotations, using the algorithm with name algo1
         recommendationService.generateAllSimilarities(anno1, anno2);
 
         // Query for the SimilarityObjects again
-        result = this.queryService.execute();
+        result = queryService.execute();
         assertEquals(2, result.size());
 
         // Check if the similarity value is correct (1, as the SimpleAlgorithm always returns 1)

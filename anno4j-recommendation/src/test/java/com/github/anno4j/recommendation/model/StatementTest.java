@@ -5,7 +5,10 @@ import com.github.anno4j.model.impl.ResourceObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectRepository;
+import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 
@@ -22,19 +25,23 @@ public class StatementTest {
 
     public final static String SOME_PAGE = "http://example.org/";
 
-    private ObjectConnection connection;
+    Repository repository;
+    ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        SailRepository repository = new SailRepository(new MemoryStore());
+        repository = new SailRepository(new MemoryStore());
         repository.initialize();
-        Anno4j.getInstance().setRepository(repository);
-        this.connection = Anno4j.getInstance().getObjectRepository().getConnection();
+
+        ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
+        ObjectRepository objectRepository = factory.createRepository(repository);
+        connection = objectRepository.getConnection();
     }
 
     @After
     public void tearDown() throws Exception {
-        this.connection.close();
+        connection.close();
+        repository.shutDown();
     }
 
     @Test
