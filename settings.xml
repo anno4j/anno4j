@@ -11,6 +11,11 @@
             <username>${env.CI_DEPLOY_USERNAME}</username>
             <password>${env.CI_DEPLOY_PASSWORD}</password>
         </server>
+        <server>
+            <id>github</id>
+            <username>Anno4jCI</username>
+            <password>${env.GITHUB_PW}</password>
+        </server>
     </servers>
     <mirrors/>
     <proxies/>
@@ -27,4 +32,3 @@
     </profiles>
     <activeProfiles/>
 </settings>
-

@@ -98,6 +98,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.root>${basedir}</project.root>
+        <project.scm.id>github</project.scm.id>
     </properties>
 
     <profiles>
@@ -111,7 +112,7 @@
                         <version>1.5</version>
                         <configuration>
                             <defaultKeyring>false</defaultKeyring>
-                            <homedir>${session.executionRootDirectory}/keyrings</homedir>
+                            <homedir>/home/travis/build/anno4j/anno4j/keyrings</homedir>
                             <secretKeyring>local.secring.gpg</secretKeyring>
                             <publicKeyring>local.pubring.gpg</publicKeyring>
                             <keyname>Anno4j</keyname>
