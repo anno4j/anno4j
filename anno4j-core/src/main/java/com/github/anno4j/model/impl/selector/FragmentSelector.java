@@ -66,4 +66,16 @@ public interface FragmentSelector extends Selector {
      */
     @Iri(RDF.VALUE)
     void setValue(String value);
-    }
+
+    Integer getX();
+    Integer getY();
+    Integer getWidth();
+    Integer getHeight();
+    String getSpatialFormat();
+    void setSpatialFragment(Integer x, Integer y, Integer width, Integer height);
+
+    Double getStart();
+    Double getEnd();
+    String getTemporalFormat();
+    void setTemporalFragment( Double start, Double end);
+}
