@@ -34,7 +34,7 @@ public class ObjectParserTest {
             List<Annotation> annotations = objectParser.parse(JSONLD, url, RDFFormat.JSONLD);
 
             for(Annotation anno : annotations) {
-                System.out.println(anno.toString());
+                System.out.println(anno.getTriples(RDFFormat.JSONLD));
             }
 
             assertEquals(1, annotations.size());
@@ -54,7 +54,7 @@ public class ObjectParserTest {
             List<Annotation> annotations = objectParser.parse(TURTLE, url, RDFFormat.TURTLE);
 
             for(Annotation anno : annotations) {
-                System.out.println(anno.toString());
+                System.out.println(anno.getTriples(RDFFormat.TURTLE));
             }
 
             assertEquals(1, annotations.size());
@@ -79,7 +79,7 @@ public class ObjectParserTest {
             assertEquals(3, annotations.size());
 
             for(Annotation anno : annotations) {
-                System.out.println(anno.toString());
+                System.out.println(anno.getTriples(RDFFormat.TURTLE));
             }
 
             objectParser.shutdown();
@@ -99,7 +99,7 @@ public class ObjectParserTest {
             assertEquals(3, annotations.size());
 
             for(Annotation anno : annotations) {
-                System.out.println(anno.toString());
+                System.out.println(anno.getTriples(RDFFormat.TURTLE));
             }
 
             objectParser.shutdown();
