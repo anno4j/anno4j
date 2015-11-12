@@ -1,6 +1,8 @@
-package com.github.anno4j.persistence.impl;
+package com.github.anno4j.io;
 
+import com.github.anno4j.io.ObjectParser;
 import org.openrdf.model.Statement;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.helpers.RDFHandlerBase;
@@ -10,14 +12,14 @@ import org.openrdf.rio.helpers.RDFHandlerBase;
  */
 public class StatementSailHandler extends RDFHandlerBase {
 
-    private SailRepositoryConnection connection;
+    private RepositoryConnection connection;
 
     /**
-     * Constructor which also takes the connection to the necessary SailRepository.
+     * Constructor which also takes the connection to the necessary Repository.
      *
-     * @param connection    The connection of the corresponding SailRepository.
+     * @param connection    The connection of the corresponding Repository.
      */
-    public StatementSailHandler(SailRepositoryConnection connection) {
+    public StatementSailHandler(RepositoryConnection connection) {
         this.connection = connection;
     }
 

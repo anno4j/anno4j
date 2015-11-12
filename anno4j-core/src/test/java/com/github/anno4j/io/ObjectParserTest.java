@@ -1,11 +1,11 @@
-package com.github.anno4j.persistence;
+package com.github.anno4j.io;
 
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.namespaces.DCTYPES;
 import com.github.anno4j.model.namespaces.RDF;
-import com.github.anno4j.persistence.impl.ObjectParser;
+import com.github.anno4j.io.ObjectParser;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.RepositoryException;

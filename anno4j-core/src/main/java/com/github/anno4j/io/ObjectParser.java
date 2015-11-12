@@ -1,8 +1,10 @@
-package com.github.anno4j.persistence.impl;
+package com.github.anno4j.io;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import org.apache.commons.io.FileUtils;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
@@ -20,15 +22,11 @@ import java.util.List;
 
 /**
  * ObjectParser class to parse annotations from different serializations, e.g.
- * JSONLD, Turtle, ... A parsed Annotation object is NOT PERSISTED in the
- * corresponding Anno4j.
+ * JSONLD, Turtle, ... A parsed Annotation object is ONLY PERSISTED in the LOCAL Anno4j instance.
  */
 public class ObjectParser {
 
-    private SailRepository sailRepository;
-    private SailRepositoryConnection sailConnection;
-    private ObjectRepository objectRepository;
-    private ObjectConnection objectConnection;
+    private Anno4j anno4j;
 
     /**
      * Basic constructor, which sets up all the necessary repositories.
@@ -37,11 +35,7 @@ public class ObjectParser {
      * @throws RepositoryConfigException
      */
     public ObjectParser() throws RepositoryException, RepositoryConfigException {
-        this.sailRepository = new SailRepository(new MemoryStore());
-        this.sailRepository.initialize();
-        this.objectRepository = new ObjectRepositoryFactory().createRepository(sailRepository);
-        this.sailConnection = sailRepository.getConnection();
-        this.objectConnection = objectRepository.getConnection();
+        this.anno4j = new Anno4j();
     }
 
     /**
@@ -51,10 +45,9 @@ public class ObjectParser {
      * @throws RepositoryException
      */
     public void shutdown() throws RepositoryException {
-        this.sailConnection.close();
-        this.objectConnection.close();
-        this.objectRepository.shutDown();
-        this.sailRepository.shutDown();
+//        Add anno4j shutdown method here.
+        this.anno4j.getObjectRepository().getConnection().close();
+        this.anno4j.getRepository().getConnection().close();
     }
 
     /**
@@ -69,7 +62,7 @@ public class ObjectParser {
         List<Annotation> results = new LinkedList<>();
 
         try {
-            results = objectConnection.getObjects(Annotation.class).asList();
+            results = anno4j.getObjectRepository().getConnection().getObjects(Annotation.class).asList();
         } catch (QueryEvaluationException | RepositoryException e) {
             e.printStackTrace();
         }
@@ -88,18 +81,17 @@ public class ObjectParser {
      * @return A list of annotations
      */
     public List<Annotation> parse(String content, URL documentURL, RDFFormat format) {
-        File file;
         RDFParser parser = Rio.createParser(format);
         try {
 
-            StatementSailHandler handler = new StatementSailHandler(sailConnection);
+            StatementSailHandler handler = new StatementSailHandler(this.anno4j.getRepository().getConnection());
 
             parser.setRDFHandler(handler);
             byte[] bytes = content.getBytes("UTF-8");
             try (InputStream stream = new ByteArrayInputStream(bytes)) {
                 parser.parse(stream, documentURL.toString());
             }
-        } catch (RDFHandlerException | RDFParseException | IOException e) {
+        } catch (RDFHandlerException | RDFParseException | IOException | RepositoryException e) {
             e.printStackTrace();
         }
 
