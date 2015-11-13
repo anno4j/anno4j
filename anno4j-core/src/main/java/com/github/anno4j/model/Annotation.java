@@ -2,8 +2,14 @@ package com.github.anno4j.model;
 
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OADM;
+import org.apache.commons.io.IOUtils;
 import org.openrdf.annotations.Iri;
+import org.openrdf.model.Statement;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
+import org.openrdf.rio.*;
 
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,31 +22,38 @@ public class Annotation extends ResourceObject {
     /**
      * Refers to http://www.w3.org/ns/oa#hasBody
      */
-    @Iri(OADM.HAS_BODY)      private Body body;
+    @Iri(OADM.HAS_BODY)
+    private Body body;
     /**
      * Refers to http://www.w3.org/ns/oa#hasTarget
      */
-    @Iri(OADM.HAS_TARGET)    private Set<Target> targets;
+    @Iri(OADM.HAS_TARGET)
+    private Set<Target> targets;
     /**
      * Refers to http://www.w3.org/ns/oa#motivatedBy
      */
-    @Iri(OADM.MOTIVATED_BY)  private Motivation motivatedBy;
+    @Iri(OADM.MOTIVATED_BY)
+    private Motivation motivatedBy;
     /**
      * Refers to http://www.w3.org/ns/oa#serializedBy
      */
-    @Iri(OADM.SERIALIZED_BY) private Agent serializedBy;
+    @Iri(OADM.SERIALIZED_BY)
+    private Agent serializedBy;
     /**
      * Refers to http://www.w3.org/ns/oa#serializedAt
      */
-    @Iri(OADM.SERIALIZED_AT) private String serializedAt;
+    @Iri(OADM.SERIALIZED_AT)
+    private String serializedAt;
     /**
      * Refers to http://www.w3.org/ns/oa#annotatedBy
      */
-    @Iri(OADM.ANNOTATED_BY)  private Agent annotatedBy;
+    @Iri(OADM.ANNOTATED_BY)
+    private Agent annotatedBy;
     /**
      * Refers to http://www.w3.org/ns/oa#annotatedAt
      */
-    @Iri(OADM.ANNOTATED_AT)  private String annotatedAt;
+    @Iri(OADM.ANNOTATED_AT)
+    private String annotatedAt;
 
     /**
      * Constructor.
@@ -74,7 +87,7 @@ public class Annotation extends ResourceObject {
      */
     @Deprecated
     public Target getTarget() {
-        if(this.targets != null && this.targets.size() > 0) {
+        if (this.targets != null && this.targets.size() > 0) {
             return this.targets.iterator().next();
         } else {
             return null;
@@ -116,7 +129,7 @@ public class Annotation extends ResourceObject {
      * @param target New http:www.w3.org/ns/oa#hasTarget relationship.
      */
     public void addTarget(Target target) {
-        if(this.targets == null) {
+        if (this.targets == null) {
             this.targets = new HashSet<>();
         }
 
@@ -211,6 +224,49 @@ public class Annotation extends ResourceObject {
      */
     public void setAnnotatedAt(String annotatedAt) {
         this.annotatedAt = annotatedAt;
+    }
+
+    /**
+     * Method returns a textual representation of the given Annotation, containing
+     * its Body, Target and possible Selection, in a supported serialisation format.
+     *
+     * @param format The format which should be printed.
+     * @return A textual representation if this object in the format.
+     */
+    @Override
+    public String getTriples(RDFFormat format) {
+        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
+        parser.setRDFHandler(Rio.createWriter(format, out));
+
+        try {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(super.getTriples(RDFFormat.NTRIPLES));
+
+            if (getBody() != null) {
+                sb.append(getBody().getTriples(RDFFormat.NTRIPLES));
+            }
+
+            if (getTargets() != null) {
+                for(Target target : getTargets()) {
+                    sb.append(target.getTriples(RDFFormat.NTRIPLES));
+                }
+            }
+            parser.parse(IOUtils.toInputStream(sb.toString()), "");
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (RDFHandlerException e) {
+            e.printStackTrace();
+        } catch (RDFParseException e) {
+            e.printStackTrace();
+        }
+
+        return out.toString();
     }
 
     @Override

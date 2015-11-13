@@ -12,7 +12,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
@@ -26,7 +25,6 @@ import org.openrdf.rio.Rio;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.sail.memory.MemoryStore;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
@@ -115,7 +113,6 @@ public class ResourceObject implements RDFObject {
             ObjectConnection connection = objectRepository.getConnection();
             connection.addObject(this);
 
-
             GraphQueryResult result = sailRepository.getConnection().prepareGraphQuery(QueryLanguage.SPARQL, "CONSTRUCT { ?s ?p ?o. } WHERE { ?s ?p ?o. } ").evaluate();
 
             rdfWriter.startRDF();
@@ -151,31 +148,13 @@ public class ResourceObject implements RDFObject {
      * @return          A textual representation if this object in the format.
      */
     public String getTriples(RDFFormat format) {
+        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        RDFWriter writer = Rio.createWriter(format, out);
-
         try {
-            MemoryStore store = new MemoryStore();
-            Repository sailRepository = new SailRepository(store);
-            sailRepository.initialize();
-            ObjectRepository objectRepository = new ObjectRepositoryFactory().createRepository(sailRepository);
-            ObjectConnection connection = objectRepository.getConnection();
-            connection.addObject(this);
-
-            RepositoryResult<Statement> statements = connection.getStatements(null, null, null, false);
-
-            writer.startRDF();
-
-            while(statements.hasNext()) {
-                Statement statement = statements.next();
-                writer.handleStatement(statement);
-            }
-
-            writer.endRDF();
+            RDFWriter writer = Rio.createWriter(format, out);
+            this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
         } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (RepositoryConfigException e) {
             e.printStackTrace();
         } catch (RDFHandlerException e) {
             e.printStackTrace();

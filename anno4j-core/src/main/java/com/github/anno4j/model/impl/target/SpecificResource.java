@@ -4,8 +4,14 @@ import com.github.anno4j.model.Selector;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OADM;
+import org.apache.commons.io.IOUtils;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.RDFObject;
+import org.openrdf.rio.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Conforms to http://www.w3.org/ns/oa#SpecificResource
@@ -137,6 +143,31 @@ public class SpecificResource extends Target {
      */
     public void setScope(ResourceObject scope) {
         this.scope = scope;
+    }
+
+    @Override
+    public String getTriples(RDFFormat format) {
+        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
+        RDFWriter writer = Rio.createWriter(format, out);
+        parser.setRDFHandler(writer);
+        try {
+            parser.parse(IOUtils.toInputStream(super.getTriples(RDFFormat.NTRIPLES), "UTF-8"), "");
+            if (getSelector() != null) {
+                parser.parse(IOUtils.toInputStream(getSelector().getTriples(RDFFormat.NTRIPLES), "UTF-8"), "");
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (RDFHandlerException e) {
+            e.printStackTrace();
+        } catch (RDFParseException e) {
+            e.printStackTrace();
+        }
+
+        return out.toString();
     }
 
     @Override
