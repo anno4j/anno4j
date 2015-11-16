@@ -1,4 +1,4 @@
-package com.github.anno4j.model.impl.target;
+package com.github.anno4j.model.impl.targets;
 
 import com.github.anno4j.model.Selector;
 import com.github.anno4j.model.Target;

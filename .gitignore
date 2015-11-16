@@ -1,5 +1,4 @@
 local.*
-/target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -11,7 +10,6 @@ buildNumber.properties
 anno4j.iml
 
 *.iml
-*/target/
 anno4j-core/target
 anno4j-alibaba/target
 anno4j-recommendation/target

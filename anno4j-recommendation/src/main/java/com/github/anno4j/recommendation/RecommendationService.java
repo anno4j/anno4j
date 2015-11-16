@@ -2,16 +2,13 @@ package com.github.anno4j.recommendation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Target;
-import com.github.anno4j.model.impl.target.SpecificResource;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectRepository;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Class represents a suite to generate similarity annotations. Several algorithms can be registered and then used

@@ -1,19 +1,15 @@
 package com.github.anno4j.querying.tests;
 
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.github.anno4j.model;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.selector.FragmentSelector;
-import com.github.anno4j.model.impl.target.SpecificResource;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

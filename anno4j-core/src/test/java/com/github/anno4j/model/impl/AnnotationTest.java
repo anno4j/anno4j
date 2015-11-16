@@ -3,7 +3,7 @@ package com.github.anno4j.model.impl;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Target;
-import com.github.anno4j.model.impl.target.SpecificResource;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

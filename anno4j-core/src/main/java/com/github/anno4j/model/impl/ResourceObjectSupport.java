@@ -12,7 +12,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
@@ -81,32 +80,16 @@ public abstract class ResourceObjectSupport implements ResourceObject, RDFObject
      * @param format    The format which should be printed.
      * @return          A textual representation if this object in the format.
      */
+    @Override
     public String getTriples(RDFFormat format) {
+        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        RDFWriter writer = Rio.createWriter(format, out);
-
         try {
-            MemoryStore store = new MemoryStore();
-            Repository sailRepository = new SailRepository(store);
-            sailRepository.initialize();
-            ObjectRepository objectRepository = new ObjectRepositoryFactory().createRepository(sailRepository);
-            ObjectConnection connection = objectRepository.getConnection();
-            connection.addObject(this);
+            RDFWriter writer = Rio.createWriter(format, out);
+            this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
 
-            RepositoryResult<Statement> statements = connection.getStatements(null, null, null, false);
-
-            writer.startRDF();
-
-            while(statements.hasNext()) {
-                Statement statement = statements.next();
-                writer.handleStatement(statement);
-            }
-
-            writer.endRDF();
         } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (RepositoryConfigException e) {
             e.printStackTrace();
         } catch (RDFHandlerException e) {
             e.printStackTrace();
@@ -115,16 +98,9 @@ public abstract class ResourceObjectSupport implements ResourceObject, RDFObject
         return out.toString();
     }
 
-
     @Override
     public void setResource(Resource resource) {
         this.resource = resource;
-
-    }
-
-    @Override
-    public ObjectConnection getObjectConnection() {
-        return null;
     }
 
     /**

@@ -7,7 +7,7 @@ import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
 import com.github.anno4j.model.impl.motivation.Commenting;
 import com.github.anno4j.model.impl.selector.TextPositionSelector;
-import com.github.anno4j.model.impl.target.SpecificResource;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

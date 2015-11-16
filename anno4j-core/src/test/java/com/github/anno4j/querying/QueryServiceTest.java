@@ -5,7 +5,7 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.impl.selector.FragmentSelector;
 import com.github.anno4j.model.impl.selector.SvgSelector;
-import com.github.anno4j.model.impl.target.SpecificResource;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
