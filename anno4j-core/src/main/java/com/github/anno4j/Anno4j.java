@@ -33,6 +33,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,7 +53,7 @@ public class Anno4j {
     /**
      * Logger of this class.
      */
-    private static final Logger logger = LoggerFactory.getLogger(Anno4j.class);
+    private final Logger logger = LoggerFactory.getLogger(Anno4j.class);
     private IDGenerator idGenerator;
 
     /**
@@ -65,12 +66,18 @@ public class Anno4j {
      */
     private ObjectRepository objectRepository;
 
+    /**
+     * Wrapper to store the evaluators for the different LDPath components
+     */
     private LDPathEvaluatorConfiguration evaluatorConfiguration = new LDPathEvaluatorConfiguration();
-    private Set<Class<?>> partialClasses;
 
     /**
-     * Private constructor because of singleton pattern
+     * Stores alls partial implementations of the defined interfaces, such as the ResourceObject or the
+     * Annotation interface.
      */
+    private Set<Class<?>> partialClasses;
+
+
     public Anno4j() throws RepositoryException, RepositoryConfigException {
         this(new SailRepository(new MemoryStore()));
     }

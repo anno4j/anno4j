@@ -2,7 +2,6 @@ package com.github.anno4j.querying.evaluation.ldpath;
 
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.evaluation.VarIDGenerator;
-import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
 import com.github.anno4j.querying.extension.annotation.Evaluator;
 import com.hp.hpl.jena.graph.NodeFactory;
@@ -20,8 +19,13 @@ import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.IsATest;
 
+/**
+ * Creates the part of the SPARQL query that tests for a specific rdf:type.
+ */
 @Evaluator(IsATest.class)
 public class IsATestEvaluator implements TestEvaluator {
+
+
     @Override
     public Var evaluate(NodeSelector nodeSelector, ElementGroup elementGroup, Var var, LDPathEvaluatorConfiguration evaluatorConfiguration) {
         TestingSelector testingSelector = (TestingSelector) nodeSelector;

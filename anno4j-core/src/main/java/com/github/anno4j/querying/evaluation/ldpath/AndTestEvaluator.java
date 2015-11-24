@@ -1,12 +1,10 @@
 package com.github.anno4j.querying.evaluation.ldpath;
 
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
-import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
 import com.github.anno4j.querying.extension.annotation.Evaluator;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.E_LogicalAnd;
-import com.hp.hpl.jena.sparql.expr.E_LogicalOr;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.syntax.ElementFilter;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
@@ -14,8 +12,11 @@ import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.AndTest;
-import org.apache.marmotta.ldpath.model.tests.OrTest;
 
+/**
+ * This evaluator creates a filter for the logical conjunction. The evaluation of the
+ * particular expressions will be handled by a more specific evaluator.
+ */
 @Evaluator(AndTest.class)
 public class AndTestEvaluator implements TestEvaluator {
     @Override

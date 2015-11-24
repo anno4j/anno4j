@@ -15,6 +15,10 @@ import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.OrTest;
 
+/**
+ * This evaluator creates a filter for the logical disjunction. The evaluation of the
+ * particular expressions will be handled by a more specific evaluator.
+ */
 @Evaluator(OrTest.class)
 public class OrTestEvaluator implements TestEvaluator {
     @Override

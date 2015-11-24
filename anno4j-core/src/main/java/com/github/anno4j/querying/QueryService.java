@@ -43,7 +43,6 @@ public class QueryService {
 
     private final Logger logger = LoggerFactory.getLogger(QueryService.class);
     private final URI graph;
-    private final LDPathEvaluatorConfiguration evaluatorConfiguration;
 
     /**
      * The repository needed for the actual querying
@@ -83,14 +82,18 @@ public class QueryService {
     private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector";
 
     /**
-     * All user defined name spaces
+     * Bundles the:
+     *
+     * <ul>
+     *     <li>prefixes</li>
+     *     <li>criteria</li>
+     *     <li>configuration</li>
+     * </ul>
+     *
+     * into a single object, so it can be passed to the
+     * EvalQuery object for further processing.
      */
-    private Map<String, String> prefixes = new HashMap<String, String>();
-
-    /**
-     * All user defined criteria
-     */
-    private ArrayList<Criteria> criteria = new ArrayList<Criteria>();
+    private QueryServiceDTO queryServiceDTO;
 
     /**
      * Limit value of the query
@@ -107,25 +110,13 @@ public class QueryService {
      */
     private QueryOptimizer queryOptimizer = null;
 
-    /**
-     * Required to have an ongoing variable name when creating the SPARQL query
-     */
-    private int varIndex = 0;
-
-    private Configuration configuration;
-
-    /**
-     * Stores the created variable and the associated criteria.
-     */
-    private Map<Criteria, Var> variableMapping;
-
     public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration) {
         this(objectRepository, evaluatorConfiguration, null);
     }
 
     public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration, URI graph) {
+        queryServiceDTO = new QueryServiceDTO();
         this.objectRepository = objectRepository;
-        this.variableMapping = new HashMap<>();
 
         // Setting some common name spaces
         addPrefix(OADM.PREFIX, OADM.NS);
@@ -142,14 +133,14 @@ public class QueryService {
 
         this.queryOptimizer = QueryOptimizer.getInstance();
         this.graph = graph;
-        this.evaluatorConfiguration = evaluatorConfiguration;
-        this.configuration = createLDPathConfiguration();
+        queryServiceDTO.setEvaluatorConfiguration(evaluatorConfiguration);
+        queryServiceDTO.setConfiguration(createLDPathConfiguration());
     }
 
     private Configuration createLDPathConfiguration() {
         DefaultConfiguration config = new DefaultConfiguration();
 
-        for (Map.Entry<Class<? extends TestFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getTestFunctionEvaluators().entrySet()) {
+        for (Map.Entry<Class<? extends TestFunction>, Class<QueryEvaluator>> entry : queryServiceDTO.getEvaluatorConfiguration().getTestFunctionEvaluators().entrySet()) {
             try {
                 TestFunction newInstance = entry.getKey().newInstance();
                 config.addTestFunction(Constants.NS_LMF_FUNCS + newInstance.getLocalName(), newInstance);
@@ -159,7 +150,7 @@ public class QueryService {
             }
         }
 
-        for (Map.Entry<Class<? extends SelectorFunction>, Class<QueryEvaluator>> entry : evaluatorConfiguration.getFunctionEvaluators().entrySet()) {
+        for (Map.Entry<Class<? extends SelectorFunction>, Class<QueryEvaluator>> entry : queryServiceDTO.getEvaluatorConfiguration().getFunctionEvaluators().entrySet()) {
             try {
                 SelectorFunction newInstance = entry.getKey().newInstance();
                 config.addFunction(Constants.NS_LMF_FUNCS + newInstance.getPathExpression(new SesameValueBackend()), newInstance);
@@ -173,15 +164,11 @@ public class QueryService {
     }
 
     public Map<String, String> getPrefixes() {
-        return prefixes;
+        return queryServiceDTO.getPrefixes();
     }
 
     public ArrayList<Criteria> getCriteria() {
-        return criteria;
-    }
-
-    public void addMapping(Criteria c, Var v) {
-        variableMapping.put(c, v);
+        return queryServiceDTO.getCriteria();
     }
 
     /**
@@ -193,7 +180,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService addCriteria(String ldpath, String value, Comparison comparison) {
-        criteria.add(new Criteria(ldpath, value, comparison));
+        queryServiceDTO.getCriteria().add(new Criteria(ldpath, value, comparison));
         return this;
     }
 
@@ -206,7 +193,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService addCriteria(String ldpath, Number value, Comparison comparison) {
-        criteria.add(new Criteria(ldpath, value, comparison));
+        queryServiceDTO.getCriteria().add(new Criteria(ldpath, value, comparison));
         return this;
     }
 
@@ -243,7 +230,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService addCriteria(String ldpath) {
-        criteria.add(new Criteria(ldpath, Comparison.EQ));
+        queryServiceDTO.getCriteria().add(new Criteria(ldpath, Comparison.EQ));
         return this;
     }
 
@@ -254,7 +241,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService addCriteriaObject(Criteria criteria) {
-        this.criteria.add(criteria);
+        queryServiceDTO.getCriteria().add(criteria);
         return this;
     }
 
@@ -266,7 +253,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService addPrefix(String label, String url) {
-        this.prefixes.put(label, url);
+        queryServiceDTO.getPrefixes().put(label, url);
         return this;
     }
 
@@ -277,7 +264,7 @@ public class QueryService {
      * @return itself to allow chaining.
      */
     public QueryService addPrefixes(HashMap<String, String> prefixes) {
-        this.prefixes.putAll(prefixes);
+        queryServiceDTO.getPrefixes().putAll(prefixes);
         return this;
     }
 
@@ -319,7 +306,7 @@ public class QueryService {
             con.setRemoveContexts(graph);
         }
 
-        Query sparql = EvalQuery.evaluate(this);
+        Query sparql = EvalQuery.evaluate(queryServiceDTO);
 
         if (limit != null) {
             sparql.setLimit(limit);
@@ -334,11 +321,11 @@ public class QueryService {
 //        System.out.println();
 
         String q = sparql.serialize();
-//        logger.debug("Created query:\n" + queryOptimizer.prettyPrint(q));
+        logger.debug("Initial query:\n" + queryOptimizer.prettyPrint(q));
 
         // Optimize the join order
         q = queryOptimizer.optimizeJoinOrder(q);
-//        logger.debug("Join order optimized:\n " + q);
+        logger.debug("Query after join order optimization:\n " + q);
 
         ObjectQuery query = con.prepareObjectQuery(q);
 
@@ -352,11 +339,11 @@ public class QueryService {
     }
 
     public Configuration getConfiguration() {
-        return configuration;
+        return queryServiceDTO.getConfiguration();
     }
 
     public LDPathEvaluatorConfiguration getEvaluatorConfiguration() {
-        return evaluatorConfiguration;
+        return queryServiceDTO.getEvaluatorConfiguration();
     }
 
     /**

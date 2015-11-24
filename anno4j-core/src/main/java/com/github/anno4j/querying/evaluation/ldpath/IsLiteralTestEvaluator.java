@@ -16,6 +16,9 @@ import org.apache.marmotta.ldpath.model.selectors.PropertySelector;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.FunctionTest;
 
+/**
+ * Creates the part of the SPARQL query that tests for literal values
+ */
 @Evaluator(IsLiteralTest.class)
 public class IsLiteralTestEvaluator implements QueryEvaluator {
 

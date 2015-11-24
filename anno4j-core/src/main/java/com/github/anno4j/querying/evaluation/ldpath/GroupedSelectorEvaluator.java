@@ -8,6 +8,10 @@ import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.model.selectors.GroupedSelector;
 
+/**
+ * This evaluator only creates a new group, which will contain further
+ * query parts.
+ */
 @Evaluator(GroupedSelector.class)
 public class GroupedSelectorEvaluator implements QueryEvaluator {
 

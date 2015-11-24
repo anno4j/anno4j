@@ -3,6 +3,7 @@ package com.github.anno4j.querying.evaluation;
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.Criteria;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.QueryServiceDTO;
 import com.github.anno4j.querying.evaluation.ldpath.LDPathEvaluator;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
@@ -22,9 +23,7 @@ import java.io.StringReader;
 
 public class EvalQuery {
 
-    private static final Logger logger = LoggerFactory.getLogger(EvalQuery.class);
-
-    public static Query evaluate(QueryService queryService) throws ParseException {
+    public static Query evaluate(QueryServiceDTO queryServiceDTO) throws ParseException {
 
         Query query = QueryFactory.make();
         query.setQuerySelectType();
@@ -38,11 +37,12 @@ public class EvalQuery {
         elementGroup.addTriplePattern(t1);
 
         // Evaluating the criteria
-        for (Criteria c : queryService.getCriteria()) {
+        for (Criteria c : queryServiceDTO.getCriteria()) {
             SesameValueBackend backend = new SesameValueBackend();
 
-            LdPathParser parser = new LdPathParser(backend, queryService.getConfiguration(), new StringReader(c.getLdpath()));
-            Var var = LDPathEvaluator.evaluate(parser.parseSelector(queryService.getPrefixes()), elementGroup, annotationVar, queryService.getEvaluatorConfiguration());
+            LdPathParser parser = new LdPathParser(backend, queryServiceDTO.getConfiguration(), new StringReader(c.getLdpath()));
+            Var var = LDPathEvaluator.evaluate(parser.parseSelector(queryServiceDTO.getPrefixes()), elementGroup, annotationVar, queryServiceDTO.getEvaluatorConfiguration());
+
             if (c.getConstraint() != null) {
                 EvalComparison.evaluate(elementGroup, c, var);
             }
@@ -55,7 +55,7 @@ public class EvalQuery {
         query.addResultVar(annotationVar);
 
         // Setting the default prefixes, like rdf: or dc:
-        query.getPrefixMapping().setNsPrefixes(queryService.getPrefixes());
+        query.getPrefixMapping().setNsPrefixes(queryServiceDTO.getPrefixes());
 
         return query;
     }

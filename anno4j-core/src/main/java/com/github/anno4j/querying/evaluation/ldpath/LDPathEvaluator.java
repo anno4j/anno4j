@@ -12,6 +12,8 @@ import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.model.selectors.*;
 import org.apache.marmotta.ldpath.model.tests.FunctionTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -21,6 +23,8 @@ import java.util.Map;
  * for each considered part, using the Jena ARQ query engine
  */
 public class LDPathEvaluator {
+
+    private final static Logger logger = LoggerFactory.getLogger(LDPathEvaluator.class);
 
     /**
      * Function to transform LDPath to SPARQL. Recursively splits the LDPath expression into the
@@ -69,12 +73,13 @@ public class LDPathEvaluator {
                 if (functionEvaluators.containsKey(functionSelector.getFunction().getClass())) {
                     return functionEvaluators.get(functionSelector.getFunction().getClass()).newInstance().evaluate(nodeSelector, elementGroup, variable, evaluatorConfiguration);
                 } else {
-                    throw new IllegalStateException("No Function evaluator for " + functionSelector.getClass().getCanonicalName());
+                    throw new IllegalStateException("No Function evaluator found for " + functionSelector.getClass().getCanonicalName());
                 }
             } else {
                 throw new IllegalStateException(nodeSelector.getClass() + " is not supported.");
             }
         } catch (Exception e) {
+            logger.error("{}", e);
             throw new IllegalStateException("Could not instantiate evaluator for " + nodeSelector.getClass());
         }
     }
@@ -87,10 +92,14 @@ public class LDPathEvaluator {
             if (testEvaluators.containsKey(nodeTest.getClass())) {
                 return testEvaluators.get(nodeTest.getClass()).newInstance().evaluate(nodeTest, elementGroup, variable, evaluatorConfiguration);
             } else {
-                throw new IllegalStateException("No NodeTest evaluator for " + nodeTest.getClass().getCanonicalName());
+                throw new IllegalStateException("No NodeTest evaluator found for " + nodeTest.getClass().getCanonicalName());
             }
-        } catch (Exception e) {
+        } catch (InstantiationException e) {
+            logger.error("{}", e);
             throw new IllegalStateException("Could not instantiate evaluator for NodeTest " + nodeTest.getClass());
+        } catch (IllegalAccessException e) {
+            logger.error("{}", e);
+            throw new IllegalStateException("Could not instantiate evaluator for NodeTest, because of missing access " + nodeTest.getClass());
         }
     }
 }

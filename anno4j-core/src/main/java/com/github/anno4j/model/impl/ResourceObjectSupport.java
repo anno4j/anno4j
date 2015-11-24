@@ -30,7 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 
 @Partial
-public abstract class ResourceObjectSupport implements ResourceObject, RDFObject {
+public abstract class ResourceObjectSupport implements ResourceObject {
 
     private Resource resource = IDGenerator.BLANK_RESOURCE;
 
@@ -82,7 +82,6 @@ public abstract class ResourceObjectSupport implements ResourceObject, RDFObject
      */
     @Override
     public String getTriples(RDFFormat format) {
-        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {

@@ -17,6 +17,9 @@ import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.LiteralLanguageTest;
 
+/**
+ * Creates the part of the SPARQL query that tests for a specific language.
+ */
 @Evaluator(LiteralLanguageTest.class)
 public class LiteralLanguageTestEvaluator implements TestEvaluator {
     @Override

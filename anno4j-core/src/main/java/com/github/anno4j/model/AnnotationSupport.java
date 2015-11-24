@@ -5,6 +5,7 @@ import com.github.anno4j.persistence.annotation.Partial;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.*;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,16 +33,13 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
      */
     @Override
     public String getTriples(RDFFormat format) {
-        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
         parser.setRDFHandler(Rio.createWriter(format, out));
 
         try {
             StringBuilder sb = new StringBuilder();
-
-            RDFWriter writer = Rio.createWriter(format, out);
-            this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
+            sb.append(super.getTriples(RDFFormat.NTRIPLES));
 
             if (getBody() != null) {
                 sb.append(getBody().getTriples(RDFFormat.NTRIPLES));
@@ -61,8 +59,6 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
         } catch (RDFHandlerException e) {
             e.printStackTrace();
         } catch (RDFParseException e) {
-            e.printStackTrace();
-        } catch (RepositoryException e) {
             e.printStackTrace();
         }
 

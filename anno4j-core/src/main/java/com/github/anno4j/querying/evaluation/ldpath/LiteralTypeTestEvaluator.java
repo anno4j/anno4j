@@ -14,6 +14,9 @@ import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.model.selectors.TestingSelector;
 import org.apache.marmotta.ldpath.model.tests.LiteralTypeTest;
 
+/**
+ * Creates the part of the SPARQL query that tests for a specific type
+ */
 @Evaluator(LiteralTypeTest.class)
 public class LiteralTypeTestEvaluator implements TestEvaluator {
     @Override
