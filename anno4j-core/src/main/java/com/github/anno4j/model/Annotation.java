@@ -235,7 +235,6 @@ public class Annotation extends ResourceObject {
      */
     @Override
     public String getTriples(RDFFormat format) {
-        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
         parser.setRDFHandler(Rio.createWriter(format, out));

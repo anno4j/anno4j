@@ -93,7 +93,7 @@ public class InputOutputTest {
     /**
      * Inner class to represent a sound media item.
      */
-    @Iri(DCTYPES.SOUND)
+    @Iri(DCTYPES.SOUND+"123")
     public static class Sound extends Body {
 
         public Sound() {
@@ -131,7 +131,7 @@ public class InputOutputTest {
     /**
      * Inner class to represent an image media file as body.
      */
-    @Iri(DCTYPES.IMAGE)
+    @Iri(DCTYPES.IMAGE+"123")
     public static class Image extends Target {
 
         public Image() {
@@ -187,12 +187,12 @@ public class InputOutputTest {
             " \"@type\":\"oa:Annotation\" , \n" +
             " \"body\": { \n" +
             " \"@id\":\"http://example.org/body1\", \n" +
-            " \"@type\":\"dctypes:Sound\", \n" +
+            " \"@type\":\"dctypes:Sound123\", \n" +
             " \"value\":\"someValue\" \n" +
             " }, \n" +
             " \"target\": { \n" +
             " \"@id\": \"http://example.org/target1\", \n" +
-            " \"@type\": \"dctypes:Image\" \n" +
+            " \"@type\": \"dctypes:Image123\" \n" +
             " }\n" +
             "}";
 }

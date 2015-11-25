@@ -98,7 +98,7 @@ public class ResourceObject implements RDFObject {
      * @return identifier as String.
      */
     public String getResourceAsString() {
-        return this.resource.stringValue();
+        return getResource().stringValue();
     }
 
     @Deprecated
@@ -148,7 +148,6 @@ public class ResourceObject implements RDFObject {
      * @return          A textual representation if this object in the format.
      */
     public String getTriples(RDFFormat format) {
-        assert this.getObjectConnection() != null : this.getClass().getCanonicalName() + "is not stored in any object store";
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {

@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
@@ -45,7 +46,7 @@ public class ResourceObjectTest extends TestCase {
     }
 
     @Test
-    public void testGetTriplesWithTurtle() {
+    public void testGetTriplesWithTurtle() throws RepositoryException {
         // Create arbitrary annotation with some provenance information
         Annotation annotation = new Annotation();
         long time = System.currentTimeMillis();
@@ -63,28 +64,32 @@ public class ResourceObjectTest extends TestCase {
         // Add the body to the annotation
         annotation.setBody(body);
 
-        String output = annotation.getTriples(RDFFormat.TURTLE);
+        this.connection.addObject(annotation);
+
+        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+
+        String output = an.getTriples(RDFFormat.TURTLE);
 
         // Check annotation type
-        assertTrue(output.contains("<" + annotation.getResourceAsString() + "> a <http://www.w3.org/ns/oa#Annotation>"));
+        assertTrue(output.contains("<" + an.getResourceAsString() + "> a <http://www.w3.org/ns/oa#Annotation>"));
 
         // Check provenance
         assertTrue(output.contains("<http://www.w3.org/ns/oa#annotatedAt> " + "\"" + time + "\""));
 
         // Check that the annotation has a body
-        assertTrue(output.contains("<" + annotation.getResourceAsString() + "> <http://www.w3.org/ns/oa#hasBody> <" + body.getResourceAsString() + ">"));
+        assertTrue(output.contains("<http://www.w3.org/ns/oa#hasBody> <" + an.getBody().getResourceAsString() + ">"));
 
         // Check body values
-        assertTrue(output.contains("<" + body.getResourceAsString() + "> a <http://www.w3.org/ns/oa#EmbeddedContent>"));
+        assertTrue(output.contains("<" + an.getBody().getResourceAsString() + "> a <http://www.w3.org/ns/oa#EmbeddedContent>"));
         assertTrue(output.contains("<http://purl.org/dc/elements/1.1/format> \"" + format + "\""));
         assertTrue(output.contains("<http://purl.org/dc/elements/1.1/language> \"" + language + "\""));
         assertTrue(output.contains("<http://www.w3.org/1999/02/22-rdf-syntax-ns#value> \"" + value + "\""));
 
-        System.out.println(annotation.getTriples(RDFFormat.TURTLE));
+        System.out.println(an.getTriples(RDFFormat.TURTLE));
     }
 
     @Test
-    public void testGetTriplesWithJSONLD() {
+    public void testGetTriplesWithJSONLD() throws RepositoryException {
         // Create arbitrary annotation with some provenance information
         Annotation annotation = new Annotation();
         long time = System.currentTimeMillis();
@@ -102,7 +107,11 @@ public class ResourceObjectTest extends TestCase {
         // Add the body to the annotation
         annotation.setBody(body);
 
-        String output = annotation.getTriples(RDFFormat.JSONLD);
+        this.connection.addObject(annotation);
+
+        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+
+        String output = an.getTriples(RDFFormat.JSONLD);
 
         // Create Strings that need to be contained in the JSONLD output (at some place)
         String jsonldBody = "  \"@id\" : \"" + body.getResourceAsString() + "\",\n" +
@@ -116,10 +125,10 @@ public class ResourceObjectTest extends TestCase {
                 "  \"http://www.w3.org/1999/02/22-rdf-syntax-ns#value\" : [ {\n" +
                 "    \"@value\" : \"" + body.getValue() + "\"";
 
-        String jsondldAnnotation = "  \"@id\" : \"" + annotation.getResourceAsString() + "\",\n" +
+        String jsondldAnnotation = "  \"@id\" : \"" + an.getResourceAsString() + "\",\n" +
                 "  \"@type\" : [ \"http://www.w3.org/ns/oa#Annotation\" ],\n" +
                 "  \"http://www.w3.org/ns/oa#annotatedAt\" : [ {\n" +
-                "    \"@value\" : \"" + annotation.getAnnotatedAt() + "\"\n" +
+                "    \"@value\" : \"" + an.getAnnotatedAt() + "\"\n" +
                 "  } ],\n" +
                 "  \"http://www.w3.org/ns/oa#hasBody\" : [ {\n" +
                 "    \"@id\" : \"" + body.getResourceAsString() + "\"";
