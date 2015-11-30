@@ -51,7 +51,7 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 
 ### Configuration
 
-The central Anno4j object implements the singleton pattern. To the Anno4j instance, simple call the getInstance() method.
+The central Anno4j object implements the singleton pattern. To get the Anno4j instance, simple call the getInstance() method.
 
 ```java
     Anno4j anno4j = Anno4j.getInstance();
