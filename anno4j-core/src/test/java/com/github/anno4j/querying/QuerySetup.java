@@ -26,8 +26,7 @@ public abstract class QuerySetup {
     @Before
     public void setupUpQueryTest() throws RepositoryConfigException, RepositoryException, IllegalAccessException, InstantiationException {
         anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix("ex", "http://www.example.com/schema#");
+        queryService = anno4j.createQueryService().addPrefix("ex", "http://www.example.com/schema#");
         this.persistTestData();
     }
 
