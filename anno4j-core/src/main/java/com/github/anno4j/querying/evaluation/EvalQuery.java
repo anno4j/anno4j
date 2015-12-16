@@ -2,8 +2,7 @@ package com.github.anno4j.querying.evaluation;
 
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.Criteria;
-import com.github.anno4j.querying.QueryService;
-import com.github.anno4j.querying.QueryServiceDTO;
+import com.github.anno4j.querying.QueryServiceConfiguration;
 import com.github.anno4j.querying.evaluation.ldpath.LDPathEvaluator;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
@@ -12,18 +11,15 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.vocabulary.RDF;
-import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.parser.LdPathParser;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 
 public class EvalQuery {
 
-    public static Query evaluate(QueryServiceDTO queryServiceDTO) throws ParseException {
+    public static Query evaluate(QueryServiceConfiguration queryServiceDTO) throws ParseException {
 
         Query query = QueryFactory.make();
         query.setQuerySelectType();

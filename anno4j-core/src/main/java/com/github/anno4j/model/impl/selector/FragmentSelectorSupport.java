@@ -1,7 +1,7 @@
 package com.github.anno4j.model.impl.selector;
 
 import com.github.anno4j.model.impl.selector.enums.FragmentSpecification;
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.annotations.Partial;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

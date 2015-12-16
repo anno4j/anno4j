@@ -1,6 +1,6 @@
 package com.github.anno4j.model.impl;
 
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.annotations.Partial;
 import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
@@ -15,7 +15,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.RDFObject;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.object.traits.ObjectMessage;
 import org.openrdf.repository.sail.SailRepository;

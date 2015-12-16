@@ -1,12 +1,9 @@
 package com.github.anno4j.querying.tests;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
@@ -70,14 +67,14 @@ public class RecursivePathTest extends QuerySetup {
         RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
         recursiveBody.setValue("Some Testing Value");
         annotation.setBody(recursiveBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
         recursiveBody2.setValue("Another Testing Value");
         annotation1.setBody(recursiveBody2);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
 
     }
 

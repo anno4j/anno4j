@@ -1,13 +1,10 @@
 package com.github.anno4j.model.impl.targets;
 
-import com.github.anno4j.model.AnnotationSupport;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.*;
-import sun.misc.Resource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

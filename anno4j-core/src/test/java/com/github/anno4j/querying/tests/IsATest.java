@@ -1,18 +1,14 @@
 package com.github.anno4j.querying.tests;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -70,13 +66,13 @@ public class IsATest extends QuerySetup {
         FirstTestBody firstTestBody = anno4j.createObject(FirstTestBody.class);
         firstTestBody.setValue("First Value");
         annotation.setBody(firstTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondTestBody secondTestBody = anno4j.createObject(SecondTestBody.class);
         secondTestBody.setValue("Second Value");
         annotation1.setBody(secondTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#firstBodyType")

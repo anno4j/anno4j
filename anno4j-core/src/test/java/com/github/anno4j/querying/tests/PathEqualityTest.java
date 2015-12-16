@@ -1,20 +1,16 @@
 package com.github.anno4j.querying.tests;
 
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
-import org.openrdf.repository.object.LangString;
 
 import java.util.List;
 
@@ -31,14 +27,14 @@ public class PathEqualityTest extends QuerySetup {
         firstTestBody.setValue("First Value");
         firstTestBody.setAnotherValue("Another Value");
         annotation.setBody(firstTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondPathEqualityTestBody secondTestBody = anno4j.createObject(SecondPathEqualityTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setAnotherValue("Another Value");
         annotation1.setBody(secondTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
     }
 
 

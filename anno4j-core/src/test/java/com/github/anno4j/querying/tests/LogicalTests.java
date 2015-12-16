@@ -1,13 +1,10 @@
 package com.github.anno4j.querying.tests;
 
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
@@ -77,14 +74,14 @@ public class LogicalTests extends QuerySetup {
         firstTestBody.setAnotherValue("Another Value");
         firstTestBody.setLangValue(new LangString("Testwert", "de"));
         annotation.setBody(firstTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondLogicalTestBody secondTestBody = anno4j.createObject(SecondLogicalTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setLangValue(new LangString("Second Body Lang Value", "en"));
         annotation1.setBody(secondTestBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#firstLogicalBodyType")

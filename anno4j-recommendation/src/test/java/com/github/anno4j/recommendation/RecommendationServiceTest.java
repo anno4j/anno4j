@@ -2,13 +2,11 @@ package com.github.anno4j.recommendation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.persistence.PersistenceService;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
-import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;

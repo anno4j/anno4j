@@ -6,7 +6,6 @@ import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.QueryExtension;
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.core.Var;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
@@ -93,7 +92,7 @@ public class QueryService {
      * into a single object, so it can be passed to the
      * EvalQuery object for further processing.
      */
-    private QueryServiceDTO queryServiceDTO;
+    private QueryServiceConfiguration queryServiceDTO;
 
     /**
      * Limit value of the query
@@ -115,7 +114,7 @@ public class QueryService {
     }
 
     public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration, URI graph) {
-        queryServiceDTO = new QueryServiceDTO();
+        queryServiceDTO = new QueryServiceConfiguration();
         this.objectRepository = objectRepository;
 
         // Setting some common name spaces

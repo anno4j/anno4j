@@ -1,6 +1,6 @@
 package com.github.anno4j.recommendation.model;
 
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.annotations.Partial;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.object.RDFObject;
 
