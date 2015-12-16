@@ -117,6 +117,18 @@ public interface Annotation extends ResourceObject {
     void setSerializedAt(String serializedAt);
 
     /**
+     * Sets http:www.w3.org/ns/oa#serializedAt according to the format year-month-dayThours:minutes:secondsZ, e.g. 2015-12-16T12:00:00Z.
+     *
+     * @param year      The year to set.
+     * @param month     The month to set.
+     * @param day       The day to set.
+     * @param hours     The hours to set.
+     * @param minutes   The minutes to set.
+     * @param seconds   The seconds to set.
+     */
+    void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds);
+
+    /**
      * Gets http:www.w3.org/ns/oa#annotatedAt relationship.
      *
      * @return Value of http:www.w3.org/ns/oa#annotatedAt.
@@ -132,4 +144,15 @@ public interface Annotation extends ResourceObject {
     @Iri(OADM.ANNOTATED_AT)
     void setAnnotatedAt(String annotatedAt);
 
+    /**
+     * Sets http:www.w3.org/ns/oa#annotatedAt according to the format year-month-dayThours:minutes:secondsZ, e.g. 2015-12-16T12:00:00Z.
+     *
+     * @param year      The year to set.
+     * @param month     The month to set.
+     * @param day       The day to set.
+     * @param hours     The hours to set.
+     * @param minutes   The minutes to set.
+     * @param seconds   The seconds to set.
+     */
+    void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds);
 }

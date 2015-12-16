@@ -114,7 +114,6 @@ public class AnnotationTest {
         specificResource2.setSource(resourceObject2);
         annotation.addTarget(specificResource2);
 
-
         // Persist annotation
         connection.addObject(annotation);
 
@@ -130,5 +129,32 @@ public class AnnotationTest {
         assertTrue(urls.contains("http://www.somepage.org/resource1/"));
         assertTrue(urls.contains("http://www.somepage.org/resource2/"));
         assertEquals(2, result.getTarget().size());
+    }
+
+    @Test
+    public void testSerializedAtAndAnnotatedAt() throws RepositoryException, IllegalAccessException, InstantiationException {
+        int year = 2015;
+        int month = 12;
+        int day = 16;
+        int hours = 12;
+        int minutes = 0;
+        int seconds = 0;
+
+        int hours2 = 0;
+        int minutes2 = 5;
+        int seconds2 = 16;
+
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        annotation.setSerializedAt(year, month, day, hours, minutes, seconds);
+        annotation.setAnnotatedAt(year, month, day, hours2, minutes2, seconds2);
+
+        // Persist annotation
+        connection.addObject(annotation);
+
+        // Query annotation
+        Annotation result = (Annotation) connection.getObject(annotation.getResource());
+
+        assertEquals("2015-12-16T12:00:00Z", result.getSerializedAt());
+        assertEquals("2015-12-16T00:05:16Z", result.getAnnotatedAt());
     }
 }
