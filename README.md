@@ -43,7 +43,7 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
       <dependency>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-core</artifactId>
-        <version>1.1.1</version>
+        <version>2.0.0</version>
       </dependency>
 ```     
 2. Add an empty concept file "org.openrdf.concepts" under your META-INF directory
@@ -476,6 +476,37 @@ Recursive selection will apply an selectore recursively.
 The intersection of several paths can be computed by using an intersection & between path elements: `PATH & PATH`. Where PATH is an arbitrary path selector.
 
     "foaf:interest & foaf:topic_interest"
+
+## Development Guidelines
+
+### Snapshot
+Each push on the development branch triggers the build of a snapshot version. Snapshots are public available:
+```
+      <dependency>
+        <groupId>com.github.anno4j</groupId>
+        <artifactId>anno4j-core</artifactId>
+        <version>X.X.X-SNAPSHOT</version>
+      </dependency>
+```     
+
+### Compile, Package and Install
+
+Package with:
+```
+      mvn package
+```     
+
+Install to your local repository
+```
+      mvn install
+```     
+
+### Participate
+1. Create an issue
+2. Fork Anno4j
+3. Add features
+4. Add jUnit Tests
+5. Create pull request to anno4j/develop
 
 ## Contributors
 
