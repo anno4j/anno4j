@@ -61,8 +61,12 @@ public class ResourceObjectTest {
         annotation.setAnnotatedAt("" + System.currentTimeMillis());
         annotation.setSerializedAt("" + System.currentTimeMillis());
 
-        String output = annotation.getNTriples();
+        this.connection.addObject(annotation);
 
+        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+
+        String output = an.getTriples(RDFFormat.NTRIPLES);
+        System.out.println("output" + output);
         assertTrue(output.contains("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/oa#Annotation>"));
         assertTrue(output.contains(" <http://www.w3.org/ns/oa#annotatedAt> "));
         assertTrue(output.contains(" <http://www.w3.org/ns/oa#serializedAt> "));
