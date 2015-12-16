@@ -4,74 +4,20 @@ import com.github.anno4j.annotations.Partial;
 import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
-import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.object.traits.ObjectMessage;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.ntriples.NTriplesWriter;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
 
 @Partial
 public abstract class ResourceObjectSupport implements ResourceObject {
 
     private Resource resource = IDGenerator.BLANK_RESOURCE;
-
-    @Override
-    @Deprecated
-    public String getNTriples(){
-        StringWriter stringWriter = new StringWriter();
-        NTriplesWriter rdfWriter = new NTriplesWriter(stringWriter);
-        try {
-            MemoryStore store = new MemoryStore();
-            Repository sailRepository = new SailRepository(store);
-            sailRepository.initialize();
-            ObjectRepository objectRepository = new ObjectRepositoryFactory().createRepository(sailRepository);
-            ObjectConnection connection = objectRepository.getConnection();
-            connection.addObject(this);
-            GraphQueryResult result = sailRepository.getConnection().prepareGraphQuery(QueryLanguage.SPARQL, "CONSTRUCT { ?s ?p ?o. } WHERE { ?s ?p ?o. } ").evaluate();
-
-            rdfWriter.startRDF();
-
-            while (result.hasNext()) {
-                Statement item = result.next();
-                rdfWriter.handleStatement(item);
-            }
-
-            result.close();
-            connection.close();
-            rdfWriter.endRDF();
-
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (RepositoryConfigException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        }
-
-        return stringWriter.toString();
-    }
 
     /**
      * Method returns a textual representation of the given ResourceObject in a supported serialisation format.

@@ -49,38 +49,6 @@ public class QueryService {
     private ObjectRepository objectRepository;
 
     /**
-     * LDPath for the shortcut method setBodyCriteria
-     * <p/>
-     * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
-     * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasBody/[is-a ex:exampleType]",
-     * if we would append the slash to the BODY_PREFIX constant, which would be simple wrong!
-     */
-    private final String BODY_PREFIX = "oa:hasBody";
-
-    /**
-     * LDPath for the shortcut method setTargetCriteria
-     */
-    private final String TARGET_PREFIX = "oa:hasTarget/";
-
-    /**
-     * LDPath for the shortcut method setSourceCriteria
-     * <p/>
-     * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
-     * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSource/[is-a ex:exampleType]",
-     * if we would append the slash to the SOURCE_PREFIX constant, which would be simple wrong!
-     */
-    private final String SOURCE_PREFIX = TARGET_PREFIX + "oa:hasSource";
-
-    /**
-     * LDPath for the shortcut method setSelectorCriteria
-     * <p/>
-     * Notice: Storing the path without the slash "/", because the passed LDPath expression can look like
-     * this : "[is-a ex:exampleType]". This would lead to this constructed path "oa:hasTarget/oa:hasSelector/[is-a ex:exampleType]",
-     * if we would append the slash to the SELECTOR_PREFIX constant, which would be simple wrong!
-     */
-    private final String SELECTOR_PREFIX = TARGET_PREFIX + "oa:hasSelector";
-
-    /**
      * Bundles the:
      *
      * <ul>
@@ -239,7 +207,7 @@ public class QueryService {
      * @param criteria The criteria object
      * @return itself to allow chaining.
      */
-    public QueryService addCriteriaObject(Criteria criteria) {
+    public QueryService addCriteria(Criteria criteria) {
         queryServiceDTO.getCriteria().add(criteria);
         return this;
     }
