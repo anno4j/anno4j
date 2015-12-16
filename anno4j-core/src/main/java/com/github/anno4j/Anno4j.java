@@ -1,12 +1,12 @@
 package com.github.anno4j;
 
-import com.github.anno4j.persistence.PersistenceService;
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.model.Annotation;
+import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
-import com.github.anno4j.querying.extension.annotation.Evaluator;
+import com.github.anno4j.annotations.Evaluator;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
@@ -33,7 +33,6 @@ import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,22 +155,34 @@ public class Anno4j {
     }
 
     /**
-     * Create persistence object
-     *
-     * @return persistence object
+     * Writes the annotation to the configured SPARQL endpoint with a corresponding INSERT query.
+     * @param annotation annotation to write to the SPARQL endpoint
+     * @throws RepositoryException
      */
-    public PersistenceService createPersistenceService() {
-        return new PersistenceService(objectRepository);
+    public void persist(Annotation annotation) throws RepositoryException {
+        ObjectConnection connection = objectRepository.getConnection();
+
+        connection.addObject(annotation);
+        connection.close();
     }
 
     /**
-     * Create persistence object
-     *
+     * Writes the annotation to the configured SPARQL endpoint with a corresponding INSERT query.
+     * @param annotation annotation to write to the SPARQL endpoint
      * @param graph Graph context to query
-     * @return persistence object
+     * @throws RepositoryException
      */
-    public PersistenceService createPersistenceService(URI graph) {
-        return new PersistenceService(objectRepository, graph);
+    public void persist(Annotation annotation, URI graph) throws RepositoryException {
+        ObjectConnection connection = objectRepository.getConnection();
+
+        if(graph != null) {
+            connection.setReadContexts(graph);
+            connection.setInsertContext(graph);
+            connection.setRemoveContexts(graph);
+        }
+
+        connection.addObject(annotation);
+        connection.close();
     }
 
     /**
@@ -192,7 +203,6 @@ public class Anno4j {
     public QueryService createQueryService(URI graph) {
         return new QueryService(objectRepository, evaluatorConfiguration, graph);
     }
-
 
     /**
      * Getter for the configured Repository instance (Connector for local/remote SPARQL repository).

@@ -1,18 +1,14 @@
 package com.github.anno4j.querying.tests;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -69,14 +65,14 @@ public class ReversePathTest extends QuerySetup {
         InverseBody inverseBody = anno4j.createObject(InverseBody.class);
         inverseBody.setValue("Some Testing Value");
         annotation.setBody(inverseBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         InverseBody inverseBody2 = anno4j.createObject(InverseBody.class);
         inverseBody2.setValue("Another Testing Value");
         annotation1.setBody(inverseBody2);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
     }
 
 

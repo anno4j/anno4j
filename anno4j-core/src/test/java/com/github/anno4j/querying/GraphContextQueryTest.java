@@ -35,7 +35,7 @@ public class GraphContextQueryTest {
         annotation.setBody(body);
 
         // persist annotation
-        anno4j.createPersistenceService(subgraph).persistAnnotation(annotation);
+        anno4j.persist(annotation,subgraph);
 
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService();
@@ -60,7 +60,7 @@ public class GraphContextQueryTest {
         annotation.setBody(body);
 
         // persist annotation
-        anno4j.createPersistenceService(subgraph).persistAnnotation(annotation);
+        anno4j.persist(annotation,subgraph);
 
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService(subgraph);
@@ -86,7 +86,7 @@ public class GraphContextQueryTest {
         annotation.setBody(body);
 
         // persist annotation
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService(subgraph);

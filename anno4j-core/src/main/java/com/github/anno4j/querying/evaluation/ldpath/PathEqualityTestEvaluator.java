@@ -2,7 +2,7 @@ package com.github.anno4j.querying.evaluation.ldpath;
 
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.TestEvaluator;
-import com.github.anno4j.querying.extension.annotation.Evaluator;
+import com.github.anno4j.annotations.Evaluator;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.E_Equals;

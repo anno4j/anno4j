@@ -73,7 +73,7 @@ public class InputOutputTest {
             System.out.println(annotation.getTriples(RDFFormat.JSONLD));
 
             // Persist the annotation
-            anno4j.createPersistenceService().persistAnnotation(annotation);
+            anno4j.persist(annotation);
 
             // Query for persisted annotations
             List<Annotation> result = connection.getObjects(Annotation.class).asList();

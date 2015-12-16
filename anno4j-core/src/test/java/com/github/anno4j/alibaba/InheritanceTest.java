@@ -3,7 +3,7 @@ package com.github.anno4j.alibaba;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.annotations.Partial;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

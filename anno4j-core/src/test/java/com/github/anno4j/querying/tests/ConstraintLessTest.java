@@ -1,18 +1,14 @@
 package com.github.anno4j.querying.tests;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -32,7 +28,7 @@ public class ConstraintLessTest extends QuerySetup {
         ConstraintLessBody constraintLessBody = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody.setValue("Value 1");
         annotation.setBody(constraintLessBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
@@ -40,13 +36,13 @@ public class ConstraintLessTest extends QuerySetup {
         constraintLessBody2.setValue("Value 2");
 
         annotation1.setBody(constraintLessBody2);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
 
         // This
         Annotation annotation2 = anno4j.createObject(Annotation.class);
         annotation2.setAnnotatedAt("01.01.2011");
         annotation2.setBody(anno4j.createObject(ConstraintLessBody.class));
-        anno4j.createPersistenceService().persistAnnotation(annotation2);
+        anno4j.persist(annotation2);
     }
 
     @Test

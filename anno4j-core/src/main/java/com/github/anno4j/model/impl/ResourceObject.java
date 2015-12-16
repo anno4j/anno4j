@@ -11,8 +11,6 @@ import org.openrdf.rio.RDFFormat;
  */
 @Iri(RDFS.RESOURCE)
 public interface ResourceObject extends RDFObject {
-    @Deprecated
-    String getNTriples();
 
     String getTriples(RDFFormat format);
 

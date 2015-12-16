@@ -1,19 +1,15 @@
 package com.github.anno4j.querying.tests;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.querying.Comparison;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.QuerySetup;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.List;
 
@@ -89,13 +85,13 @@ public class DataTypeTest extends QuerySetup {
         DataTypeBody dataTypeBody = anno4j.createObject(DataTypeBody.class);
         dataTypeBody.setDoubleValue(2.0);
         annotation.setBody(dataTypeBody);
-        anno4j.createPersistenceService().persistAnnotation(annotation);
+        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         DataTypeBody dataTypeBody2 = anno4j.createObject(DataTypeBody.class);
         dataTypeBody2.setStringValue("3.0");
         annotation1.setBody(dataTypeBody2);
-        anno4j.createPersistenceService().persistAnnotation(annotation1);
+        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#datatTypeBody")

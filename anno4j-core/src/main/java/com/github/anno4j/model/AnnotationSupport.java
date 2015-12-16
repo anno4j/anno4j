@@ -1,11 +1,9 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.model.impl.ResourceObjectSupport;
-import com.github.anno4j.persistence.annotation.Partial;
+import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.*;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

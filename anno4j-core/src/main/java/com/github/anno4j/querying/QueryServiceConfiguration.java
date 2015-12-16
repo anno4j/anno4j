@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Data Transfer Object for the QueryService. Bundles all data needed for further processing.
  */
-public class QueryServiceDTO {
+public class QueryServiceConfiguration {
 
     private ArrayList<Criteria> criteria = new ArrayList<>();
 
