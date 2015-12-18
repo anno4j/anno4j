@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <parent>
         <groupId>com.github.anno4j</groupId>
-        <artifactId>anno4j-parent</artifactId>
+        <artifactId>anno4j-ontologies</artifactId>
         <version>2.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
-
-    <artifactId>anno4j-ontologies</artifactId>
-    <packaging>pom</packaging>
-    <name>Anno4j Ontologies</name>
-
-    <description />
-
-    <modules>
-        <module>ontologies-mico</module>
-        <module>ontologies-mmm</module>
-    </modules>
+    <artifactId>anno4j-ontologies-mmm</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>Anno4j MICO Ontology v2</name>
+    <description>MICO project specific ontology version 2 based ob Web Annotation Data Model</description>
+    
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.anno4j</groupId>
+            <artifactId>anno4j-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

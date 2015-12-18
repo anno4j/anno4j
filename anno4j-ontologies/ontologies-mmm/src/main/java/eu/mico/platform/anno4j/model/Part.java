@@ -1,23 +1,27 @@
-package com.github.anno4j.model;
+package eu.mico.platform.anno4j.model;
 
-import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.*;
 import com.github.anno4j.model.namespaces.OADM;
+import eu.mico.platform.anno4j.model.namespaces.MMM;
 import org.openrdf.annotations.Iri;
+import org.openrdf.repository.object.RDFObject;
 
 import java.util.Set;
 
 /**
- * Conforms to oa:Annotation (http://www.openannotation.org/spec/core/core.html)
+ * Class represents a Part. A Part resembles an extractor step and consecutively an (intermediary)
+ * result of an Item and its extraction chain.
  */
-@Iri(OADM.ANNOTATION)
-public interface Annotation extends ResourceObject {
+@Iri(MMM.PART)
+public interface Part extends Annotation {
 
     /**
      * Gets http:www.w3.org/ns/oa#hasBody relationship.
      *
      * @return Value of http:www.w3.org/ns/oa#hasBody.
      */
-    @Iri(OADM.HAS_BODY)
+    @Iri(MMM.HAS_BODY)
+    @Override
     Body getBody();
 
     /**
@@ -25,7 +29,8 @@ public interface Annotation extends ResourceObject {
      *
      * @param body New value of http:www.w3.orgnsoa#hasBody.
      */
-    @Iri(OADM.HAS_BODY)
+    @Iri(MMM.HAS_BODY)
+    @Override
     void setBody(Body body);
 
     /**
@@ -33,7 +38,8 @@ public interface Annotation extends ResourceObject {
      *
      * @return Values of http:www.w3.org/ns/oa#hasTarget.
      */
-    @Iri(OADM.HAS_TARGET)
+    @Iri(MMM.HAS_TARGET)
+    @Override
     Set<Target> getTarget();
 
     /**
@@ -41,8 +47,31 @@ public interface Annotation extends ResourceObject {
      *
      * @param targets New value of http:www.w3.org/ns/oa#hasTarget.
      */
-    @Iri(OADM.HAS_TARGET)
+    @Iri(MMM.HAS_TARGET)
     void setTarget(Set<Target> targets);
+
+    /**
+     * Gets the objects that were the semantical input for this Part.
+     *
+     * @return A set of objects that are used as semantical input for creating this Part.
+     */
+    @Iri(MMM.HAS_INPUT)
+    Set<RDFObject> getInputs();
+
+    /**
+     * Sets the Set of objects that are the semantical input for this Part.
+     *
+     * @param inputs    The set of objects that form the semantical input for this Part
+     */
+    @Iri(MMM.HAS_INPUT)
+    void setInputs(Set<RDFObject> inputs);
+
+    /**
+     * Adds a single object to the set of objects, that form the semantical input for this Part.
+     *
+     * @param input The object that is to be added to the set of objects, that form the semantical input for this part.
+     */
+    void addInput(RDFObject input);
 
     /**
      * Adds a http:www.w3.org/ns/oa#hasTarget relationship.
