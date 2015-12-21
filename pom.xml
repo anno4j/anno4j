@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.anno4j</groupId>
     <artifactId>anno4j-parent</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
     <packaging>pom</packaging>
     <name>Anno4j Parent</name>
     <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C
@@ -19,7 +18,7 @@
     <scm>
         <developerConnection>scm:git:https://github.com/anno4j/anno4j.git</developerConnection>
         <url>https://github.com/anno4j/anno4j.git</url>
-        <tag>HEAD</tag>
+        <tag>v2.0.0</tag>
     </scm>
 
     <organization>
@@ -117,7 +116,7 @@
                             <publicKeyring>local.pubring.gpg</publicKeyring>
                             <keyname>Anno4j</keyname>
                             <executable>gpg</executable>
-                            <passphrase></passphrase>
+                            <passphrase />
                         </configuration>
                         <executions>
                             <execution>
