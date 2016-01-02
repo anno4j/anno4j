@@ -2,14 +2,9 @@ package com.github.anno4j.io;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Body;
-import com.github.anno4j.model.Target;
-import com.github.anno4j.model.namespaces.DCTYPES;
-import com.github.anno4j.model.namespaces.RDF;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.annotations.Iri;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -101,25 +96,6 @@ public class InputOutputTest {
 
 
     }
-
-    /**
-     * Inner class to represent a sound media item.
-     */
-    @Iri(DCTYPES.SOUND)
-    public static interface Sound extends Body {
-
-        @Iri(RDF.VALUE)
-        String getValue();
-
-        @Iri(RDF.VALUE)
-        void setValue(String value);
-    }
-
-    /**
-     * Inner class to represent an image media file as body.
-     */
-    @Iri(DCTYPES.IMAGE)
-    public static interface Image extends Target {}
 
     private final static String JSONLD = "{\n" +
             "  \"@context\": {\n" +
