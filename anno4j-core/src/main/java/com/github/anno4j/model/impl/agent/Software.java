@@ -3,7 +3,13 @@ package com.github.anno4j.model.impl.agent;
 import com.github.anno4j.model.Agent;
 import com.github.anno4j.model.namespaces.FOAF;
 import com.github.anno4j.model.namespaces.PROV;
+import java.io.ByteArrayOutputStream;
 import org.openrdf.annotations.Iri;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.Rio;
 
 /**
  * Conforms to http://www.w3.org/ns/prov#SoftwareAgent
@@ -11,7 +17,7 @@ import org.openrdf.annotations.Iri;
  * A software agent is running software.
  */
 @Iri(PROV.SOFTWARE_AGENT)
-public interface Software extends Agent {
+public abstract class Software implements Agent {
     /**
      * Sets new Refers to http:xmlns.comfoafspec#term_homepage
      * homepage - A homepage for some thing..
@@ -20,7 +26,7 @@ public interface Software extends Agent {
      *                 homepage - A homepage for some thing..
      */
     @Iri(FOAF.HOMEPAGE)
-    void setHomepage(String homepage);
+    public abstract void setHomepage(String homepage);
 
     /**
      * Gets Refers to http:xmlns.comfoafspec#term_homepage
@@ -30,5 +36,19 @@ public interface Software extends Agent {
      * homepage - A homepage for some thing..
      */
     @Iri(FOAF.HOMEPAGE)
-    String getHomepage();
+    public abstract String getHomepage();
+
+    @Override
+    public String getTriples(RDFFormat format) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            RDFWriter writer = Rio.createWriter(format, out);
+            this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
+
+        } catch (RepositoryException | RDFHandlerException e) {
+            e.printStackTrace();
+        }
+        return out.toString();
+    }
 }

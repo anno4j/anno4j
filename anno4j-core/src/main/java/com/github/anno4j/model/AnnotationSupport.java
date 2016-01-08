@@ -1,14 +1,13 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
-import org.apache.commons.io.IOUtils;
-import org.openrdf.rio.*;
-
+import com.github.anno4j.model.impl.ResourceObjectSupport;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
+import org.apache.commons.io.IOUtils;
+import org.openrdf.rio.*;
 
 @Partial
 public abstract class AnnotationSupport extends ResourceObjectSupport implements Annotation {
@@ -48,15 +47,20 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
                     sb.append(target.getTriples(RDFFormat.NTRIPLES));
                 }
             }
+
+            if (getAnnotatedBy() != null) {
+                sb.append(getAnnotatedBy().getTriples(RDFFormat.NTRIPLES));
+            }
+
+            if (getSerializedBy() != null) {
+                sb.append(getSerializedBy().getTriples(RDFFormat.NTRIPLES));
+            }
+
             parser.parse(IOUtils.toInputStream(sb.toString()), "");
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        } catch (RDFParseException e) {
+        } catch (IOException | RDFHandlerException | RDFParseException e) {
             e.printStackTrace();
         }
 
