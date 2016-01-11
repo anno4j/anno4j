@@ -3,6 +3,8 @@ package com.github.anno4j.model.impl;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.example.TextAnnotationBody;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.impl.agent.Person;
+import com.github.anno4j.model.impl.agent.Software;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -167,5 +169,49 @@ public class ResourceObjectTest {
 
         // Test if the crucial body information is present
         assertTrue(output.contains(jsonldBody));
+    }
+
+    @Test
+    public void testGetTriplesOnAgent() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        long time = System.currentTimeMillis();
+        annotation.setAnnotatedAt("" + time);
+
+        Software softwareAgent = anno4j.createObject(Software.class);
+        softwareAgent.setHomepage("www.example.org");
+        softwareAgent.setName("SoftwareAgentName");
+
+        Person personAgent = anno4j.createObject(Person.class);
+        personAgent.setName("PersonAgentName");
+        personAgent.setNick("PersonNick");
+
+        annotation.setAnnotatedBy(softwareAgent);
+        annotation.setSerializedBy(personAgent);
+
+        this.connection.addObject(annotation);
+
+        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+
+        String output = an.getTriples(RDFFormat.JSONLD);
+
+        String jsonldPerson = " \"@type\" : [ \"https://github.com/anno4j/ns#Agent\", \"http://xmlns.com/foaf/0.1/Person\" ],\n" +
+                "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
+                "    \"@value\" : \"PersonAgentName\"\n" +
+                "  } ],\n" +
+                "  \"http://xmlns.com/foaf/0.1/nick\" : [ {\n" +
+                "    \"@value\" : \"PersonNick\"\n" +
+                "  } ]";
+
+        assertTrue(output.contains(jsonldPerson));
+
+        String jsondldSoftware = " \"@type\" : [ \"https://github.com/anno4j/ns#Agent\", \"http://www.w3.org/ns/prov/SoftwareAgent\" ],\n" +
+                "  \"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
+                "    \"@value\" : \"www.example.org\"\n" +
+                "  } ],\n" +
+                "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
+                "    \"@value\" : \"SoftwareAgentName\"\n" +
+                "  } ]";
+
+        assertTrue(output.contains(jsondldSoftware));
     }
 }
