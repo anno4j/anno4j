@@ -32,8 +32,6 @@ public class MMM {
 
     public final static String HAS_INPUT = NS + "hasInput";
 
-    public final static String INITIAL_TARGET = NS + "InitialTarget";
-
     public final static String BINARY_BODY = NS + "BinaryBody";
 
     public final static String HAS_CONFIDENCE = NS + "hasConfidence";
