@@ -508,6 +508,66 @@ Install to your local repository
 4. Add jUnit Tests
 5. Create pull request to anno4j/develop
 
+
+### 3rd party integration of custom LDPath expressions
+
+To contribute custom LDPath (test) functions, and thereby custom LDPath syntax the following two class has to be provided:
+
+1. Step: 
+
+Create a Java class that extends either the SelectorFunction class or the TestFunction class. This class defines the actual syntax
+that has to be injected in to the Anno4j evaluation process.
+
+```java
+    public class GetSelector extends SelectorFunction<Node> {
+    
+        @Override
+        protected String getLocalName() {
+            return "getSelector";
+        }
+    
+        @Override
+        public Collection<Node> apply(RDFBackend<Node> backend, Node context, Collection<Node>... args) throws IllegalArgumentException {
+            return null;
+        }
+    
+        @Override
+        public String getSignature() {
+            return "fn:getSelector(Annotation) : Selector";
+        }
+    
+        @Override
+        public String getDescription() {
+            return "Selects the Selector of a given annotation object.";
+        }
+    }
+
+``` 
+
+2. Step:
+
+Create a Java class that actually evaluates the newly provided LDPath expression. This class needs
+to be flagged with the @Evaluator Java annotation. The @Evaluator annotation requires the class 
+of the description mentioned in the first step. Besides that, the evaluator has to implement either
+the QueryEvaluator or the TestEvaluator interface. Inside the prepared evaluate method, the actual
+SPARQL query has to be generated using the Apache Jena framework.
+
+```java
+    @Evaluator(GetSelector.class)
+    public class GetSelectorFunctionEvaluator implements QueryEvaluator {
+        @Override
+        public Var evaluate(NodeSelector nodeSelector, ElementGroup elementGroup, Var var, LDPathEvaluatorConfiguration evaluatorConfiguration) {
+            Var evaluate = new SelfSelectionEvaluator().evaluate(nodeSelector, elementGroup, var, evaluatorConfiguration);
+            Var target = Var.alloc("target");
+            Var selector = Var.alloc("selector");
+    
+            elementGroup.addTriplePattern(new Triple(evaluate.asNode(), new ResourceImpl(OADM.HAS_TARGET).asNode(), target));
+            elementGroup.addTriplePattern(new Triple(target.asNode(), new ResourceImpl(OADM.HAS_SELECTOR).asNode(), selector));
+            return selector;
+        }
+    }
+``` 
+
 ## Contributors
 
 - Kai Schlegel (University of Passau)
