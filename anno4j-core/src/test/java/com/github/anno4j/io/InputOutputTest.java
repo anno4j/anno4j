@@ -3,13 +3,17 @@ package com.github.anno4j.io;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
+import com.github.anno4j.model.Motivation;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.namespaces.DCTYPES;
+import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.model.namespaces.RDF;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
+import org.openrdf.model.impl.StatementImpl;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -72,6 +76,8 @@ public class InputOutputTest {
 
             System.out.println(annotation.getTriples(RDFFormat.JSONLD));
 
+            List<Motivation> motivationList = connection.getObjects(Motivation.class).asList();
+
             // Persist the annotation
             anno4j.persist(annotation);
 
@@ -89,6 +95,7 @@ public class InputOutputTest {
 
             // Test for the same ID on the altered and persisted annotation
             assertEquals(annotation.getResourceAsString(), resultObject.getResourceAsString());
+
         } catch (RepositoryException e) {
             e.printStackTrace();
         } catch (RepositoryConfigException e) {
@@ -168,6 +175,8 @@ public class InputOutputTest {
 
             " \"@id\": \"http://example.org/anno1\" , \n" +
             " \"@type\":\"oa:Annotation\" , \n" +
+//            " \"oa:motivatedBy\": { \"@id\" : \"oa:describing\" } , \n" +
+            " \"motivation\" : \"oa:describing\" , \n" +
             " \"body\": { \n" +
             " \"@id\":\"http://example.org/body1\", \n" +
             " \"@type\":\"dctypes:Sound\", \n" +

@@ -1,7 +1,6 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.impl.motivation.Bookmarking;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,14 +37,14 @@ public class MotivationTest {
         Annotation annotation = anno4j.createObject(Annotation.class);
 
         // Create and add motivation
-        Motivation motivation = anno4j.createObject(Bookmarking.class);
+        Motivation motivation = MotivationFactory.getBookmarking(anno4j);
         annotation.setMotivatedBy(motivation);
 
         // Persist annotation
         connection.addObject(annotation);
 
         // Query persisted object
-        List<Bookmarking> result = connection.getObjects(Bookmarking.class).asList();
+        List<Motivation> result = connection.getObjects(Motivation.class).asList();
 
         // Tests
         assertEquals(1, result.size());

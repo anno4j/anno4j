@@ -2,10 +2,10 @@ package com.github.anno4j.example;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.MotivationFactory;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
-import com.github.anno4j.model.impl.motivation.Commenting;
 import com.github.anno4j.model.impl.selector.TextPositionSelector;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.After;
@@ -43,7 +43,8 @@ public class ExampleTest {
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
         annotation.setSerializedAt("2013-02-04T12:00:00Z");
-        annotation.setMotivatedBy(anno4j.createObject(Commenting.class));
+        annotation.setMotivatedBy(MotivationFactory.getCommenting(anno4j));
+
 
         // Create the person agent for the annotation
         Person person = anno4j.createObject(Person.class);
