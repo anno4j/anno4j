@@ -33,7 +33,8 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
     public String getTriples(RDFFormat format) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
-        parser.setRDFHandler(Rio.createWriter(format, out));
+        RDFWriter writer = Rio.createWriter(format, out);
+        parser.setRDFHandler(writer);
 
         try {
             StringBuilder sb = new StringBuilder();
@@ -48,6 +49,11 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
                     sb.append(target.getTriples(RDFFormat.NTRIPLES));
                 }
             }
+
+            if(getMotivatedBy() != null) {
+               sb.append(getMotivatedBy().getTriples(RDFFormat.NTRIPLES));
+            }
+
             parser.parse(IOUtils.toInputStream(sb.toString()), "");
 
         } catch (UnsupportedEncodingException e) {
