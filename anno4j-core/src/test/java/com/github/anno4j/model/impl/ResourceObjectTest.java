@@ -194,7 +194,7 @@ public class ResourceObjectTest {
 
         String output = an.getTriples(RDFFormat.JSONLD);
 
-        String jsonldPerson = " \"@type\" : [ \"https://github.com/anno4j/ns#Agent\", \"http://xmlns.com/foaf/0.1/Person\" ],\n" +
+        String jsonldPerson = " \"@type\" : [ \"http://xmlns.com/foaf/0.1/Person\", \"https://github.com/anno4j/ns#Agent\" ],\n" +
                 "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
                 "    \"@value\" : \"PersonAgentName\"\n" +
                 "  } ],\n" +
@@ -204,7 +204,7 @@ public class ResourceObjectTest {
 
         assertTrue(output.contains(jsonldPerson));
 
-        String jsondldSoftware = " \"@type\" : [ \"https://github.com/anno4j/ns#Agent\", \"http://www.w3.org/ns/prov/SoftwareAgent\" ],\n" +
+        String jsondldSoftware = " \"@type\" : [ \"http://www.w3.org/ns/prov/SoftwareAgent\", \"https://github.com/anno4j/ns#Agent\" ],\n" +
                 "  \"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
                 "    \"@value\" : \"www.example.org\"\n" +
                 "  } ],\n" +
