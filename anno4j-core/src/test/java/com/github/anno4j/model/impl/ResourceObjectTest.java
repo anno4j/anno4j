@@ -6,16 +6,15 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.RDFFormat;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by schlegel on 05/10/15.
@@ -194,8 +193,8 @@ public class ResourceObjectTest {
 
         String output = an.getTriples(RDFFormat.JSONLD);
 
-        String jsonldPerson = " \"@type\" : [ \"https://github.com/anno4j/ns#Agent\", \"http://xmlns.com/foaf/0.1/Person\" ],\n" +
-                "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
+        String jsonldPerson = " \"@type\" : [ \"http://xmlns.com/foaf/0.1/Person\", \"https://github.com/anno4j/ns#Agent\" ],\n"
+                +                "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
                 "    \"@value\" : \"PersonAgentName\"\n" +
                 "  } ],\n" +
                 "  \"http://xmlns.com/foaf/0.1/nick\" : [ {\n" +
@@ -204,8 +203,8 @@ public class ResourceObjectTest {
 
         assertTrue(output.contains(jsonldPerson));
 
-        String jsondldSoftware = " \"@type\" : [ \"https://github.com/anno4j/ns#Agent\", \"http://www.w3.org/ns/prov/SoftwareAgent\" ],\n" +
-                "  \"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
+        String jsondldSoftware = " \"@type\" : [ \"http://www.w3.org/ns/prov/SoftwareAgent\", \"https://github.com/anno4j/ns#Agent\" ],\n"
+                +                "  \"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
                 "    \"@value\" : \"www.example.org\"\n" +
                 "  } ],\n" +
                 "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
