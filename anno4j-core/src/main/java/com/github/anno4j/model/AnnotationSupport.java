@@ -1,13 +1,12 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObjectSupport;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.rio.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 
 @Partial
@@ -50,19 +49,17 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
                 }
             }
 
-            if(getMotivatedBy() != null) {
-               sb.append(getMotivatedBy().getTriples(RDFFormat.NTRIPLES));
+            if (getAnnotatedBy() != null) {
+                sb.append(getAnnotatedBy().getTriples(RDFFormat.NTRIPLES));
+            }
+
+            if (getSerializedBy() != null) {
+                sb.append(getSerializedBy().getTriples(RDFFormat.NTRIPLES));
             }
 
             parser.parse(IOUtils.toInputStream(sb.toString()), "");
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        } catch (RDFParseException e) {
+        } catch (IOException | RDFHandlerException | RDFParseException e) {
             e.printStackTrace();
         }
 
@@ -80,21 +77,21 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
                 append(Integer.toString(month)).append("-").
                 append(Integer.toString(day)).append("T");
 
-        if(hours < 10) {
+        if (hours < 10) {
             builder.append(0);
         }
         builder.append(Integer.toString(hours));
 
         builder.append(":");
 
-        if(minutes < 10) {
+        if (minutes < 10) {
             builder.append(0);
         }
         builder.append(Integer.toString(minutes));
 
         builder.append(":");
 
-        if(seconds < 10) {
+        if (seconds < 10) {
             builder.append(0);
         }
         builder.append(Integer.toString(seconds));
@@ -115,21 +112,21 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
                 append(Integer.toString(month)).append("-").
                 append(Integer.toString(day)).append("T");
 
-        if(hours < 10) {
+        if (hours < 10) {
             builder.append(0);
         }
         builder.append(Integer.toString(hours));
 
         builder.append(":");
 
-        if(minutes < 10) {
+        if (minutes < 10) {
             builder.append(0);
         }
         builder.append(Integer.toString(minutes));
 
         builder.append(":");
 
-        if(seconds < 10) {
+        if (seconds < 10) {
             builder.append(0);
         }
         builder.append(Integer.toString(seconds));
