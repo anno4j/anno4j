@@ -194,24 +194,30 @@ public class ResourceObjectTest {
 
         String output = an.getTriples(RDFFormat.JSONLD);
 
-        String jsonldPerson = " \"@type\" : [ \"http://xmlns.com/foaf/0.1/Person\", \"https://github.com/anno4j/ns#Agent\" ],\n" +
-                "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
+        String jsonldPersonType1 = "http://xmlns.com/foaf/0.1/Person";
+        String jsonldPersonType2 = "https://github.com/anno4j/ns#Agent";
+        String jsonldPerson = "\"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
                 "    \"@value\" : \"PersonAgentName\"\n" +
                 "  } ],\n" +
                 "  \"http://xmlns.com/foaf/0.1/nick\" : [ {\n" +
                 "    \"@value\" : \"PersonNick\"\n" +
                 "  } ]";
 
+        assertTrue(output.contains(jsonldPersonType1));
+        assertTrue(output.contains(jsonldPersonType2));
         assertTrue(output.contains(jsonldPerson));
 
-        String jsondldSoftware = " \"@type\" : [ \"http://www.w3.org/ns/prov/SoftwareAgent\", \"https://github.com/anno4j/ns#Agent\" ],\n" +
-                "  \"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
+        String jsonoldSoftwareType1 = "http://www.w3.org/ns/prov/SoftwareAgent";
+        String jsonoldSoftwareType2 = "https://github.com/anno4j/ns#Agent";
+        String jsondldSoftware = "\"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
                 "    \"@value\" : \"www.example.org\"\n" +
                 "  } ],\n" +
                 "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
                 "    \"@value\" : \"SoftwareAgentName\"\n" +
                 "  } ]";
 
+        assertTrue(output.contains(jsonoldSoftwareType1));
+        assertTrue(output.contains(jsonoldSoftwareType2));
         assertTrue(output.contains(jsondldSoftware));
     }
 }
