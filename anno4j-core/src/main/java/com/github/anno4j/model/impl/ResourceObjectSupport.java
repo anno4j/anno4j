@@ -1,6 +1,7 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.annotations.Partial;
+import java.io.ByteArrayOutputStream;
 import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
@@ -11,8 +12,6 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
-
-import java.io.ByteArrayOutputStream;
 
 @Partial
 public abstract class ResourceObjectSupport implements ResourceObject {
@@ -33,9 +32,7 @@ public abstract class ResourceObjectSupport implements ResourceObject {
             RDFWriter writer = Rio.createWriter(format, out);
             this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
 
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (RDFHandlerException e) {
+        } catch (RepositoryException | RDFHandlerException e) {
             e.printStackTrace();
         }
 
