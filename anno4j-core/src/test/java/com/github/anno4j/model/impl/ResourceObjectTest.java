@@ -5,17 +5,25 @@ import com.github.anno4j.example.TextAnnotationBody;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.JsonLdOptions;
+import com.github.jsonldjava.core.JsonLdProcessor;
+import com.github.jsonldjava.utils.JsonUtils;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.RDFFormat;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by schlegel on 05/10/15.
@@ -121,103 +129,114 @@ public class ResourceObjectTest {
 
     @Test
     public void testGetTriplesWithJSONLD() throws RepositoryException, IllegalAccessException, InstantiationException {
-        // Create arbitrary annotation with some provenance information
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        long time = System.currentTimeMillis();
-        annotation.setAnnotatedAt("" + time);
+        try {
+            // Create arbitrary annotation with some provenance information
+            Annotation annotation = anno4j.createObject(Annotation.class);
+            long time = System.currentTimeMillis();
+            annotation.setAnnotatedAt("" + time);
 
-        // Create a (for test cases only) textual body
-        TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
-        String value = "someValue";
-        String format = "someFormat";
-        String language = "someLanguage";
-        body.setValue(value);
-        body.setFormat(format);
-        body.setLanguage(language);
+            // Create a (for test cases only) textual body
+            TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
+            String value = "someValue";
+            String format = "someFormat";
+            String language = "someLanguage";
+            body.setValue(value);
+            body.setFormat(format);
+            body.setLanguage(language);
 
-        // Add the body to the annotation
-        annotation.setBody(body);
+            // Add the body to the annotation
+            annotation.setBody(body);
 
-        this.connection.addObject(annotation);
+            this.connection.addObject(annotation);
 
-        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+            // Commit changes so that we do not get weird results
+            this.connection.commit();
 
-        String output = an.getTriples(RDFFormat.JSONLD);
+            Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+            String output = an.getTriples(RDFFormat.JSONLD);
+            Object jsonObject = JsonUtils.fromString(output);
+            JsonLdOptions options = new JsonLdOptions();
+            Map context = new HashMap();
+            String compact = JsonUtils.toPrettyString(JsonLdProcessor.compact(jsonObject, context, options));
 
-        // Create Strings that need to be contained in the JSONLD output (at some place)
-        String jsonldBody = "  \"@id\" : \"" + body.getResourceAsString() + "\",\n" +
-                "  \"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\" ],\n" +
-                "  \"http://purl.org/dc/elements/1.1/format\" : [ {\n" +
-                "    \"@value\" : \"" + body.getFormat() + "\"\n" +
-                "  } ],\n" +
-                "  \"http://purl.org/dc/elements/1.1/language\" : [ {\n" +
-                "    \"@value\" : \"" + body.getLanguage() + "\"\n" +
-                "  } ],\n" +
-                "  \"http://www.w3.org/1999/02/22-rdf-syntax-ns#value\" : [ {\n" +
-                "    \"@value\" : \"" + body.getValue() + "\"";
+            // Create Strings that need to be contained in the JSONLD output (at some place)
+            String jsonldBody = "    \"@id\" : \"" + body.getResourceAsString() + "\",\n"
+                    + "    \"@type\" : \"http://www.w3.org/ns/oa#EmbeddedContent\",\n"
+                    + "    \"http://purl.org/dc/elements/1.1/format\" : \"" + body.getFormat() + "\",\n"
+                    + "    \"http://purl.org/dc/elements/1.1/language\" : \"" + body.getLanguage() + "\",\n"
+                    + "    \"http://www.w3.org/1999/02/22-rdf-syntax-ns#value\" : \"" + body.getValue() + "\"";
 
-        String jsondldAnnotation = "  \"@id\" : \"" + an.getResourceAsString() + "\",\n" +
-                "  \"@type\" : [ \"http://www.w3.org/ns/oa#Annotation\" ],\n" +
-                "  \"http://www.w3.org/ns/oa#annotatedAt\" : [ {\n" +
-                "    \"@value\" : \"" + an.getAnnotatedAt() + "\"\n" +
-                "  } ],\n" +
-                "  \"http://www.w3.org/ns/oa#hasBody\" : [ {\n" +
-                "    \"@id\" : \"" + body.getResourceAsString() + "\"";
+            String jsondldAnnotation = "  \"@id\" : \"" + annotation.getResourceAsString() + "\",\n"
+                    + "  \"@type\" : \"http://www.w3.org/ns/oa#Annotation\",\n"
+                    + "  \"http://www.w3.org/ns/oa#annotatedAt\" : \"" + annotation.getAnnotatedAt() + "\",\n"
+                    + "  \"http://www.w3.org/ns/oa#hasBody\" : {\n"
+                    + "    \"@id\" : \"" + body.getResourceAsString() + "\",";
+            // The rest part of the annotation is missing
 
-        // Test if the crucial annotation information is present
-        assertTrue(output.contains(jsondldAnnotation));
+            // Test if the crucial annotation information is present
+            assertTrue(compact.contains(jsondldAnnotation));
 
-        // Test if the crucial body information is present
-        assertTrue(output.contains(jsonldBody));
+            System.out.println(compact);
+            System.out.println("NEXT");
+            System.out.println(jsonldBody);
+
+            // Test if the crucial body information is present
+            assertTrue(compact.contains(jsonldBody));
+        } catch (IOException | JsonLdError ex) {
+            Logger.getLogger(ResourceObjectTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Test
     public void testGetTriplesOnAgent() throws RepositoryException, IllegalAccessException, InstantiationException {
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        long time = System.currentTimeMillis();
-        annotation.setAnnotatedAt("" + time);
+        try {
+            Annotation annotation = anno4j.createObject(Annotation.class);
+            long time = System.currentTimeMillis();
+            annotation.setAnnotatedAt("" + time);
 
-        Software softwareAgent = anno4j.createObject(Software.class);
-        softwareAgent.setHomepage("www.example.org");
-        softwareAgent.setName("SoftwareAgentName");
+            Software softwareAgent = anno4j.createObject(Software.class);
+            softwareAgent.setHomepage("www.example.org");
+            softwareAgent.setName("SoftwareAgentName");
 
-        Person personAgent = anno4j.createObject(Person.class);
-        personAgent.setName("PersonAgentName");
-        personAgent.setNick("PersonNick");
+            Person personAgent = anno4j.createObject(Person.class);
+            personAgent.setName("PersonAgentName");
+            personAgent.setNick("PersonNick");
 
-        annotation.setAnnotatedBy(softwareAgent);
-        annotation.setSerializedBy(personAgent);
+            annotation.setAnnotatedBy(softwareAgent);
+            annotation.setSerializedBy(personAgent);
 
-        this.connection.addObject(annotation);
+            this.connection.addObject(annotation);
 
-        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+            // Commit changes so that we do not get weird results
+            this.connection.commit();
 
-        String output = an.getTriples(RDFFormat.JSONLD);
+            Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+            String output = an.getTriples(RDFFormat.JSONLD);
 
-        String jsonldPersonType1 = "http://xmlns.com/foaf/0.1/Person";
-        String jsonldPersonType2 = "https://github.com/anno4j/ns#Agent";
-        String jsonldPerson = "\"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
-                "    \"@value\" : \"PersonAgentName\"\n" +
-                "  } ],\n" +
-                "  \"http://xmlns.com/foaf/0.1/nick\" : [ {\n" +
-                "    \"@value\" : \"PersonNick\"\n" +
-                "  } ]";
+            Object jsonObject = JsonUtils.fromString(output);
+            JsonLdOptions options = new JsonLdOptions();
+            Map context = new HashMap();
+            String compact = JsonUtils.toPrettyString(JsonLdProcessor.compact(jsonObject, context, options));
 
-        assertTrue(output.contains(jsonldPersonType1));
-        assertTrue(output.contains(jsonldPersonType2));
-        assertTrue(output.contains(jsonldPerson));
+            String jsonldPersonType1 = "http://xmlns.com/foaf/0.1/Person";
+            String jsonldPersonType2 = "https://github.com/anno4j/ns#Agent";
+            String jsonldPerson = "\"http://xmlns.com/foaf/0.1/name\" : \"PersonAgentName\",\n"
+                    + "    \"http://xmlns.com/foaf/0.1/nick\" : \"PersonNick\"\n";
 
-        String jsonoldSoftwareType1 = "http://www.w3.org/ns/prov/SoftwareAgent";
-        String jsonoldSoftwareType2 = "https://github.com/anno4j/ns#Agent";
-        String jsondldSoftware = "\"http://xmlns.com/foaf/0.1/homepage\" : [ {\n" +
-                "    \"@value\" : \"www.example.org\"\n" +
-                "  } ],\n" +
-                "  \"http://xmlns.com/foaf/0.1/name\" : [ {\n" +
-                "    \"@value\" : \"SoftwareAgentName\"\n" +
-                "  } ]";
+            assertTrue(compact.contains(jsonldPersonType1));
+            assertTrue(compact.contains(jsonldPersonType2));
+            assertTrue(compact.contains(jsonldPerson));
 
-        assertTrue(output.contains(jsonoldSoftwareType1));
-        assertTrue(output.contains(jsonoldSoftwareType2));
-        assertTrue(output.contains(jsondldSoftware));
+            String jsonoldSoftwareType1 = "http://www.w3.org/ns/prov/SoftwareAgent";
+            String jsonoldSoftwareType2 = "https://github.com/anno4j/ns#Agent";
+            String jsondldSoftware = "\"http://xmlns.com/foaf/0.1/homepage\" : \"www.example.org\",\n"
+                    + "    \"http://xmlns.com/foaf/0.1/name\" : \"SoftwareAgentName\"\n";
+
+            assertTrue(compact.contains(jsonoldSoftwareType1));
+            assertTrue(compact.contains(jsonoldSoftwareType2));
+            assertTrue(compact.contains(jsondldSoftware));
+        } catch (IOException | JsonLdError ex) {
+            Logger.getLogger(ResourceObjectTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
