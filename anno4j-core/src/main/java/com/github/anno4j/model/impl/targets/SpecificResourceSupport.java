@@ -1,7 +1,5 @@
 package com.github.anno4j.model.impl.targets;
 
-import com.github.anno4j.model.AnnotationSupport;
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.repository.RepositoryException;
@@ -32,11 +30,7 @@ public abstract class SpecificResourceSupport implements SpecificResource {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        } catch (RDFParseException e) {
-            e.printStackTrace();
-        } catch (RepositoryException e) {
+        } catch (RDFHandlerException | RDFParseException | RepositoryException e) {
             e.printStackTrace();
         }
 

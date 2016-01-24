@@ -1,10 +1,9 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
+import java.io.ByteArrayOutputStream;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.*;
-
-import java.io.ByteArrayOutputStream;
 
 @Partial
 public abstract class AgentSupport implements Agent {
@@ -18,9 +17,7 @@ public abstract class AgentSupport implements Agent {
     @Override
     public String getTriples(RDFFormat format) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
         RDFWriter writer = Rio.createWriter(format, out);
-        parser.setRDFHandler(writer);
 
         try {
             this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
