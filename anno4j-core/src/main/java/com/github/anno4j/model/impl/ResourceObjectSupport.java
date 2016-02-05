@@ -4,8 +4,11 @@ import com.github.anno4j.annotations.Partial;
 import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.traits.ObjectMessage;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -22,8 +25,8 @@ public abstract class ResourceObjectSupport implements ResourceObject {
     /**
      * Method returns a textual representation of the given ResourceObject in a supported serialisation format.
      *
-     * @param format    The format which should be printed.
-     * @return          A textual representation if this object in the format.
+     * @param format The format which should be printed.
+     * @return A textual representation if this object in the format.
      */
     @Override
     public String getTriples(RDFFormat format) {
@@ -56,11 +59,11 @@ public abstract class ResourceObjectSupport implements ResourceObject {
     public Resource getResource(ObjectMessage msg) throws Exception {
         Resource proceed = (Resource) msg.proceed();
 
-        if(proceed == null ) {
+        if (proceed == null) {
             return this.resource;
-        } else if(!IDGenerator.BLANK_RESOURCE.equals(this.resource)) {
+        } else if (!IDGenerator.BLANK_RESOURCE.equals(this.resource)) {
             return this.resource;
-        } else  {
+        } else {
             return proceed;
         }
     }
@@ -77,10 +80,24 @@ public abstract class ResourceObjectSupport implements ResourceObject {
 
     /**
      * Gets new identifier for this instance as String.
+     *
      * @return identifier as String.
      */
     public String getResourceAsString() {
         return getResource().stringValue();
+    }
+
+    @Override
+    public void delete() {
+        try {
+            ObjectConnection connection = getObjectConnection();
+            connection.removeDesignation(this, (URI) getResource());
+            // explicitly removing the rdf type triple from the repository
+            connection.remove(getResource(), null, null);
+            connection.remove(null, null, getResource(), null);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
     }
 
 }

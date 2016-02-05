@@ -2,7 +2,14 @@ package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.model.namespaces.OADM;
 import org.apache.commons.io.IOUtils;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.StatementImpl;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.*;
 
 import java.io.ByteArrayOutputStream;
@@ -56,9 +63,9 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
             if (getSerializedBy() != null) {
                 sb.append(getSerializedBy().getTriples(RDFFormat.NTRIPLES));
             }
-            
-            if(getMotivatedBy() != null) {
-               sb.append(getMotivatedBy().getTriples(RDFFormat.NTRIPLES));
+
+            if (getMotivatedBy() != null) {
+                sb.append(getMotivatedBy().getTriples(RDFFormat.NTRIPLES));
             }
 
             parser.parse(IOUtils.toInputStream(sb.toString()), "");
@@ -138,5 +145,41 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
         builder.append("Z");
 
         this.setAnnotatedAt(builder.toString());
+    }
+
+    @Override
+    public void delete() {
+        try {
+            ObjectConnection connection = getObjectConnection();
+
+            // deleting an existing body
+            if (getBody() != null) {
+                getBody().delete();
+                setBody(null);
+            }
+
+            // deleting existing targets one by one
+            if (getTarget() != null) {
+                for (Target target : getTarget()) {
+                    target.delete();
+                }
+                setTarget(null);
+            }
+
+            // deleting possible provenance information
+            setAnnotatedBy(null);
+            setAnnotatedAt(null);
+            setMotivatedBy(null);
+            setSerializedBy(null);
+            setSerializedAt(null);
+
+
+            // finally removing this annotation
+            connection.removeDesignation(this, (URI) getResource());
+            // explicitly removing the rdf type triple from the repository
+            connection.remove(getResource(), null, null);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -19,4 +19,6 @@ public interface ResourceObject extends RDFObject {
     void setResourceAsString(String resourceAsString);
 
     String getResourceAsString();
+
+    void delete();
 }

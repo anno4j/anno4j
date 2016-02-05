@@ -4,7 +4,9 @@ import com.github.anno4j.model.AnnotationSupport;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.*;
 
@@ -43,4 +45,22 @@ public abstract class SpecificResourceSupport implements SpecificResource {
         return out.toString();
     }
 
+    @Override
+    public void delete() {
+        try {
+            ObjectConnection connection = getObjectConnection();
+
+            // deleting an existing selector
+            if(getSelector() != null) {
+                getSelector().delete();
+                setSelector(null);
+            }
+
+            connection.removeDesignation(this, (URI) getResource());
+            // explicitly removing the rdf type triple from the repository
+            connection.remove(getResource(), null, null);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
 }
