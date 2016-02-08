@@ -56,7 +56,7 @@ public class ItemTest {
         assertEquals(0, result.asList().size());
 
         // Persist the Item
-        connection.addObject(item);
+        anno4j.persist(item);
 
         // Query for now one existing Item
         result = connection.getObjects(Item.class);
