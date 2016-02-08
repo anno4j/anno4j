@@ -1,18 +1,18 @@
 package eu.mico.platform.anno4j.model;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.targets.SpecificResource;
+import com.github.anno4j.querying.QueryService;
+import eu.mico.platform.anno4j.model.namespaces.MMM;
 import eu.mico.platform.anno4j.model.provenance.Asset;
-import org.junit.After;
+import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.RDFObject;
-import org.openrdf.result.Result;
-import org.openrdf.rio.RDFFormat;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,17 +22,13 @@ import static org.junit.Assert.assertEquals;
 public class WorkflowTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
+    private QueryService queryService;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
+        queryService = anno4j.createQueryService();
+        queryService.addPrefix("mmm", "http://www.mico-project.eu/ns/mmm/2.0/schema#");
     }
 
     @Test
@@ -41,7 +37,7 @@ public class WorkflowTest {
      *
      * Shallow test.
      */
-    public void workflowTest() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException {
+    public void workflowTest() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException, ParseException, MalformedQueryException {
         // Create the Item
         Item item = anno4j.createObject(Item.class);
 
@@ -101,11 +97,11 @@ public class WorkflowTest {
         item.addPart(part3);
 
         // Persist
-        connection.addObject(item);
+        anno4j.persist(item);
 
-        Result<Item> result = connection.getObjects(Item.class);
+        List<Item> result = queryService.execute(MMM.ITEM);
 
-        Item resultItem = result.asList().get(0);
+        Item resultItem = result.get(0);
 
         // Test
         assertEquals(3, resultItem.getParts().size());

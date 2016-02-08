@@ -1,5 +1,6 @@
 package com.github.anno4j.querying.evaluation;
 
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.Criteria;
 import com.github.anno4j.querying.QueryServiceConfiguration;
@@ -19,17 +20,17 @@ import java.io.StringReader;
 
 public class EvalQuery {
 
-    public static Query evaluate(QueryServiceConfiguration queryServiceDTO) throws ParseException {
+    public static <T extends ResourceObject> Query evaluate(QueryServiceConfiguration queryServiceDTO, String resultType) throws ParseException {
 
         Query query = QueryFactory.make();
         query.setQuerySelectType();
 
         ElementGroup elementGroup = new ElementGroup();
 
-        Var annotationVar = Var.alloc("annotation");
+        Var objectVar = Var.alloc("object");
 
-        // Creating and adding the first triple - "?annotation rdf:type oa:Annotation
-        Triple t1 = new Triple(annotationVar, RDF.type.asNode(), NodeFactory.createURI(OADM.ANNOTATION));
+        // Creating and adding the first triple - could be something like: "?annotation rdf:type oa:Annotation
+        Triple t1 = new Triple(objectVar, RDF.type.asNode(), NodeFactory.createURI(resultType));
         elementGroup.addTriplePattern(t1);
 
         // Evaluating the criteria
@@ -37,7 +38,7 @@ public class EvalQuery {
             SesameValueBackend backend = new SesameValueBackend();
 
             LdPathParser parser = new LdPathParser(backend, queryServiceDTO.getConfiguration(), new StringReader(c.getLdpath()));
-            Var var = LDPathEvaluator.evaluate(parser.parseSelector(queryServiceDTO.getPrefixes()), elementGroup, annotationVar, queryServiceDTO.getEvaluatorConfiguration());
+            Var var = LDPathEvaluator.evaluate(parser.parseSelector(queryServiceDTO.getPrefixes()), elementGroup, objectVar, queryServiceDTO.getEvaluatorConfiguration());
 
             if (c.getConstraint() != null) {
                 EvalComparison.evaluate(elementGroup, c, var);
@@ -48,7 +49,7 @@ public class EvalQuery {
         query.setQueryPattern(elementGroup);
 
         // Choose what we want so select - SELECT ?annotation in this case
-        query.addResultVar(annotationVar);
+        query.addResultVar(objectVar);
 
         // Setting the default prefixes, like rdf: or dc:
         query.getPrefixMapping().setNsPrefixes(queryServiceDTO.getPrefixes());

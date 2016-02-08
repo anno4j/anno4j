@@ -18,7 +18,7 @@ public class QueryServiceConfiguration {
 
     private LDPathEvaluatorConfiguration evaluatorConfiguration;
 
-    private Map<String, String> prefixes = new HashMap<>();;
+    private Map<String, String> prefixes = new HashMap<>();
 
     public ArrayList<Criteria> getCriteria() {
         return criteria;

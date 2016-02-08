@@ -1,5 +1,7 @@
 package com.github.anno4j.querying;
 
+import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.*;
 import com.github.anno4j.querying.evaluation.EvalQuery;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
@@ -261,10 +263,20 @@ public class QueryService {
      * Creates and executes the SPARQL query according to the
      * criteria specified by the user.
      *
-     * @param <T>
+     * @return the result set of annotations
+     */
+    public List<Annotation> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
+        return this.execute(OADM.ANNOTATION);
+    }
+
+    /**
+     * Creates and executes the SPARQL query according to the
+     * criteria specified by the user.
+     *
+     * @param <T> type Type of the expected result.
      * @return the result set
      */
-    public <T> List<T> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
+    public <T extends ResourceObject> List<T> execute(String resultType) throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         ObjectConnection con = objectRepository.getConnection();
 
         if (graph != null) {
@@ -273,7 +285,7 @@ public class QueryService {
             con.setRemoveContexts(graph);
         }
 
-        Query sparql = EvalQuery.evaluate(queryServiceDTO);
+        Query sparql = EvalQuery.evaluate(queryServiceDTO, resultType);
 
         if (limit != null) {
             sparql.setLimit(limit);

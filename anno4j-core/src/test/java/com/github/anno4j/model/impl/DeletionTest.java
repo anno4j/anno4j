@@ -64,7 +64,7 @@ public class DeletionTest {
         assertEquals(false, statements.hasNext());
 
         // confirming the empty result set with the QueryService
-        List<Object> emptyList = queryService.execute();
+        List<Annotation> emptyList = queryService.execute();
         assertEquals(0, emptyList.size());
     }
 
@@ -92,7 +92,7 @@ public class DeletionTest {
         result.delete();
 
         // confirming the empty result set with the QueryService
-        List<Object> emptyList = queryService.execute();
+        List<Annotation> emptyList = queryService.execute();
         assertEquals(0, emptyList.size());
 
         // checking if there are no statements left (repository should be completely empty)
@@ -136,7 +136,7 @@ public class DeletionTest {
         result.delete();
 
         // confirming the empty result set with the QueryService
-        List<Object> emptyList = queryService.execute();
+        List<Annotation> emptyList = queryService.execute();
         assertEquals(0, emptyList.size());
 
         // checking if there are no statements left (repository should be completely empty)

@@ -46,7 +46,7 @@ public class QueryServiceTest {
 
     @Test
     public void testCustomLDPah() throws Exception {
-        List<Object> list = queryService.addCriteria("fn:getSelector(.)[is-a oa:FragmentSelector]").execute();
+        List<Annotation> list = queryService.addCriteria("fn:getSelector(.)[is-a oa:FragmentSelector]").execute();
         assertEquals(1, list.size());
     }
 }
