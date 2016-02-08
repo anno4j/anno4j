@@ -2,6 +2,7 @@ package com.github.anno4j;
 
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
@@ -155,24 +156,24 @@ public class Anno4j {
     }
 
     /**
-     * Writes the annotation to the configured SPARQL endpoint with a corresponding INSERT query.
-     * @param annotation annotation to write to the SPARQL endpoint
+     * Writes the resource object to the configured SPARQL endpoint with a corresponding INSERT query.
+     * @param resource resource object to write to the SPARQL endpoint
      * @throws RepositoryException
      */
-    public void persist(Annotation annotation) throws RepositoryException {
+    public <T extends ResourceObject> void persist(T resource) throws RepositoryException {
         ObjectConnection connection = objectRepository.getConnection();
 
-        connection.addObject(annotation);
+        connection.addObject(resource);
         connection.close();
     }
 
     /**
-     * Writes the annotation to the configured SPARQL endpoint with a corresponding INSERT query.
-     * @param annotation annotation to write to the SPARQL endpoint
+     * Writes the resource object to the configured SPARQL endpoint with a corresponding INSERT query.
+     * @param resource resource object to write to the SPARQL endpoint
      * @param graph Graph context to query
      * @throws RepositoryException
      */
-    public void persist(Annotation annotation, URI graph) throws RepositoryException {
+    public <T extends ResourceObject> void persist(T resource, URI graph) throws RepositoryException {
         ObjectConnection connection = objectRepository.getConnection();
 
         if(graph != null) {
@@ -181,7 +182,7 @@ public class Anno4j {
             connection.setRemoveContexts(graph);
         }
 
-        connection.addObject(annotation);
+        connection.addObject(resource);
         connection.close();
     }
 
