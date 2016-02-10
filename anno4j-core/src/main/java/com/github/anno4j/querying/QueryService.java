@@ -287,7 +287,7 @@ public class QueryService {
 
         URI rootType = objectRepository.getConnection().getObjectFactory().getNameOf(type);
         if (rootType == null) {
-            throw new IllegalArgumentException("Can't query for: " + type + " Missing name of type. Is @Iri annotation set?");
+            throw new IllegalArgumentException("Can't query for: " + type + " not found in name map. Is @Iri annotation set?");
         }
 
         Query sparql = EvalQuery.evaluate(queryServiceDTO, rootType);

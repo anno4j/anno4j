@@ -49,7 +49,7 @@ public class ItemTest {
         queryService.addCriteria("mmm:hasAsset[is-a mmm:Asset]");
 
         // Query for non existing Items
-        List<Item> result = queryService.execute(MMM.ITEM);
+        List<Item> result = queryService.execute(Item.class);
 
         assertEquals(0, result.size());
 
@@ -57,7 +57,7 @@ public class ItemTest {
         anno4j.persist(item);
 
         // Query for now one existing Item
-        result = queryService.execute(MMM.ITEM);
+        result = queryService.execute(Item.class);
 
         assertEquals(1, result.size());
 

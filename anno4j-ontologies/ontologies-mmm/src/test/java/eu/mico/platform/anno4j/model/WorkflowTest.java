@@ -99,7 +99,7 @@ public class WorkflowTest {
         // Persist
         anno4j.persist(item);
 
-        List<Item> result = queryService.execute(MMM.ITEM);
+        List<Item> result = queryService.execute(Item.class);
 
         Item resultItem = result.get(0);
 

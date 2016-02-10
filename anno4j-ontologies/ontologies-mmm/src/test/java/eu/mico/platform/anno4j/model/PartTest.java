@@ -48,7 +48,7 @@ public class PartTest {
         part.addTarget(spec);
 
         // Query for no existing Part
-        List<Part> result = queryService.execute(MMM.PART);
+        List<Part> result = queryService.execute(Part.class);
 
         assertEquals(0, result.size());
 
@@ -56,7 +56,7 @@ public class PartTest {
         anno4j.persist(part);
 
         // Query for one existing Part
-        result = queryService.execute(MMM.PART);
+        result = queryService.execute(Part.class);
 
         assertEquals(1, result.size());
         assertTrue(result.get(0).getTarget() != null);

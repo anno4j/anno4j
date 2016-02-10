@@ -1,12 +1,7 @@
 package com.github.anno4j.querying;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Target;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.model.impl.selector.FragmentSelector;
-import com.github.anno4j.model.impl.selector.SvgSelector;
-import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.model.namespaces.OADM;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +9,6 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
