@@ -160,7 +160,7 @@ public class Anno4j {
      * @param resource resource object to write to the SPARQL endpoint
      * @throws RepositoryException
      */
-    public <T extends ResourceObject> void persist(T resource) throws RepositoryException {
+    public void persist(ResourceObject resource) throws RepositoryException {
         ObjectConnection connection = objectRepository.getConnection();
 
         connection.addObject(resource);
@@ -173,7 +173,7 @@ public class Anno4j {
      * @param graph Graph context to query
      * @throws RepositoryException
      */
-    public <T extends ResourceObject> void persist(T resource, URI graph) throws RepositoryException {
+    public void persist(ResourceObject resource, URI graph) throws RepositoryException {
         ObjectConnection connection = objectRepository.getConnection();
 
         if(graph != null) {

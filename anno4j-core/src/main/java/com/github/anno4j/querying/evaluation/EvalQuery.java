@@ -1,7 +1,6 @@
 package com.github.anno4j.querying.evaluation;
 
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.querying.Criteria;
 import com.github.anno4j.querying.QueryServiceConfiguration;
 import com.github.anno4j.querying.evaluation.ldpath.LDPathEvaluator;
@@ -15,22 +14,23 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.marmotta.ldpath.backend.sesame.SesameValueBackend;
 import org.apache.marmotta.ldpath.parser.LdPathParser;
 import org.apache.marmotta.ldpath.parser.ParseException;
+import org.openrdf.model.URI;
 
 import java.io.StringReader;
 
 public class EvalQuery {
 
-    public static <T extends ResourceObject> Query evaluate(QueryServiceConfiguration queryServiceDTO, String resultType) throws ParseException {
+    public static <T extends ResourceObject> Query evaluate(QueryServiceConfiguration queryServiceDTO, URI rootType) throws ParseException {
 
         Query query = QueryFactory.make();
         query.setQuerySelectType();
 
         ElementGroup elementGroup = new ElementGroup();
 
-        Var objectVar = Var.alloc("object");
+        Var objectVar = Var.alloc("root");
 
-        // Creating and adding the first triple - could be something like: "?annotation rdf:type oa:Annotation
-        Triple t1 = new Triple(objectVar, RDF.type.asNode(), NodeFactory.createURI(resultType));
+        // Creating and adding the first triple - could be something like: "?objectVar rdf:type oa:Annotation
+        Triple t1 = new Triple(objectVar, RDF.type.asNode(), NodeFactory.createURI(rootType.toString()));
         elementGroup.addTriplePattern(t1);
 
         // Evaluating the criteria

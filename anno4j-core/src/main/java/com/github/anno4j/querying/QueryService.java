@@ -266,7 +266,7 @@ public class QueryService {
      * @return the result set of annotations
      */
     public List<Annotation> execute() throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
-        return this.execute(OADM.ANNOTATION);
+        return this.execute(Annotation.class);
     }
 
     /**
@@ -276,7 +276,7 @@ public class QueryService {
      * @param <T> type Type of the expected result.
      * @return the result set
      */
-    public <T extends ResourceObject> List<T> execute(String resultType) throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
+    public <T extends ResourceObject> List<T> execute(Class<T> type) throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         ObjectConnection con = objectRepository.getConnection();
 
         if (graph != null) {
@@ -285,7 +285,12 @@ public class QueryService {
             con.setRemoveContexts(graph);
         }
 
-        Query sparql = EvalQuery.evaluate(queryServiceDTO, resultType);
+        URI rootType = objectRepository.getConnection().getObjectFactory().getNameOf(type);
+        if (rootType == null) {
+            throw new IllegalArgumentException("Can't query for: " + type + " Missing name of type. Is @Iri annotation set?");
+        }
+
+        Query sparql = EvalQuery.evaluate(queryServiceDTO, rootType);
 
         if (limit != null) {
             sparql.setLimit(limit);

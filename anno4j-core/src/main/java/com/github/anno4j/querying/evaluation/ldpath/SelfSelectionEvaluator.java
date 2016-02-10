@@ -12,6 +12,6 @@ import org.apache.marmotta.ldpath.model.selectors.SelfSelector;
 public class SelfSelectionEvaluator implements QueryEvaluator {
     @Override
     public Var evaluate(NodeSelector nodeSelector, ElementGroup elementGroup, Var var, LDPathEvaluatorConfiguration evaluatorConfiguration) {
-        return Var.alloc("annotation");
+        return Var.alloc("root");
     }
 }
