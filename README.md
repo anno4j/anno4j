@@ -115,7 +115,7 @@ interfaces, i.e. to create an Annotation object. The following code shows how it
 
      // persist annotation
      Anno4j anno4j = new Anno4j();
-     anno4j.createPersistenceService().persistAnnotation(annotation);
+     anno4j.persist(annotation);
 ```
 
 This would lead to the persistence of the annotation object and all of its annotated attributes to the preset repository.  
@@ -181,6 +181,15 @@ to be invoked. Because Anno4j provides a fluent-interface, the code examples fro
         .addPrefix("ex", "http://www.example.com/schema#")
         .addCriteria("oa:hasBody/ex:value", "Example Value")
         .execute();
+```
+
+An execute method call like this, will query for resources of type OADM.ANNOTATION which satisfy the given criteria. It is also possible to query for other types of resources.
+The type of the required resource can be passed to the execute method. This will produce and execute a hidden sparql query to retrieve resources of such a type.
+In this way the underlying repository can be queried for every class annotated with the *@Iri* annotation.
+The following example shows how to prompt for a SpecificResource object:
+
+```java
+    queryService.execute(SpecificResource.class);
 ```
 
 ### Graph Context
