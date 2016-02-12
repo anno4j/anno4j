@@ -183,7 +183,7 @@ to be invoked. Because Anno4j provides a fluent-interface, the code examples fro
         .execute();
 ```
 
-An execute method call like this, will query for resources of type OADM.ANNOTATION which satisfy the given criteria. It is also possible to query for other types of resources.
+An execute method call like this will query for resources of type OADM.ANNOTATION which satisfy the given criteria. It is also possible to query for other types of resources.
 The type of the required resource can be passed to the execute method. This will produce and execute a hidden sparql query to retrieve resources of such a type.
 In this way the underlying repository can be queried for every class annotated with the *@Iri* annotation.
 The following example shows how to prompt for a SpecificResource object:
