@@ -15,6 +15,7 @@ import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -35,10 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -186,6 +184,7 @@ public class Anno4j {
         connection.close();
     }
 
+
     public <T extends ResourceObject> T findByID (Class<T> type, String id) throws RepositoryException {
         ObjectConnection connection = objectRepository.getConnection();
         T result = null;
@@ -201,6 +200,42 @@ public class Anno4j {
         }
 
         return result;
+    }
+    
+    public <T extends ResourceObject> T findByID (Class<T> type, URI id) throws RepositoryException {
+        return this.findByID(type, id.toString());
+    }
+
+    /**
+     * Removes all triples from the given context.
+     * @param context context to clear
+     * @throws RepositoryException
+     */
+    public void clearContext(URI context) throws RepositoryException {
+        objectRepository.getConnection().clear(context);
+    }
+
+    /**
+     * Removes all triples from the given context.
+     * @param context context to clear
+     * @throws RepositoryException
+     */
+    public void clearContext(String context) throws RepositoryException {
+        this.clearContext(new URIImpl(context));
+    }
+
+    /**
+     * Queries for all instances of the RDF class connected with the given class
+     * @param type Class with connected RDF type
+     * @return All instances of the given RDF type
+     * @throws RepositoryException
+     */
+    public <T extends ResourceObject> List<T> findAll(Class<T> type) throws RepositoryException {
+        try {
+            return objectRepository.getConnection().getObjects(type).asList();
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException("Couldn't evaluate query" , e);
+        }
     }
 
     /**
