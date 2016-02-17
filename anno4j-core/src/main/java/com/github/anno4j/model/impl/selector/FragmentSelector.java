@@ -41,6 +41,7 @@ public interface FragmentSelector extends Selector {
      * <p/>
      * An established standard to which the described resource conforms..
      */
+    @Iri(DCTERMS.CONFORMS_TO)
     String getConformsTo();
 
     /**
