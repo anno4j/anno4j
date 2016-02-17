@@ -1,13 +1,12 @@
 package com.github.anno4j;
 
-import com.github.anno4j.model.Annotation;
+import com.github.anno4j.annotations.Evaluator;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
-import com.github.anno4j.annotations.Evaluator;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
@@ -16,6 +15,8 @@ import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -35,10 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -184,6 +182,60 @@ public class Anno4j {
 
         connection.addObject(resource);
         connection.close();
+    }
+
+
+    public <T extends ResourceObject> T findByID (Class<T> type, String id) throws RepositoryException {
+        ObjectConnection connection = objectRepository.getConnection();
+        T result = null;
+
+        try {
+            result = connection.getObject(type, id);
+        } catch (RepositoryException e) {
+            throw e;
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException("Couldn't evaluate query" , e);
+        } finally {
+            connection.close();
+        }
+
+        return result;
+    }
+    
+    public <T extends ResourceObject> T findByID (Class<T> type, URI id) throws RepositoryException {
+        return this.findByID(type, id.toString());
+    }
+
+    /**
+     * Removes all triples from the given context.
+     * @param context context to clear
+     * @throws RepositoryException
+     */
+    public void clearContext(URI context) throws RepositoryException {
+        objectRepository.getConnection().clear(context);
+    }
+
+    /**
+     * Removes all triples from the given context.
+     * @param context context to clear
+     * @throws RepositoryException
+     */
+    public void clearContext(String context) throws RepositoryException {
+        this.clearContext(new URIImpl(context));
+    }
+
+    /**
+     * Queries for all instances of the RDF class connected with the given class
+     * @param type Class with connected RDF type
+     * @return All instances of the given RDF type
+     * @throws RepositoryException
+     */
+    public <T extends ResourceObject> List<T> findAll(Class<T> type) throws RepositoryException {
+        try {
+            return objectRepository.getConnection().getObjects(type).asList();
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException("Couldn't evaluate query" , e);
+        }
     }
 
     /**
