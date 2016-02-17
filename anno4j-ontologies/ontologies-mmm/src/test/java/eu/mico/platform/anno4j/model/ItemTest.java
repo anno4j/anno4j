@@ -2,7 +2,6 @@ package eu.mico.platform.anno4j.model;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.querying.QueryService;
-import eu.mico.platform.anno4j.model.namespaces.MMM;
 import eu.mico.platform.anno4j.model.provenance.Asset;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
