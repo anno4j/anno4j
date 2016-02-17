@@ -98,6 +98,72 @@ public class GraphContextQueryTest {
         assertEquals(0, defaultList.size());
     }
 
+
+    @Test
+    public void persisteDefaultGraphFindAll() throws Exception {
+        // Create test annotation
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        TestBody body =  anno4j.createObject(TestBody.class);
+        body.setValue("Example Value");
+        annotation.setBody(body);
+
+        // persist annotation
+        anno4j.persist(annotation);
+
+        // Querying for the persisted annotation
+        QueryService queryService = anno4j.createQueryService();
+        List<Annotation> subGraphList = anno4j.findAll(Annotation.class, subgraph);
+        assertEquals(0, subGraphList.size());
+        List<Annotation> defaultGraphList = anno4j.findAll(Annotation.class);
+        assertEquals(1, defaultGraphList.size());
+    }
+
+    @Test
+    public void persistSubGraphFindAll() throws Exception {
+        // Create test annotation
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        TestBody body =  anno4j.createObject(TestBody.class);
+        body.setValue("Example Value");
+        annotation.setBody(body);
+
+        // persist annotation
+        anno4j.persist(annotation, subgraph);
+
+        // Querying for the persisted annotation
+        QueryService queryService = anno4j.createQueryService();
+        List<Annotation> subGraphList = anno4j.findAll(Annotation.class, subgraph);
+        assertEquals(1, subGraphList.size());
+        List<Annotation> defaultGraphList = anno4j.findAll(Annotation.class);
+        assertEquals(1, defaultGraphList.size());
+    }
+
+    @Test
+    public void persistDefaultAndSubGraphFindAll() throws Exception {
+        // Create test annotation
+        Annotation annotationDefault = anno4j.createObject(Annotation.class);
+        TestBody body =  anno4j.createObject(TestBody.class);
+        body.setValue("Example Value");
+        annotationDefault.setBody(body);
+
+        anno4j.persist(annotationDefault);
+
+        // Create test annotation
+        Annotation annotationSubgraph = anno4j.createObject(Annotation.class);
+        TestBody body2 =  anno4j.createObject(TestBody.class);
+        body.setValue("Example Value");
+        annotationSubgraph.setBody(body2);
+
+        // persist annotation
+        anno4j.persist(annotationSubgraph, subgraph);
+
+        // Querying for the persisted annotation
+        QueryService queryService = anno4j.createQueryService();
+        List<Annotation> subGraphList = anno4j.findAll(Annotation.class, subgraph);
+        assertEquals(1, subGraphList.size());
+        List<Annotation> defaultGraphList = anno4j.findAll(Annotation.class);
+        assertEquals(2, defaultGraphList.size());
+    }
+
     @Iri("http://www.example.com/schema#GraphTestBody")
     public static interface TestBody extends Body {
         @Iri("http://www.example.com/schema#value")
