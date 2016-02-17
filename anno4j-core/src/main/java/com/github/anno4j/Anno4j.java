@@ -160,9 +160,7 @@ public class Anno4j {
      */
     public void persist(ResourceObject resource) throws RepositoryException {
         ObjectConnection connection = objectRepository.getConnection();
-
         connection.addObject(resource);
-        connection.close();
     }
 
     /**
@@ -181,7 +179,6 @@ public class Anno4j {
         }
 
         connection.addObject(resource);
-        connection.close();
     }
 
 
@@ -194,9 +191,7 @@ public class Anno4j {
         } catch (RepositoryException e) {
             throw e;
         } catch (QueryEvaluationException e) {
-            throw new RepositoryException("Couldn't evaluate query" , e);
-        } finally {
-            connection.close();
+            throw new RepositoryException("Couldn't evaluate query", e);
         }
 
         return result;
