@@ -132,6 +132,10 @@ public class MMM {
 
     public final static String QUESTION_DETECTION_BODY = NS + "QuestionDetectionBody";
 
+    public final static String MATCHING_VIDEO_SEGMENT_BODY = NS + "MatchingVideoSegmentBody";
+
+    public final static String MATCHING_AUDIO_SEGMENT_BODY = NS + "MatchingAudioSegmentBody";
+
     public final static String YDCCOEFF = NS + "YDCCoeff";
 
     public final static String CBACCOEFF = NS + "CbACCoeff2";
