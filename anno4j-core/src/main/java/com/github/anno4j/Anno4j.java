@@ -201,7 +201,7 @@ public class Anno4j {
 
         return result;
     }
-    
+
     public <T extends ResourceObject> T findByID (Class<T> type, URI id) throws RepositoryException {
         return this.findByID(type, id.toString());
     }
@@ -233,6 +233,21 @@ public class Anno4j {
     public <T extends ResourceObject> List<T> findAll(Class<T> type) throws RepositoryException {
         try {
             return objectRepository.getConnection().getObjects(type).asList();
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException("Couldn't evaluate query" , e);
+        }
+    }
+
+    public <T extends ResourceObject> List<T> findAll(Class<T> type, URI context) throws RepositoryException {
+        try {
+            ObjectConnection con = objectRepository.getConnection();
+            if (context != null) {
+                con.setReadContexts(context);
+                con.setInsertContext(context);
+                con.setRemoveContexts(context);
+            }
+
+            return con.getObjects(type).asList();
         } catch (QueryEvaluationException e) {
             throw new RepositoryException("Couldn't evaluate query" , e);
         }
