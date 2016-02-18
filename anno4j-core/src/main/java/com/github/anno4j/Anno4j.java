@@ -312,10 +312,35 @@ public class Anno4j {
     public <T> T createObject (Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException {
         ObjectConnection con = getObjectRepository().getConnection();
         ObjectFactory objectFactory = con.getObjectFactory();
-        T result = objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
+        return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
+    }
 
-        return result;
+    public <T> T createObject (Class<T> clazz, URI context) throws RepositoryException, IllegalAccessException, InstantiationException {
+        ObjectConnection con = getObjectRepository().getConnection();
+        if (context != null) {
+            con.setReadContexts(context);
+            con.setInsertContext(context);
+            con.setRemoveContexts(context);
+        }
+        ObjectFactory objectFactory = con.getObjectFactory();
+        return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
+    }
 
+    /**
+     * Creates object with the same read,write,remove context as the given resource object
+     */
+    public <T,S extends ResourceObject> T createObject (Class<T> clazz, S resourceObject) throws RepositoryException, IllegalAccessException, InstantiationException {
+        ObjectConnection con = getObjectRepository().getConnection();
+
+        if (resourceObject != null) {
+            con.setReadContexts(resourceObject.getObjectConnection().getReadContexts());
+            con.setInsertContext(resourceObject.getObjectConnection().getInsertContext());
+            con.setRemoveContexts(resourceObject.getObjectConnection().getRemoveContexts());
+        }
+
+        ObjectFactory objectFactory = con.getObjectFactory();
+
+        return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
     }
 
     public IDGenerator getIdGenerator() {
