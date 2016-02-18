@@ -326,13 +326,6 @@ public class Anno4j {
         return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
     }
 
-    /**
-     * Creates object with the same read,write,remove context as the given resource object
-     */
-    public <T,S extends ResourceObject> T createObject (Class<T> clazz, S resourceObject) throws RepositoryException, IllegalAccessException, InstantiationException {
-        return createObject(clazz, resourceObject.getObjectConnection().getInsertContext());
-    }
-
     public IDGenerator getIdGenerator() {
         return idGenerator;
     }
