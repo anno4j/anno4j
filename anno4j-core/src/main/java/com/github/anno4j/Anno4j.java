@@ -330,17 +330,7 @@ public class Anno4j {
      * Creates object with the same read,write,remove context as the given resource object
      */
     public <T,S extends ResourceObject> T createObject (Class<T> clazz, S resourceObject) throws RepositoryException, IllegalAccessException, InstantiationException {
-        ObjectConnection con = getObjectRepository().getConnection();
-
-        if (resourceObject != null) {
-            con.setReadContexts(resourceObject.getObjectConnection().getReadContexts());
-            con.setInsertContext(resourceObject.getObjectConnection().getInsertContext());
-            con.setRemoveContexts(resourceObject.getObjectConnection().getRemoveContexts());
-        }
-
-        ObjectFactory objectFactory = con.getObjectFactory();
-
-        return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
+        return createObject(clazz, resourceObject.getObjectConnection().getInsertContext());
     }
 
     public IDGenerator getIdGenerator() {
