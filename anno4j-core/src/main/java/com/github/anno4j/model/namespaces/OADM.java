@@ -356,4 +356,13 @@ public class OADM {
      * The timestamp at which the Source resource should be interpreted for the Annotation, typically the time that the Annotation was created.
      */
     public final static String WHEN = NS + "when";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#default
+     * The constituent resource of a oa:Choice to use as a default option, if 
+     * there is no other means to determine which would be most appropriate.
+     *
+     * There SHOULD be exactly 1 default relationship for each Choice.
+     */
+    public static final String DEFAULT = NS + "default";
 }
