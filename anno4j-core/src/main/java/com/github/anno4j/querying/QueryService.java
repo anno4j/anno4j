@@ -79,10 +79,6 @@ public class QueryService {
      */
     private QueryOptimizer queryOptimizer = null;
 
-    public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration) {
-        this(objectRepository, evaluatorConfiguration, null);
-    }
-
     public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration, URI graph) {
         queryServiceDTO = new QueryServiceConfiguration();
         this.objectRepository = objectRepository;
