@@ -97,6 +97,10 @@ public class Anno4j {
         this(repository, new IDGeneratorAnno4jURN(), null);
     }
 
+    public Anno4j(Repository repository, IDGenerator idGenerator) throws RepositoryException, RepositoryConfigException {
+        this(repository, idGenerator, null);
+    }
+
     public Anno4j(Repository repository, URI defaultContext) throws RepositoryException, RepositoryConfigException {
         this(repository, new IDGeneratorAnno4jURN(), defaultContext);
     }
