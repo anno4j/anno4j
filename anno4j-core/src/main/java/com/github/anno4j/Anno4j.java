@@ -150,19 +150,25 @@ public class Anno4j {
         for (Class clazz : defaultEvaluatorAnnotations) {
             Evaluator evaluator = (Evaluator) clazz.getAnnotation(Evaluator.class);
 
-            if (ClassUtils.isAssignable(evaluator.value(), TestFunction.class)) {
-                logger.debug("Found evaluator {} for TestFunction {}", clazz.getCanonicalName(), evaluator.value().getCanonicalName());
-                testFunctionEvaluators.put((Class<? extends TestFunction>) evaluator.value(), clazz);
-            } else if (ClassUtils.isAssignable(evaluator.value(), NodeTest.class)) {
-                logger.debug("Found evaluator {} for NodeTest {}", clazz.getCanonicalName(), evaluator.value().getCanonicalName());
-                testEvaluators.put((Class<? extends NodeTest>) evaluator.value(), clazz);
-            } else if (ClassUtils.isAssignable(evaluator.value(), SelectorFunction.class)) {
-                logger.debug("Found evaluator {} for NodeFunction {}", clazz.getCanonicalName(), evaluator.value().getCanonicalName());
-                functionEvaluators.put((Class<? extends SelectorFunction>) evaluator.value(), clazz);
-            } else {
-                logger.debug("Found evaluator {} for NodeSelector {}", clazz.getCanonicalName(), evaluator.value().getCanonicalName());
-                defaultEvaluators.put((Class<? extends NodeSelector>) evaluator.value(), clazz);
+            Class[] functionClasses = evaluator.value();
+
+            for(Class functionClass : functionClasses) {
+                if (ClassUtils.isAssignable(functionClass, TestFunction.class)) {
+                    logger.debug("Found evaluator {} for TestFunction {}", clazz.getCanonicalName(), functionClass.getCanonicalName());
+                    testFunctionEvaluators.put((Class<? extends TestFunction>) functionClass, clazz);
+                } else if (ClassUtils.isAssignable(functionClass, NodeTest.class)) {
+                    logger.debug("Found evaluator {} for NodeTest {}", clazz.getCanonicalName(), functionClass.getCanonicalName());
+                    testEvaluators.put((Class<? extends NodeTest>) functionClass, clazz);
+                } else if (ClassUtils.isAssignable(functionClass, SelectorFunction.class)) {
+                    logger.debug("Found evaluator {} for NodeFunction {}", clazz.getCanonicalName(), functionClass.getCanonicalName());
+                    functionEvaluators.put((Class<? extends SelectorFunction>) functionClass, clazz);
+                } else {
+                    logger.debug("Found evaluator {} for NodeSelector {}", clazz.getCanonicalName(), functionClass.getCanonicalName());
+                    defaultEvaluators.put((Class<? extends NodeSelector>) functionClass, clazz);
+                }
             }
+
+
         }
 
         evaluatorConfiguration.setDefaultEvaluators(defaultEvaluators);
