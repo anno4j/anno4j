@@ -52,6 +52,7 @@ public class Anno4j {
      * Logger of this class.
      */
     private final Logger logger = LoggerFactory.getLogger(Anno4j.class);
+    private final URI defaultContext;
     private IDGenerator idGenerator;
 
     /**
@@ -80,16 +81,33 @@ public class Anno4j {
         this(new SailRepository(new MemoryStore()));
     }
 
+    public Anno4j(URI defaultContext) throws RepositoryException, RepositoryConfigException {
+        this(new SailRepository(new MemoryStore()), defaultContext);
+    }
+
     public Anno4j(IDGenerator idGenerator) throws RepositoryException, RepositoryConfigException {
-        this(new SailRepository(new MemoryStore()), idGenerator);
+        this(new SailRepository(new MemoryStore()), idGenerator, null);
+    }
+
+    public Anno4j(IDGenerator idGenerator, URI defaultContext) throws RepositoryException, RepositoryConfigException {
+        this(new SailRepository(new MemoryStore()), idGenerator, defaultContext);
     }
 
     public Anno4j(Repository repository) throws RepositoryException, RepositoryConfigException {
-        this(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN());
+        this(repository, new IDGeneratorAnno4jURN(), null);
     }
 
-    public Anno4j(Repository repository, IDGenerator idGenerator) throws RepositoryConfigException, RepositoryException {
+    public Anno4j(Repository repository, IDGenerator idGenerator) throws RepositoryException, RepositoryConfigException {
+        this(repository, idGenerator, null);
+    }
+
+    public Anno4j(Repository repository, URI defaultContext) throws RepositoryException, RepositoryConfigException {
+        this(repository, new IDGeneratorAnno4jURN(), defaultContext);
+    }
+
+    public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext) throws RepositoryConfigException, RepositoryException {
         this.idGenerator = idGenerator;
+        this.defaultContext = defaultContext;
 
         Set<URL> classpath = new HashSet<>();
         classpath.addAll(ClasspathHelper.forClassLoader());
@@ -159,48 +177,48 @@ public class Anno4j {
         evaluatorConfiguration.setFunctionEvaluators(functionEvaluators);
     }
 
+    private ObjectConnection createObjectConnection(URI context) throws RepositoryException {
+        ObjectConnection connection = objectRepository.getConnection();
+
+        if(context != null) {
+            connection.setReadContexts(context);
+            connection.setInsertContext(context);
+            connection.setRemoveContexts(context);
+        } else if (defaultContext != null) {
+            connection.setReadContexts(defaultContext);
+            connection.setInsertContext(defaultContext);
+            connection.setRemoveContexts(defaultContext);
+        }
+
+       return connection;
+    }
+
     /**
      * Writes the resource object to the configured SPARQL endpoint with a corresponding INSERT query.
      * @param resource resource object to write to the SPARQL endpoint
      * @throws RepositoryException
      */
     public void persist(ResourceObject resource) throws RepositoryException {
-        ObjectConnection connection = objectRepository.getConnection();
-        connection.addObject(resource);
+        persist(resource, null);
     }
 
     /**
      * Writes the resource object to the configured SPARQL endpoint with a corresponding INSERT query.
      * @param resource resource object to write to the SPARQL endpoint
-     * @param graph Graph context to query
+     * @param context Graph context to query
      * @throws RepositoryException
      */
-    public void persist(ResourceObject resource, URI graph) throws RepositoryException {
-        ObjectConnection connection = objectRepository.getConnection();
-
-        if(graph != null) {
-            connection.setReadContexts(graph);
-            connection.setInsertContext(graph);
-            connection.setRemoveContexts(graph);
-        }
-
-        connection.addObject(resource);
+    public void persist(ResourceObject resource, URI context) throws RepositoryException {
+        createObjectConnection(context).addObject(resource);
     }
 
 
     public <T extends ResourceObject> T findByID (Class<T> type, String id) throws RepositoryException {
-        ObjectConnection connection = objectRepository.getConnection();
-        T result = null;
-
         try {
-            result = connection.getObject(type, id);
-        } catch (RepositoryException e) {
-            throw e;
+           return createObjectConnection(null).getObject(type, id);
         } catch (QueryEvaluationException e) {
             throw new RepositoryException("Couldn't evaluate query", e);
         }
-
-        return result;
     }
 
     public <T extends ResourceObject> T findByID (Class<T> type, URI id) throws RepositoryException {
@@ -232,23 +250,12 @@ public class Anno4j {
      * @throws RepositoryException
      */
     public <T extends ResourceObject> List<T> findAll(Class<T> type) throws RepositoryException {
-        try {
-            return objectRepository.getConnection().getObjects(type).asList();
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException("Couldn't evaluate query" , e);
-        }
+        return findAll(type, null);
     }
 
     public <T extends ResourceObject> List<T> findAll(Class<T> type, URI context) throws RepositoryException {
         try {
-            ObjectConnection con = objectRepository.getConnection();
-            if (context != null) {
-                con.setReadContexts(context);
-                con.setInsertContext(context);
-                con.setRemoveContexts(context);
-            }
-
-            return con.getObjects(type).asList();
+            return createObjectConnection(context).getObjects(type).asList();
         } catch (QueryEvaluationException e) {
             throw new RepositoryException("Couldn't evaluate query" , e);
         }
@@ -260,7 +267,7 @@ public class Anno4j {
      * @return query service object for specified type
      */
     public QueryService createQueryService() {
-        return new QueryService(objectRepository, evaluatorConfiguration);
+        return new QueryService(objectRepository, evaluatorConfiguration, defaultContext);
     }
 
     /**
@@ -316,18 +323,19 @@ public class Anno4j {
     }
 
     public <T> T createObject (Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException {
-        ObjectConnection con = getObjectRepository().getConnection();
+        ObjectConnection con = createObjectConnection(null);
         ObjectFactory objectFactory = con.getObjectFactory();
         return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
     }
 
+    /**
+     * Creates a instance of the given class.
+     * @param clazz Class of the instance to create. Can be an annotated interface.
+     * @param context The graph context where the triples are inserted into. can be null for default graph.
+     * @return A instance of the given class.
+     */
     public <T> T createObject (Class<T> clazz, URI context) throws RepositoryException, IllegalAccessException, InstantiationException {
-        ObjectConnection con = getObjectRepository().getConnection();
-        if (context != null) {
-            con.setReadContexts(context);
-            con.setInsertContext(context);
-            con.setRemoveContexts(context);
-        }
+        ObjectConnection con = createObjectConnection(context);
         ObjectFactory objectFactory = con.getObjectFactory();
         return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
     }
@@ -340,4 +348,9 @@ public class Anno4j {
         this.idGenerator = idGenerator;
         this.objectRepository.setIdGenerator(idGenerator);
     }
+
+    public URI getDefaultContext() {
+        return defaultContext;
+    }
+
 }
