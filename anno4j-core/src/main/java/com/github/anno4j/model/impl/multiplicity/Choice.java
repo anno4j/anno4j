@@ -1,6 +1,6 @@
 package com.github.anno4j.model.impl.multiplicity;
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.RDFObject;
@@ -11,10 +11,10 @@ import com.github.anno4j.model.namespaces.OADM;
 public interface Choice {
 
     @Iri(OADM.ITEM)
-    void setItems(Collection<RDFObject> items);
+    void setItems(Set<RDFObject> items);
     
     @Iri(OADM.ITEM)
-    Collection<RDFObject> getItems();
+    Set<RDFObject> getItems();
     
     void addItem(RDFObject item);
 
