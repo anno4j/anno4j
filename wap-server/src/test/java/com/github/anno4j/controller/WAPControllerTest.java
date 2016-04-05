@@ -1,9 +1,10 @@
 package com.github.anno4j.controller;
 
-import com.anno4j.anno4j.Anno4j;
-import com.anno4j.anno4j.model.Annotation;
-import com.anno4j.anno4j.model.Body;
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.Body;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.Application;
 import com.github.anno4j.BaseWebTest;
 import org.junit.Before;
