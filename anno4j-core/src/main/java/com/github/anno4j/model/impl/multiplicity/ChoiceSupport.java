@@ -1,6 +1,5 @@
 package com.github.anno4j.model.impl.multiplicity;
 
-import java.util.Collection;
 import java.util.HashSet;
 
 import org.openrdf.repository.object.RDFObject;
@@ -16,12 +15,10 @@ public abstract class ChoiceSupport extends ResourceObjectSupport implements Cho
         if(item == null){
             return;
         }
-        Collection<RDFObject> items = getItems();
-        if(items == null){
-            items = new HashSet<>();
-            setItems(items);
+        if(this.getItems() == null){
+            this.setItems(new HashSet<RDFObject>());
         }
-        items.add(item);
+        this.getItems().add(item);
     }
     
 }
