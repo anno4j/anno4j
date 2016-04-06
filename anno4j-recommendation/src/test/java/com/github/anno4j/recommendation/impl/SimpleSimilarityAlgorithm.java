@@ -6,7 +6,7 @@ import com.github.anno4j.recommendation.SimilarityAlgorithm;
 /**
  * A simple similarity algorithm, implementing {@link com.github.anno4j.recommendation.SimilarityAlgorithm}
  */
-public class SimpleSimilarityAlgorithm implements SimilarityAlgorithm {
+public class SimpleSimilarityAlgorithm extends SimilarityAlgorithm {
 
     @Override
     public double calculateSimilarity(Annotation anno1, Annotation anno2) {

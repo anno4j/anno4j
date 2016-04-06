@@ -51,7 +51,7 @@ public class SimilarityStatementTest {
         SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
         statement.setSubject(subject);
         statement.setObject(object);
-        statement.setSimilarity(similarity);
+        statement.setValue(similarity);
 
         // Connect the statement with subject and predicate
         statement.setSubject(subject);

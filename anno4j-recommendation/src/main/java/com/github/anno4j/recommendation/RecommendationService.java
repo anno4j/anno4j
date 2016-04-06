@@ -3,8 +3,10 @@ package com.github.anno4j.recommendation;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.targets.SpecificResource;
+import com.github.anno4j.recommendation.model.Similarity;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,13 +25,48 @@ public class RecommendationService {
 
     private Anno4j anno4j;
 
-    /**
-     * Basic constructor.
-     */
     public RecommendationService(Anno4j anno4j) {
         this.algorithms = new HashMap<String, SimilarityAlgorithm>();
         this.anno4j = anno4j;
     }
+
+
+    public RecommendationService() throws RepositoryConfigException, RepositoryException {
+        this.algorithms = new HashMap<String, SimilarityAlgorithm>();
+        this.anno4j = new Anno4j();
+    }
+
+
+    /**
+     * Method to register a new algorithm.
+     *
+     * @param key       The key for the new algorithm.
+     * @param algorithm The instance of the algorithm.
+     */
+    public void addAlgorithm(String key, SimilarityAlgorithm algorithm) {
+        this.algorithms.put(key, algorithm);
+    }
+
+    /**
+     * Method to remove an algorithm from the registered map.
+     *
+     * @param key The key
+     */
+    public void removeAlgorithm(String key) {
+        this.algorithms.remove(key);
+    }
+
+    /**
+     * This method will create the RDF triples that represent the algorithm in RDF and store them into the associated Anno4j instance.
+     */
+    private void generateSimilarityProvenance(SimilarityAlgorithm algorithm) {
+
+    }
+
+
+
+
+
 
     /**
      * Constructor also setting the algorithms.
@@ -72,29 +109,10 @@ public class RecommendationService {
         SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
         statement.setSubject(subject);
         statement.setObject(object);
-        statement.setSimilarity(similarity);
+        statement.setValue(similarity);
         similarityAnnotation.setBody(statement);
 
         return similarityAnnotation;
-    }
-
-    /**
-     * Method to register a new algorithm.
-     *
-     * @param key       The key for the new algorithm.
-     * @param algorithm The instance of the algorithm.
-     */
-    public void addAlgorithm(String key, SimilarityAlgorithm algorithm) {
-        this.algorithms.put(key, algorithm);
-    }
-
-    /**
-     * Method to remove an algorithm from the registered map.
-     *
-     * @param key The key
-     */
-    public void removeAlgorithm(String key) {
-        this.algorithms.remove(key);
     }
 
     /**

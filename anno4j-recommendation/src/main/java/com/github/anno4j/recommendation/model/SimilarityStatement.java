@@ -11,19 +11,15 @@ import org.openrdf.annotations.Iri;
 @Iri(ANNO4JREC.SIMILARITY_STATEMENT)
 public interface SimilarityStatement extends Statement {
 
-    /**
-     * Gets The value of similarity.
-     *
-     * @return Value of The value of similarity.
-     */
-    @Iri(ANNO4JREC.SIMILARITY)
-    public double getSimilarity();
+    @Iri(ANNO4JREC.BASED_ON)
+    Similarity getSimilarity();
 
-    /**
-     * Sets new The value of similarity.
-     *
-     * @param similarity New value of The value of similarity.
-     */
-    @Iri(ANNO4JREC.SIMILARITY)
-    public void setSimilarity(double similarity);
+    @Iri(ANNO4JREC.BASED_ON)
+    void setSimilarity(Similarity similarity);
+
+    @Iri(ANNO4JREC.HAS_SIMILARITY_VALUE)
+    double getValue();
+
+    @Iri(ANNO4JREC.HAS_SIMILARITY_VALUE)
+    void setValue(double value);
 }
