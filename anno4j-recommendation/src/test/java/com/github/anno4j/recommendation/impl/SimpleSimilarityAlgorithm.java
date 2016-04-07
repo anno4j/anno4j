@@ -1,10 +1,10 @@
 package com.github.anno4j.recommendation.impl;
 
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.recommendation.SimilarityAlgorithm;
+import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
 
 /**
- * A simple similarity algorithm, implementing {@link com.github.anno4j.recommendation.SimilarityAlgorithm}
+ * A simple similarity algorithm, implementing {@link SimilarityAlgorithm}
  */
 public class SimpleSimilarityAlgorithm extends SimilarityAlgorithm {
 

@@ -1,4 +1,4 @@
-package com.github.anno4j.recommendation;
+package com.github.anno4j.recommendation.computation;
 
 import com.github.anno4j.model.Annotation;
 

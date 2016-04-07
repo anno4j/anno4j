@@ -3,7 +3,7 @@ package com.github.anno4j.recommendation;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.targets.SpecificResource;
-import com.github.anno4j.recommendation.model.Similarity;
+import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
