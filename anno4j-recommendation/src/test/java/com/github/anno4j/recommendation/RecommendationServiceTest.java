@@ -74,7 +74,7 @@ public class RecommendationServiceTest {
         // Check if the similarity value is correct (1, as the SimpleAlgorithm always returns 1)
         Annotation annotation = result.get(0);
         SimilarityStatement statement = (SimilarityStatement) annotation.getBody();
-        assertEquals(new Double(1.0), (Double) statement.getValue());
+        assertEquals(new Double(1.0), (Double) statement.getSimilarity());
     }
 
     @Test
@@ -112,11 +112,11 @@ public class RecommendationServiceTest {
         // Check if the similarity value is correct (1, as the SimpleAlgorithm always returns 1)
         Annotation annotation = result.get(0);
         SimilarityStatement statement = (SimilarityStatement) annotation.getBody();
-        assertEquals(new Double(1.0), (Double) statement.getValue());
+        assertEquals(new Double(1.0), (Double) statement.getSimilarity());
 
         // Check if the second similarity value is correct (1, as the SimpleAlgorithm always returns 1)
         Annotation annotation2 = result.get(1);
         SimilarityStatement statement2 = (SimilarityStatement) annotation2.getBody();
-        assertEquals(new Double(1.0), (Double) statement2.getValue());
+        assertEquals(new Double(1.0), (Double) statement2.getSimilarity());
     }
 }

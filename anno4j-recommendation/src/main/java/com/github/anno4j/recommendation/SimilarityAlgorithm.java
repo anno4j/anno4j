@@ -5,9 +5,7 @@ import com.github.anno4j.model.Annotation;
 /**
  * Interface for an algorithm that calculates the similarity between two given annotations.
  */
-public abstract class SimilarityAlgorithm {
+public interface SimilarityAlgorithm {
 
-    
-
-    public abstract double calculateSimilarity(Annotation anno1, Annotation anno2);
+    public double calculateSimilarity(Annotation anno1, Annotation anno2);
 }
