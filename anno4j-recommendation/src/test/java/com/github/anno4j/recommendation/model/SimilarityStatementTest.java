@@ -5,8 +5,10 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 
@@ -22,22 +24,23 @@ public class SimilarityStatementTest {
     public final static String SOME_PAGE = "http://example.org/";
 
     private Anno4j anno4j;
-    private QueryService queryService;
+    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
-        SailRepository repository = new SailRepository(new MemoryStore());
-        repository.initialize();
+        this.anno4j = new Anno4j();
+        this.connection = this.anno4j.getObjectRepository().getConnection();
+    }
 
-        anno4j = new Anno4j();
-
-        anno4j.setRepository(repository);
-        queryService = anno4j.createQueryService();
-        queryService.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
+    @After
+    public void tearDown() throws Exception {
+        connection.close();
     }
 
     @Test
     public void testSimilarityStatement() throws Exception {
+        QueryService queryService = this.anno4j.createQueryService();
+
         ResourceObject subject = anno4j.createObject(ResourceObject.class);
         subject.setResourceAsString(SOME_PAGE + "subject");
         ResourceObject object = anno4j.createObject(ResourceObject.class);

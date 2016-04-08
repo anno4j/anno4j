@@ -78,16 +78,16 @@ public class RecommendationService {
     }
 
     public void generateSimilarity(Annotation subject, Annotation object, String algorithmName) {
-        SimilarityAlgorithm algorithm = this.algorithms.get(algorithmName);
-
-        double similarity = algorithm.calculateSimilarity(subject, object);
-
-        try {
-            Annotation anno = createSimilarityAnnotation(subject, object, similarity);
-            this.anno4j.getObjectRepository().getConnection().addObject(anno);
-        } catch (RepositoryException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+//        SimilarityAlgorithm algorithm = this.algorithms.get(algorithmName);
+//
+//        double similarity = algorithm.calculateSimilarity(subject, object);
+//
+//        try {
+//            Annotation anno = createSimilarityAnnotation(subject, object, similarity);
+//            this.anno4j.getObjectRepository().getConnection().addObject(anno);
+//        } catch (RepositoryException | InstantiationException | IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void generateAllSimilarities(Annotation subject, Annotation object) {
