@@ -1,4 +1,4 @@
-package com.github.anno4j.recommendation.computation;
+package com.github.anno4j.recommendation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
@@ -6,7 +6,6 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.impl.TestBody1;
 import com.github.anno4j.recommendation.impl.TestBody2;
 import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
-import com.github.anno4j.recommendation.model.SimilarityStatement;
 import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.After;
@@ -17,22 +16,17 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
- * Created by Manu on 08/04/16.
+ * Created by Manu on 11/04/16.
  */
-public class SimilarityAlgorithmTest {
+public class RecommendationServiceTest {
 
     private Anno4j anno4j;
     private ObjectConnection connection;
 
-    private final static String NS = "http://somepage.com#";
-    private final static String BODY_URI1 = NS + "TestBody1";
-    private final static String BODY_URI2 = NS + "TestBody2";
+    private final static String ALGORITM_NAME = "algo1";
 
     @Before
     public void setUp() throws Exception {
@@ -46,40 +40,47 @@ public class SimilarityAlgorithmTest {
     }
 
     @Test
-    public void testSimpleSimilarityAlgorithm() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, IllegalAccessException, InstantiationException {
-        createTestAnnotations();
+    public void testAlgorithmRegistration() {
+        RecommendationService rs = new RecommendationService(this.anno4j);
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, BODY_URI1, BODY_URI2);
+        assertEquals(0, rs.getAlgorithms().size());
 
-        algo.calculateSimilarities();
+        // TODO get resource of a class?
 
-        assertEquals(4, algo.getCounter());
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, "http://somepage.com#TestBody1", "http://somepage.com#TestBody2");
+
+        rs.addAlgorithm(ALGORITM_NAME, algo);
+
+        assertEquals(1, rs.getAlgorithms().size());
+
+        rs.removeAlgorithm(ALGORITM_NAME);
+
+        assertEquals(0, rs.getAlgorithms().size());
     }
 
     @Test
-    public void testSimilarityStatementCreation() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException, MalformedQueryException, ParseException {
+    public void testAlgorithmRunning() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        RecommendationService rs = new RecommendationService(this.anno4j);
+
+        // TODO get resource of a class?
+
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, "http://somepage.com#TestBody1", "http://somepage.com#TestBody2");
+
+        rs.addAlgorithm(ALGORITM_NAME, algo);
+
         createTestAnnotations();
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, BODY_URI1, BODY_URI2);
-
-        algo.calculateSimilarities();
+        rs.useSingleAlgorithm(ALGORITM_NAME);
 
         QueryService qs = this.anno4j.createQueryService();
         qs.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
         qs.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]");
 
-        List<Annotation> similarityAnnotations = qs.execute();
-        assertEquals(4, similarityAnnotations.size());
+        assertEquals(4, qs.execute().size());
 
-        boolean foundZeroEquality = false;
-        for(Annotation anno : similarityAnnotations) {
-            if(((SimilarityStatement) anno.getBody()).getValue() == 0.0) {
-                foundZeroEquality = true;
-                break;
-            }
-        }
+        rs.useAllAlgorithms();
 
-        assertTrue(foundZeroEquality);
+        assertEquals(8, qs.execute().size());
     }
 
     private void createTestAnnotations() throws RepositoryException, InstantiationException, IllegalAccessException {

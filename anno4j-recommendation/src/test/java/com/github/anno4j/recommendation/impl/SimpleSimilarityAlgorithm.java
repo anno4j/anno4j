@@ -4,9 +4,6 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * A simple similarity algorithm, implementing {@link SimilarityAlgorithm}
  */
@@ -22,6 +19,13 @@ public class SimpleSimilarityAlgorithm extends SimilarityAlgorithm {
     @Override
     public double calculateSimilarity(Annotation anno1, Annotation anno2) {
         this.counter++;
+
+        TestBody1 body = (TestBody1) anno1.getBody();
+
+        if(body.getValue() != null && body.getValue().equals("test")) {
+            return 0.0;
+        }
+
         return 1.0;
     }
 

@@ -40,6 +40,7 @@ public class SimilarityStatementTest {
     @Test
     public void testSimilarityStatement() throws Exception {
         QueryService queryService = this.anno4j.createQueryService();
+        queryService.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
 
         ResourceObject subject = anno4j.createObject(ResourceObject.class);
         subject.setResourceAsString(SOME_PAGE + "subject");

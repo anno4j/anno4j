@@ -5,6 +5,9 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
+import org.apache.marmotta.ldpath.parser.ParseException;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 
@@ -25,17 +28,25 @@ public class RecommendationService {
 
     private Anno4j anno4j;
 
-    public RecommendationService(Anno4j anno4j) {
-        this.algorithms = new HashMap<String, SimilarityAlgorithm>();
-        this.anno4j = anno4j;
-    }
-
-
     public RecommendationService() throws RepositoryConfigException, RepositoryException {
         this.algorithms = new HashMap<String, SimilarityAlgorithm>();
         this.anno4j = new Anno4j();
     }
 
+    public RecommendationService(Anno4j anno4j) {
+        this.algorithms = new HashMap<String, SimilarityAlgorithm>();
+        this.anno4j = anno4j;
+    }
+
+    public RecommendationService(HashMap<String, SimilarityAlgorithm> algorithms) throws RepositoryConfigException, RepositoryException {
+        this.algorithms = algorithms;
+        this.anno4j = new Anno4j();
+    }
+
+    public RecommendationService(HashMap<String, SimilarityAlgorithm> algorithms, Anno4j anno4j) {
+        this.algorithms = algorithms;
+        this.anno4j = anno4j;
+    }
 
     /**
      * Method to register a new algorithm.
@@ -56,63 +67,24 @@ public class RecommendationService {
         this.algorithms.remove(key);
     }
 
-    /**
-     * This method will create the RDF triples that represent the algorithm in RDF and store them into the associated Anno4j instance.
-     */
-    private void generateSimilarityProvenance(SimilarityAlgorithm algorithm) {
-
-    }
-
-
-
-
-
-
-    /**
-     * Constructor also setting the algorithms.
-     *
-     * @param algorithms The map of algorithms.
-     */
-    public RecommendationService(HashMap<String, SimilarityAlgorithm> algorithms) {
-        this.algorithms = algorithms;
-    }
-
-    public void generateSimilarity(Annotation subject, Annotation object, String algorithmName) {
-//        SimilarityAlgorithm algorithm = this.algorithms.get(algorithmName);
-//
-//        double similarity = algorithm.calculateSimilarity(subject, object);
-//
-//        try {
-//            Annotation anno = createSimilarityAnnotation(subject, object, similarity);
-//            this.anno4j.getObjectRepository().getConnection().addObject(anno);
-//        } catch (RepositoryException | InstantiationException | IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-    public void generateAllSimilarities(Annotation subject, Annotation object) {
+    public void useSingleAlgorithm(String algorithm) throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
         Iterator iterator = this.algorithms.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry pair = (Map.Entry) iterator.next();
 
-            generateSimilarity(subject, object, (String) pair.getKey());
+            if(pair.getKey().equals(algorithm)) {
+                ((SimilarityAlgorithm) pair.getValue()).calculateSimilarities();
+            }
         }
     }
 
-    private Annotation createSimilarityAnnotation(Annotation subject, Annotation object, double similarity) throws RepositoryException, IllegalAccessException, InstantiationException {
-        Annotation similarityAnnotation = anno4j.createObject(Annotation.class);
+    public void useAllAlgorithms() throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
+        Iterator iterator = this.algorithms.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry pair = (Map.Entry) iterator.next();
 
-        SpecificResource specificResource = anno4j.createObject(SpecificResource.class);
-        specificResource.setSource(subject);
-        similarityAnnotation.addTarget(specificResource);
-
-        SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
-        statement.setSubject(subject);
-        statement.setObject(object);
-        statement.setValue(similarity);
-        similarityAnnotation.setBody(statement);
-
-        return similarityAnnotation;
+            ((SimilarityAlgorithm) pair.getValue()).calculateSimilarities();
+        }
     }
 
     /**
