@@ -49,11 +49,9 @@ public class SimilarityAlgorithmTest extends RecommendationTestSetup {
 
         algo.calculateSimilarities();
 
-        QueryService qs = this.anno4j.createQueryService();
-        qs.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
-        qs.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]");
+        this.queryService.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]");
 
-        List<Annotation> similarityAnnotations = qs.execute();
+        List<Annotation> similarityAnnotations = this.queryService.execute();
         assertEquals(4, similarityAnnotations.size());
 
         boolean foundZeroEquality = false;

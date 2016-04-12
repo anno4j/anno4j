@@ -2,9 +2,11 @@ package com.github.anno4j.recommendation.model;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.recommendation.RecommendationTestSetup;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
@@ -18,16 +20,9 @@ import static org.junit.Assert.assertEquals;
  *
  * A simple statement is set up, then persisted and queried.
  */
-public class StatementTest {
+public class StatementTest extends RecommendationTestSetup {
 
-    public final static String SOME_PAGE = "http://example.org/";
-
-    Anno4j anno4j;
-
-    @Before
-    public void setUp() throws Exception {
-        this.anno4j = new Anno4j();
-    }
+    private final static String SOME_PAGE = "http://example.org/";
 
     @Test
     public void testStatement() throws Exception {
@@ -62,4 +57,7 @@ public class StatementTest {
 
         assertEquals(statement.getSubject().getResource(), resultObject.getSubject().getResource());
     }
+
+    @Override
+    protected void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {}
 }
