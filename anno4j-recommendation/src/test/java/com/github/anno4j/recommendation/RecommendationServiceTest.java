@@ -21,23 +21,9 @@ import static org.junit.Assert.*;
 /**
  * Created by Manu on 11/04/16.
  */
-public class RecommendationServiceTest {
-
-    private Anno4j anno4j;
-    private ObjectConnection connection;
+public class RecommendationServiceTest extends RecommendationTestSetup {
 
     private final static String ALGORITM_NAME = "algo1";
-
-    @Before
-    public void setUp() throws Exception {
-        this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
-    }
 
     @Test
     public void testAlgorithmRegistration() {
@@ -68,8 +54,6 @@ public class RecommendationServiceTest {
 
         rs.addAlgorithm(ALGORITM_NAME, algo);
 
-        createTestAnnotations();
-
         rs.useSingleAlgorithm(ALGORITM_NAME);
 
         QueryService qs = this.anno4j.createQueryService();
@@ -83,7 +67,8 @@ public class RecommendationServiceTest {
         assertEquals(8, qs.execute().size());
     }
 
-    private void createTestAnnotations() throws RepositoryException, InstantiationException, IllegalAccessException {
+    @Override
+    protected void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         for (int i = 0; i <= 1; ++i) {
             Annotation anno = this.anno4j.createObject(Annotation.class);
             TestBody1 body = this.anno4j.createObject(TestBody1.class);
