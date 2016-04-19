@@ -1,18 +1,10 @@
 package com.github.anno4j.recommendation.model;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.RecommendationTestSetup;
-import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -40,7 +32,7 @@ public class SimilarityStatementTest extends RecommendationTestSetup {
         SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
         statement.setSubject(subject);
         statement.setObject(object);
-        statement.setValue(similarity);
+        statement.setSimilarityValue(similarity);
 
         // Connect the statement with subject and predicate
         statement.setSubject(subject);

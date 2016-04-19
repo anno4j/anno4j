@@ -5,15 +5,12 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.model.Similarity;
-import com.github.anno4j.recommendation.model.SimilarityMeasure;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -69,9 +66,17 @@ public abstract class SimilarityAlgorithm {
         SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
         statement.setSubject(subject);
         statement.setObject(object);
-        statement.setValue(similarity);
+        statement.setSimilarityValue(similarity);
         similarityAnnotation.setBody(statement);
 
         return similarityAnnotation;
     }
+
+//    private Similarity createSimilarityProvenance(String bodyIRI1, String bodyIRI2) throws RepositoryException, IllegalAccessException, InstantiationException {
+//        Similarity similarity = this.anno4j.createObject(Similarity.class);
+//
+//        similarity.addBody(bodyIRI1);
+//
+//        return similarity;
+//    }
 }

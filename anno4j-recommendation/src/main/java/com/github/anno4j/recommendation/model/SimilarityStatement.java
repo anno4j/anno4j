@@ -18,8 +18,8 @@ public interface SimilarityStatement extends Statement {
     void setSimilarity(Similarity similarity);
 
     @Iri(ANNO4JREC.HAS_SIMILARITY_VALUE)
-    double getValue();
+    double getSimilarityValue();
 
     @Iri(ANNO4JREC.HAS_SIMILARITY_VALUE)
-    void setValue(double value);
+    void setSimilarityValue(double value);
 }

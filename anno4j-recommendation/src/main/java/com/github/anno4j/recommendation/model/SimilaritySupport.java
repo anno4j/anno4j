@@ -1,6 +1,7 @@
 package com.github.anno4j.recommendation.model;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.Body;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 
 import java.util.HashSet;
@@ -12,11 +13,11 @@ import java.util.HashSet;
 public abstract class SimilaritySupport extends ResourceObjectSupport implements Similarity {
 
     @Override
-    public void addSimilarityMeasure(SimilarityMeasure measure) {
-        if(this.getMeasures().isEmpty()) {
-            this.setMeasures(new HashSet<SimilarityMeasure>());
+    public void addBody(Body body) {
+        if(this.getBodies().isEmpty()) {
+            this.setBodies(new HashSet<Body>());
         }
 
-        this.getMeasures().add(measure);
+        this.getBodies().add(body);
     }
 }
