@@ -7,9 +7,11 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.model.Similarity;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.apache.marmotta.ldpath.parser.ParseException;
+import org.openrdf.model.URI;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectFactory;
 import org.openrdf.repository.object.managers.RoleMapper;
 
 import java.util.List;
@@ -21,24 +23,29 @@ public abstract class SimilarityAlgorithm {
 
     private Anno4j anno4j;
 
-    private String bodyIRI1;
-    private String bodyIRI2;
+    private Class clazz1;
+    private Class clazz2;
 
-    public SimilarityAlgorithm(Anno4j anno4j, String bodyIRI1, String bodyIRI2) {
+    public SimilarityAlgorithm(Anno4j anno4j, Class clazz1, Class clazz2) {
         this.anno4j = anno4j;
-        this.bodyIRI1 = bodyIRI1;
-        this.bodyIRI2 = bodyIRI2;
+        this.clazz1 = clazz1;
+        this.clazz2 = clazz2;
     }
 
     public void calculateSimilarities() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
 
+        ObjectFactory factory = this.anno4j.getObjectRepository().getObjectService().createObjectFactory();
+
+        URI clazz1URI = factory.getNameOf(this.clazz1);
+        URI clazz2URI = factory.getNameOf(this.clazz2);
+
         QueryService qs = this.anno4j.createQueryService();
-        qs.addCriteria("oa:hasBody[is-a <" + this.bodyIRI1 + ">]");
+        qs.addCriteria("oa:hasBody[is-a <" + clazz1URI + ">]");
 
         List<Annotation> annotations1 = qs.execute();
 
         qs = this.anno4j.createQueryService();
-        qs.addCriteria("oa:hasBody[is-a <" + this.bodyIRI2 + ">]");
+        qs.addCriteria("oa:hasBody[is-a <" + clazz2URI + ">]");
 
         List<Annotation> annotations2 = qs.execute();
 

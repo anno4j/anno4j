@@ -52,7 +52,7 @@ public class SimilarityAlgorithmTest extends RecommendationTestSetup {
     @Test
     public void testSimpleSimilarityAlgorithm() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, IllegalAccessException, InstantiationException {
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, BODY_URI1, BODY_URI2);
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
 
         algo.calculateSimilarities();
 
@@ -62,7 +62,7 @@ public class SimilarityAlgorithmTest extends RecommendationTestSetup {
     @Test
     public void testSimilarityStatementCreation() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException, MalformedQueryException, ParseException {
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, BODY_URI1, BODY_URI2);
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
 
         algo.calculateSimilarities();
 

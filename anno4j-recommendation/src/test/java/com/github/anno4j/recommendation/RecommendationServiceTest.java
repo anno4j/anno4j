@@ -33,7 +33,7 @@ public class RecommendationServiceTest extends RecommendationTestSetup {
 
         // TODO get resource of a class?
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, "http://somepage.com#TestBody1", "http://somepage.com#TestBody2");
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
 
         rs.addAlgorithm(ALGORITM_NAME, algo);
 
@@ -48,9 +48,7 @@ public class RecommendationServiceTest extends RecommendationTestSetup {
     public void testAlgorithmRunning() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         RecommendationService rs = new RecommendationService(this.anno4j);
 
-        // TODO get resource of a class?
-
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, "http://somepage.com#TestBody1", "http://somepage.com#TestBody2");
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
 
         rs.addAlgorithm(ALGORITM_NAME, algo);
 
@@ -67,6 +65,7 @@ public class RecommendationServiceTest extends RecommendationTestSetup {
         assertEquals(8, qs.execute().size());
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     protected void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         for (int i = 0; i <= 1; ++i) {

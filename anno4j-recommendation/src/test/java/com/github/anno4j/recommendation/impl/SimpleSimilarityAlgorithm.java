@@ -11,8 +11,8 @@ public class SimpleSimilarityAlgorithm extends SimilarityAlgorithm {
 
     private int counter;
 
-    public SimpleSimilarityAlgorithm(Anno4j anno4j, String bodyIRI1, String bodyIRI2) {
-        super(anno4j, bodyIRI1, bodyIRI2);
+    public SimpleSimilarityAlgorithm(Anno4j anno4j, Class clazz1, Class clazz2) {
+        super(anno4j, clazz1, clazz2);
         this.counter = 0;
     }
 
