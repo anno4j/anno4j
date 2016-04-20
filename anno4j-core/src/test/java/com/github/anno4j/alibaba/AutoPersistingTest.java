@@ -10,9 +10,6 @@ import org.openrdf.repository.RepositoryException;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by schlegel on 17/02/16.
- */
 public class AutoPersistingTest {
 
     private Anno4j anno4j;
@@ -29,9 +26,6 @@ public class AutoPersistingTest {
         TestBody body =  anno4j.createObject(TestBody.class);
         body.setValue("FirstValue");
         annotation.setBody(body);
-
-        // persist annotation
-        anno4j.persist(annotation);
 
         // update value
         Annotation queriedAnnotation = anno4j.findByID(Annotation.class, annotation.getResourceAsString());

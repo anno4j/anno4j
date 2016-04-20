@@ -23,17 +23,10 @@ public class SelectorTest {
     public final static String SOME_PAGE = "http://example.org/";
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -57,11 +50,9 @@ public class SelectorTest {
 
         annotation.addTarget(specificResource);
 
-        // Persist annotation
-        connection.addObject(annotation);
 
         // Query object
-        List<FragmentSelector> result = connection.getObjects(FragmentSelector.class).asList();
+        List<FragmentSelector> result = anno4j.findAll(FragmentSelector.class);
 
         FragmentSelector resultObject = result.get(0);
 

@@ -34,9 +34,6 @@ public class GraphContextQueryTest {
         body.setValue("Example Value");
         annotation.setBody(body);
 
-        // persist annotation
-        anno4j.persist(annotation,subgraph);
-
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService();
         List<Annotation> defaultList = queryService
@@ -58,9 +55,6 @@ public class GraphContextQueryTest {
         TestBody body =  anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
         annotation.setBody(body);
-
-        // persist annotation
-        anno4j.persist(annotation,subgraph);
 
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService(subgraph);
@@ -85,9 +79,6 @@ public class GraphContextQueryTest {
         body.setValue("Example Value");
         annotation.setBody(body);
 
-        // persist annotation
-        anno4j.persist(annotation);
-
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService(subgraph);
         List<Annotation> defaultList = queryService
@@ -107,9 +98,6 @@ public class GraphContextQueryTest {
         body.setValue("Example Value");
         annotation.setBody(body);
 
-        // persist annotation
-        anno4j.persist(annotation);
-
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService();
         List<Annotation> subGraphList = anno4j.findAll(Annotation.class, subgraph);
@@ -125,9 +113,6 @@ public class GraphContextQueryTest {
         TestBody body =  anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
         annotation.setBody(body);
-
-        // persist annotation
-        anno4j.persist(annotation, subgraph);
 
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService();
@@ -145,16 +130,11 @@ public class GraphContextQueryTest {
         body.setValue("Example Value");
         annotationDefault.setBody(body);
 
-        anno4j.persist(annotationDefault);
-
         // Create test annotation
         Annotation annotationSubgraph = anno4j.createObject(Annotation.class);
         TestBody body2 =  anno4j.createObject(TestBody.class);
         body.setValue("Example Value");
         annotationSubgraph.setBody(body2);
-
-        // persist annotation
-        anno4j.persist(annotationSubgraph, subgraph);
 
         // Querying for the persisted annotation
         QueryService queryService = anno4j.createQueryService();

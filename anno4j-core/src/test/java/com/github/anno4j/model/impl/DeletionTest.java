@@ -33,12 +33,10 @@ import static org.junit.Assert.assertEquals;
 public class DeletionTest {
 
     private Anno4j anno4j;
-    private QueryService queryService;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        queryService = anno4j.createQueryService();
     }
 
     @Test
@@ -48,11 +46,8 @@ public class DeletionTest {
         annotation.setAnnotatedAt("" + System.currentTimeMillis());
         annotation.setSerializedAt("" + System.currentTimeMillis());
 
-        // persist annotation
-        anno4j.persist(annotation);
-
         // query persisted object
-        Annotation result = (Annotation) queryService.execute().get(0);
+        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
 
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
 
@@ -64,7 +59,7 @@ public class DeletionTest {
         assertEquals(false, statements.hasNext());
 
         // confirming the empty result set with the QueryService
-        List<Annotation> emptyList = queryService.execute();
+        List<Annotation> emptyList = anno4j.createQueryService().execute();
         assertEquals(0, emptyList.size());
     }
 
@@ -81,10 +76,8 @@ public class DeletionTest {
 
         annotation.setBody(body);
 
-        anno4j.persist(annotation);
-
         // query persisted object
-        Annotation result = (Annotation) queryService.execute().get(0);
+        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
         assertEquals(body.getValue(), ((DeletionTestBody) result.getBody()).getValue());
 
@@ -92,7 +85,7 @@ public class DeletionTest {
         result.delete();
 
         // confirming the empty result set with the QueryService
-        List<Annotation> emptyList = queryService.execute();
+        List<Annotation> emptyList = anno4j.createQueryService().execute();
         assertEquals(0, emptyList.size());
 
         // checking if there are no statements left (repository should be completely empty)
@@ -121,10 +114,8 @@ public class DeletionTest {
         annotation.setBody(body);
         annotation.addTarget(specificResource);
 
-        anno4j.persist(annotation);
-
         // query persisted objects
-        Annotation result = (Annotation) queryService.execute().get(0);
+        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
         assertEquals(body.getValue(), ((DeletionTestBody) result.getBody()).getValue());
 
@@ -136,7 +127,7 @@ public class DeletionTest {
         result.delete();
 
         // confirming the empty result set with the QueryService
-        List<Annotation> emptyList = queryService.execute();
+        List<Annotation> emptyList = anno4j.createQueryService().execute();
         assertEquals(0, emptyList.size());
 
         // checking if there are no statements left (repository should be completely empty)
@@ -157,16 +148,14 @@ public class DeletionTest {
 
         annotation.setBody(body);
 
-        anno4j.persist(annotation);
-
         // query persisted objects
-        Annotation result = (Annotation) queryService.execute().get(0);
+        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
 
         // deleting only the body
         result.getBody().delete();
 
         // checking if the persisted annotation still has the body
-        Annotation annotationWithoutBody = (Annotation) queryService.execute().get(0);
+        Annotation annotationWithoutBody = (Annotation) anno4j.createQueryService().execute().get(0);
         assertEquals(null, annotationWithoutBody.getBody());
     }
 
@@ -186,10 +175,8 @@ public class DeletionTest {
 
         annotation.addTarget(specificResource);
 
-        anno4j.persist(annotation);
-
         // query persisted objects
-        Annotation result = (Annotation) queryService.execute().get(0);
+        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
         Set<Target> targetSet = result.getTarget();
 
         // removing the targets one by one
@@ -198,7 +185,7 @@ public class DeletionTest {
         }
 
         // finally testing if the targets of the persisted annotation is still existent
-        Annotation annotationWithoutTarget = (Annotation) queryService.execute().get(0);
+        Annotation annotationWithoutTarget = (Annotation) anno4j.createQueryService().execute().get(0);
         Object[] emptyTargetArray = annotationWithoutTarget.getTarget().toArray();
         assertEquals(0, emptyTargetArray.length);
     }

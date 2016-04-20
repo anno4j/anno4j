@@ -8,20 +8,19 @@ import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.http.annotation.NotThreadSafe;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectFactory;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryConfig;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
@@ -44,9 +43,10 @@ import java.util.*;
  * <p/>
  * <br/><br/>Anno4j can be configured by using the specific setter-methodes (e.g. setIdGenerator, setRepository). A default configuration (in-memory SPARQL endpoint) will be used if no configuration is set.
  * <p/>
- * <br/><br/> Usage: Anno4j implements a singelton pattern. The getInstance() methode can be called to get a Anno4j object.
+ * <br/><br/> Anno4j methods are not thread-safe. Use Anno4j transactions in threaded environment.
  */
-public class Anno4j {
+@NotThreadSafe
+public class Anno4j implements TransactionCommands {
 
     /**
      * Logger of this class.
@@ -167,8 +167,6 @@ public class Anno4j {
                     defaultEvaluators.put((Class<? extends NodeSelector>) functionClass, clazz);
                 }
             }
-
-
         }
 
         evaluatorConfiguration.setDefaultEvaluators(defaultEvaluators);
@@ -194,12 +192,17 @@ public class Anno4j {
     }
 
     /**
-     * Writes the resource object to the configured SPARQL endpoint with a corresponding INSERT query.
-     * @param resource resource object to write to the SPARQL endpoint
-     * @throws RepositoryException
+     * {@inheritDoc }
      */
+    @Override
     public void persist(ResourceObject resource) throws RepositoryException {
-        persist(resource, null);
+        Transaction transaction = createTransaction();
+
+        if(defaultContext != null) {
+            transaction.setAllContexts(defaultContext);
+        }
+
+        transaction.persist(resource);
     }
 
     /**
@@ -209,75 +212,139 @@ public class Anno4j {
      * @throws RepositoryException
      */
     public void persist(ResourceObject resource, URI context) throws RepositoryException {
-        createObjectConnection(context).addObject(resource);
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context);
+        transaction.persist(resource);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public <T extends ResourceObject> T findByID(Class<T> type, String id) throws RepositoryException {
+        Transaction transaction = createTransaction();
 
-    public <T extends ResourceObject> T findByID (Class<T> type, String id) throws RepositoryException {
-        try {
-           return createObjectConnection(null).getObject(type, id);
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException("Couldn't evaluate query", e);
+        if(defaultContext != null) {
+            transaction.setAllContexts(defaultContext);
         }
-    }
 
-    public <T extends ResourceObject> T findByID (Class<T> type, URI id) throws RepositoryException {
-        return this.findByID(type, id.toString());
+        return transaction.findByID(type, id);
     }
 
     /**
-     * Removes all triples from the given context.
-     * @param context context to clear
-     * @throws RepositoryException
+     * {@inheritDoc }
      */
+    @Override
+    public <T extends ResourceObject> T findByID(Class<T> type, URI id) throws RepositoryException {
+        Transaction transaction = createTransaction();
+
+        if(defaultContext != null) {
+            transaction.setAllContexts(defaultContext);
+        }
+        return transaction.findByID(type, id);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void clearContext(URI context) throws RepositoryException {
-        objectRepository.getConnection().clear(context);
+        Transaction transaction = createTransaction();
+        transaction.clearContext(context);
+        transaction.close();
     }
 
     /**
-     * Removes all triples from the given context.
-     * @param context context to clear
-     * @throws RepositoryException
+     * {@inheritDoc }
      */
+    @Override
     public void clearContext(String context) throws RepositoryException {
-        this.clearContext(new URIImpl(context));
+        Transaction transaction = createTransaction();
+        transaction.clearContext(context);
+        transaction.close();
     }
 
     /**
-     * Queries for all instances of the RDF class connected with the given class
-     * @param type Class with connected RDF type
-     * @return All instances of the given RDF type
-     * @throws RepositoryException
+     * {@inheritDoc }
      */
+    @Override
     public <T extends ResourceObject> List<T> findAll(Class<T> type) throws RepositoryException {
-        return findAll(type, null);
+        Transaction transaction = createTransaction();
+
+        if(defaultContext != null) {
+            transaction.setAllContexts(defaultContext);
+        }
+
+        return transaction.findAll(type);
     }
 
     public <T extends ResourceObject> List<T> findAll(Class<T> type, URI context) throws RepositoryException {
-        try {
-            return createObjectConnection(context).getObjects(type).asList();
-        } catch (QueryEvaluationException e) {
-            throw new RepositoryException("Couldn't evaluate query" , e);
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context);
+
+        return transaction.findAll(type);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public <T> T createObject(Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException {
+        return createObject(clazz, null);
+    }
+
+    @Override
+    public <T> T createObject(Class<T> clazz, Resource id) throws RepositoryException, IllegalAccessException, InstantiationException {
+        Transaction transaction = createTransaction();
+
+        if(defaultContext != null) {
+            transaction.setAllContexts(defaultContext);
         }
+
+        return transaction.createObject(clazz, id);
+    }
+
+    /**
+     * Creates a instance of the given class.
+     * @param clazz Class of the instance to create. Can be an annotated interface.
+     * @param context The graph context where the triples are inserted into. can be null for default graph.
+     * @return A instance of the given class.
+     */
+    public <T> T createObject(Class<T> clazz, URI context) throws RepositoryException, IllegalAccessException, InstantiationException {
+        return createObject(clazz, context, null);
+    }
+
+    public <T> T createObject(Class<T> clazz, URI context, Resource id) throws RepositoryException, IllegalAccessException, InstantiationException {
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context);
+
+        return createTransaction().createObject(clazz, id);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public QueryService createQueryService() throws RepositoryException {
+        Transaction transaction = createTransaction();
+
+        if(defaultContext != null) {
+            transaction.setAllContexts(defaultContext);
+        }
+
+        return transaction.createQueryService();
     }
 
     /**
      * Create query service
      *
+     * @param context context to query
      * @return query service object for specified type
      */
-    public QueryService createQueryService() {
-        return new QueryService(objectRepository, evaluatorConfiguration, defaultContext);
-    }
-
-    /**
-     * Create query service
-     *
-     * @param graph Graph context to query
-     * @return query service object for specified type
-     */
-    public QueryService createQueryService(URI graph) {
-        return new QueryService(objectRepository, evaluatorConfiguration, graph);
+    public QueryService createQueryService(URI context) throws RepositoryException {
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context);
+        return transaction.createQueryService();
     }
 
     /**
@@ -322,24 +389,6 @@ public class Anno4j {
         return objectRepository;
     }
 
-    public <T> T createObject (Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException {
-        ObjectConnection con = createObjectConnection(null);
-        ObjectFactory objectFactory = con.getObjectFactory();
-        return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
-    }
-
-    /**
-     * Creates a instance of the given class.
-     * @param clazz Class of the instance to create. Can be an annotated interface.
-     * @param context The graph context where the triples are inserted into. can be null for default graph.
-     * @return A instance of the given class.
-     */
-    public <T> T createObject (Class<T> clazz, URI context) throws RepositoryException, IllegalAccessException, InstantiationException {
-        ObjectConnection con = createObjectConnection(context);
-        ObjectFactory objectFactory = con.getObjectFactory();
-        return objectFactory.createObject(IDGenerator.BLANK_RESOURCE, clazz);
-    }
-
     public IDGenerator getIdGenerator() {
         return idGenerator;
     }
@@ -353,4 +402,7 @@ public class Anno4j {
         return defaultContext;
     }
 
+    public Transaction createTransaction() throws RepositoryException {
+        return new Transaction(objectRepository, evaluatorConfiguration);
+    }
 }

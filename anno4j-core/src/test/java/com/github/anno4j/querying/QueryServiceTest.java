@@ -41,7 +41,6 @@ public class QueryServiceTest {
         targets.add(resource2);
         annotation.setTarget(targets);
 
-        anno4j.persist(annotation);
     }
 
     @Test

@@ -18,23 +18,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by schlegel on 06/05/15.
- */
 public class AnnotationTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -44,11 +34,8 @@ public class AnnotationTest {
         annotation.setAnnotatedAt("" + System.currentTimeMillis());
         annotation.setSerializedAt("" + System.currentTimeMillis());
 
-        // persist annotation
-        connection.addObject(annotation);
-
         // query persisted object
-        Annotation result = connection.getObject(Annotation.class, annotation.getResource());
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
         assertEquals(annotation.getAnnotatedAt(), result.getAnnotatedAt());
@@ -58,15 +45,10 @@ public class AnnotationTest {
     @Test
     public void testResourceDefinition() throws Exception {
         // Create annotation
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        Resource resource = new URIImpl("http://www.somepage.org/resource1/");
-        annotation.setResource(resource);
-
-        // Persist annotation
-        connection.addObject(annotation);
+        Annotation annotation = anno4j.createObject(Annotation.class, new URIImpl("http://www.somepage.org/resource1/"));
 
         // Query persisted object
-        Annotation result = (Annotation) connection.getObject(annotation.getResource());
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         // Tests
         assertEquals(annotation.getResource(), result.getResource());
@@ -84,11 +66,8 @@ public class AnnotationTest {
         specificResource.setSource(resourceObject);
         annotation.addTarget(specificResource);
 
-        // Persist annotation
-        connection.addObject(annotation);
-
         // Query annotation
-        Annotation result = (Annotation) connection.getObject(annotation.getResource());
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         // Tests
         assertEquals(1, result.getTarget().size());
@@ -114,11 +93,8 @@ public class AnnotationTest {
         specificResource2.setSource(resourceObject2);
         annotation.addTarget(specificResource2);
 
-        // Persist annotation
-        connection.addObject(annotation);
-
         // Query annotation
-        Annotation result = (Annotation) connection.getObject(annotation.getResource());
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         // Tests
         List<String> urls = new ArrayList<>();
@@ -148,11 +124,8 @@ public class AnnotationTest {
         annotation.setSerializedAt(year, month, day, hours, minutes, seconds);
         annotation.setAnnotatedAt(year, month, day, hours2, minutes2, seconds2);
 
-        // Persist annotation
-        connection.addObject(annotation);
-
         // Query annotation
-        Annotation result = (Annotation) connection.getObject(annotation.getResource());
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         assertEquals("2015-12-16T12:00:00Z", result.getSerializedAt());
         assertEquals("2015-12-16T00:05:16Z", result.getAnnotatedAt());

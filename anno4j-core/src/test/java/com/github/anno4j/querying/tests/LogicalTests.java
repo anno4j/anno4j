@@ -74,14 +74,12 @@ public class LogicalTests extends QuerySetup {
         firstTestBody.setAnotherValue("Another Value");
         firstTestBody.setLangValue(new LangString("Testwert", "de"));
         annotation.setBody(firstTestBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondLogicalTestBody secondTestBody = anno4j.createObject(SecondLogicalTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setLangValue(new LangString("Second Body Lang Value", "en"));
         annotation1.setBody(secondTestBody);
-        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#firstLogicalBodyType")

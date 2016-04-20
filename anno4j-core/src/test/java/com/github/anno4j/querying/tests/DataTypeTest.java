@@ -85,13 +85,11 @@ public class DataTypeTest extends QuerySetup {
         DataTypeBody dataTypeBody = anno4j.createObject(DataTypeBody.class);
         dataTypeBody.setDoubleValue(2.0);
         annotation.setBody(dataTypeBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         DataTypeBody dataTypeBody2 = anno4j.createObject(DataTypeBody.class);
         dataTypeBody2.setStringValue("3.0");
         annotation1.setBody(dataTypeBody2);
-        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#datatTypeBody")

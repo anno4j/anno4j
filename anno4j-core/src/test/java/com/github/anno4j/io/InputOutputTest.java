@@ -32,24 +32,18 @@ import static org.junit.Assert.assertEquals;
 public class InputOutputTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
-    }
 
-    @Test
     /**
      * This test creates an Annotation object by parsing a JSONLD string, then the annotation is persisted.
      * It is then checked, if both the persisted and parsed Annotation have the same ID.
      */
+    @Test
     public void testInputAndPersistAnnotation() {
 
         try {
@@ -76,13 +70,11 @@ public class InputOutputTest {
 
             System.out.println(annotation.getTriples(RDFFormat.JSONLD));
 
-            List<Motivation> motivationList = connection.getObjects(Motivation.class).asList();
-
             // Persist the annotation
             anno4j.persist(annotation);
 
             // Query for persisted annotations
-            List<Annotation> result = connection.getObjects(Annotation.class).asList();
+            List<Annotation> result = anno4j.findAll(Annotation.class);
 
             assertEquals(1, result.size());
 
@@ -102,11 +94,7 @@ public class InputOutputTest {
             e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
         }
-
-
     }
 
     /**
