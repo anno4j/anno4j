@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 public class RecommendationServiceTest extends RecommendationTestSetup {
 
     private final static String ALGORITM_NAME = "algo1";
+    private final static String ALGORITHM_ID = "id";
 
     @Test
     public void testAlgorithmRegistration() {
@@ -33,7 +34,7 @@ public class RecommendationServiceTest extends RecommendationTestSetup {
 
         // TODO get resource of a class?
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
         rs.addAlgorithm(ALGORITM_NAME, algo);
 
@@ -48,7 +49,7 @@ public class RecommendationServiceTest extends RecommendationTestSetup {
     public void testAlgorithmRunning() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         RecommendationService rs = new RecommendationService(this.anno4j);
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
         rs.addAlgorithm(ALGORITM_NAME, algo);
 

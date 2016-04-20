@@ -2,17 +2,17 @@ package com.github.anno4j.recommendation.impl;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
+import com.github.anno4j.recommendation.computation.SimilarityImpl;
 
 /**
- * A simple similarity algorithm, implementing {@link SimilarityAlgorithm}
+ * A simple similarity algorithm, implementing {@link SimilarityImpl}
  */
-public class SimpleSimilarityAlgorithm extends SimilarityAlgorithm {
+public class SimpleSimilarityAlgorithm extends SimilarityImpl {
 
     private int counter;
 
-    public SimpleSimilarityAlgorithm(Anno4j anno4j, Class clazz1, Class clazz2) {
-        super(anno4j, clazz1, clazz2);
+    public SimpleSimilarityAlgorithm(Anno4j anno4j, String name, String id, Class clazz1, Class clazz2) {
+        super(anno4j, name, id, clazz1, clazz2);
         this.counter = 0;
     }
 

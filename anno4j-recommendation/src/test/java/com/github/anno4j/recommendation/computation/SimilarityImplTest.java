@@ -31,11 +31,14 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by Manu on 08/04/16.
  */
-public class SimilarityAlgorithmTest extends RecommendationTestSetup {
+public class SimilarityImplTest extends RecommendationTestSetup {
 
     private final static String NS = "http://somepage.com#";
     private final static String BODY_URI1 = NS + "TestBody1";
     private final static String BODY_URI2 = NS + "TestBody2";
+
+    private final static String ALGORITHM_NAME = "algo";
+    private final static String ALGORITHM_ID = "id";
 
     @Test
     public void testRoleMapper() {
@@ -52,7 +55,7 @@ public class SimilarityAlgorithmTest extends RecommendationTestSetup {
     @Test
     public void testSimpleSimilarityAlgorithm() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, IllegalAccessException, InstantiationException {
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
         algo.calculateSimilarities();
 
@@ -62,7 +65,7 @@ public class SimilarityAlgorithmTest extends RecommendationTestSetup {
     @Test
     public void testSimilarityStatementCreation() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException, MalformedQueryException, ParseException {
 
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, TestBody1.class, TestBody2.class);
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
         algo.calculateSimilarities();
 

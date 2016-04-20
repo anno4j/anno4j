@@ -1,10 +1,7 @@
 package com.github.anno4j.recommendation;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.impl.targets.SpecificResource;
-import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
-import com.github.anno4j.recommendation.model.SimilarityStatement;
+import com.github.anno4j.recommendation.computation.SimilarityImpl;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -24,26 +21,26 @@ public class RecommendationService {
     /**
      * A map of registered algorithms for this RecommendationService
      */
-    private Map<String, SimilarityAlgorithm> algorithms;
+    private Map<String, SimilarityImpl> algorithms;
 
     private Anno4j anno4j;
 
     public RecommendationService() throws RepositoryConfigException, RepositoryException {
-        this.algorithms = new HashMap<String, SimilarityAlgorithm>();
+        this.algorithms = new HashMap<String, SimilarityImpl>();
         this.anno4j = new Anno4j();
     }
 
     public RecommendationService(Anno4j anno4j) {
-        this.algorithms = new HashMap<String, SimilarityAlgorithm>();
+        this.algorithms = new HashMap<String, SimilarityImpl>();
         this.anno4j = anno4j;
     }
 
-    public RecommendationService(HashMap<String, SimilarityAlgorithm> algorithms) throws RepositoryConfigException, RepositoryException {
+    public RecommendationService(HashMap<String, SimilarityImpl> algorithms) throws RepositoryConfigException, RepositoryException {
         this.algorithms = algorithms;
         this.anno4j = new Anno4j();
     }
 
-    public RecommendationService(HashMap<String, SimilarityAlgorithm> algorithms, Anno4j anno4j) {
+    public RecommendationService(HashMap<String, SimilarityImpl> algorithms, Anno4j anno4j) {
         this.algorithms = algorithms;
         this.anno4j = anno4j;
     }
@@ -54,7 +51,7 @@ public class RecommendationService {
      * @param key       The key for the new algorithm.
      * @param algorithm The instance of the algorithm.
      */
-    public void addAlgorithm(String key, SimilarityAlgorithm algorithm) {
+    public void addAlgorithm(String key, SimilarityImpl algorithm) {
         this.algorithms.put(key, algorithm);
     }
 
@@ -73,7 +70,7 @@ public class RecommendationService {
             Map.Entry pair = (Map.Entry) iterator.next();
 
             if(pair.getKey().equals(algorithm)) {
-                ((SimilarityAlgorithm) pair.getValue()).calculateSimilarities();
+                ((SimilarityImpl) pair.getValue()).calculateSimilarities();
             }
         }
     }
@@ -83,7 +80,7 @@ public class RecommendationService {
         while (iterator.hasNext()) {
             Map.Entry pair = (Map.Entry) iterator.next();
 
-            ((SimilarityAlgorithm) pair.getValue()).calculateSimilarities();
+            ((SimilarityImpl) pair.getValue()).calculateSimilarities();
         }
     }
 
@@ -92,7 +89,7 @@ public class RecommendationService {
      *
      * @return Value of A map of registered algorithms for this RecommendationService.
      */
-    public Map<String, SimilarityAlgorithm> getAlgorithms() {
+    public Map<String, SimilarityImpl> getAlgorithms() {
         return algorithms;
     }
 
@@ -101,7 +98,7 @@ public class RecommendationService {
      *
      * @param algorithms New value of A map of registered algorithms for this RecommendationService.
      */
-    public void setAlgorithms(Map<String, SimilarityAlgorithm> algorithms) {
+    public void setAlgorithms(Map<String, SimilarityImpl> algorithms) {
         this.algorithms = algorithms;
     }
 }
