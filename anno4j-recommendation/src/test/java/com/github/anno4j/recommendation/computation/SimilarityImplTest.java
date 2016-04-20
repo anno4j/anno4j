@@ -1,30 +1,22 @@
 package com.github.anno4j.recommendation.computation;
 
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.recommendation.RecommendationTestSetup;
 import com.github.anno4j.recommendation.impl.TestBody1;
 import com.github.anno4j.recommendation.impl.TestBody2;
 import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
+import com.github.anno4j.recommendation.impl.TestBody3;
 import com.github.anno4j.recommendation.model.Similarity;
 import com.github.anno4j.recommendation.model.SimilarityAlgorithm;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Test;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectFactory;
-import org.openrdf.repository.object.ObjectService;
-import org.openrdf.repository.object.ObjectServiceImpl;
-import org.openrdf.repository.object.config.ObjectRepositoryFactory;
-import org.openrdf.repository.object.managers.RoleMapper;
-import org.openrdf.repository.object.managers.helpers.TypeMapper;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +76,32 @@ public class SimilarityImplTest extends RecommendationTestSetup {
         }
 
         assertTrue(foundZeroEquality);
+    }
+
+    @Test
+    public void testEmptyBodyAlgorithm() throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
+
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody3.class);
+
+        algo.calculateSimilarities();
+
+        // There should be no statements created, as there are no annotations with TestBody3
+        List<SimilarityStatement> result = this.queryService.execute(SimilarityStatement.class);
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testDoublyStartedAlgorithm() throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
+
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
+
+        algo.calculateSimilarities();
+        algo.calculateSimilarities();
+
+        List<SimilarityStatement> result = this.queryService.execute(SimilarityStatement.class);
+
+        assertEquals(8, result.size());
     }
 
     @Test

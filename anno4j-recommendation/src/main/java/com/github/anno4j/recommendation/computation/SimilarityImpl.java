@@ -18,7 +18,7 @@ import org.openrdf.repository.object.managers.RoleMapper;
 import java.util.List;
 
 /**
- * Interface for an algorithm that calculates the similarity between two given annotations.
+ * Interface for an algorithm that calculates the similarity between two given annotations by supporting their respective body.
  */
 public abstract class SimilarityImpl {
 
@@ -29,7 +29,7 @@ public abstract class SimilarityImpl {
 
     private Class clazz1;
     private Class clazz2;
-
+    
     public SimilarityImpl(Anno4j anno4j, String name, String id, Class clazz1, Class clazz2) {
         this.anno4j = anno4j;
         this.name = name;
@@ -65,11 +65,10 @@ public abstract class SimilarityImpl {
                 // Create similarity annotation
                 Annotation similarityAnnotation = createSimilarityAnnotation(anno1, anno2, similarityValue, similarity);
 
-                this.anno4j.persist(similarityAnnotation);
                 this.anno4j.persist(similarity);
+                this.anno4j.persist(similarityAnnotation);
             }
         }
-
     }
 
     protected abstract double calculateSimilarity(Annotation anno1, Annotation anno2);
