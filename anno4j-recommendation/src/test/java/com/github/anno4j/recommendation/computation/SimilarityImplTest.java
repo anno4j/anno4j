@@ -50,7 +50,7 @@ public class SimilarityImplTest extends RecommendationTestSetup {
 
         SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
-        algo.calculateSimilarities();
+        algo.compute();
 
         assertEquals(4, algo.getCounter());
     }
@@ -60,7 +60,7 @@ public class SimilarityImplTest extends RecommendationTestSetup {
 
         SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
-        algo.calculateSimilarities();
+        algo.compute();
 
         this.queryService.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]");
 
@@ -83,7 +83,7 @@ public class SimilarityImplTest extends RecommendationTestSetup {
 
         SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody3.class);
 
-        algo.calculateSimilarities();
+        algo.compute();
 
         // There should be no statements created, as there are no annotations with TestBody3
         List<SimilarityStatement> result = this.queryService.execute(SimilarityStatement.class);
@@ -96,8 +96,8 @@ public class SimilarityImplTest extends RecommendationTestSetup {
 
         SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
-        algo.calculateSimilarities();
-        algo.calculateSimilarities();
+        algo.compute();
+        algo.compute();
 
         List<SimilarityStatement> result = this.queryService.execute(SimilarityStatement.class);
 
@@ -108,7 +108,7 @@ public class SimilarityImplTest extends RecommendationTestSetup {
     public void testProvenance() throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
         SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
 
-        algo.calculateSimilarities();
+        algo.compute();
 
         List<SimilarityStatement> result = this.queryService.execute(SimilarityStatement.class);
 
