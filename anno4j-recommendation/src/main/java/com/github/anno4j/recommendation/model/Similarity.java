@@ -8,7 +8,8 @@ import org.openrdf.model.URI;
 import java.util.Set;
 
 /**
- * Created by Manu on 05/04/16.
+ * Represents an RDF node for a Similarity, which is used as provenance holder for a SimilarityAlgorithm.
+ * Links to the body classes, that are utilised in the similarity calculation and a SimilarityAlgorithm node.
  */
 @Iri(ANNO4JREC.SIMILARITY)
 public interface Similarity extends ResourceObject {

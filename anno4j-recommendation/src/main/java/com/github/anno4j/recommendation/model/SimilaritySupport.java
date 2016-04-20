@@ -9,7 +9,7 @@ import org.openrdf.model.impl.URIImpl;
 import java.util.HashSet;
 
 /**
- * Created by Manu on 05/04/16.
+ * Support class for a Similarity node, implementing abstract methods.
  */
 @Partial
 public abstract class SimilaritySupport extends ResourceObjectSupport implements Similarity {
@@ -23,6 +23,7 @@ public abstract class SimilaritySupport extends ResourceObjectSupport implements
         this.getBodies().add(new URIImpl(body));
     }
 
+    @Override
     public void addBodyURI(URI bodyURI) {
         if(this.getBodies().isEmpty()) {
             this.setBodies(new HashSet<URI>());
