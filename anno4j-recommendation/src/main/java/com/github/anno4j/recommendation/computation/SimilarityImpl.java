@@ -59,12 +59,13 @@ public abstract class SimilarityImpl {
             for(Annotation anno2 : annotations2) {
                 double similarityValue = calculateSimilarity(anno1, anno2);
 
-                // Create similarity annotation
-                Annotation similarityAnnotation = createSimilarityAnnotation(anno1, anno2, similarityValue);
-                this.anno4j.persist(similarityAnnotation);
-
                 // Create provenance
                 Similarity similarity = createSimilarityProvenance(clazz1URI, clazz2URI);
+
+                // Create similarity annotation
+                Annotation similarityAnnotation = createSimilarityAnnotation(anno1, anno2, similarityValue, similarity);
+
+                this.anno4j.persist(similarityAnnotation);
                 this.anno4j.persist(similarity);
             }
         }
@@ -73,7 +74,7 @@ public abstract class SimilarityImpl {
 
     protected abstract double calculateSimilarity(Annotation anno1, Annotation anno2);
 
-    private Annotation createSimilarityAnnotation(Annotation subject, Annotation object, double similarity) throws RepositoryException, IllegalAccessException, InstantiationException {
+    private Annotation createSimilarityAnnotation(Annotation subject, Annotation object, double similarityValue, Similarity similarity) throws RepositoryException, IllegalAccessException, InstantiationException {
         Annotation similarityAnnotation = anno4j.createObject(Annotation.class);
 
         SpecificResource specificResource = anno4j.createObject(SpecificResource.class);
@@ -83,7 +84,8 @@ public abstract class SimilarityImpl {
         SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
         statement.setSubject(subject);
         statement.setObject(object);
-        statement.setSimilarityValue(similarity);
+        statement.setSimilarityValue(similarityValue);
+        statement.setSimilarity(similarity);
         similarityAnnotation.setBody(statement);
 
         return similarityAnnotation;
@@ -96,6 +98,8 @@ public abstract class SimilarityImpl {
         similarity.addBodyURI(bodyIRI2);
 
         SimilarityAlgorithm algo = this.anno4j.createObject(SimilarityAlgorithm.class);
+        algo.setAlgorithmName(this.name);
+        algo.setAlgorithmID(this.id);
 
         similarity.setAlgorithm(algo);
 

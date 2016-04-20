@@ -6,6 +6,8 @@ import com.github.anno4j.recommendation.RecommendationTestSetup;
 import com.github.anno4j.recommendation.impl.TestBody1;
 import com.github.anno4j.recommendation.impl.TestBody2;
 import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
+import com.github.anno4j.recommendation.model.Similarity;
+import com.github.anno4j.recommendation.model.SimilarityAlgorithm;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Test;
@@ -24,6 +26,7 @@ import org.openrdf.repository.object.managers.helpers.TypeMapper;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,13 +44,11 @@ public class SimilarityImplTest extends RecommendationTestSetup {
     private final static String ALGORITHM_ID = "id";
 
     @Test
-    public void testRoleMapper() {
+    public void testRoleMapper() throws RepositoryException {
 
-        ObjectFactory fac = this.anno4j.getObjectRepository().getObjectService().createObjectFactory();
+        ObjectFactory fac = this.anno4j.getObjectRepository().getConnection().getObjectFactory();
 
         URI uri = fac.getNameOf(TestBody1.class);
-
-        System.out.println(uri.toString());
 
         assertEquals(BODY_URI1, uri.toString());
     }
@@ -85,6 +86,33 @@ public class SimilarityImplTest extends RecommendationTestSetup {
         assertTrue(foundZeroEquality);
     }
 
+    @Test
+    public void testProvenance() throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
+
+        algo.calculateSimilarities();
+
+        List<SimilarityStatement> result = this.queryService.execute(SimilarityStatement.class);
+
+        assertEquals(4, result.size());
+
+        SimilarityStatement statement = result.get(0);
+
+        Similarity similarity = statement.getSimilarity();
+        Set<URI> uris = similarity.getBodies();
+
+        ObjectFactory fac = this.anno4j.getObjectRepository().getConnection().getObjectFactory();
+        URI uri1 = fac.getNameOf(TestBody1.class);
+        URI uri2 = fac.getNameOf(TestBody2.class);
+
+        assertTrue(uris.contains(uri1));
+        assertTrue(uris.contains(uri2));
+
+        SimilarityAlgorithm algorithm = similarity.getAlgorithm();
+        assertEquals(ALGORITHM_NAME, algorithm.getAlgorithmName());
+        assertEquals(ALGORITHM_ID, algorithm.getAlgorithmID());
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     protected void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
@@ -109,6 +137,5 @@ public class SimilarityImplTest extends RecommendationTestSetup {
 
             this.anno4j.persist(anno);
         }
-
     }
 }
