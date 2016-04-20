@@ -10,6 +10,7 @@ import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.managers.RoleMapper;
 
 import java.util.List;
 
