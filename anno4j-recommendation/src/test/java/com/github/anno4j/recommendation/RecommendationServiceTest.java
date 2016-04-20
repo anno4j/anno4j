@@ -23,72 +23,8 @@ import static org.junit.Assert.*;
  */
 public class RecommendationServiceTest extends RecommendationTestSetup {
 
-    private final static String ALGORITM_NAME = "algo1";
-    private final static String ALGORITHM_ID = "id";
-
-    @Test
-    public void testAlgorithmRegistration() {
-        RecommendationService rs = new RecommendationService(this.anno4j);
-
-        assertEquals(0, rs.getAlgorithms().size());
-
-        // TODO get resource of a class?
-
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
-
-        rs.addAlgorithm(ALGORITM_NAME, algo);
-
-        assertEquals(1, rs.getAlgorithms().size());
-
-        rs.removeAlgorithm(ALGORITM_NAME);
-
-        assertEquals(0, rs.getAlgorithms().size());
-    }
-
-    @Test
-    public void testAlgorithmRunning() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
-        RecommendationService rs = new RecommendationService(this.anno4j);
-
-        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
-
-        rs.addAlgorithm(ALGORITM_NAME, algo);
-
-        rs.useSingleAlgorithm(ALGORITM_NAME);
-
-        QueryService qs = this.anno4j.createQueryService();
-        qs.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
-        qs.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]");
-
-        assertEquals(4, qs.execute().size());
-
-        rs.useAllAlgorithms();
-
-        assertEquals(8, qs.execute().size());
-    }
-
-    @SuppressWarnings("Duplicates")
     @Override
     protected void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
-        for (int i = 0; i <= 1; ++i) {
-            Annotation anno = this.anno4j.createObject(Annotation.class);
-            TestBody1 body = this.anno4j.createObject(TestBody1.class);
 
-            if(i == 0) {
-                body.setValue("test");
-            }
-
-            anno.setBody(body);
-
-            this.anno4j.persist(anno);
-        }
-
-        for (int i = 0; i <= 1; ++i) {
-            Annotation anno = this.anno4j.createObject(Annotation.class);
-            TestBody2 body = this.anno4j.createObject(TestBody2.class);
-
-            anno.setBody(body);
-
-            this.anno4j.persist(anno);
-        }
     }
 }

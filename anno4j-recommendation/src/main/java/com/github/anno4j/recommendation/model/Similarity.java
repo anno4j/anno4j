@@ -1,7 +1,6 @@
 package com.github.anno4j.recommendation.model;
 
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.recommendation.computation.SimilarityImpl;
 import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
 import org.openrdf.annotations.Iri;
 import org.openrdf.model.URI;
@@ -25,8 +24,8 @@ public interface Similarity extends ResourceObject {
     void addBodyURIAsString(String body);
 
     @Iri(ANNO4JREC.HAS_ALGORITHM)
-    SimilarityAlgorithm getAlgorithm();
+    SimilarityAlgorithmRDF getAlgorithm();
 
     @Iri(ANNO4JREC.HAS_ALGORITHM)
-    void setAlgorithm(SimilarityAlgorithm algorithm);
+    void setAlgorithm(SimilarityAlgorithmRDF algorithm);
 }

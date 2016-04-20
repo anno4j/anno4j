@@ -7,7 +7,7 @@ import com.github.anno4j.recommendation.impl.TestBody2;
 import com.github.anno4j.recommendation.impl.SimpleSimilarityAlgorithm;
 import com.github.anno4j.recommendation.impl.TestBody3;
 import com.github.anno4j.recommendation.model.Similarity;
-import com.github.anno4j.recommendation.model.SimilarityAlgorithm;
+import com.github.anno4j.recommendation.model.SimilarityAlgorithmRDF;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Test;
@@ -126,7 +126,7 @@ public class SimilarityImplTest extends RecommendationTestSetup {
         assertTrue(uris.contains(uri1));
         assertTrue(uris.contains(uri2));
 
-        SimilarityAlgorithm algorithm = similarity.getAlgorithm();
+        SimilarityAlgorithmRDF algorithm = similarity.getAlgorithm();
         assertEquals(ALGORITHM_NAME, algorithm.getAlgorithmName());
         assertEquals(ALGORITHM_ID, algorithm.getAlgorithmID());
     }

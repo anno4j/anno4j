@@ -5,7 +5,7 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.recommendation.model.Similarity;
-import com.github.anno4j.recommendation.model.SimilarityAlgorithm;
+import com.github.anno4j.recommendation.model.SimilarityAlgorithmRDF;
 import com.github.anno4j.recommendation.model.SimilarityStatement;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.URI;
@@ -13,14 +13,13 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectFactory;
-import org.openrdf.repository.object.managers.RoleMapper;
 
 import java.util.List;
 
 /**
  * Interface for an algorithm that calculates the similarity between two given annotations by supporting their respective body.
  */
-public abstract class SimilarityImpl {
+public abstract class SimilarityAlgorithm {
 
     private Anno4j anno4j;
 
@@ -29,8 +28,8 @@ public abstract class SimilarityImpl {
 
     private Class clazz1;
     private Class clazz2;
-    
-    public SimilarityImpl(Anno4j anno4j, String name, String id, Class clazz1, Class clazz2) {
+
+    public SimilarityAlgorithm(Anno4j anno4j, String name, String id, Class clazz1, Class clazz2) {
         this.anno4j = anno4j;
         this.name = name;
         this.id = id;
@@ -96,12 +95,48 @@ public abstract class SimilarityImpl {
         similarity.addBodyURI(bodyIRI1);
         similarity.addBodyURI(bodyIRI2);
 
-        SimilarityAlgorithm algo = this.anno4j.createObject(SimilarityAlgorithm.class);
+        SimilarityAlgorithmRDF algo = this.anno4j.createObject(SimilarityAlgorithmRDF.class);
         algo.setAlgorithmName(this.name);
         algo.setAlgorithmID(this.id);
 
         similarity.setAlgorithm(algo);
 
         return similarity;
+    }
+
+    /**
+     * Gets id.
+     *
+     * @return Value of id.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets new id.
+     *
+     * @param id New value of id.
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return Value of name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets new name.
+     *
+     * @param name New value of name.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

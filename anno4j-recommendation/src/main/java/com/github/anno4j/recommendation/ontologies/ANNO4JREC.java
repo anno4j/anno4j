@@ -21,7 +21,7 @@ public class ANNO4JREC {
 
     public static final String HAS_ALGORITHM = NS + "hasAlgorithm";
 
-    public static final String SIMILARITY_ALGORITHM = NS + "SimilarityImpl";
+    public static final String SIMILARITY_ALGORITHM = NS + "SimilarityAlgorithm";
 
     public static final String HAS_ALGORITHM_NAME = NS + "hasAlgorithmName";
 

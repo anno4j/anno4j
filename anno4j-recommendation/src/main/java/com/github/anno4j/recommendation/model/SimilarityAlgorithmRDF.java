@@ -8,7 +8,7 @@ import org.openrdf.annotations.Iri;
  * Created by Manu on 12/04/16.
  */
 @Iri(ANNO4JREC.SIMILARITY_ALGORITHM)
-public interface SimilarityAlgorithm extends ResourceObject {
+public interface SimilarityAlgorithmRDF extends ResourceObject {
 
     @Iri(ANNO4JREC.HAS_ALGORITHM_NAME)
     void setAlgorithmName(String name);
