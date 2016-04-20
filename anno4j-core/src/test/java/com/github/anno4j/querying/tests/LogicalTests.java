@@ -65,6 +65,22 @@ public class LogicalTests extends QuerySetup {
         assertEquals("Another Value", ((FirstLogicalTestBody) list.get(0).getBody()).getAnotherValue());
     }
 
+    @Test
+    public void logicalNotTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {
+        List<Annotation> list = queryService.addCriteria("oa:hasBody/ex:languageValue[!(@de | @en)]").execute();
+        assertEquals(0, list.size());
+
+        super.setupUpQueryTest();
+
+        List<Annotation> list2 = queryService.addCriteria("oa:hasBody/ex:languageValue[!@de]").execute();
+        assertEquals(1, list2.size());
+
+        super.setupUpQueryTest();
+
+        List<Annotation> list3 = queryService.addCriteria("oa:hasBody/ex:languageValue[!@en]").execute();
+        assertEquals(1, list3.size());
+    }
+
     @Override
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
