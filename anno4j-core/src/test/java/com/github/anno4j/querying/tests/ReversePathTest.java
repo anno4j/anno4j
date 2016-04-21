@@ -65,14 +65,12 @@ public class ReversePathTest extends QuerySetup {
         InverseBody inverseBody = anno4j.createObject(InverseBody.class);
         inverseBody.setValue("Some Testing Value");
         annotation.setBody(inverseBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         InverseBody inverseBody2 = anno4j.createObject(InverseBody.class);
         inverseBody2.setValue("Another Testing Value");
         annotation1.setBody(inverseBody2);
-        anno4j.persist(annotation1);
     }
 
 

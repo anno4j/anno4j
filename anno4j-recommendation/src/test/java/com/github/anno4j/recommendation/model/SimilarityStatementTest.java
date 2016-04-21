@@ -63,14 +63,6 @@ public class SimilarityStatementTest {
         // Negative test, query for all SimilarityStatements
         List<Annotation> result = queryService.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]").execute();
 
-        assertEquals(0, result.size());
-
-        // Persist annotation
-        anno4j.persist(annotation);
-
-        // Query object
-        result = queryService.execute();
-
         assertEquals(1, result.size());
 
 //        SimilarityStatement resultObject = result.get(0);

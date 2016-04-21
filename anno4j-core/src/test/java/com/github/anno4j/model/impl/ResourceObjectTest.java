@@ -17,43 +17,31 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by schlegel on 05/10/15.
- */
 public class ResourceObjectTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-        this.connection.setAutoCommit(false);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
     public void testSetResourceAsString() throws Exception {
         ResourceObject resourceObject = anno4j.createObject(ResourceObject.class);
         resourceObject.setResourceAsString("http://www.somepage.org/resource1/");
-        connection.addObject(resourceObject);
+        anno4j.persist(resourceObject);
 
-        ResourceObject resourceObject1 = (ResourceObject) connection.getObject(resourceObject.getResource());
+        ResourceObject resourceObject1 = anno4j.findByID(ResourceObject.class, resourceObject.getResourceAsString());
         assertEquals("http://www.somepage.org/resource1/", resourceObject1.getResourceAsString());
     }
 
     @Test
     public void testAutomaticResourceNaming() throws RepositoryException, InstantiationException, IllegalAccessException {
         ResourceObject resourceObject = anno4j.createObject(ResourceObject.class);
-        connection.addObject(resourceObject);
         assertNotEquals(IDGenerator.BLANK_RESOURCE, resourceObject.getResource());
 
-        ResourceObject resourceResult = (ResourceObject) connection.getObject(resourceObject.getResource());
+        ResourceObject resourceResult = anno4j.findByID(ResourceObject.class, resourceObject.getResourceAsString());
         assertEquals(resourceObject.getResourceAsString(), resourceResult.getResourceAsString());
     }
 
@@ -63,9 +51,7 @@ public class ResourceObjectTest {
         annotation.setAnnotatedAt("" + System.currentTimeMillis());
         annotation.setSerializedAt("" + System.currentTimeMillis());
 
-        this.connection.addObject(annotation);
-
-        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+        Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.NTRIPLES);
         System.out.println("output" + output);
@@ -93,9 +79,8 @@ public class ResourceObjectTest {
         // Add the body to the annotation
         annotation.setBody(body);
 
-        this.connection.addObject(annotation);
 
-        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+        Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.TURTLE);
 
@@ -138,9 +123,7 @@ public class ResourceObjectTest {
         // Add the body to the annotation
         annotation.setBody(body);
 
-        this.connection.addObject(annotation);
-
-        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+        Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.JSONLD);
 
@@ -188,9 +171,7 @@ public class ResourceObjectTest {
         annotation.setAnnotatedBy(softwareAgent);
         annotation.setSerializedBy(personAgent);
 
-        this.connection.addObject(annotation);
-
-        Annotation an = (Annotation) this.connection.getObject(annotation.getResource());
+        Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.JSONLD);
 
