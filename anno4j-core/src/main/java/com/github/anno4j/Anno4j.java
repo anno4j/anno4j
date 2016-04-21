@@ -31,6 +31,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,8 +116,16 @@ public class Anno4j implements TransactionCommands {
         classpath.addAll(ClasspathHelper.forManifest());
         classpath.addAll(ClasspathHelper.forPackage(""));
 
-        scanForPartials(classpath);
-        scanForEvaluators(classpath);
+        Reflections annotatedClasses = new Reflections(new ConfigurationBuilder()
+                .setUrls(classpath)
+                .useParallelExecutor()
+                .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
+                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
+
+        // find classes with @Partial annotation
+        this.partialClasses = annotatedClasses.getTypesAnnotatedWith(Partial.class, true);
+
+        scanForEvaluators(annotatedClasses);
 
         if(!repository.isInitialized()) {
             repository.initialize();
@@ -124,23 +133,9 @@ public class Anno4j implements TransactionCommands {
 
         this.setRepository(repository);
     }
-
-    private void scanForPartials(Set<URL> classpath) {
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(classpath)
-                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
-        this.partialClasses = reflections.getTypesAnnotatedWith(Partial.class, true);
-        
-    }
     
-    private void scanForEvaluators(Set<URL> classpath) {
-   
-
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(classpath)
-                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
-
-        Set<Class<?>> defaultEvaluatorAnnotations = reflections.getTypesAnnotatedWith(Evaluator.class, true);
+    private void scanForEvaluators(Reflections annotatedClasses) {
+        Set<Class<?>> defaultEvaluatorAnnotations = annotatedClasses.getTypesAnnotatedWith(Evaluator.class, true);
 
         Map<Class<? extends TestFunction>, Class<QueryEvaluator>> testFunctionEvaluators = new HashMap<>();
         Map<Class<? extends NodeSelector>, Class<QueryEvaluator>> defaultEvaluators = new HashMap<>();
