@@ -277,6 +277,9 @@ public class QueryService {
 
         Query sparql = EvalQuery.evaluate(queryServiceDTO, rootType);
 
+        // LDPath allows distinct. May have bad performance.
+        sparql.setDistinct(true);
+
         if (limit != null) {
             sparql.setLimit(limit);
         }
