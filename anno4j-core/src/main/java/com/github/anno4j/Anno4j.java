@@ -313,7 +313,7 @@ public class Anno4j implements TransactionCommands {
         Transaction transaction = createTransaction();
         transaction.setAllContexts(context);
 
-        return createTransaction().createObject(clazz, id);
+        return transaction.createObject(clazz, id);
     }
 
     /**

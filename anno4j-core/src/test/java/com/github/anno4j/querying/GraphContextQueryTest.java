@@ -29,8 +29,8 @@ public class GraphContextQueryTest {
     @Test
      public void persistInSubGraphQueryDefaultGraphTest() throws Exception {
         // Create test annotation
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        TestBody body =  anno4j.createObject(TestBody.class);
+        Annotation annotation = anno4j.createObject(Annotation.class, subgraph);
+        TestBody body =  anno4j.createObject(TestBody.class, subgraph);
         body.setValue("Example Value");
         annotation.setBody(body);
 
@@ -51,8 +51,8 @@ public class GraphContextQueryTest {
     @Test
     public void persistInSubGraphQuerySubGraphTest() throws Exception {
         // Create test annotation
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        TestBody body =  anno4j.createObject(TestBody.class);
+        Annotation annotation = anno4j.createObject(Annotation.class, subgraph);
+        TestBody body =  anno4j.createObject(TestBody.class, subgraph);
         body.setValue("Example Value");
         annotation.setBody(body);
 
@@ -109,8 +109,8 @@ public class GraphContextQueryTest {
     @Test
     public void persistSubGraphFindAll() throws Exception {
         // Create test annotation
-        Annotation annotation = anno4j.createObject(Annotation.class);
-        TestBody body =  anno4j.createObject(TestBody.class);
+        Annotation annotation = anno4j.createObject(Annotation.class, subgraph);
+        TestBody body =  anno4j.createObject(TestBody.class, subgraph);
         body.setValue("Example Value");
         annotation.setBody(body);
 
@@ -131,8 +131,8 @@ public class GraphContextQueryTest {
         annotationDefault.setBody(body);
 
         // Create test annotation
-        Annotation annotationSubgraph = anno4j.createObject(Annotation.class);
-        TestBody body2 =  anno4j.createObject(TestBody.class);
+        Annotation annotationSubgraph = anno4j.createObject(Annotation.class, subgraph);
+        TestBody body2 =  anno4j.createObject(TestBody.class, subgraph);
         body.setValue("Example Value");
         annotationSubgraph.setBody(body2);
 
