@@ -37,14 +37,12 @@ public class UnionTest extends QuerySetup {
         UnionTestBody1 unionTestBody1 = anno4j.createObject(UnionTestBody1.class);
         unionTestBody1.setValue("Value1");
         annotation.setBody(unionTestBody1);
-        anno4j.persist(annotation);
 
         Annotation annotation1 =  anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         UnionTestBody2 unionTestBody2 = anno4j.createObject(UnionTestBody2.class);
         unionTestBody2.setValue("Value2");
         annotation1.setBody(unionTestBody2);
-        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#unionBody1")

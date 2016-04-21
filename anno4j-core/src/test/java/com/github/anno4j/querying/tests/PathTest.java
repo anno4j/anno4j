@@ -71,14 +71,12 @@ public class PathTest extends QuerySetup {
         PathTestBody pathTestBody = anno4j.createObject(PathTestBody.class);
         pathTestBody.setValue("Value1");
         annotation.setBody(pathTestBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         PathTestBody pathTestBody2 = anno4j.createObject(PathTestBody.class);
         pathTestBody2.setValue("Value2");
         annotation1.setBody(pathTestBody2);
-        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#pathBody")

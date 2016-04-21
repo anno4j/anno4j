@@ -18,17 +18,10 @@ import static org.junit.Assert.assertEquals;
 public class MotivationTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -40,11 +33,8 @@ public class MotivationTest {
         Motivation motivation = MotivationFactory.getBookmarking(anno4j);
         annotation.setMotivatedBy(motivation);
 
-        // Persist annotation
-        connection.addObject(annotation);
-
         // Query persisted object
-        List<Motivation> result = connection.getObjects(Motivation.class).asList();
+        List<Motivation> result = anno4j.findAll(Motivation.class);
 
         // Tests
         assertEquals(1, result.size());

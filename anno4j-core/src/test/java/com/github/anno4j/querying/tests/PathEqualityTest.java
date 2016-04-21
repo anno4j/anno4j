@@ -27,20 +27,17 @@ public class PathEqualityTest extends QuerySetup {
         firstTestBody.setValue("First Value");
         firstTestBody.setAnotherValue("Another Value");
         annotation.setBody(firstTestBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondPathEqualityTestBody secondTestBody = anno4j.createObject(SecondPathEqualityTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setAnotherValue("Another Value");
         annotation1.setBody(secondTestBody);
-        anno4j.persist(annotation1);
 
         Annotation annotation2 = anno4j.createObject(Annotation.class);
         FirstPathEqualityTestBody firstTestBody2 = anno4j.createObject(FirstPathEqualityTestBody.class);
         firstTestBody2.setValue("Second Value");
         annotation2.setBody(firstTestBody2);
-        anno4j.persist(annotation2);
     }
 
     @Test

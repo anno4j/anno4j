@@ -70,14 +70,12 @@ public class LanguageTest extends QuerySetup {
         LangTestBody langTestBody = anno4j.createObject(LangTestBody.class);
         langTestBody.setLangString(new LangString("First Value", "en"));
         annotation.setBody(langTestBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         LangTestBody langTestBody2 = anno4j.createObject(LangTestBody.class);
         langTestBody2.setLangString(new LangString("Zweiter Wert", "de"));
         annotation1.setBody(langTestBody2);
-        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#langBody")
