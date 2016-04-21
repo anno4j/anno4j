@@ -356,8 +356,8 @@ public class ObjectConnection extends ContextAwareConnection {
 		Resource resource = findResource(entity);
 		Set<URI> types = new HashSet<URI>(4);
 		getTypes(entity.getClass(), types);
-		RDFObject bean = of.createObject(resource, types);
 		addConcept(resource, concept, types);
+		RDFObject bean = of.createObject(resource, types);
 		assert assertConceptRecorded(bean, concept);
 		return (T) cache(bean);
 	}
