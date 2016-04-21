@@ -1,8 +1,11 @@
-package com.github.anno4j.recommendation;
+package com.github.anno4j.similarity;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.Annotation;
 import com.github.anno4j.querying.QueryService;
-import com.github.anno4j.recommendation.ontologies.ANNO4JREC;
+import com.github.anno4j.similarity.impl.TestBody1;
+import com.github.anno4j.similarity.impl.TestBody2;
+import com.github.anno4j.similarity.ontologies.ANNO4JREC;
 import org.junit.Before;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -10,7 +13,7 @@ import org.openrdf.repository.config.RepositoryConfigException;
 /**
  * Created by Manu on 12/04/16.
  */
-public abstract class RecommendationTestSetup {
+public abstract class SimilarityTestSetup {
 
     protected QueryService queryService;
     protected Anno4j anno4j;
@@ -41,4 +44,28 @@ public abstract class RecommendationTestSetup {
      * @throws IllegalAccessException
      */
     protected abstract void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException;
+
+    protected void createBaseLineSimilarityAnnotations() throws RepositoryException, IllegalAccessException, InstantiationException {
+        for (int i = 0; i <= 1; ++i) {
+            Annotation anno = this.anno4j.createObject(Annotation.class);
+            TestBody2 body = this.anno4j.createObject(TestBody2.class);
+
+            anno.setBody(body);
+
+            this.anno4j.persist(anno);
+        }
+
+        for (int i = 0; i <= 1; ++i) {
+            Annotation anno = this.anno4j.createObject(Annotation.class);
+            TestBody1 body = this.anno4j.createObject(TestBody1.class);
+
+            if(i == 0) {
+                body.setValue("test");
+            }
+
+            anno.setBody(body);
+
+            this.anno4j.persist(anno);
+        }
+    }
 }

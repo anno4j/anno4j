@@ -1,9 +1,9 @@
-package com.github.anno4j.recommendation.model;
+package com.github.anno4j.similarity.model;
 
 import com.github.anno4j.querying.QueryService;
-import com.github.anno4j.recommendation.RecommendationTestSetup;
-import com.github.anno4j.recommendation.impl.TestBody1;
-import com.github.anno4j.recommendation.impl.TestBody2;
+import com.github.anno4j.similarity.SimilarityTestSetup;
+import com.github.anno4j.similarity.impl.TestBody1;
+import com.github.anno4j.similarity.impl.TestBody2;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Test;
 import org.openrdf.model.URI;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Manu on 20/04/16.
  */
-public class SimilarityTest extends RecommendationTestSetup {
+public class SimilarityTest extends SimilarityTestSetup {
 
     @Test
     public void testSimilarityWithBodies() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {

@@ -1,12 +1,13 @@
-package com.github.anno4j.recommendation.computation;
+package com.github.anno4j.similarity.computation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.querying.QueryService;
-import com.github.anno4j.recommendation.model.Similarity;
-import com.github.anno4j.recommendation.model.SimilarityAlgorithmRDF;
-import com.github.anno4j.recommendation.model.SimilarityStatement;
+import com.github.anno4j.similarity.model.Similarity;
+import com.github.anno4j.similarity.model.SimilarityAlgorithmRDF;
+import com.github.anno4j.similarity.model.SimilarityStatement;
+import com.github.anno4j.similarity.ontologies.ANNO4JREC;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.URI;
 import org.openrdf.query.MalformedQueryException;
@@ -127,6 +128,7 @@ public abstract class SimilarityAlgorithm {
         SimilarityStatement statement = anno4j.createObject(SimilarityStatement.class);
         statement.setSubject(subject);
         statement.setObject(object);
+        statement.setPredicateAsString(ANNO4JREC.SIMILAR_TO);
         statement.setSimilarityValue(similarityValue);
         statement.setSimilarity(similarity);
         similarityAnnotation.setBody(statement);

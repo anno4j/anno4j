@@ -1,4 +1,4 @@
-package com.github.anno4j.recommendation.model;
+package com.github.anno4j.similarity.model;
 
 import com.github.anno4j.annotations.Partial;
 import org.openrdf.model.impl.URIImpl;

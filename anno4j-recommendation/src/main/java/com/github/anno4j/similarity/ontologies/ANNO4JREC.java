@@ -1,4 +1,4 @@
-package com.github.anno4j.recommendation.ontologies;
+package com.github.anno4j.similarity.ontologies;
 
 /**
  * Created by Manu on 29/07/15.
@@ -16,6 +16,8 @@ public class ANNO4JREC {
     public final static String HAS_SIMILARITY_VALUE = NS + "hasSimilarityValue";
 
     public static final String BASED_ON = NS + "basedOn";
+
+    public static final String SIMILAR_TO = NS + "similarTo";
 
     public static final String HAS_SIMILARITY_CLASS = NS + "hasSimilarityClass";
 

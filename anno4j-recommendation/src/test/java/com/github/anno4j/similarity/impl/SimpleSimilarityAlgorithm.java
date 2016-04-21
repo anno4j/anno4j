@@ -1,8 +1,8 @@
-package com.github.anno4j.recommendation.impl;
+package com.github.anno4j.similarity.impl;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.recommendation.computation.SimilarityAlgorithm;
+import com.github.anno4j.similarity.computation.SimilarityAlgorithm;
 
 /**
  * A simple similarity algorithm, implementing {@link SimilarityAlgorithm}

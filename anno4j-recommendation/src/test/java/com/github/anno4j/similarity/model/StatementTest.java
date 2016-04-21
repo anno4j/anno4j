@@ -1,26 +1,20 @@
-package com.github.anno4j.recommendation.model;
+package com.github.anno4j.similarity.model;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.recommendation.RecommendationTestSetup;
-import org.junit.After;
-import org.junit.Before;
+import com.github.anno4j.similarity.SimilarityTestSetup;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test suite for the {@link com.github.anno4j.recommendation.model.Statement}.
+ * Test suite for the {@link com.github.anno4j.similarity.model.Statement}.
  *
  * A simple statement is set up, then persisted and queried.
  */
-public class StatementTest extends RecommendationTestSetup {
+public class StatementTest extends SimilarityTestSetup {
 
     private final static String SOME_PAGE = "http://example.org/";
 
