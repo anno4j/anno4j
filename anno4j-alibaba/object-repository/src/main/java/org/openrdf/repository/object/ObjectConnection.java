@@ -145,7 +145,11 @@ public class ObjectConnection extends ContextAwareConnection {
 	public String toString() {
 		URI uri = getVersionBundle();
 		if (uri == null)
-			return getDelegate().toString();
+			try {
+				return getDelegate().toString();
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			}
 		return uri.stringValue();
 	}
 
