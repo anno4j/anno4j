@@ -87,9 +87,8 @@ public class SmokeTest extends TestCase {
 		config.addConcept(Image.class);
 		config.addBehaviour(PersonSupport.class);
 		MemoryStore store = new MemoryStore();
-		SailRepository delegate = new SailRepository(store);
-		delegate.initialize();
-		repository = orf.createRepository(config, delegate);
+		repository = orf.createRepository(config, new SailRepository(store));
+		repository.initialize();
 		con = repository.getConnection();
 	}
 
