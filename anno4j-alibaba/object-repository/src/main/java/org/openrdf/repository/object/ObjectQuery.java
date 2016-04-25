@@ -97,15 +97,15 @@ public class ObjectQuery implements Query {
 		return query.getIncludeInferred();
 	}
 
-//	@Override
-//	public void setMaxExecutionTime(int maxExecTime) {
-//		query.setMaxExecutionTime(maxExecTime);
-//	}
-//
-//	@Override
-//	public int getMaxExecutionTime() {
-//		return query.getMaxExecutionTime();
-//	}
+	@Override
+	public void setMaxExecutionTime(int maxExecTime) {
+		query.setMaxExecutionTime(maxExecTime);
+	}
+
+	@Override
+	public int getMaxExecutionTime() {
+		return query.getMaxExecutionTime();
+	}
 
 	public void setIncludeInferred(boolean include) {
 		query.setIncludeInferred(include);
