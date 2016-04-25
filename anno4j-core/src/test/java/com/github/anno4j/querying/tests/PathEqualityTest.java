@@ -27,14 +27,26 @@ public class PathEqualityTest extends QuerySetup {
         firstTestBody.setValue("First Value");
         firstTestBody.setAnotherValue("Another Value");
         annotation.setBody(firstTestBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondPathEqualityTestBody secondTestBody = anno4j.createObject(SecondPathEqualityTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setAnotherValue("Another Value");
         annotation1.setBody(secondTestBody);
-        anno4j.persist(annotation1);
+
+        Annotation annotation2 = anno4j.createObject(Annotation.class);
+        FirstPathEqualityTestBody firstTestBody2 = anno4j.createObject(FirstPathEqualityTestBody.class);
+        firstTestBody2.setValue("Second Value");
+        annotation2.setBody(firstTestBody2);
+    }
+
+    @Test
+    public void inequalityTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {
+        List<Annotation> list = queryService.addCriteria("oa:hasBody[!ex:pathEqualityTestFirstValue is \"First Value\"]").execute();
+        assertEquals(1, list.size());
+
+        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list.get(0).getBody();
+        assertEquals("Second Value", firstPathEqualityTestBody.getValue());
     }
 
 

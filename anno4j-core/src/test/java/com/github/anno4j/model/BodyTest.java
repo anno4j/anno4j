@@ -10,23 +10,13 @@ import org.openrdf.repository.object.ObjectConnection;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by schlegel on 06/05/15.
- */
 public class BodyTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -38,12 +28,8 @@ public class BodyTest {
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setBody(body);
 
-
-        // persist annotation
-        connection.addObject(annotation);
-
         // query persisted object and check test body implementation
-        Annotation result = connection.getObject(Annotation.class, annotation.getResource());
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
         assertEquals(((TestBody)annotation.getBody()).getValue(), ((TestBody) result.getBody()).getValue());
     }
 

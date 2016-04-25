@@ -17,21 +17,15 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by schlegel on 06/10/15.
- */
 public class IDGeneratorTest {
 
     @Test
     public void testCustomIDGenerator() throws Exception {
         Anno4j anno4j = new Anno4j(new CustomIDGenerator());
-        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
         Person personObject = anno4j.createObject(Person.class);
-
         assertTrue(personObject.getResourceAsString().startsWith("urn:CUSTOMURL:"));
-        connection.addObject(personObject);
 
-        List<Person> resultList = connection.getObjects(Person.class).asList();
+        List<Person> resultList = anno4j.findAll(Person.class);
         assertEquals(1, resultList.size());
         assertTrue(resultList.get(0).getResourceAsString().startsWith("urn:CUSTOMURL:"));
     }
@@ -39,14 +33,11 @@ public class IDGeneratorTest {
     @Test
     public void testCustomIDGeneratorWithType() throws Exception {
         Anno4j anno4j = new Anno4j(new CustomIDGenerator());
-        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
-
         Software softwareObject = anno4j.createObject(Software.class);
 
         assertTrue(softwareObject.getResourceAsString().startsWith("urn:SOFTWARE:"));
-        connection.addObject(softwareObject);
 
-        List<Software> resultList = connection.getObjects(Software.class).asList();
+        List<Software> resultList = anno4j.findAll(Software.class);
         assertEquals(1, resultList.size());
         assertTrue(resultList.get(0).getResourceAsString().startsWith("urn:SOFTWARE:"));
     }

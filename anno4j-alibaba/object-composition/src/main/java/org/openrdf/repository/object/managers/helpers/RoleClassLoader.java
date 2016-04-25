@@ -39,6 +39,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +122,8 @@ public class RoleClassLoader {
         classpath.addAll(ClasspathHelper.forPackage(""));
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(classpath)
+				.useParallelExecutor()
+				.filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
                 .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
 
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Iri.class, true);

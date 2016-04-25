@@ -28,7 +28,6 @@ public class ConstraintLessTest extends QuerySetup {
         ConstraintLessBody constraintLessBody = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody.setValue("Value 1");
         annotation.setBody(constraintLessBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
@@ -36,13 +35,11 @@ public class ConstraintLessTest extends QuerySetup {
         constraintLessBody2.setValue("Value 2");
 
         annotation1.setBody(constraintLessBody2);
-        anno4j.persist(annotation1);
 
         // This
         Annotation annotation2 = anno4j.createObject(Annotation.class);
         annotation2.setAnnotatedAt("01.01.2011");
         annotation2.setBody(anno4j.createObject(ConstraintLessBody.class));
-        anno4j.persist(annotation2);
     }
 
     @Test

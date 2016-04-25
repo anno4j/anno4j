@@ -43,12 +43,8 @@ import java.util.Map;
 public class QueryService {
 
     private final Logger logger = LoggerFactory.getLogger(QueryService.class);
-    private final URI graph;
 
-    /**
-     * The repository needed for the actual querying
-     */
-    private ObjectRepository objectRepository;
+    private ObjectConnection connection;
 
     /**
      * Bundles the:
@@ -79,9 +75,14 @@ public class QueryService {
      */
     private QueryOptimizer queryOptimizer = null;
 
-    public <T> QueryService(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration, URI graph) {
-        queryServiceDTO = new QueryServiceConfiguration();
-        this.objectRepository = objectRepository;
+    public <T> QueryService(ObjectConnection connection, LDPathEvaluatorConfiguration evaluatorConfiguration) {
+        this.connection = connection;
+
+        this.queryServiceDTO = new QueryServiceConfiguration();
+        queryServiceDTO.setEvaluatorConfiguration(evaluatorConfiguration);
+        queryServiceDTO.setConfiguration(createLDPathConfiguration());
+
+        this.queryOptimizer = QueryOptimizer.getInstance();
 
         // Setting some common name spaces
         addPrefix(OADM.PREFIX, OADM.NS);
@@ -95,11 +96,6 @@ public class QueryService {
         addPrefix(OWL.PREFIX, OWL.NAMESPACE);
         addPrefix(RDFS.PREFIX, RDFS.NAMESPACE);
         addPrefix(SKOS.PREFIX, SKOS.NAMESPACE);
-
-        this.queryOptimizer = QueryOptimizer.getInstance();
-        this.graph = graph;
-        queryServiceDTO.setEvaluatorConfiguration(evaluatorConfiguration);
-        queryServiceDTO.setConfiguration(createLDPathConfiguration());
     }
 
     private Configuration createLDPathConfiguration() {
@@ -273,20 +269,16 @@ public class QueryService {
      * @return the result set
      */
     public <T extends ResourceObject> List<T> execute(Class<T> type) throws ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException {
-        ObjectConnection con = objectRepository.getConnection();
 
-        if (graph != null) {
-            con.setReadContexts(graph);
-            con.setInsertContext(graph);
-            con.setRemoveContexts(graph);
-        }
-
-        URI rootType = objectRepository.getConnection().getObjectFactory().getNameOf(type);
+        URI rootType = connection.getObjectFactory().getNameOf(type);
         if (rootType == null) {
             throw new IllegalArgumentException("Can't query for: " + type + " not found in name map. Is @Iri annotation set?");
         }
 
         Query sparql = EvalQuery.evaluate(queryServiceDTO, rootType);
+
+        // LDPath allows distinct. May have bad performance.
+        sparql.setDistinct(true);
 
         if (limit != null) {
             sparql.setLimit(limit);
@@ -307,7 +299,7 @@ public class QueryService {
         q = queryOptimizer.optimizeJoinOrder(q);
         logger.debug("Query after join order optimization:\n " + q);
 
-        ObjectQuery query = con.prepareObjectQuery(q);
+        ObjectQuery query = connection.prepareObjectQuery(q);
 
         if (query.getDataset() != null) {
             logger.info("\nGRAPH CONTEXT = " + query.getDataset().getDefaultGraphs() + "\nFINAL QUERY :\n" + q);

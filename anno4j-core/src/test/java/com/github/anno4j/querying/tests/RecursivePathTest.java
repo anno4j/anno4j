@@ -67,14 +67,12 @@ public class RecursivePathTest extends QuerySetup {
         RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
         recursiveBody.setValue("Some Testing Value");
         annotation.setBody(recursiveBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setAnnotatedAt("01.01.2011");
         RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
         recursiveBody2.setValue("Another Testing Value");
         annotation1.setBody(recursiveBody2);
-        anno4j.persist(annotation1);
 
     }
 

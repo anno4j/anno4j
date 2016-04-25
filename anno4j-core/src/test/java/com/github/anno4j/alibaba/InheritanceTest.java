@@ -20,17 +20,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class InheritanceTest {
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -43,11 +36,8 @@ public class InheritanceTest {
         body.setValue("myValue");
         annotation.setBody(body);
 
-        // Persist annotation
-        connection.addObject(annotation);
-
         // Query persisted object
-        List<Annotation> result = connection.getObjects(Annotation.class).asList();
+        List<Annotation> result = anno4j.findAll(Annotation.class);
 
         assertEquals(1, result.size());
 

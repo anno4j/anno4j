@@ -9,9 +9,6 @@ import org.openrdf.repository.object.ObjectConnection;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by schlegel on 27/10/15.
- */
 public class FragmentSelectorTest {
     private Anno4j anno4j;
     private ObjectConnection connection;

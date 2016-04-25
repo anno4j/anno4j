@@ -66,13 +66,11 @@ public class IsATest extends QuerySetup {
         FirstTestBody firstTestBody = anno4j.createObject(FirstTestBody.class);
         firstTestBody.setValue("First Value");
         annotation.setBody(firstTestBody);
-        anno4j.persist(annotation);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondTestBody secondTestBody = anno4j.createObject(SecondTestBody.class);
         secondTestBody.setValue("Second Value");
         annotation1.setBody(secondTestBody);
-        anno4j.persist(annotation1);
     }
 
     @Iri("http://www.example.com/schema#firstBodyType")
