@@ -5,6 +5,9 @@ COMMITMSG=$(git log --format=%B -n 1 ${TRAVIS_COMMIT})
 if [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_BRANCH}" == "develop" ]; then
    echo "Deploy develop snapshot of Anno4j:" $COMMITMSG ;
    mvn clean deploy --settings settings.xml
+elif [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_BRANCH}" == "develop-mico" ]; then
+   echo "Deploy develop snapshot of Anno4j MICO:" $COMMITMSG ;
+   mvn clean deploy --settings settings.xml
 elif [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_BRANCH}" == "master" ]; then
     if [[ $COMMITMSG != \[maven-release-plugin\]* ]]; then
         echo "Release Anno4j:" $COMMITMSG
