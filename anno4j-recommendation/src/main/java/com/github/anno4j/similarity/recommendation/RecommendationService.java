@@ -30,14 +30,7 @@ public class RecommendationService {
         QueryService qs = this.anno4j.createQueryService();
         qs.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
 
-        qs.addCriteria("^rdf:object[is-a arec:SimilarityStatement]/rdf:subject", annotation.getResourceAsString());
-
-        similarAnnotations.addAll(qs.execute(Annotation.class));
-
-        qs = this.anno4j.createQueryService();
-        qs.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
-
-        qs.addCriteria("^rdf:subject[is-a arec:SimilarityStatement]/rdf:object", annotation.getResourceAsString());
+        qs.addCriteria("^rdf:object[is-a arec:SimilarityStatement]/rdf:subject | ^rdf:subject[is-a arec:SimilarityStatement]/rdf:object", annotation.getResourceAsString());
 
         similarAnnotations.addAll(qs.execute(Annotation.class));
 
