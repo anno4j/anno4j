@@ -118,8 +118,6 @@ public class Anno4j implements TransactionCommands {
 
         Reflections annotatedClasses = new Reflections(new ConfigurationBuilder()
                 .setUrls(classpath)
-                .useParallelExecutor()
-                .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
                 .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
 
         // find classes with @Partial annotation

@@ -122,8 +122,6 @@ public class RoleClassLoader {
         classpath.addAll(ClasspathHelper.forPackage(""));
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(classpath)
-				.useParallelExecutor()
-				.filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
                 .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
 
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Iri.class, true);
