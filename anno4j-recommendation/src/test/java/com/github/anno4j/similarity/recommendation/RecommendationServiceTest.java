@@ -29,11 +29,24 @@ public class RecommendationServiceTest extends SimilarityTestSetup {
 
         algo.compute();
 
-        List<Annotation> annotations = this.queryService.execute(Annotation.class);
+        List<Annotation> annotations = this.queryService.addCriteria("oa:hasBody[is-a <" + TestBody1.URI + ">]").execute(Annotation.class);
+
+        assertEquals(2, annotations.size());
 
         RecommendationService rs = new RecommendationService(this.anno4j);
 
         List<Annotation> similarAnnotations = rs.findSimilarAnnotations(annotations.get(0));
+
+        assertEquals(2, similarAnnotations.size());
+
+        // Test object -> subject direction
+        this.queryService = this.anno4j.createQueryService().addCriteria("oa:hasBody[is-a <" + TestBody2.URI + ">]");
+
+        annotations = this.queryService.execute();
+
+        assertEquals(2, annotations.size());
+
+        similarAnnotations = rs.findSimilarAnnotations(annotations.get(0));
 
         assertEquals(2, similarAnnotations.size());
     }

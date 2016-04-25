@@ -8,4 +8,5 @@ import org.openrdf.annotations.Iri;
  */
 @Iri("http://somepage.com#TestBody3")
 public interface TestBody3 extends Body{
+    String URI = "http://somepage.com#TestBody3";
 }

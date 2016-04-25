@@ -6,6 +6,8 @@ import org.openrdf.annotations.Iri;
 
 @Iri("http://somepage.com#TestBody1")
 public interface TestBody1 extends Body {
+    String URI = "http://somepage.com#TestBody1";
+
     @Iri(RDF.VALUE)
     void setValue(String value);
 
