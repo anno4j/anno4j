@@ -22,6 +22,12 @@ The Object Composition library merges multiple Java objects into a single multi-
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>annotations</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
