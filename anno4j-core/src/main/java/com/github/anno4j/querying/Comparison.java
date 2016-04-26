@@ -1,5 +1,7 @@
 package com.github.anno4j.querying;
 
+import org.openrdf.query.algebra.evaluation.function.string.Contains;
+
 /**
  * Possible comparison methods
  */
@@ -27,7 +29,13 @@ public enum Comparison {
     /**
      * Lower than or equals
      */
-    LTE("<=");
+    LTE("<="),
+
+    CONTAINS("contains"),
+
+    STARTS_WITH("startsWith"),
+
+    ENDS_WITH("endWith");
 
     private String sparqlOperator;
 
