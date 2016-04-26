@@ -69,7 +69,7 @@ public class SimilarityImplTest extends SimilarityTestSetup {
 
         boolean foundZeroEquality = false;
         for(Annotation anno : similarityAnnotations) {
-            if(((SimilarityStatement) anno.getBody()).getSimilarityValue() == 0.0) {
+            if(((SimilarityStatement) anno.getBody()).getSimilarityValue() > 0.0) {
                 foundZeroEquality = true;
                 break;
             }

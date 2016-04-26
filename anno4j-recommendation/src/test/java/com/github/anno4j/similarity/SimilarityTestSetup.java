@@ -61,6 +61,8 @@ public abstract class SimilarityTestSetup {
 
             if(i == 0) {
                 body.setValue("test");
+            } else if(i == 1) {
+                body.setValue("test2");
             }
 
             anno.setBody(body);

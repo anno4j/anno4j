@@ -2,6 +2,7 @@ package com.github.anno4j.similarity.recommendation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.querying.Comparison;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.similarity.ontologies.ANNO4JREC;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -25,16 +26,25 @@ public class RecommendationService {
     }
 
     public List<Annotation> findSimilarAnnotations(Annotation annotation) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+        return this.findSimilarAnnotations(annotation, this.anno4j.createQueryService());
+    }
+
+    public List<Annotation> findSimilarAnnotations(Annotation annotation, double lowerBound) throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addCriteria("^rdf:object[is-a arec:SimilarityStatement]/<" + ANNO4JREC.HAS_SIMILARITY_VALUE + "> | ^rdf:subject[is-a arec:SimilarityStatement]/<" + ANNO4JREC.HAS_SIMILARITY_VALUE + ">", lowerBound, Comparison.GTE);
+
+        return this.findSimilarAnnotations(annotation, qs);
+    }
+
+    private List<Annotation> findSimilarAnnotations(Annotation annotation, QueryService queryService) throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
         List<Annotation> similarAnnotations = new LinkedList<Annotation>();
 
-        QueryService qs = this.anno4j.createQueryService();
-        qs.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
+        queryService.addPrefix(ANNO4JREC.PREFIX, ANNO4JREC.NS);
 
-        qs.addCriteria("^rdf:object[is-a arec:SimilarityStatement]/rdf:subject | ^rdf:subject[is-a arec:SimilarityStatement]/rdf:object", annotation.getResourceAsString());
+        queryService.addCriteria("^rdf:object[is-a arec:SimilarityStatement]/rdf:subject | ^rdf:subject[is-a arec:SimilarityStatement]/rdf:object", annotation.getResourceAsString());
 
-        similarAnnotations.addAll(qs.execute(Annotation.class));
+        similarAnnotations.addAll(queryService.execute(Annotation.class));
 
         return similarAnnotations;
     }
-
 }

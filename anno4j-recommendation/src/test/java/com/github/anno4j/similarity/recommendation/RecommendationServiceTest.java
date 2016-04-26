@@ -1,6 +1,7 @@
 package com.github.anno4j.similarity.recommendation;
 
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.querying.Comparison;
 import com.github.anno4j.similarity.SimilarityTestSetup;
 import com.github.anno4j.similarity.impl.SimpleSimilarityAlgorithm;
 import com.github.anno4j.similarity.impl.TestBody1;
@@ -49,6 +50,28 @@ public class RecommendationServiceTest extends SimilarityTestSetup {
         similarAnnotations = rs.findSimilarAnnotations(annotations.get(0));
 
         assertEquals(2, similarAnnotations.size());
+    }
+
+    @Test
+    public void testFindSimilarAnnotationsWithLowerBoundary() throws IllegalAccessException, MalformedQueryException, RepositoryException, ParseException, InstantiationException, QueryEvaluationException {
+        SimpleSimilarityAlgorithm algo = new SimpleSimilarityAlgorithm(this.anno4j, ALGORITHM_NAME, ALGORITHM_ID, TestBody1.class, TestBody2.class);
+
+        algo.compute();
+
+        List<Annotation> annotations = this.queryService.addCriteria("oa:hasBody[is-a <" + TestBody1.URI + ">]/rdf:value", "test2", Comparison.EQ).execute(Annotation.class);
+
+        assertEquals(1, annotations.size());
+
+        RecommendationService rs = new RecommendationService(this.anno4j);
+
+        List<Annotation> similarAnnotations = rs.findSimilarAnnotations(annotations.get(0), 0.7);
+
+        assertEquals(0, similarAnnotations.size());
+
+        similarAnnotations = rs.findSimilarAnnotations(annotations.get(0), 0.55);
+
+        assertEquals(2, similarAnnotations.size());
+
     }
 
     @Override

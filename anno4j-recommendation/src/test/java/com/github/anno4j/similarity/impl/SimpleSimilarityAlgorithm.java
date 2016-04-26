@@ -21,9 +21,12 @@ public class SimpleSimilarityAlgorithm extends SimilarityAlgorithm {
         this.counter++;
 
         TestBody1 body = (TestBody1) anno1.getBody();
+        TestBody2 body2 = (TestBody2) anno2.getBody();
 
         if(body.getValue() != null && body.getValue().equals("test")) {
-            return 0.0;
+            return 0.5;
+        } else if(body.getValue().equals("test2")) {
+            return 0.6;
         }
 
         return 1.0;
