@@ -1,6 +1,6 @@
 # Anno4j
 
-> This library provides programmatic access to read and write [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) / [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/) from and to local/remote SPARQL endpoints. An easy-to-use and extensible Java API allows creation and querying of annotations even for non-experts.  
+> This library provides programmatic access the [W3C Web Annotation Data Model](http://www.w3.org/TR/annotation-model/) (formerly known as the [W3C Open Annotation Data Model](http://www.openannotation.org/spec/core/)) to allow annotations to be writtem from and to local or remote SPARQL endpoints. An easy-to-use and extensible Java API allows creation and querying of annotations even for non-experts.  
 
 ## Build Status
 master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=master)](https://travis-ci.org/anno4j/anno4j) develop branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=develop)](https://travis-ci.org/anno4j/anno4j)
@@ -8,10 +8,10 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
 ## Features:
 
 - Extensible creation of Web/Open Annotations based on Java Annotations syntax.
-- Built-in and predefined implementations for Targets and Selectors conform to W3C Web Annotation Data Model and W3C Open Annotation Data Model
-- Annotations are transformed to RDF and automatically transmitted to local/remote SPARQL using SPARQL Update functionality
+- Built-in and predefined implementations for nearly all RDF classes conform to the W3C Web Annotation Data Model
+- Created (and annotated) Java POJOs are transformed to RDF and automatically transmitted to local/remote SPARQL using SPARQL Update functionality
 - Querying of annotations with path-based criteria
-    - [x] Basic Comparisons like (equal, greater and lower)
+    - [x] Basic comparisons like "equal", "greater", and "lower"
     - [x] Union of different paths
     - [x] Type condition
     - [x] Custom filters
@@ -21,8 +21,8 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
 - [Getting Started](#getting-started)
     - [Install](#install)
     - [Configuration](#configuration)
-    - [Create and save annotations](#create-and-save-annotations)
-    - [Query for annotations](#query-for-annotations)
+    - [Create and Save Annotations](#create-and-save-annotations)
+    - [Query for Annotations](#query-for-annotations)
     - [Graph Context](#graph-context)
 - [Example](#example)
 - [Restrictions](#restrictions)
@@ -30,15 +30,15 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
 - [License](#license)
 
 ## Introduction
-Anno4j is an Java RDF library to easily cope with annotations conform to the Web Annotation Data Model / Open Annotation Data Model. The library provides an extensible way of creating annotations and defines bundled with different target and selector interfaces. Annotations are automatically persisted on local or remote connected [SPARQL (SPARQL Protocol and RDF Query Language)](http://www.w3.org/TR/sparql11-overview/) endpoints without having to issue any kind of SPARQL query. Besides the creation of annotations, Anno4j also provides an easy-to-use query API based on the path query language [LDPath](http://marmotta.apache.org/ldpath/).
+Anno4j is a Java RDF library to easily cope with annotations conform to the Web Annotation Data Model / Open Annotation Data Model. The library provides an extensible way to create annotations while supporting bundles of pre-defined RDF class interfaces. Annotations are automatically persisted on (locally or remotely) connected [SPARQL (SPARQL Protocol and RDF Query Language)](http://www.w3.org/TR/sparql11-overview/) endpoints without having to issue any kind of SPARQL query. Besides the creation of annotations, Anno4j also provides an easy-to-use query API based on the path-based query language [LDPath](http://marmotta.apache.org/ldpath/).
 
-The Web Annotation Data Model / Open Annotation Data Model specification describes a structured model and format to enable (web) annotations to be shared and reused across different hardware and software platform. The model is based on [RDF (Resource Description Framework)](http://www.w3.org/TR/rdf11-primer/), a standard model for data interchange on the Web.
+The Web Annotation Data Model / Open Annotation Data Model specification describes a structured model and format to enable (web) annotations to be shared and reused across different hardware and software platform. The model is based on [RDF (Resource Description Framework)](http://www.w3.org/TR/rdf11-primer/), the de-facto-standard model for interchanging data over the Web.
 
 ## Getting Started
 
-### Install
+### Installation
 
-1. Add maven dependency (Anno4j is in oss.sonatype.org Repository)
+Add the maven dependency (Anno4j is in the oss.sonatype.org repository)
 ```
       <dependency>
         <groupId>com.github.anno4j</groupId>
@@ -46,85 +46,83 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
         <version>2.0.0</version>
       </dependency>
 ```     
-2. Add an empty concept file "org.openrdf.concepts" under your META-INF directory
 
 ### Configuration
 
 Unlike the first version of Anno4j, v2 does not implement the singleton pattern anymore. Without the singleton pattern, 
-it is now possible to use multiple triple stores, which was not possible with v1. To create an Anno4j instance,
-simple use the common new operator of Java:
+it is now possible to use multiple Anno4j instances and consecutively multiple triple-stores. To create an Anno4j instance,
+simply use the Anno4j class constructor:
 
 ```java
     Anno4j anno4j = new Anno4j();
 ```
 
-Default configuration of Anno4j is a local in-memory SPARQL endpoint. Anno4j is based on [Sesame](http://rdf4j.org/). To connect to your 
-local or remote SPARQL endpoint, just create a corresponding repository object (see [here](http://rdf4j.org/sesame/2.7/docs/users.docbook?view#section-repository-api)) 
-and set it in the Anno4j instance.
-
+The default configuration of Anno4j is set to a local in-memory SPARQL triple-store. Anno4j is based on [Sesame](http://rdf4j.org/). To connect to your personal
+local or remote SPARQL endpoint, just create a corresponding repository object (see [here](http://rdf4j.org/sesame/2.7/docs/users.docbook?view#section-repository-api) for the Sesame documentation of repositories) 
+and use the corresponding setter of your Anno4j instance.
 
 ```java
     anno4j.setRepository(new SPARQLRepository("http://www.mydomain.com/sparql"));
 ```       
 
-For RDF creation, Anno4j need a central instance for generating unique identifiers. The ID generator needs to implement 
-the com.github.anno4j.persistence.IDGenerator interface. To activate your ID generator, just create a corresponding object and set it in the Anno4j instance.
+For RDF creation, Anno4j needs a central instance to generate unique identifiers. The ID generator needs to implement 
+the *org.openrdf.IDGenerator* interface. To activate your ID generator, create a respective object and set it in the Anno4j instance.
 
 ```java
     anno4j.setIdGenerator(new MyIDGenerator());
 ```       
 
 
-### Create and save annotations
+### Create and Save Annotations
 
-Anno4j uses [AliBaba](https://bitbucket.org/openrdf/alibaba/) to provide an easy way to extend the 
-W3C Open Annotation Data Model by simply annotating Java interfaces with the *@IRI* Java annotation 
-(example see: com.github.anno4j.model.impl.selector.DataPositionSelector.java). To indicate for example that a given 
-interface is a *Annotation*, adding @Iri(OTADM.ANNOTAION) directly above the class declaration is enough, where OADM.ANNOTATION is
-a predefined constant for the iri: *http://www.w3.org/ns/oa#Annotation* (Other predefined namespaces are 
-declared in the *com.github.anno4j.model.ontologie package*). This would lead to the triple when persisting the 
-example class using anno4j:
+Anno4j uses [AliBaba](https://bitbucket.org/openrdf/alibaba/) to provide an easy way to create RDF by simply annotating Java interfaces with the *@IRI* Java annotation. To indicate for example that a given 
+interface is a *Annotation* you need to add "@Iri(OADM.ANNOTAION)" directly above the class declaration. 
+
+```java
+	@Iri(OADM.ANNOTATION)
+    public interface Annotation extends ResourceObject { ... }
+```
+
+OADM.ANNOTATION is a predefined constant for the IRI: *http://www.w3.org/ns/oa#Annotation* (Other predefined namespaces are 
+declared in the *com.github.anno4j.model.namespaces package*). When a respective instance is then persisted via Anno4j (merely the creation of the object is enough, see below), the following triple describing the type relationship is created:
 
     <http://example.org/exampleAnnotation> rdf:type <http://www.w3.org/ns/oa#Annotation>
  
-Declaring the rdf:type of an object is an exceptional case. To specify all other triples, the *@Iri* annotation has to be
-added directly above the getters and setters of the interface, that should be stored in the repository. An example for that is the triple:
+To specify other triples and corresponding relationships, the *@Iri* annotation has to be
+added directly above the respective getter/setter pair of the interface. An example for the body of an OADM annotation, utilising the IRI *@Iri(OADM.HAS_BODY)*, would look like this:
+
+```java
+    @Iri(OADM.HAS_BODY)
+    Body getBody() {...};
+    
+    @Iri(OADM.HAS_BODY)
+    void setBody(Body body) {...};
+```
+
+This would result in the following RDF triple:
 
     <http://example.org/exampleAnnotation> <http://www.w3.org/ns/oa#hasBody> <http://example.org/exampleBody>
-    
-To specify this triple the attribute body of the *http://www.w3.org/ns/oa#Annotation* simply needs the *@Iri(OADM.HAS_BODY)*
-annotation:
-   
-```java
-    @Iri(OADM.HAS_BODY)
-    private Body getBody() {...};
-    
-    @Iri(OADM.HAS_BODY)
-    private void setBody(Body body) {...};
-```
 
-After annotating all needed getters and setters, the given object can be persisted using anno4j. Because of the switch 
-interfaces, the Anno4j class provides a createObject() method, that has to be invoked when creating objects from predefined 
-interfaces, i.e. to create an Annotation object. The following code shows how it can be done:
-
+Once the interface is set up with its type IRI as well as annotated getters and setters, instances of the respective interface can be created by using the *.createObject()* method. Anno4j automatically persists them at its respectively assigned triple-store. The creation of an annotation that we just defined above would look like this:
 
 ```java
-    // Simple Annotation object
+	// Create Anno4j instance
+	Anno4j anno4j = new Anno4j();
+
+    // Simple Annotation and Body object
     Annotation annotation = anno4j.createObject(Annotation.class);
-    annotation.setSerializedAt("07.05.2015");
-
-     // persist annotation
-     Anno4j anno4j = new Anno4j();
-     anno4j.persist(annotation);
+    
+    // Modify the Annotation
+    annotation.setBody( ... );
 ```
 
-This would lead to the persistence of the annotation object and all of its annotated attributes to the preset repository.  
+This would lead to the persistence of the annotation object and all of its annotated attributes to the preset repository.
 
-### Query for annotations
+### Query for Annotations
 
-Anno4j also allows to query triple stores without writing own SPARQL queries. Therefore it provides hibernate like criteria
-queries to query against a particular class. Furthermore anno4j is a so-called fluent interface, that allows method chaining
-and therefore helps the user to write readable code.
+Anno4j also allows to query triple-stores without writing own SPARQL queries. Therefore it provides hibernate like criteria
+queries to query against a particular class. Furthermore Anno4j is a so-called fluent interface, that allows method chaining
+and therefore helps the user to write readable code, which can be seperated into smaller bits and pieces for better convenience.
 
 The following code shows how to get the instance of the query service, which is responsible for all provided querying mechanism. 
 In addition this example code shows how to use the method chaining ability of the fluent interface. Therefore a custom
