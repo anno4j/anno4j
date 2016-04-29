@@ -122,57 +122,72 @@ This would lead to the persistence of the annotation object and all of its annot
 
 Anno4j also allows to query triple-stores without writing own SPARQL queries. Therefore it provides hibernate like criteria
 queries to query against a particular class. Furthermore Anno4j is a so-called fluent interface, that allows method chaining
-and therefore helps the user to write readable code, which can be seperated into smaller bits and pieces for better convenience.
+and therefore helps the user to create their respective query more easily, as they are better to read and can be seperated into smaller bits and pieces for better convenience.
 
-The following code shows how to get the instance of the query service, which is responsible for all provided querying mechanism. 
-In addition this example code shows how to use the method chaining ability of the fluent interface. Therefore a custom
-namespace is added directly after retrieving the instance of the QueryService. This can be accomplished with just a single
-line of code.
+The following code shows how to get an instance of the QueryService (related to a given Anno4j object), which is responsible for all provided querying mechanisms. 
+It also gives insight on how to use the method chaining ability of the fluent interface. 
+
+However, before querying can happen, it is important to make sure that every namespace is known to the specific QueryService instance, if you intend to use abbreviations. A custom namespace can be registered with the following command, also displaying of how to create a QueryService ontop of a given Anno4j instance:
 
 ```java
-    Anno4j anno4j = new Anno4j();
-    QueryService<Annotation> queryService = anno4j.createQueryService().addPrefix("ex", "http://www.example.com/schema#");
+	// Create QueryService object
+	QueryService<Annotation> queryService = anno4j.createQueryService();
+	
+	// Register custom namespace with abbreviation ex
+	queryService.addPrefix("ex", "http://www.example.com/schema#");
 ```
 
-However, some prefixes are predefined and thereby always available without being specified. These are:
+Using a custom namespace allows to apply its abbreviation when its utilizing RDF vocabulary, so for example instead of writing *http://www.example.com/schema#SomeClass* you can write *ex:SomeClass*. Some namespaces are predefined and thereby always available without being specified. These are:
 
-    oa:      <http://www.w3.org/ns/oa#>
-    cnt:     <http://www.w3.org/2011/content#>
-    dc:      <http://purl.org/dc/elements/1.1/>
-    dcterms: <http://purl.org/dc/terms/>
-    dctypes: <http://purl.org/dc/dcmitype>
-    foaf:    <http://xmlns.com/foaf/0.1/>
-    prov:    <http://www.w3.org/ns/prov/>
-    rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    oa:			<http://www.w3.org/ns/oa#>
+    cnt:		<http://www.w3.org/2011/content#>
+    dc:			<http://purl.org/dc/elements/1.1/>
+    dcterms:	<http://purl.org/dc/terms/>
+    dctypes:	<http://purl.org/dc/dcmitype>
+    foaf:		<http://xmlns.com/foaf/0.1/>
+    prov:		<http://www.w3.org/ns/prov/>
+    rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    rdfs:		<http://www.w3.org/2000/01/rdf-schema#>
+    skos:		<http://www.w3.org/2004/02/skos/core#>
 
-After adding all needed namespaces to the query service, the next step would be to define some criteria. Therefore the QueryService
-object provides the *addCriteria(String LDPath)* method. To add criteria this method requires a string 
-value representing the [LDPath](http://marmotta.apache.org/ldpath/). LD Path is a simple path-based query language similar 
-to XPath or SPARQL Property Paths that is particularly well-suited for querying and retrieving resources from the Linked Data Cloud by 
-following RDF links between resources and servers. For example, the following path query would select the names of 
-all friends of the context resource:
+Once all namespaces are added, the next step consists of adding criteria to the QueryService, which will ultimately define the query that can be executed. This is done by using the *addCriteria(String ldPath)* method of the QueryService. The criteria in the *ldPath* parameter therefore must be conform to the [LDPath](http://marmotta.apache.org/ldpath/) specification. LDPath is a simple path-based query language similar to [XPath](https://www.w3.org/TR/xpath/) or [SPARQL Property Paths](https://www.w3.org/TR/sparql11-query/#propertypaths), that is particularly well-suited for querying and retrieving resources from a given RDF graph. LDPath offers a broad variety of tools to form comprehensive queries, extensive examples of how to use it in conjunction with Anno4j can be seen in the test suite found in the *com.github.anno4j.querying* package. A path criteria, testing if an Annotation has a FragmentSelector, could look as follows:
 
-    foaf:knows / foaf:name
+    oa:hasTarget / oa:hasSelector[is-a oa:FragmentSelector]
     
-The next parameter the addCriteria() method needs, is the actual constraint as string or as number. The last parameter is 
-the comparison operator. Anno4j supports all common comparison methods like:
+Next to a solely path-based criteria, comparison criteria are also supported by using the *addCriteria(String ldPath, String value, Comparison comparison)* method. It allows to define the path to an RDF field that is then compared against the supported *value*/*comparison* constraint. The *value* is a basic datatype like numbers or a String, which will be compared against the value of the respective RDF field. Anno4j supports various comparison operators, such as:
 
 - Equal (Comparison.EQ)
 - Greater than (Comparison.GT)
 - Greater than or else (Comparison.GTE)
 - Lower than (Comparison.LT)
 - Lower than or else (Comparison.LTE)
+- String: contains (Comparison.CONTAINS)
+- String: starts with (Comparison.STARTS_WITH)
+- String: ends with (Comparison.ENDS_WITH)
 
-If the comparison method is not provided, the query service will use Comparison.EQ by default. The following example code shows 
-how the addCriteria function could be invoked to query for a specific value of the body:
+If a comparison method is not provided, the query service will use Comparison.EQ by default. The following example code shows 
+how the addCriteria function could be invoked to query for a specific value (starting from an Annotation, over the relationships *oa:hasBody* and *ex:value*) of a given body:
 
 ```java
     queryService.addCriteria("oa:hasBody/ex:value", "Example Value", Comparison.EQ);
 ```
 
-After adding one or multiple criteria the QueryService can be executed. This means, that the QueryService will automatically create a SPARQL query
-according to the users namespaces and criteria and use this query to retrieve the data from the triple store. To achieve this, the execute() method has
-to be invoked. Because Anno4j provides a fluent-interface, the code examples from above can be rewritten to the following code example:
+After adding single or multiple criteria to the QueryService, its query can be executed. Therefore, the QueryService will automatically create a SPARQL query
+according to the users' namespaces and criteria that have been defined and use this query to retrieve the respective data from the triple store. To achieve this, the *.execute()* or *.execute(Class<T> type)* method has
+to be invoked. The *type* parameter defines the RDF class that is used as starting point for the given query. Its value is supposed to match a given Anno4j Java class. For example, one could add a specific body type (e.g. *EX.EXAMPLE_BODY* which is also applied to the respective class), in order to start the query from there. If no *type* is supported, the default starting point is the Annotation (*OADM.ANNOTATION*).
+
+A complete QueryService example can be seen in the following code snippet. 
+
+```java
+	QueryService queryService = anno4j.createQueryService();
+    queryService
+        .addPrefix("ex", "http://www.example.com/schema#")
+        
+        .addCriteria("oa:hasBody/ex:value", "Example Value")
+        .execute();
+```
+
+Because Anno4j provides a fluent-interface, the code examples from above can be rewritten to the following code example:
 
 ```java
     queryService
@@ -189,6 +204,8 @@ The following example shows how to prompt for a SpecificResource object:
 ```java
     queryService.execute(SpecificResource.class);
 ```
+
+ALL DEFINED CRITERIA ARE TRANSFORMED TO SPARQL AND SHOT AGAINST TRIPLESTORE
 
 ### Graph Context
 
