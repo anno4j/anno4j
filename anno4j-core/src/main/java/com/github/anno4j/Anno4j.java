@@ -398,4 +398,8 @@ public class Anno4j implements TransactionCommands {
     public Transaction createTransaction() throws RepositoryException {
         return new Transaction(objectRepository, evaluatorConfiguration);
     }
+
+    public Transaction adoptTransaction(ObjectConnection connection) throws RepositoryException {
+        return new Transaction(connection, evaluatorConfiguration);
+    }
 }

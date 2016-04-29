@@ -28,6 +28,11 @@ public class Transaction implements TransactionCommands {
         this.evaluatorConfiguration = evaluatorConfiguration;
     }
 
+    public Transaction(ObjectConnection connection, LDPathEvaluatorConfiguration evaluatorConfiguration) throws RepositoryException {
+        this.connection = connection;
+        this.evaluatorConfiguration = evaluatorConfiguration;
+    }
+
     /**
      * Indicates if a transaction is currently active on the connection. A
      * transaction is active if {@link #begin()} has been called, and becomes
