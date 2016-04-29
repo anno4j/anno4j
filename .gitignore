@@ -21,3 +21,5 @@ anno4j-extensions/extension-sparqlmm/target
 /anno4j-ontologies/ontologies-mmm/target/
 
 /target/
+.metadata
+.recommenders
