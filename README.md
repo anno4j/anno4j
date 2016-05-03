@@ -19,10 +19,11 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
 ## Outline
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-    - [Install](#install)
+    - [Installation](#Installation)
     - [Configuration](#configuration)
     - [Create and Save Annotations](#create-and-save-annotations)
     - [Query for Annotations](#query-for-annotations)
+    - [Transactions](#transactions)
     - [Graph Context](#graph-context)
 - [Example](#example)
 - [Restrictions](#restrictions)
@@ -174,53 +175,57 @@ how the addCriteria function could be invoked to query for a specific value (sta
 
 After adding single or multiple criteria to the QueryService, its query can be executed. Therefore, the QueryService will automatically create a SPARQL query
 according to the users' namespaces and criteria that have been defined and use this query to retrieve the respective data from the triple store. To achieve this, the *.execute()* or *.execute(Class<T> type)* method has
-to be invoked. The *type* parameter defines the RDF class that is used as starting point for the given query. Its value is supposed to match a given Anno4j Java class. For example, one could add a specific body type (e.g. *EX.EXAMPLE_BODY* which is also applied to the respective class), in order to start the query from there. If no *type* is supported, the default starting point is the Annotation (*OADM.ANNOTATION*).
+to be invoked. The *type* parameter defines the RDF class that is used as starting point for the given query. Its value is supposed to match a given Anno4j Java class. For example, one could add a specific body type (e.g. *EX.EXAMPLE_BODY*) which is also applied to the respective class), in order to start the query from there. If no *type* is supported, the default starting point is the Annotation (*OADM.ANNOTATION*).
 
-A complete QueryService example can be seen in the following code snippet. 
+A complete QueryService example can be seen in the following code snippet: 
 
 ```java
 	QueryService queryService = anno4j.createQueryService();
     queryService
         .addPrefix("ex", "http://www.example.com/schema#")
-        
-        .addCriteria("oa:hasBody/ex:value", "Example Value")
-        .execute();
+        .addCriteria("^oa:hasBody/oa:motivatedBy, "bookmarking", Comparison.EQ)
+        .addCriteria(ex:confidence, 0.5, Comparison.GT)
+        .execute(ExampleBody.class);
 ```
 
-Because Anno4j provides a fluent-interface, the code examples from above can be rewritten to the following code example:
+After registering an own namespace *ex*, the query would select and return all those body objects, that...
+
+- are of the type *ExampleBody*,
+- are associated with an Annotation node(backwards edge indcated by *^oa:hasBody*, whose motivation is *bookmarking*, and
+- have a confidence value assigned (relationship *ex:confidence*), that is higher 0.5.
+
+### Transactions
+
+Anno4j's persistence and querying features a transactional behaviour. This means that the library runs their commands in units of work, which are independant of each other, as well as atomic. Consequenctly, one array of commands is either fully executed (*commited*) or not at all (*rolled back*). This enables the database to be consistent at every possible time. Additionally, concurrent clients are isolated from one another, and therefore cannot interfere each other.
+
+Many of Anno4j's basic methods are using a hidden auto-commit transaction, but it also supports the *createTransaction()* method to create a transaction of your own, which needs to be committed or rolled back manually in order to find effect.
+
+An exemplary code snippet can be seen here (note that the begin and commit of the transaction are essential!):
 
 ```java
-    queryService
-        .addPrefix("ex", "http://www.example.com/schema#")
-        .addCriteria("oa:hasBody/ex:value", "Example Value")
-        .execute();
+	Anno4j anno4j = new Anno4j();
+	
+	Transaction transaction = anno4j.createTransaction();
+	transaction.begin();
+	
+	// Create and query different things over the transaction
+	transaction.createObject(...);
+	QueryService qs = transaction.createQueryService();
+	
+	transaction.commit();
 ```
-
-An execute method call like this will query for resources of type OADM.ANNOTATION which satisfy the given criteria. It is also possible to query for other types of resources.
-The type of the required resource can be passed to the execute method. This will produce and execute a hidden sparql query to retrieve resources of such a type.
-In this way the underlying repository can be queried for every class annotated with the *@Iri* annotation.
-The following example shows how to prompt for a SpecificResource object:
-
-```java
-    queryService.execute(SpecificResource.class);
-```
-
-ALL DEFINED CRITERIA ARE TRANSFORMED TO SPARQL AND SHOT AGAINST TRIPLESTORE
 
 ### Graph Context
 
-You can specify a sub-graph instead of the default graph in the QueryService or PersistenceService.
+Anno4j does support the RDF graph functionality which uses subgraphs and turns triples into quadruples to allow further structuring of ones data in a more fine-grained way. This can be done either in the Anno4j class or at the Transaction object directly. Two out of the four *createObject(...)* methods of the Anno4j class support an URI parameter called *context* which is uzilised for the subgraph. The Transaction class supports a *setAllContexts(URI context)* method to set a subgraph for the whole transaction.
 
 ```java
+	URI uri = new URIImpl("http://www.somePage.com/");
 
-    Anno4j anno4j = new Anno4j();
-
-    URI subgraph = new URIImpl("http://www.example.com/subgraph");
-    
-    QueryService<Annotation> queryService = anno4j.createQueryService();
-    
-    PersistenceService persistenceService = anno4j.createPersistenceService(subgraph);
-    
+	anno4j.createObject(Annotation.class, uri);
+	
+	Transaction transaction = anno4j.createTransaction();
+	transaction.setAllContexts(uri);
 ```
 
 ## Example
