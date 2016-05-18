@@ -77,7 +77,7 @@ the *org.openrdf.IDGenerator* interface. To activate your ID generator, create a
 ### Create and Save Annotations
 
 Anno4j uses [AliBaba](https://bitbucket.org/openrdf/alibaba/) to provide an easy way to create RDF by simply annotating Java interfaces with the *@IRI* Java annotation. To indicate for example that a given 
-interface is a *Annotation* you need to add "@Iri(OADM.ANNOTAION)" directly above the class declaration. 
+interface is an *Annotation* you need to add "@Iri(OADM.ANNOTAION)" directly above the class declaration. 
 
 ```java
 	@Iri(OADM.ANNOTATION)
@@ -184,7 +184,7 @@ A complete QueryService example can be seen in the following code snippet:
     queryService
         .addPrefix("ex", "http://www.example.com/schema#")
         .addCriteria("^oa:hasBody/oa:motivatedBy, "bookmarking", Comparison.EQ)
-        .addCriteria(ex:confidence, 0.5, Comparison.GT)
+        .addCriteria("ex:confidence", 0.5, Comparison.GT)
         .execute(ExampleBody.class);
 ```
 
