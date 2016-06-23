@@ -2,6 +2,8 @@ package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.Motivation;
+import com.github.anno4j.model.MotivationFactory;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.After;
@@ -13,6 +15,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -129,5 +132,33 @@ public class AnnotationTest {
 
         assertEquals("2015-12-16T12:00:00Z", result.getSerializedAt());
         assertEquals("2015-12-16T00:05:16Z", result.getAnnotatedAt());
+    }
+
+    @Test
+    public void testMotivation() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = anno4j.createObject(Annotation.class);
+
+        Motivation comment = MotivationFactory.getCommenting(this.anno4j);
+        Motivation bookmark = MotivationFactory.getBookmarking(this.anno4j);
+
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(0, result.getMotivatedBy().size());
+
+        annotation.addMotivation(comment);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(1, result.getMotivatedBy().size());
+
+        HashSet<Motivation> motivations = new HashSet<Motivation>();
+        motivations.add(comment);
+        motivations.add(bookmark);
+
+        annotation.setMotivatedBy(motivations);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(2, result.getMotivatedBy().size());
     }
 }

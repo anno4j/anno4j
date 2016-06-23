@@ -57,7 +57,7 @@ public interface Annotation extends ResourceObject {
      * @return Value of http:www.w3.org/ns/oa/#motivatedBy.
      */
     @Iri(OADM.MOTIVATED_BY)
-    Motivation getMotivatedBy();
+    Set<Motivation> getMotivatedBy();
 
     /**
      * Sets http:www.w3.org/ns/oa#motivatedBy.
@@ -65,7 +65,14 @@ public interface Annotation extends ResourceObject {
      * @param motivatedBy New value of http:www.w3.org/ns/oa#motivatedBy.
      */
     @Iri(OADM.MOTIVATED_BY)
-    void setMotivatedBy(Motivation motivatedBy);
+    void setMotivatedBy(Set<Motivation> motivatedBy);
+
+    /**
+     * Add a single http:www.w3.org/ns/oa#motivatedBy relationship.
+     *
+     * @param motivation    The Motivation to add to this Annotation node.
+     */
+    void addMotivation(Motivation motivation);
 
     /**
      * Gets http:www.w3.org/ns/oa#serializedBy relationship.

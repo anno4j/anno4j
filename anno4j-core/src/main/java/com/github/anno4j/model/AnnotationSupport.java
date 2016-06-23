@@ -28,6 +28,14 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
         this.getTarget().add(target);
     }
 
+    public void addMotivation(Motivation motivation) {
+        if(this.getMotivatedBy() == null) {
+            this.setMotivatedBy(new HashSet<Motivation>());
+        }
+
+        this.getMotivatedBy().add(motivation);
+    }
+
     /**
      * Method returns a textual representation of the given Annotation, containing
      * its Body, Target and possible Selection, in a supported serialisation format.
@@ -65,7 +73,9 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
             }
 
             if (getMotivatedBy() != null) {
-                sb.append(getMotivatedBy().getTriples(RDFFormat.NTRIPLES));
+                for(Motivation motivation : this.getMotivatedBy()) {
+                    sb.append(motivation.getTriples(RDFFormat.NTRIPLES));
+                }
             }
 
             parser.parse(IOUtils.toInputStream(sb.toString()), "");

@@ -36,7 +36,7 @@ public class ExampleTest {
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
         annotation.setSerializedAt("2013-02-04T12:00:00Z");
-        annotation.setMotivatedBy(MotivationFactory.getCommenting(anno4j));
+        annotation.addMotivation((MotivationFactory.getCommenting(anno4j)));
 
 
         // Create the person agent for the annotation

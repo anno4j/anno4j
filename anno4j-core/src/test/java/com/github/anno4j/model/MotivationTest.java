@@ -31,7 +31,7 @@ public class MotivationTest {
 
         // Create and add motivation
         Motivation motivation = MotivationFactory.getBookmarking(anno4j);
-        annotation.setMotivatedBy(motivation);
+        annotation.addMotivation(motivation);
 
         // Query persisted object
         List<Motivation> result = anno4j.findAll(Motivation.class);
