@@ -196,9 +196,9 @@ After registering an own namespace *ex*, the query would select and return all t
 
 ### Transactions
 
-Anno4j's persistence and querying features a transactional behaviour. This means that the library runs their commands in units of work, which are independant of each other, as well as atomic. Consequenctly, one array of commands is either fully executed (*commited*) or not at all (*rolled back*). This enables the database to be consistent at every possible time. Additionally, concurrent clients are isolated from one another, and therefore cannot interfere each other.
+Anno4j's persistence and querying features a transactional behaviour. This means that the library runs their commands in units of work, which are atomic. Consequenctly, one array of commands is either fully executed (*commited*) or not at all (*rolled back*). This enables the database to be consistent at every possible time.
 
-Many of Anno4j's basic methods are using a hidden auto-commit transaction, but it also supports the *createTransaction()* method to create a transaction of your own, which needs to be committed or rolled back manually in order to find effect.
+Many of Anno4j's basic methods are using a hidden auto-commit transaction, but it also supports the *createTransaction()* method to create a transaction of your own, which needs to be committed or rolled back manually in order to have effect.
 
 An exemplary code snippet can be seen here (note that the begin and commit of the transaction are essential!):
 
@@ -222,7 +222,7 @@ Anno4j does support the RDF graph functionality which uses subgraphs and turns t
 ```java
 	URI uri = new URIImpl("http://www.somePage.com/");
 
-	anno4j.createObject(Annotation.class, uri);
+	Annotation annotation = anno4j.createObject(Annotation.class, uri);
 	
 	Transaction transaction = anno4j.createTransaction();
 	transaction.setAllContexts(uri);
@@ -230,15 +230,11 @@ Anno4j does support the RDF graph functionality which uses subgraphs and turns t
 
 ## Example
 
-The following will guide through an exemplary process of producing a whole annotation from scratch. The annotation that is
+The following will guide through an exemplary process of producing a whole annotation from scratch. The exemplary annotation that is
 used is conform to the [complete example](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#complete-example) that
-is shown at the end of the [Web Annotation Data Model specification](http://www.w3.org/TR/annotation-model/).
+is shown at the end of an older version of the [Web Annotation Data Model specification](http://www.w3.org/TR/annotation-model/).
 
-**Important to note here**: As the current status of Anno4j does not support multiple instances of some relations (in this example
-the body and the motivation), the exemplary annotation does only support one of each. On instances where an entity is not specified
-any further, a simple resource URI entity is used (in the example these are *openid1* and *homepage1*).
-
-The first step is to create an annotation using the createObject method of the Anno4j object, which will be typed accordingly 
+The first step is to create an annotation using the *.createObject* method of the Anno4j object, which will be typed accordingly 
 (via the relationship *rdf:type* as an *oa:Annotation*) on its own:
 
 ```java
@@ -256,16 +252,16 @@ supported by simply filling the members of the Annotation class:
     annotation.setSerializedAt("2013-02-04T12:00:00Z");
 ```
 
-The motivation is defined by creating a new *Commenting* object, which is then added to the annotation:
+The motivation is defined by creating a new *Motvation* object, which is then added to the annotation. For Motivation objects, the MotivationFactory is to be used, which supports various functions for the different Motivation types:
 
 ```java
-    Commenting commenting = anno4j.createObject(Commenting.class);
-    annotation.setMotivatedBy(commenting);
+    Motivation commenting = MotivationFactory.getCommenting(anno4j);
+    annotation.addMotivation(commenting);
 ```
 
 As the annotation is given by a human being, the provenance feature of an agent, in this case a *foaf:Person*, is utilized.
 A *Person* object is created, filled with respective information, and then added to the annotation by setting the *annotatedBy*
-field. All of this corresponds to the *agent1* entity of the example, which is connected to the annotation via the relationship
+field via the *.setAnnotatedby()*-method. All of this corresponds to the *agent1* entity of the example, which is connected to the annotation via the relationship
 *oa:annotatedBy*.
 
 ```java
@@ -277,7 +273,7 @@ field. All of this corresponds to the *agent1* entity of the example, which is c
     annotation.setAnnotatedBy(person);
 ```
 
-In this example, the annotator made use of an homepage to create the annotation. This is implemented by a *prov:SoftwareAgent*
+In this example, the annotator made use of a homepage to create the annotation. This is implemented by a *prov:SoftwareAgent*
 (corresponding to *agent2* in the example), which is also created and then added to the annotation via the field *serializedBy*
 (relationship *oa:serializedBy* in the RDF graph).
 
@@ -291,40 +287,40 @@ In this example, the annotator made use of an homepage to create the annotation.
 ```
 
 The next step contains the actual content of the annotation, called the body (bottom left side of the example picture).
-As the example is a text annotation, it is typed being a *oa:EmbeddedContent* with the *rdf:format* *"text/plain"*. The
+As the example is a text annotation, it is typed being a *oa:EmbeddedContent* with the property *dc:format* and the value *"text/plain"*. The
 text of the annotation is supported via the *rdf:value* property of the body node, its language is specified by the
-relationship *dc:language*.
+property *dc:language*.
 
-In Anno4j, all this is done by specifying an own body interface (extending interface
-*Body*). The type of the body is supported in the first line (@Iri("http://www.w3.org/ns/oa#EmbeddedContent")) as a java-annotation,
-the respective attributes are defined using the *@Iri* java-annotation above the respective setter and getter methods.
-See the documentation of the class [here](src/test/java/com/github/anno4j/example/TextAnnotationBody.java).
+In Anno4j, all this is done by specifying an own body interface (extending the interface
+*Body*). The type of the body is supported in the first line (@Iri("http://www.w3.org/ns/oa#EmbeddedContent")) as a Java-annotation,
+the respective attributes are defined using the *@Iri* Java-annotation above the respective setter **and** getter methods.
+See the documentation of the class [here](anno4j-core/src/test/java/com/github/anno4j/example/TextAnnotationBody.java).
 
 ```java
     @Iri("http://www.w3.org/ns/oa#EmbeddedContent")
     public interface TextAnnotationBody extends Body {
     
         @Iri(DC.FORMAT)  
-        public String getFormat() { return format; }
+        String getFormat();
         
         @Iri(DC.FORMAT)
-        public void setFormat(String format) { this.format = format; }
+        void setFormat(String format);
 
         @Iri(RDF.VALUE)
-        public void setValue(String value) { this.value = value; }
-        
+        String getValue();
+
         @Iri(RDF.VALUE)
-        public String getValue() { return value; }
+        void setValue(String value);
         
         @Iri(DC.LANGUAGE)
-        public String getLanguage() { return language; }
+        String getLanguage();
 
         @Iri(DC.LANGUAGE)
-        public void setLanguage(String language) { this.language = language; }
+        void setLanguage(String language);
     }
 ```
 
-An instance of this class is then created, filled accordingly, and then added to the annotation as body:
+An instance of this class is then created, filled accordingly, and added to the annotation as body:
 
 ```java
     // Create the body
@@ -338,19 +334,19 @@ An instance of this class is then created, filled accordingly, and then added to
 ```
 
 The last thing that has to be added is the target (bottom right side of the picture), the "thing" that the annotation is about. In this case, the target
-is specified in a more detailed fashion, as a fragment and not the whole media item is to be selected. This circumstance is
+is specified in a more detailed fashion, as a fragment and not the whole media item is to be selected. This requirement is
 implemented by a combination of specific resource and a selector. A specific resource (which has the *rdf:type* *oa:SpecificResource*)
-is an entity, that joins the actual target with its selector. A selector addresses only a spatial or temporal part or
-fragment of the given multimedia item. In the case of the example, an *oa:TextPositionSelector* selects a part of the
-text that is annotated by stating a start- (relationship *oa:start*) and end position (relationship *oa:end*). Lastly,
-the actual target is connected with the specific resource node via an *oa:hasSource* relationship.
+is an entity, that joins the actual target with its selector, and therefore the case that only a subpart of the whole media item is selected. The subpart represents a fragment, spatial and/or temporal part of the given multimedia item. In the case of the example, a *oa:TextPositionSelector* selects a part of the
+text that is annotated by supporting a start- (property *oa:start*) and end position (property *oa:end*). Lastly,
+the actual target is connected with the specific resource node via the *oa:hasSource* relationship.
 
-In anno4j, a specific resource and a selector has to be created and then joined accordingly:
+In Anno4j, a specific resource and a selector has to be created and then joined accordingly:
 
 ```java
-    // Create the selector
+    // Create the specific resource
     SpecificResource specificResource = anno4j.creatObject(SpecificResource.class);
 
+	// Create the selector
     TextPositionSelector textPositionSelector = anno4j.createObject(TextPositionSelector.class);
     textPositionSelector.setStart(4096);
     textPositionSelector.setEnd(4104);
@@ -371,7 +367,7 @@ the target. As the target is not specified any further in the example, we make u
     annotation.setTarget(specificResource);
 ```
 
-The whole example implementation can be seen [here](src/test/java/com/github/anno4j/example/ExampleTest.java).
+The whole example implementation can be seen [here](anno4j-core/src/test/java/com/github/anno4j/example/ExampleTest.java).
 
 ## Restrictions
 
