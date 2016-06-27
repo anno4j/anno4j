@@ -25,6 +25,6 @@ public interface Choice extends ResourceObject {
     @Iri(OADM.DEFAULT)
     RDFObject getDefault();
 
-    
+    // test
     
 }
