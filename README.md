@@ -12,6 +12,7 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
 - Created (and annotated) Java POJOs are transformed to RDF and automatically transmitted to local/remote SPARQL using SPARQL Update functionality
 - Querying of annotations with path-based criteria
     - [x] Basic comparisons like "equal", "greater", and "lower"
+    - [x] String comparisons: "equal", "contains", "starts with", and "ends with"
     - [x] Union of different paths
     - [x] Type condition
     - [x] Custom filters
@@ -39,13 +40,14 @@ The Web Annotation Data Model / Open Annotation Data Model specification describ
 
 ### Installation
 
-Add the maven dependency (Anno4j is in the oss.sonatype.org repository)
-```
-      <dependency>
-        <groupId>com.github.anno4j</groupId>
-        <artifactId>anno4j-core</artifactId>
-        <version>2.0.0</version>
-      </dependency>
+Add the maven dependency (Anno4j is in the oss.sonatype.org repository):
+
+```xml
+<dependency>
+	<groupId>com.github.anno4j</groupId>
+	<artifactId>anno4j-core</artifactId>
+	<version>2.0.0</version>
+</dependency>
 ```     
 
 ### Configuration
@@ -371,21 +373,12 @@ The whole example implementation can be seen [here](anno4j-core/src/test/java/co
 
 ## Restrictions
 
-For the first version, Anno4j does not provide full coverage of the Web Annotation Working Group specification and LD Path for querying.
+There are some restrictions in regards to the WADM and the LDPath specification.
 
 ### Restrictions to the Ontology Model
 
-The current state of anno4j does not support the full functionality that is posed by the specification of the ontology
-model used by the Web Annotation Working Group. The restrictions are as follows:
-
-**Multiplicity**
-
-Multiplicity constructs (see [here](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#multiplicity)) are not yet supported.
-
-**Multiple instances**
-
-The specification allows to have multiple instances at certain points, for example an annotation can have multiple bodies,
-targets, and/or motivations. This is currently not possible.
+The current state of Anno4j does not support the full functionality that is posed by the specification of the ontology
+model used by the Web Annotation Working Group. It also implements an [older draft of the WADM specification](https://www.w3.org/TR/2014/WD-annotation-model-20141211/). The restrictions are as follows:
 
 **Styles**
 
@@ -397,9 +390,9 @@ are not yet implemented.
 States are utilised to represent versions of annotations that develop over time (see [here](http://www.w3.org/TR/2014/WD-annotation-model-20141211/#states))
 can not be used yet.
 
-### LD Path restrictions
+### LDPath restrictions
 
-The following selectors are supported for LD Path:
+The following selectors are supported for LDPath:
  
 **Property Selections**
 
