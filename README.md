@@ -26,6 +26,7 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
     - [Query for Annotations](#query-for-annotations)
     - [Transactions](#transactions)
     - [Graph Context](#graph-context)
+    - [Input and Output](#input-and-output)
 - [Example](#example)
 - [Restrictions](#restrictions)
 - [Contributors](#contributors)
@@ -228,6 +229,40 @@ Anno4j does support the RDF graph functionality which uses subgraphs and turns t
 	
 	Transaction transaction = anno4j.createTransaction();
 	transaction.setAllContexts(uri);
+```
+
+### Input and Output
+
+To improve the usability of the library, a small extension to the ORM has been implemented. Users can parse their RDF triples formulated in various RDF serialisations to create the respective Java objects, as well as write their Java objects as serialised RDF triples. Among the available serialisations are rdf/xml, ntriples, turtle, n3, jsonld, rdf/json, etc.
+
+In order to read a given RDF annotation (available as Java String), an *ObjectParser* object is needed. Its *.parse(String annotation, String uri, RDFFormat format)* requires the *annotation* as String, a *uri* for namespacing, and the supported *format*. It will then return a Java List of parsed Annotations. Important to note is, that all RDF nodes that are to be parsed need to be supported as respective Anno4j interfaces. The ObjectParser holds all parsed annotations in a local temporary memory store. In order to persist them to your respective database, they have to be read from the parser and be persisted "by hand" then. The following shows an example of how to read a turtle annotation.
+
+```java   
+String TURTLE = "@prefix oa: <http://www.w3.org/ns/oa#> ." +
+            "@prefix ex: <http://www.example.com/ns#> ." +
+            "@prefix dctypes: <http://purl.org/dc/dcmitype/> ." +
+            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." +
+
+            "ex:anno1 a oa:Annotation ;" +
+            "   oa:hasBody ex:body1 ;" +
+            "   oa:hasTarget ex:target1 .";
+            
+URL url = new URL("http://example.com/");
+
+ObjectParser objectParser = new ObjectParser();
+List<Annotation> annotations = objectParser.parse(TURTLE, url, RDFFormat.TURTLE);
+
+objectParser.shutdown();
+```
+
+To write a given Anno4j Java object to respective RDF serialisations, the *ResourceObject* interface (which every Anno4j object descends from) supports a *.getTriples(RDFFormat format)* method, which returns the representation of the object as a Java String in the supported *format*. The following shows an example that writes a given annotation as turtle triples.
+
+```java   
+Annotation annotation = anno4j.createObject(Annotation.class);
+
+// Add something to the Annotation
+
+String itemAsTurtle = annotation.getTriples(RDFFormat.TURTLE);
 ```
 
 ## Example
