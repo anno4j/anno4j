@@ -79,6 +79,46 @@ public class OADM {
      */
     public final static String LIST = NS + "List";
 
+    /**
+     * Refers to http://www.w3.org/ns/oa#Content
+     * The class for resources embedded in the Annotation graph, other than for textual content that is the object of the hasBody relationship.
+     */
+    public final static String CONTENT = NS + "Content";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#TextualBody
+     */
+    public final static String TEXTUAL_BODY = NS + "TextualBody";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#ResourceSelection
+     * Instances of the ResourceSelection class identify part (described by an oa:Selector) of another resource
+     * (referenced with oa:hasSource), possibly from a particular representation of a resource (described by an oa:State).
+     * Please note that ResourceSelection is not used directly in the Web Annotation model, but is provided as a separate
+     * class for further application profiles to use, separate from oa:SpecificResource which has many Annotation specific features.
+     */
+    public final static String RESOURCE_SELECTION = NS + "ResourceSelection";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#TimeState
+     * A TimeState records the time at which the resource's state is appropriate for the Annotation, typically the time
+     * that the Annotation was created and/or a link to a persistent copy of the current version.
+     */
+    public final static String TIME_STATE = NS + "TimeState";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#HttpState
+     * The HttpRequestState class is used to record the HTTP request headers that a client should use to request the
+     * correct representation from the resource.
+     */
+    public final static String HTTP_REQUEST_STATE = NS + "HttpRequestState";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#CssStyle
+     * A resource which describes styles for resources participating in the Annotation using CSS.
+     */
+    public final static String CSS_STYLE = NS + "CssStyle";
+
     // ---------- Motivation ----------
 
     /**
@@ -178,7 +218,7 @@ public class OADM {
      * The oa:FragmentSelector MUST have exactly 1 rdf:value property, containing the fragment identifier component of a URI that describes the segment of interest in the resource, excluding the initial "#".
      * The Fragment Selector SHOULD have a dcterms:conformsTo relationship with the object being the specification that defines the syntax of the fragment, for instance <http://tools.ietf.org/rfc/rfc3236> for HTML fragments.
      */
-    public final static String SELECTOR_FRAGMENT = NS + "FragmentSelector";
+    public final static String FRAGMENT_SELECTOR = NS + "FragmentSelector";
 
     /**
      * Refers to http://www.w3.org/ns/oa#SvgSelector
@@ -188,7 +228,7 @@ public class OADM {
      * The dimensions of both the shape and the SVG canvas MUST be relative to the dimensions of the Source resource. For example, given an image which is 600 pixels by 400 pixels, and the desired section is a circle of 100 pixel radius at the center of the image, then the SVG element would be: <circle cx="300" cy="200" r="100"/>
      * It is NOT RECOMMENDED to include style information within the SVG element, nor Javascript, animation, text or other non shape oriented information. Clients SHOULD ignore such information if present.
      */
-    public final static String SELECTOR_SVG = NS + "SvgSelector";
+    public final static String SVG_SELECTOR = NS + "SvgSelector";
 
     /**
      * Refers to http://www.w3.org/ns/oa#DataPositionSelector
@@ -197,7 +237,7 @@ public class OADM {
      * Each TextPositionSelector MUST have exactly 1 oa:end property.
      * See oa:TextPositionSelector for selection at normalized character level rather than bytestream level.
      */
-    public final static String SELECTOR_DATA_POSITION = NS + "DataPositionSelector";
+    public final static String DATA_POSITION_SELECTOR = NS + "DataPositionSelector";
 
     /**
      * Refers to http://www.w3.org/ns/oa#TextPositionSelector
@@ -206,7 +246,7 @@ public class OADM {
      * Each oa:TextPositionSelector MUST have exactly 1 oa:start property.
      * Each oa:TextPositionSelector MUST have exactly 1 oa:end property.
      */
-    public final static String SELECTOR_TEXT_POSITION = NS + "TextPositionSelector";
+    public final static String TEXT_POSITION_SELECTOR = NS + "TextPositionSelector";
 
     /**
      * Refers to http://www.w3.org/ns/oa#TextQuoteSelector
@@ -217,7 +257,29 @@ public class OADM {
      * Each TextQuoteSelector SHOULD have exactly 1 oa:prefix property, and MUST NOT have more than 1.
      * Each TextQuoteSelector SHOULD have exactly 1 oa:suffix property, and MUST NOT have more than 1.
      */
-    public final static String SELECTOR_TEXT_QUOTE = NS + "TextQuoteSelector";
+    public final static String TEXT_QUOTE_SELECTOR = NS + "TextQuoteSelector";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#CssSelector
+     * A CssSelector describes a Segment of interest in a representation that conforms to the Document Object Model
+     * through the use of the CSS selector specification.
+     */
+    public final static String CSS_SELECTOR = NS + "CssSelector";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#XPathSelector
+     * An XPathSelector is used to select elements and content within a resource that supports the Document Object
+     * Model via a specified XPath value.
+     */
+    public final static String XPATH_SELECTOR = NS + "XPathSelector";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#RangeSelector
+     * A Range Selector can be used to identify the beginning and the end of the selection by using other Selectors.
+     * The selection consists of everything from the beginning of the starting selector through to the beginning of the
+     * ending selector, but not including it.
+     */
+    public final static String RANGE_SELECTOR = NS + "RangeSelector";
 
     /**
      * ---------- Relationships ----------
@@ -299,6 +361,70 @@ public class OADM {
     public final static String MEMBERS = NS + "members";
 
     /**
+     * Refers to http://www.w3.org/ns/oa#hasState
+     * The relationship between the ResourceSelection, or its subclass SpecificResource, and a State resource.
+     * Please note that the domain (oa:ResourceSelection) is not used directly in the Web Annotation model.
+     */
+    public final static String HAS_STATE = NS + "hasState";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#refinedBy
+     * The relationship between a Selector or State and another Selector or State that should be applied to the results
+     * of the first to refine the processing of the source resource.
+     */
+    public final static String REFINED_BY = NS + "refinedBy";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#hasStartSelector
+     * The relationship between a RangeSelector and the Selector that describes the start position of the range.
+     */
+    public final static String HAS_START_SELECTOR = NS + "hasStartSelector";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#hasEndSelector
+     * The relationship between a RangeSelector and the Selector that describes the end position of the range.
+     */
+    public final static String HAS_END_SELECTOR = NS + "hasEndSelector";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#renderedVia
+     * A system that was used by the application that created the Annotation to render the resource.
+     */
+    public final static String RENDERED_VIA = NS + "renderedVia";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#hasPurpose
+     * The purpose served by the resource in the Annotation.
+     */
+    public final static String HAS_PURPOSE = NS + "hasPurpose";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#via
+     * A object of the relationship is a resource from which the source resource was retrieved by the providing system.
+     */
+    public final static String VIA = NS + "via";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#canonical
+     * A object of the relationship is the canonical URI that can always be used to deduplicate the Annotation,
+     * regardless of the current URI used to access the representation.
+     */
+    public final static String CANONICAL = NS + "canonical";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#styledBy
+     * A reference to a Stylesheet that should be used to apply styles to the Annotation rendering.
+     */
+    public final static String STYLED_BY = NS + "styledBy";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#cachedSource
+     * A object of the relationship is a copy of the Source resource's representation, appropriate for the Annotation.
+     */
+    public final static String CACHED_SOURCE = NS + "cachedSource";
+
+
+    /**
      * ---------- Data Properties ----------
      */
 
@@ -365,4 +491,45 @@ public class OADM {
      * There SHOULD be exactly 1 default relationship for each Choice.
      */
     public static final String DEFAULT = NS + "default";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     * The object of the predicate is a plain text string to be used as the content of the body of the Annotation.
+     * The value must be an xsd:string and that data type must not be expressed in the serialization. Note that language
+     * must not be associated with the value either as a language tag, as that is only available for rdf:langString.
+     */
+    public final static String BODY_TEXT = NS + "bodyText";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#text
+     * The content of a resource, given as text.
+     */
+    public final static String TEXT = NS + "text";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#sourceDate
+     * The timestamp at which the Source resource should be interpreted as being applicable to the Annotation.
+     */
+    public final static String SOURCE_DATE = NS + "sourceDate";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#sourceDate
+     * The start timestamp of the interval over which the Source resource should be interpreted as being applicable
+     * to the Annotation.
+     */
+    public final static String SOURCE_DATE_START = NS + "sourceDateStart";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#sourceDate
+     * The end timestamp of the interval over which the Source resource should be interpreted as being applicable
+     * to the Annotation.
+     */
+    public final static String SOURCE_DATE_END = NS + "sourceDateEnd";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#styleClass
+     * The name of the class used in the CSS description referenced from the Annotation that should be applied to the
+     * Specific Resource.
+     */
+    public final static String STYLE_CLASS = NS + "styleClass";
 }

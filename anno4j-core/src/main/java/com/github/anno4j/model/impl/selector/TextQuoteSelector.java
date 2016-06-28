@@ -19,7 +19,7 @@ import org.openrdf.annotations.Iri;
  *
  * Each TextQuoteSelector SHOULD have exactly 1 oa:suffix property, and MUST NOT have more than 1.
  */
-@Iri(OADM.SELECTOR_TEXT_QUOTE)
+@Iri(OADM.TEXT_QUOTE_SELECTOR)
 public interface TextQuoteSelector extends Selector {
     /**
      * Sets new Refers to http:www.w3.orgnsoa#prefix
