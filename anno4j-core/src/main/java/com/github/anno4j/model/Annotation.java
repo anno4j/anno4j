@@ -161,4 +161,27 @@ public interface Annotation extends ResourceObject {
      * @param seconds   The seconds to set.
      */
     void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds);
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     *
+     * @return  Returns the currently set bodyText properties.
+     */
+    @Iri(OADM.BODY_TEXT)
+    Set<String> getBodyTexts();
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     *
+     * @param texts A Set of Strings to set for this nodes bodyText property.
+     */
+    @Iri(OADM.BODY_TEXT)
+    void setBodyTexts(Set<String> texts);
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     *
+     * @param text  Adds the single text as textBody property.
+     */
+    void addBodyText(String text);
 }

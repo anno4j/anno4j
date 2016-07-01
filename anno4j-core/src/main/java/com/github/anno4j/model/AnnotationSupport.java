@@ -192,4 +192,13 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void addBodyText(String text) {
+        if(this.getBodyTexts() == null) {
+            this.setBodyTexts(new HashSet<String>());
+        }
+
+        this.getBodyTexts().add(text);
+    }
 }

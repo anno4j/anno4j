@@ -161,4 +161,27 @@ public class AnnotationTest {
 
         assertEquals(2, result.getMotivatedBy().size());
     }
+
+    @Test
+    public void testBodyText() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        annotation.addBodyText("test1");
+
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertTrue(result.getBodyTexts().contains("test1"));
+
+        HashSet<String> set = new HashSet<String>();
+        set.add("test2");
+        set.add("test3");
+
+        annotation.setBodyTexts(set);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(2, result.getBodyTexts().size());
+        assertTrue(result.getBodyTexts().contains("test2"));
+        assertTrue(result.getBodyTexts().contains("test3"));
+    }
 }
