@@ -21,19 +21,39 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
 
     @Override
     public void addTarget(Target target) {
-        if (this.getTarget() == null) {
-            this.setTarget(new HashSet<Target>());
+        HashSet<Target> targets = new HashSet<>();
+
+        if(this.getTarget() != null) {
+            targets.addAll(this.getTarget());
         }
 
-        this.getTarget().add(target);
+        targets.add(target);
+        this.setTarget(targets);
     }
 
+    @Override
     public void addMotivation(Motivation motivation) {
-        if(this.getMotivatedBy() == null) {
-            this.setMotivatedBy(new HashSet<Motivation>());
+        HashSet<Motivation> motivations = new HashSet<>();
+
+        if (this.getMotivatedBy() != null) {
+            motivations.addAll(this.getMotivatedBy());
         }
 
-        this.getMotivatedBy().add(motivation);
+        motivations.add(motivation);
+        this.setMotivatedBy(motivations);
+    }
+
+
+    @Override
+    public void addBodyText(String text) {
+        HashSet<String> texts = new HashSet<>();
+
+        if(this.getBodyTexts() != null) {
+            texts.addAll(this.getBodyTexts());
+        }
+
+        texts.add(text);
+        this.setBodyTexts(texts);
     }
 
     /**
@@ -73,7 +93,7 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
             }
 
             if (getMotivatedBy() != null) {
-                for(Motivation motivation : this.getMotivatedBy()) {
+                for (Motivation motivation : this.getMotivatedBy()) {
                     sb.append(motivation.getTriples(RDFFormat.NTRIPLES));
                 }
             }
@@ -191,14 +211,5 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
         } catch (RepositoryException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void addBodyText(String text) {
-        if(this.getBodyTexts() == null) {
-            this.setBodyTexts(new HashSet<String>());
-        }
-
-        this.getBodyTexts().add(text);
     }
 }
