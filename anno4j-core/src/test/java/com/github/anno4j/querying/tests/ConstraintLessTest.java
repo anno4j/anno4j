@@ -23,14 +23,14 @@ public class ConstraintLessTest extends QuerySetup {
     @Override
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("07.05.2015");
 
         ConstraintLessBody constraintLessBody = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody.setValue("Value 1");
         annotation.setBody(constraintLessBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("01.01.2011");
         ConstraintLessBody constraintLessBody2 = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody2.setValue("Value 2");
 
@@ -38,7 +38,7 @@ public class ConstraintLessTest extends QuerySetup {
 
         // This
         Annotation annotation2 = anno4j.createObject(Annotation.class);
-        annotation2.setAnnotatedAt("01.01.2011");
+        annotation2.setCreated("01.01.2011");
         annotation2.setBody(anno4j.createObject(ConstraintLessBody.class));
     }
 
@@ -54,8 +54,8 @@ public class ConstraintLessTest extends QuerySetup {
         assertEquals(2, list.size());
 
         // Test for annotation specific attributes
-        assertEquals("07.05.2015", list.get(0).getSerializedAt());
-        assertEquals("01.01.2011", list.get(1).getAnnotatedAt());
+        assertEquals("07.05.2015", list.get(0).getGenerated());
+        assertEquals("01.01.2011", list.get(1).getCreated());
 
         // Test for the value attribute of the body object
         assertEquals("Value 1", ((ConstraintLessBody) list.get(0).getBody()).getValue());

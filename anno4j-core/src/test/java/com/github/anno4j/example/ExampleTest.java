@@ -34,24 +34,24 @@ public class ExampleTest {
 
         // Create the base annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("2014-09-28T12:00:00Z");
-        annotation.setSerializedAt("2013-02-04T12:00:00Z");
+        annotation.setCreated("2014-09-28T12:00:00Z");
+        annotation.setGenerated("2013-02-04T12:00:00Z");
         annotation.addMotivation((MotivationFactory.getCommenting(anno4j)));
-
 
         // Create the person agent for the annotation
         Person person = anno4j.createObject(Person.class);
         person.setName("A. Person");
         person.setOpenID("http://example.org/agent1/openID1");
 
-        annotation.setAnnotatedBy(person);
+        annotation.setCreator(person);
 
         // Create the software agent for the annotation
         Software software = anno4j.createObject(Software.class);
         software.setName("Code v2.1");
         software.setHomepage("http://example.org/agent2/homepage1");
 
-        annotation.setSerializedBy(software);
+        annotation.setGenerator(software);
+
         // Create the body
         TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
         body.setFormat("text/plain");

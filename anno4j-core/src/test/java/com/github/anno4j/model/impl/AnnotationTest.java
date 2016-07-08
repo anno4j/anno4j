@@ -34,15 +34,15 @@ public class AnnotationTest {
     public void testPersistAnnotation() throws Exception {
         // Create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
 
         // query persisted object
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
-        assertEquals(annotation.getAnnotatedAt(), result.getAnnotatedAt());
-        assertEquals(annotation.getSerializedAt(), result.getSerializedAt());
+        assertEquals(annotation.getCreated(), result.getCreated());
+        assertEquals(annotation.getGenerated(), result.getGenerated());
     }
 
     @Test
@@ -124,14 +124,14 @@ public class AnnotationTest {
         int seconds2 = 16;
 
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt(year, month, day, hours, minutes, seconds);
-        annotation.setAnnotatedAt(year, month, day, hours2, minutes2, seconds2);
+        annotation.setGenerated(year, month, day, hours, minutes, seconds);
+        annotation.setCreated(year, month, day, hours2, minutes2, seconds2);
 
         // Query annotation
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals("2015-12-16T12:00:00Z", result.getSerializedAt());
-        assertEquals("2015-12-16T00:05:16Z", result.getAnnotatedAt());
+        assertEquals("2015-12-16T12:00:00Z", result.getGenerated());
+        assertEquals("2015-12-16T00:05:16Z", result.getCreated());
     }
 
     @Test
@@ -183,5 +183,20 @@ public class AnnotationTest {
         assertEquals(2, result.getBodyTexts().size());
         assertTrue(result.getBodyTexts().contains("test2"));
         assertTrue(result.getBodyTexts().contains("test3"));
+    }
+
+    @Test
+    public void testAnnotationWithCreation() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation anno = this.anno4j.createObject(Annotation.class);
+        anno.setCreated("sometime");
+
+        SpecificResource target = this.anno4j.createObject(SpecificResource.class);
+        target.setCreated("sometime2");
+        anno.addTarget(target);
+
+        Annotation result = anno4j.findByID(Annotation.class, anno.getResourceAsString());
+
+        assertEquals(anno.getCreated(), result.getCreated());
+        assertEquals(((SpecificResource) anno.getTarget().toArray()[0]).getCreated(), ((SpecificResource) result.getTarget().toArray()[0]).getCreated());
     }
 }

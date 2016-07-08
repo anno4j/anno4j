@@ -30,7 +30,7 @@ public class PathTest extends QuerySetup {
 
         // Testing against the serialization date
         Annotation annotation = annotations.get(0);
-        assertEquals("07.05.2015", annotation.getSerializedAt());
+        assertEquals("07.05.2015", annotation.getGenerated());
 
         // Testing if the body was persisted correctly
         PathTestBody testBody = (PathTestBody) annotation.getBody();
@@ -47,7 +47,7 @@ public class PathTest extends QuerySetup {
 
         // Testing against the serialization date
         Annotation annotation = annotations.get(0);
-        assertEquals("01.01.2011", annotation.getAnnotatedAt());
+        assertEquals("01.01.2011", annotation.getCreated());
 
         // Testing if the body was persisted correctly
         PathTestBody testBody = (PathTestBody) annotation.getBody();
@@ -67,13 +67,13 @@ public class PathTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("07.05.2015");
         PathTestBody pathTestBody = anno4j.createObject(PathTestBody.class);
         pathTestBody.setValue("Value1");
         annotation.setBody(pathTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("01.01.2011");
         PathTestBody pathTestBody2 = anno4j.createObject(PathTestBody.class);
         pathTestBody2.setValue("Value2");
         annotation1.setBody(pathTestBody2);

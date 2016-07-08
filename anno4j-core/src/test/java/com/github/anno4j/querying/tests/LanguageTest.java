@@ -66,13 +66,13 @@ public class LanguageTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("07.05.2015");
         LangTestBody langTestBody = anno4j.createObject(LangTestBody.class);
         langTestBody.setLangString(new LangString("First Value", "en"));
         annotation.setBody(langTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("01.01.2011");
         LangTestBody langTestBody2 = anno4j.createObject(LangTestBody.class);
         langTestBody2.setLangString(new LangString("Zweiter Wert", "de"));
         annotation1.setBody(langTestBody2);

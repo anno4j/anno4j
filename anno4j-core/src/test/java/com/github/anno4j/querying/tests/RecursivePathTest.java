@@ -63,13 +63,13 @@ public class RecursivePathTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("07.05.2015");
         RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
         recursiveBody.setValue("Some Testing Value");
         annotation.setBody(recursiveBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("01.01.2011");
         RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
         recursiveBody2.setValue("Another Testing Value");
         annotation1.setBody(recursiveBody2);

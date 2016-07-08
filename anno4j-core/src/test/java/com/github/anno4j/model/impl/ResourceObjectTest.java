@@ -48,16 +48,16 @@ public class ResourceObjectTest {
     @Test
     public void testGetNTriples() throws Exception {
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
 
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.NTRIPLES);
         System.out.println("output" + output);
         assertTrue(output.contains("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/oa#Annotation>"));
-        assertTrue(output.contains(" <http://www.w3.org/ns/oa#annotatedAt> "));
-        assertTrue(output.contains(" <http://www.w3.org/ns/oa#serializedAt> "));
+        assertTrue(output.contains(" <http://purl.org/dc/terms/issued> "));
+        assertTrue(output.contains(" <http://purl.org/dc/terms/created> "));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ResourceObjectTest {
         // Create arbitrary annotation with some provenance information
         Annotation annotation = anno4j.createObject(Annotation.class);
         long time = System.currentTimeMillis();
-        annotation.setAnnotatedAt("" + time);
+        annotation.setCreated("" + time);
 
         // Create a (for test cases only) textual body
         TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
@@ -79,7 +79,6 @@ public class ResourceObjectTest {
         // Add the body to the annotation
         annotation.setBody(body);
 
-
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.TURTLE);
@@ -91,7 +90,7 @@ public class ResourceObjectTest {
         assertTrue(output.contains("a <http://www.w3.org/ns/oa#Annotation>"));
 
         // Check provenance
-        assertTrue(output.contains("<http://www.w3.org/ns/oa#annotatedAt> " + "\"" + time + "\""));
+        assertTrue(output.contains("<http://purl.org/dc/terms/created> " + "\"" + time + "\""));
 
         // Check that the annotation has a body
         assertTrue(output.contains("<http://www.w3.org/ns/oa#hasBody> <" + body.getResourceAsString() + ">"));
@@ -107,9 +106,9 @@ public class ResourceObjectTest {
     @Test
     public void testGetTriplesWithJSONLD() throws RepositoryException, IllegalAccessException, InstantiationException {
         // Create arbitrary annotation with some provenance information
-        Annotation annotation = anno4j.createObject(Annotation.class);
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
         long time = System.currentTimeMillis();
-        annotation.setAnnotatedAt("" + time);
+        annotation.setCreated("" + time);
 
         // Create a (for test cases only) textual body
         TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
@@ -141,8 +140,8 @@ public class ResourceObjectTest {
 
         String jsondldAnnotation = "  \"@id\" : \"" + an.getResourceAsString() + "\",\n" +
                 "  \"@type\" : [ \"http://www.w3.org/ns/oa#Annotation\" ],\n" +
-                "  \"http://www.w3.org/ns/oa#annotatedAt\" : [ {\n" +
-                "    \"@value\" : \"" + an.getAnnotatedAt() + "\"\n" +
+                "  \"http://purl.org/dc/terms/created\" : [ {\n" +
+                "    \"@value\" : \"" + an.getCreated() + "\"\n" +
                 "  } ],\n" +
                 "  \"http://www.w3.org/ns/oa#hasBody\" : [ {\n" +
                 "    \"@id\" : \"" + body.getResourceAsString() + "\"";
@@ -158,7 +157,7 @@ public class ResourceObjectTest {
     public void testGetTriplesOnAgent() throws RepositoryException, IllegalAccessException, InstantiationException {
         Annotation annotation = anno4j.createObject(Annotation.class);
         long time = System.currentTimeMillis();
-        annotation.setAnnotatedAt("" + time);
+        annotation.setCreated("" + time);
 
         Software softwareAgent = anno4j.createObject(Software.class);
         softwareAgent.setHomepage("www.example.org");
@@ -168,8 +167,8 @@ public class ResourceObjectTest {
         personAgent.setName("PersonAgentName");
         personAgent.setNick("PersonNick");
 
-        annotation.setAnnotatedBy(softwareAgent);
-        annotation.setSerializedBy(personAgent);
+        annotation.setCreator(softwareAgent);
+        annotation.setGenerator(personAgent);
 
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 

@@ -43,8 +43,8 @@ public class DeletionTest {
     public void deletePlainAnnotation() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException, ParseException, MalformedQueryException {
         // Create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
 
         // query persisted object
         Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
@@ -67,8 +67,8 @@ public class DeletionTest {
     public void deleteAnnotationWithBody() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
 
         // create test body
         DeletionTestBody body = anno4j.createObject(DeletionTestBody.class);
@@ -97,8 +97,8 @@ public class DeletionTest {
     public void deleteAnnotationWithBodyAndTargets() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
 
         // create test body
         DeletionTestBody body = anno4j.createObject(DeletionTestBody.class);
@@ -139,8 +139,8 @@ public class DeletionTest {
     public void deleteBodyOfAnnotation() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
 
         // create test body
         DeletionTestBody body = anno4j.createObject(DeletionTestBody.class);
@@ -163,8 +163,8 @@ public class DeletionTest {
     public void deleteTargetOfAnnotation() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated("" + System.currentTimeMillis());
 
         // create test selector
         DeletionTestSelector selector = anno4j.createObject(DeletionTestSelector.class);

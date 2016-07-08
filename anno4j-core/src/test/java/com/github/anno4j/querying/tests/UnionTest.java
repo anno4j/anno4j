@@ -50,21 +50,21 @@ public class UnionTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation1 =  anno4j.createObject(Annotation.class);
-        annotation1.setSerializedAt("07.05.2015");
+        annotation1.setGenerated("07.05.2015");
         UnionTestBody unionTestBody1 = anno4j.createObject(UnionTestBody.class);
         unionTestBody1.setSubBody(anno4j.createObject(UnionTestBodyAlternative.class));
         unionTestBody1.setSubBody2(anno4j.createObject(UnionTestBody.class));
         annotation1.setBody(unionTestBody1);
 
         Annotation annotation2 =  anno4j.createObject(Annotation.class);
-        annotation2.setAnnotatedAt("01.01.2011");
+        annotation2.setGenerated("01.01.2011");
         UnionTestBody unionTestBody2 = anno4j.createObject(UnionTestBody.class);
         unionTestBody2.setSubBody(anno4j.createObject(UnionTestBodyAlternative.class));
         unionTestBody2.setSubBody2(anno4j.createObject(UnionTestBodyAlternative.class));
         annotation2.setBody(unionTestBody2);
 
         Annotation annotation3 =  anno4j.createObject(Annotation.class);
-        annotation3.setAnnotatedAt("01.01.2011");
+        annotation3.setGenerated("01.01.2011");
         UnionTestBodyAlternative unionTestBodyAlternative = anno4j.createObject(UnionTestBodyAlternative.class);
         unionTestBodyAlternative.setSubBody(anno4j.createObject(UnionTestBody2.class));
         unionTestBodyAlternative.setSubBody2(anno4j.createObject(UnionTestBodyAlternative.class));

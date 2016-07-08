@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 @Partial
-public abstract class AnnotationSupport extends ResourceObjectSupport implements Annotation {
+public abstract class AnnotationSupport extends CreationProvenanceSupport implements Annotation {
 
     @Override
     public void addTarget(Target target) {
@@ -84,12 +84,12 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
                 }
             }
 
-            if (getAnnotatedBy() != null) {
-                sb.append(getAnnotatedBy().getTriples(RDFFormat.NTRIPLES));
+            if (getCreator() != null) {
+                sb.append(getCreator().getTriples(RDFFormat.NTRIPLES));
             }
 
-            if (getSerializedBy() != null) {
-                sb.append(getSerializedBy().getTriples(RDFFormat.NTRIPLES));
+            if (getGenerator() != null) {
+                sb.append(getGenerator().getTriples(RDFFormat.NTRIPLES));
             }
 
             if (getMotivatedBy() != null) {
@@ -108,10 +108,50 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
     }
 
     @Override
+    public void delete() {
+        try {
+            ObjectConnection connection = getObjectConnection();
+
+            // deleting an existing body
+            if (getBody() != null) {
+                getBody().delete();
+                setBody(null);
+            }
+
+            // deleting existing targets one by one
+            if (getTarget() != null) {
+                for (Target target : getTarget()) {
+                    target.delete();
+                }
+                setTarget(null);
+            }
+
+            // deleting possible provenance information
+            setCreated(null);
+            setCreator(null);
+            setMotivatedBy(null);
+            setGenerated(null);
+            setGenerator(null);
+            setSerializedAt(null);
+            setSerializedBy(null);
+            setAnnotatedAt(null);
+            setAnnotatedBy(null);
+
+
+            // finally removing this annotation
+            connection.removeDesignation(this, (URI) getResource());
+            // explicitly removing the rdf type triple from the repository
+            connection.remove(getResource(), null, null);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     /**
      * {@inheritDoc}
      */
-    public void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds) {
+    public void setGenerated(int year, int month, int day, int hours, int minutes, int seconds) {
 
         StringBuilder builder = new StringBuilder();
         builder.append(Integer.toString(year)).append("-").
@@ -139,9 +179,10 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
 
         builder.append("Z");
 
-        this.setSerializedAt(builder.toString());
+        this.setGenerated(builder.toString());
     }
 
+    @Deprecated
     @Override
     /**
      * {@inheritDoc}
@@ -177,39 +218,39 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
         this.setAnnotatedAt(builder.toString());
     }
 
+    @Deprecated
     @Override
-    public void delete() {
-        try {
-            ObjectConnection connection = getObjectConnection();
+    /**
+     * {@inheritDoc}
+     */
+    public void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds) {
 
-            // deleting an existing body
-            if (getBody() != null) {
-                getBody().delete();
-                setBody(null);
-            }
+        StringBuilder builder = new StringBuilder();
+        builder.append(Integer.toString(year)).append("-").
+                append(Integer.toString(month)).append("-").
+                append(Integer.toString(day)).append("T");
 
-            // deleting existing targets one by one
-            if (getTarget() != null) {
-                for (Target target : getTarget()) {
-                    target.delete();
-                }
-                setTarget(null);
-            }
-
-            // deleting possible provenance information
-            setAnnotatedBy(null);
-            setAnnotatedAt(null);
-            setMotivatedBy(null);
-            setSerializedBy(null);
-            setSerializedAt(null);
-
-
-            // finally removing this annotation
-            connection.removeDesignation(this, (URI) getResource());
-            // explicitly removing the rdf type triple from the repository
-            connection.remove(getResource(), null, null);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
+        if (hours < 10) {
+            builder.append(0);
         }
+        builder.append(Integer.toString(hours));
+
+        builder.append(":");
+
+        if (minutes < 10) {
+            builder.append(0);
+        }
+        builder.append(Integer.toString(minutes));
+
+        builder.append(":");
+
+        if (seconds < 10) {
+            builder.append(0);
+        }
+        builder.append(Integer.toString(seconds));
+
+        builder.append("Z");
+
+        this.setSerializedAt(builder.toString());
     }
 }
