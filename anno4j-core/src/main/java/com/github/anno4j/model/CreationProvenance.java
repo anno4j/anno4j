@@ -21,7 +21,7 @@ public interface CreationProvenance extends ResourceObject {
     @Iri(DCTERMS.CREATED)
     void setCreated(String created);
 
-    void setCreated(int year, int month, int day, int hours, int minutes, int seconds);
+    void setCreated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     @Iri(DCTERMS.MODIFIED)
     String getModified();
@@ -29,5 +29,5 @@ public interface CreationProvenance extends ResourceObject {
     @Iri(DCTERMS.MODIFIED)
     void setModified(String modification);
 
-    void setModified(int year, int month, int day, int hours, int minutes, int seconds);
+    void setModified(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 }

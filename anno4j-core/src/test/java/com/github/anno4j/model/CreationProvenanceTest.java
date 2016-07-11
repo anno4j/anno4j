@@ -2,12 +2,14 @@ package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.targets.SpecificResource;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.exceptions.ObjectPersistException;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -26,6 +28,7 @@ public class CreationProvenanceTest {
     private final static String GOOD_DATE = "2015-01-28T12:00:00+01:00";
     private final static String GOOD_DATE_2 = "2015-01-28T12:00:00+00:00";
     private final static String BAD_DATE = "2015--01-28T12:00:00Z";
+    private final static String BAD_DATE2 = "2015-01-28T12:00:00";
 
     @Test
     public void testGoodDates() {
@@ -38,6 +41,31 @@ public class CreationProvenanceTest {
     public void testBadDates() {
         DateTimeFormatter format = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC();
         format.parseDateTime(BAD_DATE);
+    }
+
+    @Test
+    public void testGoodDates2() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        annotation.setCreated(GOOD_DATE);
+
+        Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(GOOD_DATE, result.getCreated());
+    }
+
+    @Test(expected = ObjectPersistException.class)
+    public void testBadDate2() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        annotation.setCreated(BAD_DATE);
+    }
+
+    @Test(expected = ObjectPersistException.class)
+    public void testBadDate3() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        annotation.setModified(BAD_DATE2);
     }
 
     @Test
@@ -60,12 +88,20 @@ public class CreationProvenanceTest {
         int hours = 12;
         int minutes = 0;
         int seconds = 0;
+        String timezone = "UTC";
+        String timezone2 = "America/Argentina/Ushuaia";
 
         SpecificResource spec = this.anno4j.createObject(SpecificResource.class);
-        spec.setModified(year, month, day, hours, minutes, seconds);
+        spec.setModified(year, month, day, hours, minutes, seconds, timezone);
 
         SpecificResource result = this.anno4j.findByID(SpecificResource.class, spec.getResourceAsString());
 
         assertEquals("2015-12-16T12:00:00Z", result.getModified());
+
+        spec.setModified(year, month, day, hours, minutes, seconds, timezone2);
+
+        result = this.anno4j.findByID(SpecificResource.class, spec.getResourceAsString());
+
+        assertEquals("2015-12-16T12:00:00-03:00", result.getModified());
     }
 }

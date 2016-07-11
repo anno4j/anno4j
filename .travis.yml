@@ -3,7 +3,8 @@ notifications:
   email:
   - kai.schlegel@googlemail.com
   - andreas.eisenkolb@gmail.com
-  - emanuel.berndl@gmail.com
+  - berndl.emanuel@gmail.com
+  - weissger@posteo.de
 script: ./scripts/build.sh
 env:
   global:

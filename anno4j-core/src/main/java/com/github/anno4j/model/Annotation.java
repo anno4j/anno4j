@@ -24,7 +24,7 @@ public interface Annotation extends CreationProvenance {
     /**
      * Sets http:www.w3.org/ns/oa#hasBody.
      *
-     * @param body New value of http:www.w3.orgnsoa#hasBody.
+     * @param body New value of http:www.w3.org/ns/oa#hasBody.
      */
     @Iri(OADM.HAS_BODY)
     void setBody(Body body);
@@ -110,7 +110,7 @@ public interface Annotation extends CreationProvenance {
     @Iri(DCTERMS.ISSUED)
     void setGenerated(String generated);
 
-    void setGenerated(int year, int month, int day, int hours, int minutes, int seconds);
+    void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
      * Gets http:www.w3.org/ns/oa#serializedBy relationship.
@@ -177,7 +177,7 @@ public interface Annotation extends CreationProvenance {
      * @param seconds   The seconds to set.
      */
     @Deprecated
-    void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds);
+    void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
      * Gets http:www.w3.org/ns/oa#annotatedAt relationship.
@@ -208,5 +208,5 @@ public interface Annotation extends CreationProvenance {
      * @param seconds   The seconds to set.
      */
     @Deprecated
-    void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds);
+    void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 }

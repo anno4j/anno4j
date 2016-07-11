@@ -48,8 +48,8 @@ public class ResourceObjectTest {
     @Test
     public void testGetNTriples() throws Exception {
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setCreated("" + System.currentTimeMillis());
-        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("2015-01-28T12:00:00Z");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
@@ -64,8 +64,7 @@ public class ResourceObjectTest {
     public void testGetTriplesWithTurtle() throws RepositoryException, IllegalAccessException, InstantiationException {
         // Create arbitrary annotation with some provenance information
         Annotation annotation = anno4j.createObject(Annotation.class);
-        long time = System.currentTimeMillis();
-        annotation.setCreated("" + time);
+        annotation.setCreated("2015-01-28T12:00:00Z");
 
         // Create a (for test cases only) textual body
         TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
@@ -90,7 +89,7 @@ public class ResourceObjectTest {
         assertTrue(output.contains("a <http://www.w3.org/ns/oa#Annotation>"));
 
         // Check provenance
-        assertTrue(output.contains("<http://purl.org/dc/terms/created> " + "\"" + time + "\""));
+        assertTrue(output.contains("<http://purl.org/dc/terms/created> " + "\"" + "2015-01-28T12:00:00Z" + "\""));
 
         // Check that the annotation has a body
         assertTrue(output.contains("<http://www.w3.org/ns/oa#hasBody> <" + body.getResourceAsString() + ">"));
@@ -107,8 +106,7 @@ public class ResourceObjectTest {
     public void testGetTriplesWithJSONLD() throws RepositoryException, IllegalAccessException, InstantiationException {
         // Create arbitrary annotation with some provenance information
         Annotation annotation = this.anno4j.createObject(Annotation.class);
-        long time = System.currentTimeMillis();
-        annotation.setCreated("" + time);
+        annotation.setCreated("2015-01-28T12:00:00Z");
 
         // Create a (for test cases only) textual body
         TextAnnotationBody body = anno4j.createObject(TextAnnotationBody.class);
@@ -157,7 +155,7 @@ public class ResourceObjectTest {
     public void testGetTriplesOnAgent() throws RepositoryException, IllegalAccessException, InstantiationException {
         Annotation annotation = anno4j.createObject(Annotation.class);
         long time = System.currentTimeMillis();
-        annotation.setCreated("" + time);
+        annotation.setCreated("2015-01-28T12:00:00Z");
 
         Software softwareAgent = anno4j.createObject(Software.class);
         softwareAgent.setHomepage("www.example.org");

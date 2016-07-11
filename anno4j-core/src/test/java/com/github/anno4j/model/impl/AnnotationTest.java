@@ -32,10 +32,12 @@ public class AnnotationTest {
 
     @Test
     public void testPersistAnnotation() throws Exception {
+        String timestamp = "2015-01-28T12:00:00Z";
+
         // Create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setGenerated("" + System.currentTimeMillis());
-        annotation.setCreated("" + System.currentTimeMillis());
+        annotation.setGenerated(timestamp);
+        annotation.setCreated(timestamp);
 
         // query persisted object
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
@@ -118,14 +120,15 @@ public class AnnotationTest {
         int hours = 12;
         int minutes = 0;
         int seconds = 0;
+        String timezone = "UTC";
 
         int hours2 = 0;
         int minutes2 = 5;
         int seconds2 = 16;
 
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setGenerated(year, month, day, hours, minutes, seconds);
-        annotation.setCreated(year, month, day, hours2, minutes2, seconds2);
+        annotation.setGenerated(year, month, day, hours, minutes, seconds, timezone);
+        annotation.setCreated(year, month, day, hours2, minutes2, seconds2, timezone);
 
         // Query annotation
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
@@ -188,10 +191,10 @@ public class AnnotationTest {
     @Test
     public void testAnnotationWithCreation() throws RepositoryException, IllegalAccessException, InstantiationException {
         Annotation anno = this.anno4j.createObject(Annotation.class);
-        anno.setCreated("sometime");
+        anno.setCreated("2015-01-28T12:00:00Z");
 
         SpecificResource target = this.anno4j.createObject(SpecificResource.class);
-        target.setCreated("sometime2");
+        target.setCreated("2015-01-28T12:00:00+01:00");
         anno.addTarget(target);
 
         Annotation result = anno4j.findByID(Annotation.class, anno.getResourceAsString());

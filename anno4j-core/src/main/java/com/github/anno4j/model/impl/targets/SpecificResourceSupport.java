@@ -1,6 +1,7 @@
 package com.github.anno4j.model.impl.targets;
 
 import com.github.anno4j.model.AnnotationSupport;
+import com.github.anno4j.model.CreationProvenanceSupport;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Partial
-public abstract class SpecificResourceSupport implements SpecificResource {
+public abstract class SpecificResourceSupport extends CreationProvenanceSupport implements SpecificResource {
 
     @Override
     public String getTriples(RDFFormat format) {
@@ -59,6 +60,7 @@ public abstract class SpecificResourceSupport implements SpecificResource {
             connection.removeDesignation(this, (URI) getResource());
             // explicitly removing the rdf type triple from the repository
             connection.remove(getResource(), null, null);
+            connection.remove(null, null, getResource(), null);
         } catch (RepositoryException e) {
             e.printStackTrace();
         }

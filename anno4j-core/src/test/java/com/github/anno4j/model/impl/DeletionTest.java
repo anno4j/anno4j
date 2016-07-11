@@ -43,8 +43,8 @@ public class DeletionTest {
     public void deletePlainAnnotation() throws RepositoryException, IllegalAccessException, InstantiationException, QueryEvaluationException, ParseException, MalformedQueryException {
         // Create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setCreated("" + System.currentTimeMillis());
-        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("2015-01-28T12:00:00Z");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         // query persisted object
         Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
@@ -67,8 +67,8 @@ public class DeletionTest {
     public void deleteAnnotationWithBody() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setCreated("" + System.currentTimeMillis());
-        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("2015-01-28T12:00:00Z");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         // create test body
         DeletionTestBody body = anno4j.createObject(DeletionTestBody.class);
@@ -77,7 +77,7 @@ public class DeletionTest {
         annotation.setBody(body);
 
         // query persisted object
-        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
         assertEquals(body.getValue(), ((DeletionTestBody) result.getBody()).getValue());
 
@@ -97,8 +97,8 @@ public class DeletionTest {
     public void deleteAnnotationWithBodyAndTargets() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setCreated("" + System.currentTimeMillis());
-        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("2015-01-28T12:00:00Z");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         // create test body
         DeletionTestBody body = anno4j.createObject(DeletionTestBody.class);
@@ -139,8 +139,8 @@ public class DeletionTest {
     public void deleteBodyOfAnnotation() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setCreated("" + System.currentTimeMillis());
-        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("2015-01-28T12:00:00Z");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         // create test body
         DeletionTestBody body = anno4j.createObject(DeletionTestBody.class);
@@ -163,8 +163,8 @@ public class DeletionTest {
     public void deleteTargetOfAnnotation() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         // create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setCreated("" + System.currentTimeMillis());
-        annotation.setGenerated("" + System.currentTimeMillis());
+        annotation.setCreated("2015-01-28T12:00:00Z");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         // create test selector
         DeletionTestSelector selector = anno4j.createObject(DeletionTestSelector.class);
@@ -176,7 +176,7 @@ public class DeletionTest {
         annotation.addTarget(specificResource);
 
         // query persisted objects
-        Annotation result = (Annotation) anno4j.createQueryService().execute().get(0);
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
         Set<Target> targetSet = result.getTarget();
 
         // removing the targets one by one
@@ -185,9 +185,8 @@ public class DeletionTest {
         }
 
         // finally testing if the targets of the persisted annotation is still existent
-        Annotation annotationWithoutTarget = (Annotation) anno4j.createQueryService().execute().get(0);
-        Object[] emptyTargetArray = annotationWithoutTarget.getTarget().toArray();
-        assertEquals(0, emptyTargetArray.length);
+        Annotation annotationWithoutTarget = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+        assertEquals(0, annotationWithoutTarget.getTarget().size());
     }
 
     /**

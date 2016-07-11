@@ -2,14 +2,17 @@ package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
 import org.apache.commons.io.IOUtils;
+import org.openrdf.annotations.Iri;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.exceptions.ObjectPersistException;
 import org.openrdf.rio.*;
 
 import java.io.ByteArrayOutputStream;
@@ -19,11 +22,20 @@ import java.util.HashSet;
 @Partial
 public abstract class AnnotationSupport extends CreationProvenanceSupport implements Annotation {
 
+    @Iri(OADM.ANNOTATED_AT)
+    private String annotatedAt;
+
+    @Iri(OADM.SERIALIZED_AT)
+    private String serializedAt;
+
+    @Iri(DCTERMS.ISSUED)
+    private String generated;
+
     @Override
     public void addTarget(Target target) {
         HashSet<Target> targets = new HashSet<>();
 
-        if(this.getTarget() != null) {
+        if (this.getTarget() != null) {
             targets.addAll(this.getTarget());
         }
 
@@ -48,7 +60,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
     public void addBodyText(String text) {
         HashSet<String> texts = new HashSet<>();
 
-        if(this.getBodyTexts() != null) {
+        if (this.getBodyTexts() != null) {
             texts.addAll(this.getBodyTexts());
         }
 
@@ -127,16 +139,41 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
             }
 
             // deleting possible provenance information
-            setCreated(null);
-            setCreator(null);
-            setMotivatedBy(null);
-            setGenerated(null);
-            setGenerator(null);
-            setSerializedAt(null);
-            setSerializedBy(null);
-            setAnnotatedAt(null);
-            setAnnotatedBy(null);
+            if (this.getSerializedAt() != null) {
+                this.setSerializedAt(null);
+            }
 
+            if (this.getSerializedBy() != null) {
+                this.setSerializedBy(null);
+            }
+
+            if (this.getAnnotatedAt() != null) {
+                this.setAnnotatedAt(null);
+            }
+
+            if (this.getAnnotatedBy() != null) {
+                this.setAnnotatedBy(null);
+            }
+
+            if (this.getCreator() != null) {
+                this.setCreator(null);
+            }
+
+            if (this.getMotivatedBy() != null) {
+                this.setMotivatedBy(null);
+            }
+
+            if (this.getCreated() != null) {
+                this.setCreated(null);
+            }
+
+            if (this.getGenerated() != null) {
+                this.setGenerated(null);
+            }
+
+            if (this.getGenerator() != null) {
+                this.setGenerator(null);
+            }
 
             // finally removing this annotation
             connection.removeDesignation(this, (URI) getResource());
@@ -151,35 +188,8 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
     /**
      * {@inheritDoc}
      */
-    public void setGenerated(int year, int month, int day, int hours, int minutes, int seconds) {
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(Integer.toString(year)).append("-").
-                append(Integer.toString(month)).append("-").
-                append(Integer.toString(day)).append("T");
-
-        if (hours < 10) {
-            builder.append(0);
-        }
-        builder.append(Integer.toString(hours));
-
-        builder.append(":");
-
-        if (minutes < 10) {
-            builder.append(0);
-        }
-        builder.append(Integer.toString(minutes));
-
-        builder.append(":");
-
-        if (seconds < 10) {
-            builder.append(0);
-        }
-        builder.append(Integer.toString(seconds));
-
-        builder.append("Z");
-
-        this.setGenerated(builder.toString());
+    public void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
+        this.setGenerated(createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     @Deprecated
@@ -187,35 +197,8 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
     /**
      * {@inheritDoc}
      */
-    public void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds) {
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(Integer.toString(year)).append("-").
-                append(Integer.toString(month)).append("-").
-                append(Integer.toString(day)).append("T");
-
-        if (hours < 10) {
-            builder.append(0);
-        }
-        builder.append(Integer.toString(hours));
-
-        builder.append(":");
-
-        if (minutes < 10) {
-            builder.append(0);
-        }
-        builder.append(Integer.toString(minutes));
-
-        builder.append(":");
-
-        if (seconds < 10) {
-            builder.append(0);
-        }
-        builder.append(Integer.toString(seconds));
-
-        builder.append("Z");
-
-        this.setAnnotatedAt(builder.toString());
+    public void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
+        this.setAnnotatedAt(createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     @Deprecated
@@ -223,34 +206,71 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
     /**
      * {@inheritDoc}
      */
-    public void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds) {
+    public void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
+        this.setSerializedAt(createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+    }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(Integer.toString(year)).append("-").
-                append(Integer.toString(month)).append("-").
-                append(Integer.toString(day)).append("T");
-
-        if (hours < 10) {
-            builder.append(0);
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public void setGenerated(String generated) {
+        if (generated == null || this.testTimeString(generated)) {
+            this.generated = generated;
+        } else {
+            throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
         }
-        builder.append(Integer.toString(hours));
+    }
 
-        builder.append(":");
-
-        if (minutes < 10) {
-            builder.append(0);
+    @Deprecated
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public void setSerializedAt(String serializedAt) {
+        if (serializedAt == null || this.testTimeString(serializedAt)) {
+            this.serializedAt = serializedAt;
+        } else {
+            throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
         }
-        builder.append(Integer.toString(minutes));
+    }
 
-        builder.append(":");
-
-        if (seconds < 10) {
-            builder.append(0);
+    @Deprecated
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public void setAnnotatedAt(String annotatedAt) {
+        if (annotatedAt == null || this.testTimeString(annotatedAt)) {
+            this.annotatedAt = annotatedAt;
+        } else {
+            throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
         }
-        builder.append(Integer.toString(seconds));
+    }
 
-        builder.append("Z");
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public String getGenerated() {
+        return this.generated;
+    }
 
-        this.setSerializedAt(builder.toString());
+    @Deprecated
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public String getSerializedAt() {
+        return this.serializedAt;
+    }
+
+    @Deprecated
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public String getAnnotatedAt() {
+        return this.annotatedAt;
     }
 }
