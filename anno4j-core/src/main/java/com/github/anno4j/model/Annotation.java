@@ -3,6 +3,7 @@ package com.github.anno4j.model;
 import com.github.anno4j.model.namespaces.AS;
 import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
+import com.github.anno4j.model.namespaces.SCHEMA;
 import org.openrdf.annotations.Iri;
 
 import java.util.Set;
@@ -242,4 +243,27 @@ public interface Annotation extends CreationProvenance {
      */
     @Deprecated
     void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
+
+    /**
+     * Sets the set of values for the http://schema.org/audience relationship.
+     *
+     * @param audiences The audiences to set for the http://schema.org/audience relationship.
+     */
+    @Iri(SCHEMA.AUDIENCE_RELATIONSHIP)
+    void setAudiences(Set<Audience> audiences);
+
+    /**
+     * Gets the set of values for the http://schema.org/audience relationship.
+     *
+     * @return  A set of Audience objects related to the http://schema.org/audience relationship.
+     */
+    @Iri(SCHEMA.AUDIENCE_RELATIONSHIP)
+    Set<Audience> getAudiences();
+
+    /**
+     * Adds a single Audience object to the set of Audiences.
+     *
+     * @param audience  The Audience to add
+     */
+    void addAudience(Audience audience);
 }

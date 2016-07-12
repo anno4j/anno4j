@@ -1,16 +1,18 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Motivation;
-import com.github.anno4j.model.MotivationFactory;
-import com.github.anno4j.model.Target;
+import com.github.anno4j.model.*;
 import com.github.anno4j.model.impl.targets.SpecificResource;
+import com.github.anno4j.querying.QueryService;
+import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
@@ -201,5 +203,40 @@ public class AnnotationTest {
 
         assertEquals(anno.getCreated(), result.getCreated());
         assertEquals(((SpecificResource) anno.getTarget().toArray()[0]).getCreated(), ((SpecificResource) result.getTarget().toArray()[0]).getCreated());
+    }
+
+    @Test
+    public void testAudiences() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(0, result.getAudiences().size());
+
+        TestAudience audience = this.anno4j.createObject(TestAudience.class);
+        annotation.addAudience(audience);
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addPrefix("schema", "https://schema.org/");
+        qs.addCriteria("schema:audience[is-a schema:TestAudience]");
+
+        List<Annotation> results = qs.execute(Annotation.class);
+        result = results.get(0);
+
+        assertEquals(1, result.getAudiences().size());
+
+        HashSet<Audience> audiences = new HashSet<>();
+        audiences.add(this.anno4j.createObject(TestAudience.class));
+        audiences.add(this.anno4j.createObject(TestAudience.class));
+        annotation.setAudiences(audiences);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(2, result.getAudiences().size());
+    }
+
+    @Iri("https://schema.org/TestAudience")
+    public interface TestAudience extends Audience {
+
     }
 }

@@ -9,7 +9,7 @@ public class SCHEMA {
     /**
      * Textual representation of the namespace.
      */
-    public final static String NS = "http://schema.org/";
+    public final static String NS = "https://schema.org/";
 
     /**
      * Textual prefix of the ontology.

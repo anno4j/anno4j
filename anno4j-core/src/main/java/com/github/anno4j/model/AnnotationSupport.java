@@ -88,6 +88,21 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addAudience(Audience audience) {
+        HashSet<Audience> audiences = new HashSet<>();
+
+        if(this.getAudiences() != null) {
+            audiences.addAll(this.getAudiences());
+        }
+
+        audiences.add(audience);
+        this.setAudiences(audiences);
+    }
+
+    /**
      * Method returns a textual representation of the given Annotation, containing
      * its Body, Target and possible Selection, in a supported serialisation format.
      *
