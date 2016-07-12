@@ -98,18 +98,49 @@ public interface Annotation extends CreationProvenance {
      */
     void addBodyText(String text);
 
+    /**
+     * Gets the value of the http://www.w3.org/ns/activitystreams#generator relationship.
+     *
+     * @return  The Agent of the as:generator relationship.
+     */
     @Iri(AS.GENERATOR)
     Agent getGenerator();
 
+    /**
+     * Sets the value of the http://www.w3.org/ns/activitystreams#generator relationship.
+     *
+     * @param generator The Agent to set for the as:generator relationship.
+     */
     @Iri(AS.GENERATOR)
     void setGenerator(Agent generator);
 
+    /**
+     * Gets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @return  The timestamp value of the dcterms:issued property.
+     */
     @Iri(DCTERMS.ISSUED)
     String getGenerated();
 
+    /**
+     * Sets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @param generated The timestamp value to set for the dcterms:issued property.
+     */
     @Iri(DCTERMS.ISSUED)
     void setGenerated(String generated);
 
+    /**
+     * Sets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param timezoneID    The timezone to set.
+     */
     void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
@@ -169,12 +200,13 @@ public interface Annotation extends CreationProvenance {
     /**
      * Sets http:www.w3.org/ns/oa#serializedAt according to the format year-month-dayThours:minutes:secondsZ, e.g. 2015-12-16T12:00:00Z.
      *
-     * @param year      The year to set.
-     * @param month     The month to set.
-     * @param day       The day to set.
-     * @param hours     The hours to set.
-     * @param minutes   The minutes to set.
-     * @param seconds   The seconds to set.
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param timezoneID    The timezone to set.
      */
     @Deprecated
     void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
@@ -200,12 +232,13 @@ public interface Annotation extends CreationProvenance {
     /**
      * Sets http:www.w3.org/ns/oa#annotatedAt according to the format year-month-dayThours:minutes:secondsZ, e.g. 2015-12-16T12:00:00Z.
      *
-     * @param year      The year to set.
-     * @param month     The month to set.
-     * @param day       The day to set.
-     * @param hours     The hours to set.
-     * @param minutes   The minutes to set.
-     * @param seconds   The seconds to set.
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param timezoneID    The timezone to set.
      */
     @Deprecated
     void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);

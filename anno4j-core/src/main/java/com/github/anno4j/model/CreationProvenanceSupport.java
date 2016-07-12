@@ -17,11 +17,17 @@ import java.util.concurrent.TimeUnit;
 @Partial
 public abstract class CreationProvenanceSupport extends ResourceObjectSupport implements CreationProvenance {
 
+    /**
+     * Refers to http://purl.org/dc/terms/modified.
+     */
     @Iri(DCTERMS.MODIFIED)
-    String modified;
+    private String modified;
 
+    /**
+     * Refers to http://purl.org/dc/terms/created.
+     */
     @Iri(DCTERMS.CREATED)
-    String created;
+    private String created;
 
     @Override
     /**

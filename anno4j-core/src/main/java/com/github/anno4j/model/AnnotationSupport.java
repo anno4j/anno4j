@@ -22,15 +22,29 @@ import java.util.HashSet;
 @Partial
 public abstract class AnnotationSupport extends CreationProvenanceSupport implements Annotation {
 
+    /**
+     * Refers to http://www.w3.org/ns/oa#annotatedAt.
+     * Deprecated property.
+     */
     @Iri(OADM.ANNOTATED_AT)
     private String annotatedAt;
 
+    /**
+     * Refers to http://www.w3.org/ns/oa#serializedAt.
+     * Deprecated property.
+     */
     @Iri(OADM.SERIALIZED_AT)
     private String serializedAt;
 
+    /**
+     * Refers to http://purl.org/dc/terms/issued.
+     */
     @Iri(DCTERMS.ISSUED)
     private String generated;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addTarget(Target target) {
         HashSet<Target> targets = new HashSet<>();
@@ -43,6 +57,9 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
         this.setTarget(targets);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addMotivation(Motivation motivation) {
         HashSet<Motivation> motivations = new HashSet<>();
@@ -55,7 +72,9 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
         this.setMotivatedBy(motivations);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addBodyText(String text) {
         HashSet<String> texts = new HashSet<>();
