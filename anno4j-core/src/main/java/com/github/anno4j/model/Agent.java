@@ -11,6 +11,7 @@ import org.openrdf.annotations.Iri;
  */
 @Iri(Anno4jNS.AGENT)
 public interface Agent extends ResourceObject {
+
     /**
      * Sets new The name of the agent.
      * Refers to http://xmlns.com/foaf/spec/#term_name. The name of the agent.
@@ -27,4 +28,68 @@ public interface Agent extends ResourceObject {
      */
     @Iri(FOAF.NAME)
     String getName();
+
+    /**
+     * Sets the http://xmlns.com/foaf/0.1/nick property.
+     *
+     * @param nickname  The value of the http://xmlns.com/foaf/0.1/ property.
+     */
+    @Iri(FOAF.NICK)
+    void setNickname(String nickname);
+
+    /**
+     * Gets the http://xmlns.com/foaf/0.1/nick property.
+     *
+     * @return  The value of the http://xmlns.com/foaf/0.1/nick property.
+     */
+    @Iri(FOAF.NICK)
+    String getNickname();
+
+    /**
+     * Sets the http://xmlns.com/foaf/0.1/mbox property.
+     *
+     * @param email The email to set for the http://xmlns.com/foaf/0.1/mbox property.
+     */
+    @Iri(FOAF.MBOX)
+    void setMbox(String email);
+
+    /**
+     * Gets the value of the http://xmlns.com/foaf/0.1/mbox property.
+     *
+     * @return  The value of the http://xmlns.com/foaf/0.1/mbox property.
+     */
+    @Iri(FOAF.MBOX)
+    String getMbox();
+
+    /**
+     * Sets the value for the http://xmlns.com/foaf/0.1/mbox_sha1sum property.
+     *
+     * @param emailSha1 The value to set for the http://xmlns.com/foaf/0.1/mbox_sha1sum property.
+     */
+    @Iri(FOAF.MBOX_SHA1SUM)
+    void setMboxSha1(String emailSha1);
+
+    /**
+     * Gets the value of the http://xmlns.com/foaf/0.1/mbox_sha1sum property.
+     *
+     * @return The value of the http://xmlns.com/foaf/0.1/mbox_sha1sum property.
+     */
+    @Iri(FOAF.MBOX_SHA1SUM)
+    String getMboxSha1();
+
+    /**
+     * Sets the value for the http://xmlns.com/foaf/0.1/homepage property.
+     *
+     * @param homepage  The value to set for the http://xmlns.com/foaf/0.1/homepage property.
+     */
+    @Iri(FOAF.HOMEPAGE)
+    void setHomepage(String homepage);
+
+    /**
+     * Gets the value of the http://xmlns.com/foaf/0.1/homepage property.
+     *
+     * @return  The value of the http://xmlns.com/foaf/0.1/homepage property.
+     */
+    @Iri(FOAF.HOMEPAGE)
+    String getHomepage();
 }

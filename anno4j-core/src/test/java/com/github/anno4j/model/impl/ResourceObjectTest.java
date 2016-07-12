@@ -163,7 +163,7 @@ public class ResourceObjectTest {
 
         Person personAgent = anno4j.createObject(Person.class);
         personAgent.setName("PersonAgentName");
-        personAgent.setNick("PersonNick");
+        personAgent.setNickname("PersonNick");
 
         annotation.setCreator(softwareAgent);
         annotation.setGenerator(personAgent);
