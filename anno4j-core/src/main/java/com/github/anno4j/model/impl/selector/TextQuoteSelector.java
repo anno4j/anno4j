@@ -30,7 +30,7 @@ public interface TextQuoteSelector extends Selector {
      *               A snippet of text that occurs immediately before the text which is being selected.
      *               Each TextQuoteSelector should have exactly 1 oa:prefix property, and must not have more than 1..
      */
-    @Iri(OADM.TEXT_PREFIX)
+    @Iri(OADM.PREFIX_TEXT)
     void setPrefix(String prefix);
 
     /**
@@ -90,6 +90,6 @@ public interface TextQuoteSelector extends Selector {
      * A snippet of text that occurs immediately before the text which is being selected.
      * Each TextQuoteSelector should have exactly 1 oa:prefix property, and must not have more than 1..
      */
-    @Iri(OADM.TEXT_PREFIX)
+    @Iri(OADM.PREFIX_TEXT)
     public String getPrefix();
 }

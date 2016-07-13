@@ -468,7 +468,7 @@ public class OADM {
      * A snippet of text that occurs immediately before the text which is being selected.
      * See oa:TextQuoteSelector.
      */
-    public final static String TEXT_PREFIX = NS + "prefix";
+    public final static String PREFIX_TEXT = NS + "prefix";
 
     /**
      * Refers to http://www.w3.org/ns/oa#suffix
