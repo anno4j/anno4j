@@ -5,7 +5,7 @@ import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
 
-public abstract class MotivationFactory {
+public class MotivationFactory {
 
     public static Motivation getBookmarking(Anno4j anno4j) throws RepositoryException, IllegalAccessException, InstantiationException {
         return anno4j.createObject(Motivation.class, new URIImpl(OADM.MOTIVATION_BOOKMARKING));
