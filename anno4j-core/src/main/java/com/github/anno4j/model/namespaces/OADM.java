@@ -129,6 +129,12 @@ public class OADM {
     public final static String MOTIVATION = NS + "Motivation";
 
     /**
+     * Refers to http://www.w3.org/ns/oa#assessing.
+     * The motivation for when the user intends to provide an assessment about the Target resource.
+     */
+    public final static String MOTIVATION_ASSESSING = NS + "assessing";
+
+    /**
      * Refers to http://www.w3.org/ns/oa#bookmarking
      * The motivation that represents the creation of a bookmark to the target resources or recorded point or points within one or more resources. For example, an Annotation that bookmarks the point in a text where the reader finished reading. Bookmark Annotations may or may not have a Body resource.
      */
