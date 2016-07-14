@@ -532,4 +532,41 @@ public class OADM {
      * Specific Resource.
      */
     public final static String STYLE_CLASS = NS + "styleClass";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#processingLanguage.
+     * The object of the property is the language that should be used for textual processing algorithms when dealing
+     * with the content of the resource, including hyphenation, line breaking, which font to use for rendering and
+     * so forth. The value must follow the recommendations of [BCP47].
+     */
+    public final static String PROCESSING_LANGUAGE = NS + "processingLanguage";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#textDirection.
+     * The direction of the text of the subject resource. There must only be one text direction associated with
+     * any given resource.
+     */
+    public final static String TEXT_DIRECTION = NS + "textDirection";
+
+    /**
+     * ---------- Text Direction ----------
+     */
+
+    /**
+     * http://www.w3.org/ns/oa#rtlDirection.
+     * The direction of text that is read from right to left.
+     */
+    public final static String RIGHT_TO_LEFT_DIRECTION = NS + "rtlDirection";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#ltrDirection.
+     * The direction of text that is read from left to right.
+     */
+    public final static String LEFT_TO_RIGHT_DIRECTION = NS + "ltrDirection";
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#autoDirection.
+     * The direction of text that should be automatically determined from the content.
+     */
+    public final static String AUTO_DIRECTION = NS + "autoDirection";
 }

@@ -2,6 +2,7 @@ package com.github.anno4j.model.impl.targets;
 
 import com.github.anno4j.model.AnnotationSupport;
 import com.github.anno4j.model.CreationProvenanceSupport;
+import com.github.anno4j.model.ExternalWebResourceSupport;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Partial
-public abstract class SpecificResourceSupport extends CreationProvenanceSupport implements SpecificResource {
+public abstract class SpecificResourceSupport extends ExternalWebResourceSupport implements SpecificResource {
 
     @Override
     public String getTriples(RDFFormat format) {
