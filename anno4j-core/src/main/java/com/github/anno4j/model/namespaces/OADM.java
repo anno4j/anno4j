@@ -288,6 +288,13 @@ public class OADM {
     public final static String RANGE_SELECTOR = NS + "RangeSelector";
 
     /**
+     * Refers to http://www.w3.org/ns/oa#styleClass
+     * The name of the class used in the CSS description referenced from the Annotation that should be applied to the
+     * Specific Resource.
+     */
+    public final static String STYLE = NS + "Style";
+
+    /**
      * ---------- Relationships ----------
      */
 
@@ -424,6 +431,13 @@ public class OADM {
     public final static String STYLED_BY = NS + "styledBy";
 
     /**
+     * Refers to http://www.w3.org/ns/oa#styleClass.
+     * The name of the class used in the CSS description referenced from the Annotation that should be applied to
+     * the Specific Resource.
+     */
+    public final static String STYLE_CLASS = NS + "styleClass";
+
+    /**
      * Refers to http://www.w3.org/ns/oa#cachedSource
      * A object of the relationship is a copy of the Source resource's representation, appropriate for the Annotation.
      */
@@ -531,13 +545,6 @@ public class OADM {
      * to the Annotation.
      */
     public final static String SOURCE_DATE_END = NS + "sourceDateEnd";
-
-    /**
-     * Refers to http://www.w3.org/ns/oa#styleClass
-     * The name of the class used in the CSS description referenced from the Annotation that should be applied to the
-     * Specific Resource.
-     */
-    public final static String STYLE_CLASS = NS + "styleClass";
 
     /**
      * Refers to http://www.w3.org/ns/oa#processingLanguage.

@@ -15,9 +15,25 @@ import org.openrdf.rio.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 
 @Partial
 public abstract class SpecificResourceSupport extends ExternalWebResourceSupport implements SpecificResource {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addStyleClass(String styleClass) {
+        HashSet<String> styleClasses = new HashSet<>();
+
+        if(this.getStyleClasses() != null) {
+            styleClasses.addAll(this.getStyleClasses());
+        }
+
+        styleClasses.add(styleClass);
+        this.setStyleClasses(styleClasses);
+    }
 
     @Override
     public String getTriples(RDFFormat format) {

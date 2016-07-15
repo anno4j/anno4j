@@ -6,6 +6,8 @@ import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.RDFObject;
 
+import java.util.Set;
+
 /**
  * Conforms to http://www.w3.org/ns/oa#SpecificResource
  *
@@ -119,4 +121,12 @@ public interface SpecificResource extends Target {
      */
     @Iri(OADM.HAS_SCOPE)
     void setScope(RDFObject scope);
+
+    @Iri(OADM.STYLE_CLASS)
+    void setStyleClasses(Set<String> styleClasses);
+
+    @Iri(OADM.STYLE_CLASS)
+    Set<String> getStyleClasses();
+
+    void addStyleClass(String styleClass);
 }

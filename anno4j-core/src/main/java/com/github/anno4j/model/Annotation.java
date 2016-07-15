@@ -266,4 +266,24 @@ public interface Annotation extends CreationProvenance {
      * @param audience  The Audience to add
      */
     void addAudience(Audience audience);
+
+    /**
+     * Sets the value for the http://www.w3.org/ns/oa#styledBy relationship.
+     *
+     * A reference to a Stylesheet that should be used to apply styles to the Annotation rendering.
+     *
+     * @param stylesheet    The value to set for the http://www.w3.org/ns/oa#styledBy relationship.
+     */
+    @Iri(OADM.STYLED_BY)
+    void setStyledBy(Style stylesheet);
+
+    /**
+     * Gets the value currently set for the http://www.w3.org/ns/oa#styledBy relationship.
+     *
+     * A reference to a Stylesheet that should be used to apply styles to the Annotation rendering.
+     *
+     * @return  The value currently set for the http://www.w3.org/ns/oa#styledBy relationship.
+     */
+    @Iri(OADM.STYLED_BY)
+    Style getStyledBy();
 }

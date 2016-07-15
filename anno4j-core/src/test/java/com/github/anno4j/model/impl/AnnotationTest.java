@@ -2,6 +2,7 @@ package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.*;
+import com.github.anno4j.model.impl.style.CssStylesheet;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.querying.QueryService;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -238,5 +239,20 @@ public class AnnotationTest {
     @Iri("https://schema.org/TestAudience")
     public interface TestAudience extends Audience {
 
+    }
+
+    @Test
+    public void testStyle() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        CssStylesheet sheet = this.anno4j.createObject(CssStylesheet.class);
+        annotation.setStyledBy(sheet);
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addCriteria("oa:styledBy[is-a oa:CssStyle]");
+
+        List<Annotation> result = qs.execute(Annotation.class);
+
+        assertEquals(1, result.size());
     }
 }
