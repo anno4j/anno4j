@@ -33,7 +33,7 @@ public class PathTest extends QuerySetup {
         assertEquals("2015-01-28T12:00:00Z", annotation.getGenerated());
 
         // Testing if the body was persisted correctly
-        PathTestBody testBody = (PathTestBody) annotation.getBody();
+        PathTestBody testBody = (PathTestBody) annotation.getBodies().iterator().next();
         assertEquals("Value1", testBody.getValue());
     }
 
@@ -50,7 +50,7 @@ public class PathTest extends QuerySetup {
         assertEquals("2015-01-28T12:00:00Z", annotation.getCreated());
 
         // Testing if the body was persisted correctly
-        PathTestBody testBody = (PathTestBody) annotation.getBody();
+        PathTestBody testBody = (PathTestBody) annotation.getBodies().iterator().next();
         assertEquals("Value2", testBody.getValue());
     }
 
@@ -70,13 +70,13 @@ public class PathTest extends QuerySetup {
         annotation.setGenerated("2015-01-28T12:00:00Z");
         PathTestBody pathTestBody = anno4j.createObject(PathTestBody.class);
         pathTestBody.setValue("Value1");
-        annotation.setBody(pathTestBody);
+        annotation.addBody(pathTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setCreated("2015-01-28T12:00:00Z");
         PathTestBody pathTestBody2 = anno4j.createObject(PathTestBody.class);
         pathTestBody2.setValue("Value2");
-        annotation1.setBody(pathTestBody2);
+        annotation1.addBody(pathTestBody2);
     }
 
     @Iri("http://www.example.com/schema#pathBody")

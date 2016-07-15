@@ -32,13 +32,13 @@ public class ExternalWebResourceTest {
 
         Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals(0, ((SpecificResource)result.getTarget().toArray()[0]).getLanguages().size());
+        assertEquals(0, ((SpecificResource)result.getTargets().toArray()[0]).getLanguages().size());
 
         specificResource.addLanguage("de");
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals(1, ((SpecificResource)result.getTarget().toArray()[0]).getLanguages().size());
+        assertEquals(1, ((SpecificResource)result.getTargets().toArray()[0]).getLanguages().size());
 
         HashSet<String> languages = new HashSet<>();
         languages.add("de");
@@ -48,7 +48,7 @@ public class ExternalWebResourceTest {
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals(2, ((SpecificResource)result.getTarget().toArray()[0]).getLanguages().size());
+        assertEquals(2, ((SpecificResource)result.getTargets().toArray()[0]).getLanguages().size());
     }
 
     @Test
@@ -63,6 +63,6 @@ public class ExternalWebResourceTest {
 
         Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals(textDirection.getResourceAsString(), ((SpecificResource)result.getTarget().toArray()[0]).getTextDirection().getResourceAsString());
+        assertEquals(textDirection.getResourceAsString(), ((SpecificResource)result.getTargets().toArray()[0]).getTextDirection().getResourceAsString());
     }
 }

@@ -33,17 +33,17 @@ public class TextualBodyTest {
         TextualBody body = this.anno4j.createObject(TextualBody.class);
         body.setValue(VALUE);
 
-        annotation.setBody(body);
+        annotation.addBody(body);
 
         Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals(VALUE, ((TextualBody) result.getBody()).getValue());
-        assertEquals(0, ((TextualBody) result.getBody()).getPurposes().size());
+        assertEquals(VALUE, ((TextualBody) result.getBodies().iterator().next()).getValue());
+        assertEquals(0, ((TextualBody) result.getBodies().iterator().next()).getPurposes().size());
 
         body.addPurpose(MotivationFactory.getAssessing(this.anno4j));
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals(1, ((TextualBody) result.getBody()).getPurposes().size());
+        assertEquals(1, ((TextualBody) result.getBodies().iterator().next()).getPurposes().size());
 
         HashSet<Motivation> purposes = new HashSet<>();
         purposes.add(MotivationFactory.getBookmarking(this.anno4j));
@@ -52,6 +52,6 @@ public class TextualBodyTest {
         body.setPurposes(purposes);
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals(2, ((TextualBody) result.getBody()).getPurposes().size());
+        assertEquals(2, ((TextualBody) result.getBodies().iterator().next()).getPurposes().size());
     }
 }

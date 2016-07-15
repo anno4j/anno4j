@@ -29,14 +29,14 @@ public class LogicalTests extends QuerySetup {
 
         List<Annotation> list1 = queryService.addCriteria("oa:hasBody/ex:languageValue[@de]").execute();
         assertEquals(1, list1.size());
-        FirstLogicalTestBody firstLogicalTestBody = (FirstLogicalTestBody) list1.get(0).getBody();
+        FirstLogicalTestBody firstLogicalTestBody = (FirstLogicalTestBody) list1.get(0).getBodies().iterator().next();
         assertEquals(firstLogicalTestBody.getLangValue().toString(), "Testwert");
 
         super.setupUpQueryTest();
 
         List<Annotation> list2 = queryService.addCriteria("oa:hasBody/ex:languageValue[@en]").execute();
         assertEquals(1, list2.size());
-        SecondLogicalTestBody secondLogicalTestBody = (SecondLogicalTestBody) list2.get(0).getBody();
+        SecondLogicalTestBody secondLogicalTestBody = (SecondLogicalTestBody) list2.get(0).getBodies().iterator().next();
         assertEquals(secondLogicalTestBody.getLangValue().toString(), "Second Body Lang Value");
 
         super.setupUpQueryTest();
@@ -54,7 +54,7 @@ public class LogicalTests extends QuerySetup {
     public void logicalAndTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {
         List<Annotation> list = queryService.addCriteria("oa:hasBody[ex:logicalTestFirstValue is \"First Value\"  & ex:logicalTestAnotherValue is \"Another Value\"]").execute();
         assertEquals(1, list.size());
-        FirstLogicalTestBody firstLogicalTestBody = (FirstLogicalTestBody) list.get(0).getBody();
+        FirstLogicalTestBody firstLogicalTestBody = (FirstLogicalTestBody) list.get(0).getBodies().iterator().next();
         assertEquals("First Value", firstLogicalTestBody.getValue());
         assertEquals("Another Value", firstLogicalTestBody.getAnotherValue());
 
@@ -62,7 +62,7 @@ public class LogicalTests extends QuerySetup {
 
         List<Annotation> list1 = queryService.addCriteria("oa:hasBody[rdf:type is ex:firstLogicalBodyType  & ex:logicalTestAnotherValue is \"Another Value\"]").execute();
         assertEquals(1, list1.size());
-        assertEquals("Another Value", ((FirstLogicalTestBody) list.get(0).getBody()).getAnotherValue());
+        assertEquals("Another Value", ((FirstLogicalTestBody) list.get(0).getBodies().iterator().next()).getAnotherValue());
     }
 
     @Test
@@ -89,13 +89,13 @@ public class LogicalTests extends QuerySetup {
         firstTestBody.setValue("First Value");
         firstTestBody.setAnotherValue("Another Value");
         firstTestBody.setLangValue(new LangString("Testwert", "de"));
-        annotation.setBody(firstTestBody);
+        annotation.addBody(firstTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondLogicalTestBody secondTestBody = anno4j.createObject(SecondLogicalTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setLangValue(new LangString("Second Body Lang Value", "en"));
-        annotation1.setBody(secondTestBody);
+        annotation1.addBody(secondTestBody);
     }
 
     @Iri("http://www.example.com/schema#firstLogicalBodyType")

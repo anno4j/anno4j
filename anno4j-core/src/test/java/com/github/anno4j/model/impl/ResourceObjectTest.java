@@ -5,12 +5,10 @@ import com.github.anno4j.example.TextAnnotationBody;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.RDFFormat;
 
 import static org.junit.Assert.assertEquals;
@@ -76,7 +74,7 @@ public class ResourceObjectTest {
         body.setLanguage(language);
 
         // Add the body to the annotation
-        annotation.setBody(body);
+        annotation.addBody(body);
 
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
@@ -118,7 +116,7 @@ public class ResourceObjectTest {
         body.setLanguage(language);
 
         // Add the body to the annotation
-        annotation.setBody(body);
+        annotation.addBody(body);
 
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 

@@ -27,19 +27,19 @@ public class ConstraintLessTest extends QuerySetup {
 
         ConstraintLessBody constraintLessBody = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody.setValue("Value 1");
-        annotation.setBody(constraintLessBody);
+        annotation.addBody(constraintLessBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setCreated("2015-01-28T12:00:00Z");
         ConstraintLessBody constraintLessBody2 = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody2.setValue("Value 2");
 
-        annotation1.setBody(constraintLessBody2);
+        annotation1.addBody(constraintLessBody2);
 
         // This
         Annotation annotation2 = anno4j.createObject(Annotation.class);
         annotation2.setCreated("2015-01-28T12:00:00Z");
-        annotation2.setBody(anno4j.createObject(ConstraintLessBody.class));
+        annotation2.addBody(anno4j.createObject(ConstraintLessBody.class));
     }
 
     @Test
@@ -58,8 +58,8 @@ public class ConstraintLessTest extends QuerySetup {
         assertEquals("2015-01-28T12:00:00Z", list.get(1).getCreated());
 
         // Test for the value attribute of the body object
-        assertEquals("Value 1", ((ConstraintLessBody) list.get(0).getBody()).getValue());
-        assertEquals("Value 2", ((ConstraintLessBody) list.get(1).getBody()).getValue());
+        assertEquals("Value 1", ((ConstraintLessBody) list.get(0).getBodies().iterator().next()).getValue());
+        assertEquals("Value 2", ((ConstraintLessBody) list.get(1).getBodies().iterator().next()).getValue());
     }
 
     @Test

@@ -4,11 +4,9 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.annotations.Partial;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
-import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.List;
 
@@ -34,7 +32,7 @@ public class InheritanceTest {
         // Create the body
         Superclass body = anno4j.createObject(Superclass.class);
         body.setValue("myValue");
-        annotation.setBody(body);
+        annotation.addBody(body);
 
         // Query persisted object
         List<Annotation> result = anno4j.findAll(Annotation.class);
@@ -42,7 +40,7 @@ public class InheritanceTest {
         assertEquals(1, result.size());
 
         Annotation resultObject = result.get(0);
-        Body resultBody = resultObject.getBody();
+        Body resultBody = resultObject.getBodies().iterator().next();
 
         assertTrue(resultBody instanceof  Superclass);
         assertEquals("myValue", ((Superclass) resultBody).getValue());

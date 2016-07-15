@@ -6,6 +6,7 @@ import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.model.namespaces.SCHEMA;
 import org.openrdf.annotations.Iri;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ public interface Annotation extends CreationProvenance {
      * @return Value of http:www.w3.org/ns/oa#hasBody.
      */
     @Iri(OADM.HAS_BODY)
-    Body getBody();
+    Set<Body> getBodies();
 
     /**
      * Sets http:www.w3.org/ns/oa#hasBody.
@@ -28,7 +29,14 @@ public interface Annotation extends CreationProvenance {
      * @param body New value of http:www.w3.org/ns/oa#hasBody.
      */
     @Iri(OADM.HAS_BODY)
-    void setBody(Body body);
+    void setBodies(Set<Body> body);
+
+    /**
+     * Adds a http:www.w3.org/ns/oa#hasBody relationship.
+     *
+     * @param body New http:www.w3.org/ns/oa#hasBody relationship.
+     */
+    void addBody(Body body);
 
     /**
      * Gets http:www.w3.org/ns/oa#hasTarget relationships.
@@ -36,7 +44,7 @@ public interface Annotation extends CreationProvenance {
      * @return Values of http:www.w3.org/ns/oa#hasTarget.
      */
     @Iri(OADM.HAS_TARGET)
-    Set<Target> getTarget();
+    Set<Target> getTargets();
 
     /**
      * Sets http:www.w3.org/ns/oa#hasTarget.
@@ -44,7 +52,7 @@ public interface Annotation extends CreationProvenance {
      * @param targets New value of http:www.w3.org/ns/oa#hasTarget.
      */
     @Iri(OADM.HAS_TARGET)
-    void setTarget(Set<Target> targets);
+    void setTargets(Set<Target> targets);
 
     /**
      * Adds a http:www.w3.org/ns/oa#hasTarget relationship.

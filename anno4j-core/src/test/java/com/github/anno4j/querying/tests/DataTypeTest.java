@@ -31,7 +31,7 @@ public class DataTypeTest extends QuerySetup {
                 .execute();
 
         assertEquals(1, list.size());
-        assertEquals(new Double(2.0), ((DataTypeBody) list.get(0).getBody()).getDoubleValue());
+        assertEquals(new Double(2.0), ((DataTypeBody) list.get(0).getBodies().iterator().next()).getDoubleValue());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class DataTypeTest extends QuerySetup {
                 .execute();
 
         assertEquals(1, list.size());
-        assertEquals(new Double(2.0), ((DataTypeBody) list.get(0).getBody()).getDoubleValue());
+        assertEquals(new Double(2.0), ((DataTypeBody) list.get(0).getBodies().iterator().next()).getDoubleValue());
     }
 
     @Test
@@ -74,8 +74,8 @@ public class DataTypeTest extends QuerySetup {
                 .execute();
 
         assertEquals(1, list.size());
-        assertEquals("3.0", ((DataTypeBody) list.get(0).getBody()).getStringValue());
-        assertEquals(null, ((DataTypeBody) list.get(0).getBody()).getDoubleValue());
+        assertEquals("3.0", ((DataTypeBody) list.get(0).getBodies().iterator().next()).getStringValue());
+        assertEquals(null, ((DataTypeBody) list.get(0).getBodies().iterator().next()).getDoubleValue());
     }
 
     @Override
@@ -84,12 +84,12 @@ public class DataTypeTest extends QuerySetup {
         Annotation annotation = anno4j.createObject(Annotation.class);
         DataTypeBody dataTypeBody = anno4j.createObject(DataTypeBody.class);
         dataTypeBody.setDoubleValue(2.0);
-        annotation.setBody(dataTypeBody);
+        annotation.addBody(dataTypeBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         DataTypeBody dataTypeBody2 = anno4j.createObject(DataTypeBody.class);
         dataTypeBody2.setStringValue("3.0");
-        annotation1.setBody(dataTypeBody2);
+        annotation1.addBody(dataTypeBody2);
     }
 
     @Iri("http://www.example.com/schema#datatTypeBody")

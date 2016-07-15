@@ -13,7 +13,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
 import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -126,13 +125,13 @@ public class CreationProvenanceTest {
         rights.add(this.anno4j.createObject(ResourceObject.class, RIGHT3));
         target.setRights(rights);
 
-        annotation.setBody(body);
+        annotation.addBody(body);
         annotation.addTarget(target);
 
         Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         assertEquals(0, result.getRights().size());
-        assertEquals(1, result.getBody().getRights().size());
-        assertEquals(2, ((SpecificResource) result.getTarget().toArray()[0]).getRights().size());
+        assertEquals(1, result.getBodies().iterator().next().getRights().size());
+        assertEquals(2, ((SpecificResource) result.getTargets().toArray()[0]).getRights().size());
     }
 }
