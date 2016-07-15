@@ -1,15 +1,11 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.annotations.Iri;
-import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
@@ -49,12 +45,28 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
     public void addTarget(Target target) {
         HashSet<Target> targets = new HashSet<>();
 
-        if (this.getTarget() != null) {
-            targets.addAll(this.getTarget());
+        if (this.getTargets() != null) {
+            targets.addAll(this.getTargets());
         }
 
         targets.add(target);
-        this.setTarget(targets);
+        this.setTargets(targets);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addBody(Body body) {
+        HashSet<Body> bodies = new HashSet<>();
+
+        if (this.getBodies() != null) {
+            bodies.addAll(this.getBodies());
+        }
+
+        bodies.add(body);
+        this.setBodies(bodies);
     }
 
     /**
@@ -120,12 +132,14 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
             StringBuilder sb = new StringBuilder();
             sb.append(super.getTriples(RDFFormat.NTRIPLES));
 
-            if (getBody() != null) {
-                sb.append(getBody().getTriples(RDFFormat.NTRIPLES));
+            if (getBodies() != null) {
+                for (Body body : getBodies()) {
+                    sb.append(body.getTriples(RDFFormat.NTRIPLES));
+                }
             }
 
-            if (getTarget() != null) {
-                for (Target target : getTarget()) {
+            if (getTargets() != null) {
+                for (Target target : getTargets()) {
                     sb.append(target.getTriples(RDFFormat.NTRIPLES));
                 }
             }
@@ -159,17 +173,19 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
             ObjectConnection connection = getObjectConnection();
 
             // deleting an existing body
-            if (getBody() != null) {
-                getBody().delete();
-                setBody(null);
+            if (getBodies() != null) {
+                for (Body body : getBodies()) {
+                    body.delete();
+                }
+                setBodies(null);
             }
 
             // deleting existing targets one by one
-            if (getTarget() != null) {
-                for (Target target : getTarget()) {
+            if (getTargets() != null) {
+                for (Target target : getTargets()) {
                     target.delete();
                 }
-                setTarget(null);
+                setTargets(null);
             }
 
             // deleting possible provenance information

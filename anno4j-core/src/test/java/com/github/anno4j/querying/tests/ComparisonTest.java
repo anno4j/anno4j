@@ -79,17 +79,17 @@ public class ComparisonTest extends QuerySetup {
         Annotation annotation = anno4j.createObject(Annotation.class);
         ComparisonBody comparisonBody = anno4j.createObject(ComparisonBody.class);
         comparisonBody.setStringValue("Test");
-        annotation.setBody(comparisonBody);
+        annotation.addBody(comparisonBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         ComparisonBody comparisonBody1 = anno4j.createObject(ComparisonBody.class);
         comparisonBody1.setStringValue("Test1");
-        annotation1.setBody(comparisonBody1);
+        annotation1.addBody(comparisonBody1);
 
         Annotation annotation2 = anno4j.createObject(Annotation.class);
         ComparisonBody comparisonBody2 = anno4j.createObject(ComparisonBody.class);
         comparisonBody2.setStringValue("2Test");
-        annotation2.setBody(comparisonBody2);
+        annotation2.addBody(comparisonBody2);
     }
 
     @Iri("http://www.example.com/schema#comparisonBody")

@@ -39,7 +39,7 @@ public class RecursivePathTest extends QuerySetup {
                 .addCriteria("oa:hasBody/ex:recursiveBodyValue", "Another Testing Value")
                 .execute();
         assertEquals(1, annotations.size());
-        assertEquals("Another Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());
+        assertEquals("Another Testing Value", ((RecursiveBody) annotations.get(0).getBodies().iterator().next()).getValue());
     }
 
     @Test
@@ -51,7 +51,7 @@ public class RecursivePathTest extends QuerySetup {
     public void zeroOrMoreTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, RepositoryConfigException, IllegalAccessException, InstantiationException {
         List<Annotation> annotations = queryService.addCriteria("(oa:hasBody/ex:recursiveBodyValue)*", "Some Testing Value").execute();
         assertEquals(1, annotations.size());
-        assertEquals("Some Testing Value", ((RecursiveBody) annotations.get(0).getBody()).getValue());
+        assertEquals("Some Testing Value", ((RecursiveBody) annotations.get(0).getBodies().iterator().next()).getValue());
 
         super.setupUpQueryTest();
 
@@ -66,13 +66,13 @@ public class RecursivePathTest extends QuerySetup {
         annotation.setGenerated("2015-01-28T12:00:00Z");
         RecursiveBody recursiveBody = anno4j.createObject(RecursiveBody.class);
         recursiveBody.setValue("Some Testing Value");
-        annotation.setBody(recursiveBody);
+        annotation.addBody(recursiveBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         annotation1.setCreated("2015-01-28T12:00:00Z");
         RecursiveBody recursiveBody2 = anno4j.createObject(RecursiveBody.class);
         recursiveBody2.setValue("Another Testing Value");
-        annotation1.setBody(recursiveBody2);
+        annotation1.addBody(recursiveBody2);
 
     }
 

@@ -6,16 +6,13 @@ import com.github.anno4j.model.impl.style.CssStylesheet;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.querying.QueryService;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
-import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -78,8 +75,8 @@ public class AnnotationTest {
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         // Tests
-        assertEquals(1, result.getTarget().size());
-        assertEquals(("http://www.somepage.org/resource1/"), ((SpecificResource) result.getTarget().toArray()[0]).getSource().getResource().toString());
+        assertEquals(1, result.getTargets().size());
+        assertEquals(("http://www.somepage.org/resource1/"), ((SpecificResource) result.getTargets().toArray()[0]).getSource().getResource().toString());
     }
 
     @Test
@@ -106,13 +103,13 @@ public class AnnotationTest {
 
         // Tests
         List<String> urls = new ArrayList<>();
-        for(Target target : result.getTarget()) {
+        for(Target target : result.getTargets()) {
             urls.add(((SpecificResource) target).getSource().getResource().toString());
         }
 
         assertTrue(urls.contains("http://www.somepage.org/resource1/"));
         assertTrue(urls.contains("http://www.somepage.org/resource2/"));
-        assertEquals(2, result.getTarget().size());
+        assertEquals(2, result.getTargets().size());
     }
 
     @Test
@@ -203,7 +200,7 @@ public class AnnotationTest {
         Annotation result = anno4j.findByID(Annotation.class, anno.getResourceAsString());
 
         assertEquals(anno.getCreated(), result.getCreated());
-        assertEquals(((SpecificResource) anno.getTarget().toArray()[0]).getCreated(), ((SpecificResource) result.getTarget().toArray()[0]).getCreated());
+        assertEquals(((SpecificResource) anno.getTargets().toArray()[0]).getCreated(), ((SpecificResource) result.getTargets().toArray()[0]).getCreated());
     }
 
     @Test

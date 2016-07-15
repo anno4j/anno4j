@@ -1,12 +1,10 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.LangString;
-import org.openrdf.repository.object.ObjectConnection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,11 +24,11 @@ public class BodyTest {
         body.setValue("Example Value");
 
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setBody(body);
+        annotation.addBody(body);
 
         // query persisted object and check test body implementation
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals(((TestBody)annotation.getBody()).getValue(), ((TestBody) result.getBody()).getValue());
+        assertEquals(((TestBody)annotation.getBodies().iterator().next()).getValue(), ((TestBody) result.getBodies().iterator().next()).getValue());
     }
 
     @Iri("http://www.example.com/schema#bodyType")

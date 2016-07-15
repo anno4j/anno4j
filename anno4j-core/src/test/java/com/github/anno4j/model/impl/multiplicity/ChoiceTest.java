@@ -53,7 +53,7 @@ public class ChoiceTest {
         choiceTarget.addItem(this.anno4j.createObject(ResourceObject.class));
 
         annotation.addTarget(choiceTarget);
-        annotation.setBody(choiceBody);
+        annotation.addBody(choiceBody);
 
         List<Annotation> result = this.anno4j.findAll(Annotation.class);
 
@@ -61,7 +61,7 @@ public class ChoiceTest {
 
         Annotation resultAnnotation = result.get(0);
 
-        assertEquals(1, ((Choice) resultAnnotation.getBody()).getItems().size());
-        assertEquals(2, ((Choice) resultAnnotation.getTarget().toArray()[0]).getItems().size());
+        assertEquals(1, ((Choice) resultAnnotation.getBodies().iterator().next()).getItems().size());
+        assertEquals(2, ((Choice) resultAnnotation.getTargets().toArray()[0]).getItems().size());
     }
 }
