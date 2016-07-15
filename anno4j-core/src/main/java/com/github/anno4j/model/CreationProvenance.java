@@ -2,7 +2,10 @@ package com.github.anno4j.model;
 
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.DCTERMS;
+import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
+
+import java.util.Set;
 
 /**
  * Interface for the Annotation, Body, and Target class, introducing provenance information: created, creator, and modified properties
@@ -82,4 +85,12 @@ public interface CreationProvenance extends ResourceObject {
      * @param timezoneID    The timezone to set.
      */
     void setModified(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
+
+    @Iri(DCTERMS.RIGHTS)
+    void setRights(Set<ResourceObject> rights);
+
+    @Iri(DCTERMS.RIGHTS)
+    Set<ResourceObject> getRights();
+
+    void addRight(ResourceObject right);
 }

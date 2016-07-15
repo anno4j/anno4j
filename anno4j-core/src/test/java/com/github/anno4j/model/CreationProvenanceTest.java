@@ -1,14 +1,18 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.impl.body.TextualBody;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -29,6 +33,10 @@ public class CreationProvenanceTest {
     private final static String GOOD_DATE_2 = "2015-01-28T12:00:00+00:00";
     private final static String BAD_DATE = "2015--01-28T12:00:00Z";
     private final static String BAD_DATE2 = "2015-01-28T12:00:00";
+
+    private final static URIImpl RIGHT = new URIImpl("http://example.org/right");
+    private final static URIImpl RIGHT2 = new URIImpl("http://example.org/right2");
+    private final static URIImpl RIGHT3 = new URIImpl("http://example.org/right3");
 
     @Test
     public void testGoodDates() {
@@ -103,5 +111,28 @@ public class CreationProvenanceTest {
         result = this.anno4j.findByID(SpecificResource.class, spec.getResourceAsString());
 
         assertEquals("2015-12-16T12:00:00-03:00", result.getModified());
+    }
+
+    @Test
+    public void testRights() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        TextualBody body = this.anno4j.createObject(TextualBody.class);
+        body.addRight(this.anno4j.createObject(ResourceObject.class, RIGHT));
+
+        SpecificResource target = this.anno4j.createObject(SpecificResource.class);
+        HashSet<ResourceObject> rights = new HashSet<>();
+        rights.add(this.anno4j.createObject(ResourceObject.class, RIGHT2));
+        rights.add(this.anno4j.createObject(ResourceObject.class, RIGHT3));
+        target.setRights(rights);
+
+        annotation.setBody(body);
+        annotation.addTarget(target);
+
+        Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(0, result.getRights().size());
+        assertEquals(1, result.getBody().getRights().size());
+        assertEquals(2, ((SpecificResource) result.getTarget().toArray()[0]).getRights().size());
     }
 }

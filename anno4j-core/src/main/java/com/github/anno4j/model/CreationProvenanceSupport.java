@@ -1,6 +1,7 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.DCTERMS;
 import org.joda.time.DateTimeZone;
@@ -9,6 +10,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -85,6 +87,21 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
      */
     public void setCreated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
         this.setCreated(createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRight(ResourceObject right) {
+        HashSet<ResourceObject> rights = new HashSet<>();
+
+        if(this.getRights() != null) {
+            rights.addAll(this.getRights());
+        }
+
+        rights.add(right);
+        this.setRights(rights);
     }
 
     /**
