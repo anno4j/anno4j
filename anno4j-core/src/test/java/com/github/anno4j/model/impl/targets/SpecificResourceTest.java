@@ -31,12 +31,12 @@ public class SpecificResourceTest {
         annotation.addTarget(specificResource);
 
         Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals(0, ((SpecificResource) result.getTarget().iterator().next()).getStyleClasses().size());
+        assertEquals(0, ((SpecificResource) result.getTargets().iterator().next()).getStyleClasses().size());
 
         specificResource.addStyleClass("red");
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals(1, ((SpecificResource) result.getTarget().iterator().next()).getStyleClasses().size());
+        assertEquals(1, ((SpecificResource) result.getTargets().iterator().next()).getStyleClasses().size());
 
         HashSet<String> styleClasses = new HashSet<>();
         styleClasses.add("green");
@@ -44,7 +44,7 @@ public class SpecificResourceTest {
         specificResource.setStyleClasses(styleClasses);
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals(2, ((SpecificResource) result.getTarget().iterator().next()).getStyleClasses().size());
+        assertEquals(2, ((SpecificResource) result.getTargets().iterator().next()).getStyleClasses().size());
     }
 
 }
