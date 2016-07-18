@@ -100,6 +100,13 @@ public class OADM {
     public final static String RESOURCE_SELECTION = NS + "ResourceSelection";
 
     /**
+     * Refers to http://www.w3.org/ns/oa#State.
+     * A State describes the intended state of a resource as applied to the particular Annotation, and thus provides
+     * the information needed to retrieve the correct representation of that resource.
+     */
+    public final static String STATE = NS + "State";
+
+    /**
      * Refers to http://www.w3.org/ns/oa#TimeState
      * A TimeState records the time at which the resource's state is appropriate for the Annotation, typically the time
      * that the Annotation was created and/or a link to a persistent copy of the current version.
