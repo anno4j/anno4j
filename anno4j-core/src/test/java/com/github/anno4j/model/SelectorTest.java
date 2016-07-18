@@ -2,13 +2,17 @@ package com.github.anno4j.model;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.impl.selector.CSSSelector;
+import com.github.anno4j.model.impl.selector.DataPositionSelector;
 import com.github.anno4j.model.impl.selector.FragmentSelector;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +54,6 @@ public class SelectorTest {
 
         annotation.addTarget(specificResource);
 
-
         // Query object
         List<FragmentSelector> result = anno4j.findAll(FragmentSelector.class);
 
@@ -59,5 +62,30 @@ public class SelectorTest {
         // Tests
         assertEquals(fragmentSelector.getResource(), resultObject.getResource());
         assertEquals(fragmentSelector.getValue(), resultObject.getValue());
+    }
+
+    @Test
+    public void testRefinedBy() throws RepositoryException, IllegalAccessException, InstantiationException {
+        CSSSelector selector = this.anno4j.createObject(CSSSelector.class);
+
+        CSSSelector result = this.anno4j.findByID(CSSSelector.class, selector.getResourceAsString());
+
+        assertEquals(0, result.getRefinedSelectors().size());
+
+        selector.addRefinedSelector(this.anno4j.createObject(DataPositionSelector.class));
+
+        result = this.anno4j.findByID(CSSSelector.class, selector.getResourceAsString());
+
+        assertEquals(1, result.getRefinedSelectors().size());
+
+        HashSet<Selector> selectors = new HashSet<>();
+        selectors.add(this.anno4j.createObject(FragmentSelector.class));
+        selectors.add(this.anno4j.createObject(FragmentSelector.class));
+
+        selector.setRefinedSelectors(selectors);
+
+        result = this.anno4j.findByID(CSSSelector.class, selector.getResourceAsString());
+
+        assertEquals(2, result.getRefinedSelectors().size());
     }
 }

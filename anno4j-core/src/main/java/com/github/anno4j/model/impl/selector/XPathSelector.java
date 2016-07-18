@@ -12,7 +12,7 @@ import org.openrdf.annotations.Iri;
  * via a specified XPath value.
  */
 @Iri(OADM.XPATH_SELECTOR)
-public interface XPathSelector extends Selector{
+public interface XPathSelector extends Selector {
 
     /**
      * Set the http://www.w3.org/1999/02/22-rdf-syntax-ns#value property.

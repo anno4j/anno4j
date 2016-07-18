@@ -1,6 +1,7 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.namespaces.Anno4jNS;
 import com.github.anno4j.model.namespaces.DC;
 import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
@@ -15,6 +16,7 @@ import java.util.Set;
  * resource's content. This information may be recorded as part of the Annotation, even if the representation of the
  * resource must be retrieved from the Web.
  */
+@Iri(Anno4jNS.EXTERNAL_WEB_RESOURCE)
 public interface ExternalWebResource extends CreationProvenance {
 
     /**

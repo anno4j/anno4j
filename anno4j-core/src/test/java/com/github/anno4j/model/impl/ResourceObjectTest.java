@@ -124,7 +124,7 @@ public class ResourceObjectTest {
 
         // Create Strings that need to be contained in the JSONLD output (at some place)
         String jsonldBody = "  \"@id\" : \"" + body.getResourceAsString() + "\",\n" +
-                "  \"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\" ],\n" +
+                "  \"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\", \"https://github.com/anno4j/ns#CreationProvenance\" ],\n" +
                 "  \"http://purl.org/dc/elements/1.1/format\" : [ {\n" +
                 "    \"@value\" : \"" + body.getFormat() + "\"\n" +
                 "  } ],\n" +
@@ -152,7 +152,6 @@ public class ResourceObjectTest {
     @Test
     public void testGetTriplesOnAgent() throws RepositoryException, IllegalAccessException, InstantiationException {
         Annotation annotation = anno4j.createObject(Annotation.class);
-        long time = System.currentTimeMillis();
         annotation.setCreated("2015-01-28T12:00:00Z");
 
         Software softwareAgent = anno4j.createObject(Software.class);

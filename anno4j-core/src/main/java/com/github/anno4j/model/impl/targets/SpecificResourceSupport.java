@@ -1,9 +1,6 @@
 package com.github.anno4j.model.impl.targets;
 
-import com.github.anno4j.model.AnnotationSupport;
-import com.github.anno4j.model.CreationProvenanceSupport;
 import com.github.anno4j.model.ExternalWebResourceSupport;
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.model.URI;
