@@ -88,11 +88,30 @@ public interface CreationProvenance extends ResourceObject {
      */
     void setModified(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
+    /**
+     * Sets the values for the http://purl.org/dc/terms/rights relationship.
+     *
+     * Information about rights held in and over the resource.
+     *
+     * @param rights    The Set of values to set for the http://purl.org/dc/terms/rights relationship.
+     */
     @Iri(DCTERMS.RIGHTS)
     void setRights(Set<ResourceObject> rights);
 
+    /**
+     * Gets the Set of values currently defined for the http://purl.org/dc/terms/rights relationship.
+     *
+     * Information about rights held in and over the resource.
+     *
+     * @return  The Set of values currently defined for the http://purl.org/dc/terms/rights relationship.
+     */
     @Iri(DCTERMS.RIGHTS)
     Set<ResourceObject> getRights();
 
+    /**
+     * Adds a single value to the Set of values currently defined for the http://purl.org/dc/terms/rights relationship.
+     *
+     * @param right The value to add to the http://purl.org/dc/terms/rights relationship.
+     */
     void addRight(ResourceObject right);
 }
