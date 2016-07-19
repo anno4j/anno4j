@@ -2,6 +2,9 @@ package com.github.anno4j.model.impl.targets;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.State;
+import com.github.anno4j.model.impl.state.HttpRequestState;
+import com.github.anno4j.model.impl.state.TimeState;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
@@ -45,6 +48,31 @@ public class SpecificResourceTest {
 
         result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
         assertEquals(2, ((SpecificResource) result.getTargets().iterator().next()).getStyleClasses().size());
+    }
+
+    @Test
+    public void testStates() throws RepositoryException, IllegalAccessException, InstantiationException {
+        SpecificResource specificResource = this.anno4j.createObject(SpecificResource.class);
+
+        SpecificResource result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
+
+        assertEquals(0, result.getStates().size());
+
+        specificResource.addState(this.anno4j.createObject(TimeState.class));
+
+        result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
+
+        assertEquals(1, result.getStates().size());
+
+        HashSet<State> states = new HashSet<>();
+        states.add(this.anno4j.createObject(HttpRequestState.class));
+        states.add(this.anno4j.createObject(HttpRequestState.class));
+
+        specificResource.setStates(states);
+
+        result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
+
+        assertEquals(2, result.getStates().size());
     }
 
 }

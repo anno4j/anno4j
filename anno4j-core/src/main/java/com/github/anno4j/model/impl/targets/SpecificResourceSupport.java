@@ -2,6 +2,7 @@ package com.github.anno4j.model.impl.targets;
 
 import com.github.anno4j.model.ExternalWebResourceSupport;
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.State;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
@@ -13,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
+import java.util.Set;
 
 @Partial
 public abstract class SpecificResourceSupport extends ExternalWebResourceSupport implements SpecificResource {
@@ -30,6 +32,23 @@ public abstract class SpecificResourceSupport extends ExternalWebResourceSupport
 
         styleClasses.add(styleClass);
         this.setStyleClasses(styleClasses);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addState(State state) {
+        HashSet<State> states = new HashSet<>();
+
+        Set<State> current = this.getStates();
+
+        if(current != null) {
+            states.addAll(current);
+        }
+
+        states.add(state);
+        this.setStates(states);
     }
 
     @Override
