@@ -4,12 +4,17 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.body.TextualBody;
 import com.github.anno4j.model.impl.targets.SpecificResource;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.RDFObject;
+import org.openrdf.repository.object.behaviours.RDFObjectImpl;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
 import java.util.HashSet;
@@ -133,5 +138,62 @@ public class CreationProvenanceTest {
         assertEquals(0, result.getRights().size());
         assertEquals(1, result.getBodies().iterator().next().getRights().size());
         assertEquals(2, ((SpecificResource) result.getTargets().toArray()[0]).getRights().size());
+    }
+
+    @Test
+    public void testCanonical() throws RepositoryException, IllegalAccessException, InstantiationException {
+        String canonicalURI = "http://somepage/canonical/";
+
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(null, result.getCanonical());
+
+        ResourceObject canonical = this.anno4j.createObject(ResourceObject.class);
+        canonical.setResourceAsString(canonicalURI);
+        annotation.setCanonical(canonical);
+
+        result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(canonicalURI, result.getCanonical().getResourceAsString());
+    }
+
+    @Test
+    public void testVia() throws RepositoryException, IllegalAccessException, InstantiationException {
+        String viaURI = "http://somepage/via1/";
+        ResourceObject via = this.anno4j.createObject(ResourceObject.class);
+        via.setResourceAsString(viaURI);
+
+        String viaURI2 = "http://somepage/via2/";
+        ResourceObject via2 = this.anno4j.createObject(ResourceObject.class);
+        via2.setResourceAsString(viaURI2);
+
+        String viaURI3 = "http://somepage/via3/";
+        ResourceObject via3 = this.anno4j.createObject(ResourceObject.class);
+        via3.setResourceAsString(viaURI3);
+
+        TextualBody body = this.anno4j.createObject(TextualBody.class);
+
+        TextualBody result = this.anno4j.findByID(TextualBody.class, body.getResourceAsString());
+
+        assertEquals(0, result.getVia().size());
+
+        body.addVia(via);
+
+        result = this.anno4j.findByID(TextualBody.class, body.getResourceAsString());
+
+        assertEquals(1, result.getVia().size());
+        assertEquals(viaURI, result.getVia().iterator().next().getResourceAsString());
+
+        HashSet<ResourceObject> vias = new HashSet<>();
+        vias.add(via2);
+        vias.add(via3);
+
+        body.setVia(vias);
+
+        result = this.anno4j.findByID(TextualBody.class, body.getResourceAsString());
+
+        assertEquals(2, result.getVia().size());
     }
 }

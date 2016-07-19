@@ -12,6 +12,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,4 +106,20 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
         this.setRights(rights);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addVia(ResourceObject via) {
+        HashSet<ResourceObject> vias = new HashSet<>();
+
+        Set<ResourceObject> current = this.getVia();
+
+        if(current != null) {
+            vias.addAll(current);
+        }
+
+        vias.add(via);
+        this.setVia(vias);
+    }
 }

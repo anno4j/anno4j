@@ -114,4 +114,54 @@ public interface CreationProvenance extends ResourceObject {
      * @param right The value to add to the http://purl.org/dc/terms/rights relationship.
      */
     void addRight(ResourceObject right);
+
+    /**
+     * Sets the value for the http://www.w3.org/ns/oa#canonical relationship.
+     *
+     * A object of the relationship is the canonical IRI that can always be used to deduplicate the Annotation,
+     * regardless of the current IRI used to access the representation.
+     *
+     * @param canonicalResource The value to set for the http://www.w3.org/ns/oa#canonical relationship.
+     */
+    @Iri(OADM.CANONICAL)
+    void setCanonical(ResourceObject canonicalResource);
+
+    /**
+     * Gets the value currently defined for the http://www.w3.org/ns/oa#canonical relationship.
+     *
+     * A object of the relationship is the canonical IRI that can always be used to deduplicate the Annotation,
+     * regardless of the current IRI used to access the representation.
+     *
+     * @return  The value currently defined for the http://www.w3.org/ns/oa#canonical relationship.
+     */
+    @Iri(OADM.CANONICAL)
+    ResourceObject getCanonical();
+
+    /**
+     * Sets the values for the http://www.w3.org/ns/oa#via relationship.
+     *
+     * A object of the relationship is a resource from which the source resource was retrieved by the providing system.
+     *
+     * @param viaSet    The Set of values to set for the http://www.w3.org/ns/oa#via relationship.
+     */
+    @Iri(OADM.VIA)
+    void setVia(Set<ResourceObject> viaSet);
+
+    /**
+     * Gets the Set of values currently defined for the http://www.w3.org/ns/oa#via relationship.
+     *
+     * A object of the relationship is a resource from which the source resource was retrieved by the providing system.
+     *
+     * @return  The Set of values currently defined for the http://www.w3.org/ns/oa#via relationship.
+     */
+    @Iri(OADM.VIA)
+    Set<ResourceObject> getVia();
+
+    /**
+     * Adds a single value to the Set of values currently defined for the http://www.w3.org/ns/oa#via relationship.
+     *
+     * @param via   The single value to add to the Set of values currently defined for the http://www.w3.org/ns/oa#via
+     *              relationship.
+     */
+    void addVia(ResourceObject via);
 }
