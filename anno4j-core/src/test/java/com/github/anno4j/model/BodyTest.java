@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.LangString;
 
+import java.util.HashSet;
+
 import static org.junit.Assert.assertEquals;
 
 public class BodyTest {
@@ -29,6 +31,39 @@ public class BodyTest {
         // query persisted object and check test body implementation
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
         assertEquals(((TestBody)annotation.getBodies().iterator().next()).getValue(), ((TestBody) result.getBodies().iterator().next()).getValue());
+    }
+
+    @Test
+    public void testBodyCardinalityAnnotation() throws Exception {
+        // Create test annotation
+        TestBody body = anno4j.createObject(TestBody.class);
+        body.setValue("Example Value");
+
+        TestBody secondBody = anno4j.createObject(TestBody.class);
+        body.setValue("Example Value 2");
+
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        annotation.addBody(body);
+
+        assertEquals(annotation.getBodies().size(), 1);
+
+        // query persisted object and check test body implementation
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+        assertEquals(annotation.getBodies().size(), result.getBodies().size());
+
+        annotation.addBody(secondBody);
+
+        assertEquals(annotation.getBodies().size(), 2);
+
+        // query persisted object and check test body implementation
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+        assertEquals(annotation.getBodies().size(), result.getBodies().size());
+
+        annotation.setBodies(new HashSet<Body>());
+        assertEquals(annotation.getBodies().size(), 0);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+        assertEquals(annotation.getBodies().size(), result.getBodies().size());
     }
 
     @Iri("http://www.example.com/schema#bodyType")
