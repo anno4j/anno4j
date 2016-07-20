@@ -3,6 +3,7 @@ package com.github.anno4j.model.impl.targets;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.State;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.state.HttpRequestState;
 import com.github.anno4j.model.impl.state.TimeState;
 import org.junit.Before;
@@ -73,6 +74,31 @@ public class SpecificResourceTest {
         result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
 
         assertEquals(2, result.getStates().size());
+    }
+
+    @Test
+    public void testRenderedVia() throws RepositoryException, IllegalAccessException, InstantiationException {
+        SpecificResource specificResource = this.anno4j.createObject(SpecificResource.class);
+
+        SpecificResource result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
+
+        assertEquals(0, result.getRenderedVia().size());
+
+        specificResource.addRenderedVia(this.anno4j.createObject(ResourceObject.class));
+
+        result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
+
+        assertEquals(1, result.getRenderedVia().size());
+
+        HashSet<ResourceObject> rendered = new HashSet<>();
+        rendered.add(this.anno4j.createObject(ResourceObject.class));
+        rendered.add(this.anno4j.createObject(ResourceObject.class));
+
+        specificResource.setRenderedVia(rendered);
+
+        result = this.anno4j.findByID(SpecificResource.class, specificResource.getResourceAsString());
+
+        assertEquals(2, result.getRenderedVia().size());
     }
 
 }

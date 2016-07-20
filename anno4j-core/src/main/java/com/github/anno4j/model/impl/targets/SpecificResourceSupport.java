@@ -3,6 +3,7 @@ package com.github.anno4j.model.impl.targets;
 import com.github.anno4j.model.ExternalWebResourceSupport;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.State;
+import com.github.anno4j.model.impl.ResourceObject;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
@@ -49,6 +50,23 @@ public abstract class SpecificResourceSupport extends ExternalWebResourceSupport
 
         states.add(state);
         this.setStates(states);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRenderedVia(ResourceObject renderedVia) {
+        HashSet<ResourceObject> rendered = new HashSet<>();
+
+        Set<ResourceObject> current = this.getRenderedVia();
+
+        if(current != null) {
+            rendered.addAll(current);
+        }
+
+        rendered.add(renderedVia);
+        this.setRenderedVia(rendered);
     }
 
     @Override

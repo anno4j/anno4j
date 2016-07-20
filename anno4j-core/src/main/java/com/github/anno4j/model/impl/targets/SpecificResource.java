@@ -3,6 +3,7 @@ package com.github.anno4j.model.impl.targets;
 import com.github.anno4j.model.Selector;
 import com.github.anno4j.model.State;
 import com.github.anno4j.model.Target;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.RDFObject;
@@ -180,4 +181,33 @@ public interface SpecificResource extends Target {
      * @param state The value to add to the Set currently defined for the http://www.w3.org/ns/oa#hasState relationship.
      */
     void addState(State state);
+
+    /**
+     * Sets the values for the http://www.w3.org/ns/oa#renderedVia relationship.
+     *
+     * A system that was used by the application that created the Annotation to render the resource.
+     *
+     * @param renderedVia   The Set of values to set for the http://www.w3.org/ns/oa#renderedVia relationship.
+     */
+    @Iri(OADM.RENDERED_VIA)
+    void setRenderedVia(Set<ResourceObject> renderedVia);
+
+    /**
+     * Gets the Set of values currently defined for the http://www.w3.org/ns/oa#renderedVia relationship.
+     *
+     * A system that was used by the application that created the Annotation to render the resource.
+     *
+     * @return  The Set of values currently defined for the http://www.w3.org/ns/oa#renderedVia relationship.
+     */
+    @Iri(OADM.RENDERED_VIA)
+    Set<ResourceObject> getRenderedVia();
+
+    /**
+     * Add a single value to the Set of values currently defined for the http://www.w3.org/ns/oa#renderedVia
+     * relationship.
+     *
+     * @param renderedVia   The value to add to the Set of values currently defined for the
+     *                      http://www.w3.org/ns/oa#renderedVia relationship.
+     */
+    void addRenderedVia(ResourceObject renderedVia);
 }
