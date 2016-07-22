@@ -29,7 +29,7 @@ public class LanguageTest extends QuerySetup {
                 .addCriteria("oa:hasBody/ex:languageValue[@en]", "First Value")
                 .execute();
 
-        LangTestBody testBody = (LangTestBody) list.get(0).getBody();
+        LangTestBody testBody = (LangTestBody) list.get(0).getBodies().iterator().next();
         assertEquals("en", testBody.getLangString().getLang());
         assertEquals("First Value", testBody.getLangString().toString());
     }
@@ -45,7 +45,7 @@ public class LanguageTest extends QuerySetup {
 
         assertEquals(1, list.size());
 
-        LangTestBody testBody = (LangTestBody) list.get(0).getBody();
+        LangTestBody testBody = (LangTestBody) list.get(0).getBodies().iterator().next();
         assertEquals("de", testBody.getLangString().getLang());
         assertEquals("Zweiter Wert", testBody.getLangString().toString());
     }
@@ -66,18 +66,16 @@ public class LanguageTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
         LangTestBody langTestBody = anno4j.createObject(LangTestBody.class);
         langTestBody.setLangString(new LangString("First Value", "en"));
-        annotation.setBody(langTestBody);
-        anno4j.persist(annotation);
+        annotation.addBody(langTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("2015-01-28T12:00:00Z");
         LangTestBody langTestBody2 = anno4j.createObject(LangTestBody.class);
         langTestBody2.setLangString(new LangString("Zweiter Wert", "de"));
-        annotation1.setBody(langTestBody2);
-        anno4j.persist(annotation1);
+        annotation1.addBody(langTestBody2);
     }
 
     @Iri("http://www.example.com/schema#langBody")

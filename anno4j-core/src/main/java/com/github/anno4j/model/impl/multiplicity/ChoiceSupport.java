@@ -15,10 +15,15 @@ public abstract class ChoiceSupport extends ResourceObjectSupport implements Cho
         if(item == null){
             return;
         }
-        if(this.getItems() == null){
-            this.setItems(new HashSet<RDFObject>());
+
+        HashSet<RDFObject> items = new HashSet<>();
+
+        if(this.getItems() != null) {
+            items.addAll(this.getItems());
         }
-        this.getItems().add(item);
+
+        items.add(item);
+        this.setItems(items);
     }
     
 }

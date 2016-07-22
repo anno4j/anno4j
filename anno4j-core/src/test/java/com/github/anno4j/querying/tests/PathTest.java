@@ -30,10 +30,10 @@ public class PathTest extends QuerySetup {
 
         // Testing against the serialization date
         Annotation annotation = annotations.get(0);
-        assertEquals("07.05.2015", annotation.getSerializedAt());
+        assertEquals("2015-01-28T12:00:00Z", annotation.getGenerated());
 
         // Testing if the body was persisted correctly
-        PathTestBody testBody = (PathTestBody) annotation.getBody();
+        PathTestBody testBody = (PathTestBody) annotation.getBodies().iterator().next();
         assertEquals("Value1", testBody.getValue());
     }
 
@@ -47,10 +47,10 @@ public class PathTest extends QuerySetup {
 
         // Testing against the serialization date
         Annotation annotation = annotations.get(0);
-        assertEquals("01.01.2011", annotation.getAnnotatedAt());
+        assertEquals("2015-01-28T12:00:00Z", annotation.getCreated());
 
         // Testing if the body was persisted correctly
-        PathTestBody testBody = (PathTestBody) annotation.getBody();
+        PathTestBody testBody = (PathTestBody) annotation.getBodies().iterator().next();
         assertEquals("Value2", testBody.getValue());
     }
 
@@ -67,18 +67,16 @@ public class PathTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
         PathTestBody pathTestBody = anno4j.createObject(PathTestBody.class);
         pathTestBody.setValue("Value1");
-        annotation.setBody(pathTestBody);
-        anno4j.persist(annotation);
+        annotation.addBody(pathTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("2015-01-28T12:00:00Z");
         PathTestBody pathTestBody2 = anno4j.createObject(PathTestBody.class);
         pathTestBody2.setValue("Value2");
-        annotation1.setBody(pathTestBody2);
-        anno4j.persist(annotation1);
+        annotation1.addBody(pathTestBody2);
     }
 
     @Iri("http://www.example.com/schema#pathBody")

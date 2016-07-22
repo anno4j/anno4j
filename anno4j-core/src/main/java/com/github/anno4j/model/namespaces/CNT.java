@@ -4,6 +4,7 @@ package com.github.anno4j.model.namespaces;
  * Ontology class for the Representing Content in RDF ontology (cnt:).
  * See <a href="http://www.w3.org/TR/Content-in-RDF10/">http://www.w3.org/TR/Content-in-RDF10/</a>
  */
+@Deprecated
 public class CNT {
 
     /**

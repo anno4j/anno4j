@@ -19,50 +19,103 @@ import static org.junit.Assert.assertEquals;
  */
 public class UnionTest extends QuerySetup {
 
+    @Test
+    public void testDoubleUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
+        List<Annotation> annotations = queryService
+                .addCriteria("oa:hasBody/(ex:subBody | ex:subBody2)[is-a ex:unionBody | is-a ex:unionBody2]")
+                .execute();
+
+        assertEquals(2, annotations.size());
+    }
+
+    @Test
+    public void testNoUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
+        List<Annotation> annotations = queryService
+                .addCriteria("oa:hasBody[is-a ex:unionBody]")
+                .execute();
+
+        assertEquals(2, annotations.size());
+    }
 
     @Test
     public void testUnionBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException, InstantiationException, IllegalAccessException {
         List<Annotation> annotations = queryService
-                .addCriteria("oa:hasBody[is-a ex:unionBody1] | oa:hasBody[is-a ex:unionBody2]")
+                .addCriteria("oa:hasBody[is-a ex:unionBody] | oa:hasBody[is-a ex:unionBodyAlternative]")
                 .execute();
         
-        assertEquals(2, annotations.size());
+        assertEquals(3, annotations.size());
     }
 
     @Override
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
-        Annotation annotation =  anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
-        UnionTestBody1 unionTestBody1 = anno4j.createObject(UnionTestBody1.class);
-        unionTestBody1.setValue("Value1");
-        annotation.setBody(unionTestBody1);
-        anno4j.persist(annotation);
-
         Annotation annotation1 =  anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
-        UnionTestBody2 unionTestBody2 = anno4j.createObject(UnionTestBody2.class);
-        unionTestBody2.setValue("Value2");
-        annotation1.setBody(unionTestBody2);
-        anno4j.persist(annotation1);
+        annotation1.setGenerated("2015-01-28T12:00:00Z");
+        UnionTestBody unionTestBody1 = anno4j.createObject(UnionTestBody.class);
+        unionTestBody1.setSubBody(anno4j.createObject(UnionTestBodyAlternative.class));
+        unionTestBody1.setSubBody2(anno4j.createObject(UnionTestBody.class));
+        annotation1.addBody(unionTestBody1);
+
+        Annotation annotation2 =  anno4j.createObject(Annotation.class);
+        annotation2.setGenerated("2015-01-28T12:00:00Z");
+        UnionTestBody unionTestBody2 = anno4j.createObject(UnionTestBody.class);
+        unionTestBody2.setSubBody(anno4j.createObject(UnionTestBodyAlternative.class));
+        unionTestBody2.setSubBody2(anno4j.createObject(UnionTestBodyAlternative.class));
+        annotation2.addBody(unionTestBody2);
+
+        Annotation annotation3 =  anno4j.createObject(Annotation.class);
+        annotation3.setGenerated("2015-01-28T12:00:00Z");
+        UnionTestBodyAlternative unionTestBodyAlternative = anno4j.createObject(UnionTestBodyAlternative.class);
+        unionTestBodyAlternative.setSubBody(anno4j.createObject(UnionTestBody2.class));
+        unionTestBodyAlternative.setSubBody2(anno4j.createObject(UnionTestBodyAlternative.class));
+        annotation3.addBody(unionTestBodyAlternative);
     }
 
-    @Iri("http://www.example.com/schema#unionBody1")
-    public static interface UnionTestBody1 extends Body {
+    @Iri("http://www.example.com/schema#unionBody")
+    public static interface UnionTestBody extends Body {
 
-        @Iri("http://www.example.com/schema#value")
-        String getValue();
+        @Iri("http://www.example.com/schema#subBody")
+        Body getSubBody();
 
-        @Iri("http://www.example.com/schema#value")
-        void setValue(String value);
+        @Iri("http://www.example.com/schema#subBody")
+        void setSubBody(Body body);
+
+        @Iri("http://www.example.com/schema#subBody2")
+        Body getSubBody2();
+
+        @Iri("http://www.example.com/schema#subBody2")
+        void setSubBody2(Body body);
     }
 
     @Iri("http://www.example.com/schema#unionBody2")
     public static interface UnionTestBody2 extends Body {
-        @Iri("http://www.example.com/schema#value")
-        String getValue();
 
-        @Iri("http://www.example.com/schema#value")
-        void setValue(String value);
+        @Iri("http://www.example.com/schema#subBody")
+        Body getSubBody();
+
+        @Iri("http://www.example.com/schema#subBody")
+        void setSubBody(Body body);
+
+        @Iri("http://www.example.com/schema#subBody2")
+        Body getSubBody2();
+
+        @Iri("http://www.example.com/schema#subBody2")
+        void setSubBody2(Body body);
+    }
+
+    @Iri("http://www.example.com/schema#unionBodyAlternative")
+    public static interface UnionTestBodyAlternative extends Body {
+
+        @Iri("http://www.example.com/schema#subBody")
+        Body getSubBody();
+
+        @Iri("http://www.example.com/schema#subBody")
+        void setSubBody(Body body);
+
+        @Iri("http://www.example.com/schema#subBody2")
+        Body getSubBody2();
+
+        @Iri("http://www.example.com/schema#subBody2")
+        void setSubBody2(Body body);
     }
 }

@@ -23,26 +23,23 @@ public class ConstraintLessTest extends QuerySetup {
     @Override
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
 
         ConstraintLessBody constraintLessBody = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody.setValue("Value 1");
-        annotation.setBody(constraintLessBody);
-        anno4j.persist(annotation);
+        annotation.addBody(constraintLessBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("2015-01-28T12:00:00Z");
         ConstraintLessBody constraintLessBody2 = anno4j.createObject(ConstraintLessBody.class);
         constraintLessBody2.setValue("Value 2");
 
-        annotation1.setBody(constraintLessBody2);
-        anno4j.persist(annotation1);
+        annotation1.addBody(constraintLessBody2);
 
         // This
         Annotation annotation2 = anno4j.createObject(Annotation.class);
-        annotation2.setAnnotatedAt("01.01.2011");
-        annotation2.setBody(anno4j.createObject(ConstraintLessBody.class));
-        anno4j.persist(annotation2);
+        annotation2.setCreated("2015-01-28T12:00:00Z");
+        annotation2.addBody(anno4j.createObject(ConstraintLessBody.class));
     }
 
     @Test
@@ -57,12 +54,12 @@ public class ConstraintLessTest extends QuerySetup {
         assertEquals(2, list.size());
 
         // Test for annotation specific attributes
-        assertEquals("07.05.2015", list.get(0).getSerializedAt());
-        assertEquals("01.01.2011", list.get(1).getAnnotatedAt());
+        assertEquals("2015-01-28T12:00:00Z", list.get(0).getGenerated());
+        assertEquals("2015-01-28T12:00:00Z", list.get(1).getCreated());
 
         // Test for the value attribute of the body object
-        assertEquals("Value 1", ((ConstraintLessBody) list.get(0).getBody()).getValue());
-        assertEquals("Value 2", ((ConstraintLessBody) list.get(1).getBody()).getValue());
+        assertEquals("Value 1", ((ConstraintLessBody) list.get(0).getBodies().iterator().next()).getValue());
+        assertEquals("Value 2", ((ConstraintLessBody) list.get(1).getBodies().iterator().next()).getValue());
     }
 
     @Test

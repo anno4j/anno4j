@@ -4,11 +4,9 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.annotations.Partial;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
-import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.List;
 
@@ -20,17 +18,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class InheritanceTest {
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -41,18 +32,15 @@ public class InheritanceTest {
         // Create the body
         Superclass body = anno4j.createObject(Superclass.class);
         body.setValue("myValue");
-        annotation.setBody(body);
-
-        // Persist annotation
-        connection.addObject(annotation);
+        annotation.addBody(body);
 
         // Query persisted object
-        List<Annotation> result = connection.getObjects(Annotation.class).asList();
+        List<Annotation> result = anno4j.findAll(Annotation.class);
 
         assertEquals(1, result.size());
 
         Annotation resultObject = result.get(0);
-        Body resultBody = resultObject.getBody();
+        Body resultBody = resultObject.getBodies().iterator().next();
 
         assertTrue(resultBody instanceof  Superclass);
         assertEquals("myValue", ((Superclass) resultBody).getValue());

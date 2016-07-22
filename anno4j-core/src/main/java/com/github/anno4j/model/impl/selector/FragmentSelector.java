@@ -17,7 +17,7 @@ import org.openrdf.annotations.Iri;
  *
  * The Fragment Selector SHOULD have a dcterms:conformsTo relationship with the object being the specification that defines the syntax of the fragment, for instance <http://tools.ietf.org/rfc/rfc3236> for HTML fragments.
  */
-@Iri(OADM.SELECTOR_FRAGMENT)
+@Iri(OADM.FRAGMENT_SELECTOR)
 public interface FragmentSelector extends Selector {
 
     /**

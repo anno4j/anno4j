@@ -1,13 +1,14 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObjectSupport;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.*;
 
 import java.io.ByteArrayOutputStream;
 
 @Partial
-public abstract class AgentSupport implements Agent {
+public abstract class AgentSupport extends ResourceObjectSupport implements Agent {
     /**
      * Method returns a textual representation of the given Annotation, containing
      * its Body, Target and possible Selection, in a supported serialisation format.

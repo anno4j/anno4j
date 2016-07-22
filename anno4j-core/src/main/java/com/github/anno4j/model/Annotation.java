@@ -1,16 +1,19 @@
 package com.github.anno4j.model;
 
-import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.namespaces.AS;
+import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
+import com.github.anno4j.model.namespaces.SCHEMA;
 import org.openrdf.annotations.Iri;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Conforms to oa:Annotation (http://www.openannotation.org/spec/core/core.html)
  */
 @Iri(OADM.ANNOTATION)
-public interface Annotation extends ResourceObject {
+public interface Annotation extends CreationProvenance {
 
     /**
      * Gets http:www.w3.org/ns/oa#hasBody relationship.
@@ -18,15 +21,22 @@ public interface Annotation extends ResourceObject {
      * @return Value of http:www.w3.org/ns/oa#hasBody.
      */
     @Iri(OADM.HAS_BODY)
-    Body getBody();
+    Set<Body> getBodies();
 
     /**
      * Sets http:www.w3.org/ns/oa#hasBody.
      *
-     * @param body New value of http:www.w3.orgnsoa#hasBody.
+     * @param body New value of http:www.w3.org/ns/oa#hasBody.
      */
     @Iri(OADM.HAS_BODY)
-    void setBody(Body body);
+    void setBodies(Set<Body> body);
+
+    /**
+     * Adds a http:www.w3.org/ns/oa#hasBody relationship.
+     *
+     * @param body New http:www.w3.org/ns/oa#hasBody relationship.
+     */
+    void addBody(Body body);
 
     /**
      * Gets http:www.w3.org/ns/oa#hasTarget relationships.
@@ -34,7 +44,7 @@ public interface Annotation extends ResourceObject {
      * @return Values of http:www.w3.org/ns/oa#hasTarget.
      */
     @Iri(OADM.HAS_TARGET)
-    Set<Target> getTarget();
+    Set<Target> getTargets();
 
     /**
      * Sets http:www.w3.org/ns/oa#hasTarget.
@@ -42,7 +52,7 @@ public interface Annotation extends ResourceObject {
      * @param targets New value of http:www.w3.org/ns/oa#hasTarget.
      */
     @Iri(OADM.HAS_TARGET)
-    void setTarget(Set<Target> targets);
+    void setTargets(Set<Target> targets);
 
     /**
      * Adds a http:www.w3.org/ns/oa#hasTarget relationship.
@@ -57,7 +67,7 @@ public interface Annotation extends ResourceObject {
      * @return Value of http:www.w3.org/ns/oa/#motivatedBy.
      */
     @Iri(OADM.MOTIVATED_BY)
-    Motivation getMotivatedBy();
+    Set<Motivation> getMotivatedBy();
 
     /**
      * Sets http:www.w3.org/ns/oa#motivatedBy.
@@ -65,13 +75,89 @@ public interface Annotation extends ResourceObject {
      * @param motivatedBy New value of http:www.w3.org/ns/oa#motivatedBy.
      */
     @Iri(OADM.MOTIVATED_BY)
-    void setMotivatedBy(Motivation motivatedBy);
+    void setMotivatedBy(Set<Motivation> motivatedBy);
+
+    /**
+     * Add a single http:www.w3.org/ns/oa#motivatedBy relationship.
+     *
+     * @param motivation    The Motivation to add to this Annotation node.
+     */
+    void addMotivation(Motivation motivation);
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     *
+     * @return  Returns the currently set bodyText properties.
+     */
+    @Iri(OADM.BODY_TEXT)
+    Set<String> getBodyTexts();
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     *
+     * @param texts A Set of Strings to set for this nodes bodyText property.
+     */
+    @Iri(OADM.BODY_TEXT)
+    void setBodyTexts(Set<String> texts);
+
+    /**
+     * Refers to http://www.w3.org/ns/oa#bodyText
+     *
+     * @param text  Adds the single text as textBody property.
+     */
+    void addBodyText(String text);
+
+    /**
+     * Gets the value of the http://www.w3.org/ns/activitystreams#generator relationship.
+     *
+     * @return  The Agent of the as:generator relationship.
+     */
+    @Iri(AS.GENERATOR)
+    Agent getGenerator();
+
+    /**
+     * Sets the value of the http://www.w3.org/ns/activitystreams#generator relationship.
+     *
+     * @param generator The Agent to set for the as:generator relationship.
+     */
+    @Iri(AS.GENERATOR)
+    void setGenerator(Agent generator);
+
+    /**
+     * Gets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @return  The timestamp value of the dcterms:issued property.
+     */
+    @Iri(DCTERMS.ISSUED)
+    String getGenerated();
+
+    /**
+     * Sets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @param generated The timestamp value to set for the dcterms:issued property.
+     */
+    @Iri(DCTERMS.ISSUED)
+    void setGenerated(String generated);
+
+    /**
+     * Sets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param timezoneID    The timezone to set.
+     */
+    void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
      * Gets http:www.w3.org/ns/oa#serializedBy relationship.
      *
      * @return Value of http:www.w3.org/ns/oa#serializedBy.
      */
+    @Deprecated
     @Iri(OADM.SERIALIZED_BY)
     Agent getSerializedBy();
 
@@ -80,6 +166,7 @@ public interface Annotation extends ResourceObject {
      *
      * @param serializedBy New value of http:www.w3.org/ns/oa#serializedBy.
      */
+    @Deprecated
     @Iri(OADM.SERIALIZED_BY)
     void setSerializedBy(Agent serializedBy);
 
@@ -88,6 +175,7 @@ public interface Annotation extends ResourceObject {
      *
      * @return Value of http:www.w3.org/ns/oa#annotatedBy.
      */
+    @Deprecated
     @Iri(OADM.ANNOTATED_BY)
     Agent getAnnotatedBy();
 
@@ -96,6 +184,7 @@ public interface Annotation extends ResourceObject {
      *
      * @param annotatedBy New value of http:www.w3.org/ns/oa#annotatedBy.
      */
+    @Deprecated
     @Iri(OADM.ANNOTATED_BY)
     void setAnnotatedBy(Agent annotatedBy);
 
@@ -104,6 +193,7 @@ public interface Annotation extends ResourceObject {
      *
      * @return Value of http:www.w3.org/ns/oa#serializedAt.
      */
+    @Deprecated
     @Iri(OADM.SERIALIZED_AT)
     String getSerializedAt();
 
@@ -112,26 +202,30 @@ public interface Annotation extends ResourceObject {
      *
      * @param serializedAt New value of http:www.w3.org/ns/oa#serializedAt.
      */
+    @Deprecated
     @Iri(OADM.SERIALIZED_AT)
     void setSerializedAt(String serializedAt);
 
     /**
      * Sets http:www.w3.org/ns/oa#serializedAt according to the format year-month-dayThours:minutes:secondsZ, e.g. 2015-12-16T12:00:00Z.
      *
-     * @param year      The year to set.
-     * @param month     The month to set.
-     * @param day       The day to set.
-     * @param hours     The hours to set.
-     * @param minutes   The minutes to set.
-     * @param seconds   The seconds to set.
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param timezoneID    The timezone to set.
      */
-    void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds);
+    @Deprecated
+    void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
      * Gets http:www.w3.org/ns/oa#annotatedAt relationship.
      *
      * @return Value of http:www.w3.org/ns/oa#annotatedAt.
      */
+    @Deprecated
     @Iri(OADM.ANNOTATED_AT)
     String getAnnotatedAt();
 
@@ -140,18 +234,64 @@ public interface Annotation extends ResourceObject {
      *
      * @param annotatedAt New value of http:www.w3.org/ns/oa#annotatedAt.
      */
+    @Deprecated
     @Iri(OADM.ANNOTATED_AT)
     void setAnnotatedAt(String annotatedAt);
 
     /**
      * Sets http:www.w3.org/ns/oa#annotatedAt according to the format year-month-dayThours:minutes:secondsZ, e.g. 2015-12-16T12:00:00Z.
      *
-     * @param year      The year to set.
-     * @param month     The month to set.
-     * @param day       The day to set.
-     * @param hours     The hours to set.
-     * @param minutes   The minutes to set.
-     * @param seconds   The seconds to set.
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param timezoneID    The timezone to set.
      */
-    void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds);
+    @Deprecated
+    void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
+
+    /**
+     * Sets the set of values for the http://schema.org/audience relationship.
+     *
+     * @param audiences The audiences to set for the http://schema.org/audience relationship.
+     */
+    @Iri(SCHEMA.AUDIENCE_RELATIONSHIP)
+    void setAudiences(Set<Audience> audiences);
+
+    /**
+     * Gets the set of values for the http://schema.org/audience relationship.
+     *
+     * @return  A set of Audience objects related to the http://schema.org/audience relationship.
+     */
+    @Iri(SCHEMA.AUDIENCE_RELATIONSHIP)
+    Set<Audience> getAudiences();
+
+    /**
+     * Adds a single Audience object to the set of Audiences.
+     *
+     * @param audience  The Audience to add
+     */
+    void addAudience(Audience audience);
+
+    /**
+     * Sets the value for the http://www.w3.org/ns/oa#styledBy relationship.
+     *
+     * A reference to a Stylesheet that should be used to apply styles to the Annotation rendering.
+     *
+     * @param stylesheet    The value to set for the http://www.w3.org/ns/oa#styledBy relationship.
+     */
+    @Iri(OADM.STYLED_BY)
+    void setStyledBy(Style stylesheet);
+
+    /**
+     * Gets the value currently set for the http://www.w3.org/ns/oa#styledBy relationship.
+     *
+     * A reference to a Stylesheet that should be used to apply styles to the Annotation rendering.
+     *
+     * @return  The value currently set for the http://www.w3.org/ns/oa#styledBy relationship.
+     */
+    @Iri(OADM.STYLED_BY)
+    Style getStyledBy();
 }

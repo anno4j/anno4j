@@ -73,7 +73,7 @@ public class RecommendationService {
         statement.setSubject(subject);
         statement.setObject(object);
         statement.setSimilarity(similarity);
-        similarityAnnotation.setBody(statement);
+        similarityAnnotation.addBody(statement);
 
         return similarityAnnotation;
     }

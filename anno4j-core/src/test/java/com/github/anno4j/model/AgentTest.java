@@ -21,17 +21,10 @@ import static org.junit.Assert.assertEquals;
 public class AgentTest {
 
     private Anno4j anno4j;
-    private ObjectConnection connection;
 
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        this.connection = this.anno4j.getObjectRepository().getConnection();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        connection.close();
     }
 
     @Test
@@ -45,13 +38,10 @@ public class AgentTest {
         person.setMbox("TextMbox");
         person.setOpenID("TestID");
 
-        annotation.setAnnotatedBy(person);
-
-        // Persist annotation
-        connection.addObject(annotation);
+        annotation.setCreator(person);
 
         // Query persisted object
-        List<Person> result = connection.getObjects(Person.class).asList();
+        List<Person> result = anno4j.findAll(Person.class);
 
         Person resultObject = result.get(0);
         assertEquals(person.getName(), resultObject.getName());
@@ -68,13 +58,10 @@ public class AgentTest {
         Organization organization = anno4j.createObject(Organization.class);
         organization.setName("TestName");
 
-        annotation.setAnnotatedBy(organization);
-
-        // Persist annotation
-        connection.addObject(annotation);
+        annotation.setCreator(organization);
 
         // Query persisted object
-        List<Organization> result = connection.getObjects(Organization.class).asList();
+        List<Organization> result = anno4j.findAll(Organization.class);
 
         Organization resultObject = result.get(0);
         assertEquals(organization.getName(), resultObject.getName());
@@ -90,13 +77,10 @@ public class AgentTest {
         software.setName("TestName");
         software.setHomepage("TestPage");
 
-        annotation.setAnnotatedBy(software);
-
-        // Persist annotation
-        connection.addObject(annotation);
+        annotation.setCreator(software);
 
         // Query persisted object
-        List<Software> result = connection.getObjects(Software.class).asList();
+        List<Software> result = anno4j.findAll(Software.class);
 
         Software resultObject = result.get(0);
         assertEquals(software.getName(), resultObject.getName());

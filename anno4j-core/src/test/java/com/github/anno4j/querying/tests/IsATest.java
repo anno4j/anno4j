@@ -29,7 +29,7 @@ public class IsATest extends QuerySetup {
                 .execute();
 
         assertEquals(1, list.size());
-        assertEquals("First Value", ((FirstTestBody) list.get(0).getBody()).getValue());
+        assertEquals("First Value", ((FirstTestBody) list.get(0).getBodies().iterator().next()).getValue());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class IsATest extends QuerySetup {
                 .execute();
 
         assertEquals(1, list.size());
-        assertEquals("Second Value", ((SecondTestBody) list.get(0).getBody()).getValue());
+        assertEquals("Second Value", ((SecondTestBody) list.get(0).getBodies().iterator().next()).getValue());
     }
 
     @Test
@@ -65,14 +65,12 @@ public class IsATest extends QuerySetup {
         Annotation annotation = anno4j.createObject(Annotation.class);
         FirstTestBody firstTestBody = anno4j.createObject(FirstTestBody.class);
         firstTestBody.setValue("First Value");
-        annotation.setBody(firstTestBody);
-        anno4j.persist(annotation);
+        annotation.addBody(firstTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondTestBody secondTestBody = anno4j.createObject(SecondTestBody.class);
         secondTestBody.setValue("Second Value");
-        annotation1.setBody(secondTestBody);
-        anno4j.persist(annotation1);
+        annotation1.addBody(secondTestBody);
     }
 
     @Iri("http://www.example.com/schema#firstBodyType")

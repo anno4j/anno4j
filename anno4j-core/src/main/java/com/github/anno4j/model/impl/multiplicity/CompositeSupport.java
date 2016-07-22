@@ -15,10 +15,15 @@ public abstract class CompositeSupport extends ResourceObjectSupport implements 
         if(item == null){
             return;
         }
-        if(this.getItems() == null){
-            this.setItems(new HashSet<RDFObject>());
+
+        HashSet<RDFObject> items = new HashSet<>();
+
+        if(this.getItems() != null) {
+            items.addAll(this.getItems());
         }
-        this.getItems().add(item);
+
+        items.add(item);
+        this.setItems(items);
     }
     
 }
