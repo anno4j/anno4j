@@ -25,15 +25,15 @@ public class AutoPersistingTest {
         Annotation annotation = anno4j.createObject(Annotation.class);
         TestBody body =  anno4j.createObject(TestBody.class);
         body.setValue("FirstValue");
-        annotation.setBody(body);
+        annotation.addBody(body);
 
         // update value
         Annotation queriedAnnotation = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals("FirstValue", ((TestBody)queriedAnnotation.getBody()).getValue());
-        ((TestBody)queriedAnnotation.getBody()).setValue("UpdatedValue");
+        assertEquals("FirstValue", ((TestBody)queriedAnnotation.getBodies().iterator().next()).getValue());
+        ((TestBody)queriedAnnotation.getBodies().iterator().next()).setValue("UpdatedValue");
 
         Annotation updatedAnnotation = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
-        assertEquals("UpdatedValue", ((TestBody)queriedAnnotation.getBody()).getValue());
+        assertEquals("UpdatedValue", ((TestBody)queriedAnnotation.getBodies().iterator().next()).getValue());
     }
 
     @Iri("http://www.example.com/schema#AutoPersistingTestBody")

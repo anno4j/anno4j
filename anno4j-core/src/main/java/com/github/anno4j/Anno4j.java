@@ -122,6 +122,10 @@ public class Anno4j implements TransactionCommands {
                 .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
                 .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
 
+        // Bugfix: Searching for Reflections creates a lot ot Threads, that are not closed at the end by themselves,
+        // so we close them manually.
+        annotatedClasses.getConfiguration().getExecutorService().shutdown();
+
         // find classes with @Partial annotation
         this.partialClasses = annotatedClasses.getTypesAnnotatedWith(Partial.class, true);
 

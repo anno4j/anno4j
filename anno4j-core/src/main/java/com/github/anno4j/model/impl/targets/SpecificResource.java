@@ -1,10 +1,14 @@
 package com.github.anno4j.model.impl.targets;
 
 import com.github.anno4j.model.Selector;
+import com.github.anno4j.model.State;
 import com.github.anno4j.model.Target;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OADM;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.RDFObject;
+
+import java.util.Set;
 
 /**
  * Conforms to http://www.w3.org/ns/oa#SpecificResource
@@ -119,4 +123,91 @@ public interface SpecificResource extends Target {
      */
     @Iri(OADM.HAS_SCOPE)
     void setScope(RDFObject scope);
+
+    /**
+     * Sets the values of the http://www.w3.org/ns/oa#styleClass relationship.
+     *
+     * The name of the class used in the CSS description referenced from the Annotation that should be applied to the
+     * Specific Resource.
+     *
+     * @param styleClasses  The Set of values to set for the http://www.w3.org/ns/oa#styleClass relationship.
+     */
+    @Iri(OADM.STYLE_CLASS)
+    void setStyleClasses(Set<String> styleClasses);
+
+    /**
+     * Gets the Set of currently defined values for the http://www.w3.org/ns/oa#styleClass relationship.
+     *
+     * The name of the class used in the CSS description referenced from the Annotation that should be applied to the
+     * Specific Resource.
+     *
+     * @return  The Set of values currently defined for the http://www.w3.org/ns/oa#styleClass relationship.
+     */
+    @Iri(OADM.STYLE_CLASS)
+    Set<String> getStyleClasses();
+
+    /**
+     * Adds a single value to the Set of currently defined http://www.w3.org/ns/oa#styleClass relationships.
+     *
+     * @param styleClass    The value to add to the Set of http://www.w3.org/ns/oa#styleClass relationships.
+     */
+    void addStyleClass(String styleClass);
+
+    /**
+     * Sets the Set of values for the http://www.w3.org/ns/oa#hasState relationship.
+     *
+     * The relationship between the ResourceSelection, or its subclass SpecificResource, and a State resource.
+     * Please note that the domain (oa:ResourceSelection) is not used directly in the Web Annotation model.
+     *
+     * @param states    The Set of values to set for the http://www.w3.org/ns/oa#hasState relationship.
+     */
+    @Iri(OADM.HAS_STATE)
+    void setStates(Set<State> states);
+
+    /**
+     * Gets the Set of values currently defined for the http://www.w3.org/ns/oa#hasState relationship.
+     *
+     * The relationship between the ResourceSelection, or its subclass SpecificResource, and a State resource.
+     * Please note that the domain (oa:ResourceSelection) is not used directly in the Web Annotation model.
+     *
+     * @return  The Set of values currently defined for the http://www.w3.org/ns/oa#hasState relationship.
+     */
+    @Iri(OADM.HAS_STATE)
+    Set<State> getStates();
+
+    /**
+     * Adds a single value to the Set currently defined for the http://www.w3.org/ns/oa#hasState relationship.
+     *
+     * @param state The value to add to the Set currently defined for the http://www.w3.org/ns/oa#hasState relationship.
+     */
+    void addState(State state);
+
+    /**
+     * Sets the values for the http://www.w3.org/ns/oa#renderedVia relationship.
+     *
+     * A system that was used by the application that created the Annotation to render the resource.
+     *
+     * @param renderedVia   The Set of values to set for the http://www.w3.org/ns/oa#renderedVia relationship.
+     */
+    @Iri(OADM.RENDERED_VIA)
+    void setRenderedVia(Set<ResourceObject> renderedVia);
+
+    /**
+     * Gets the Set of values currently defined for the http://www.w3.org/ns/oa#renderedVia relationship.
+     *
+     * A system that was used by the application that created the Annotation to render the resource.
+     *
+     * @return  The Set of values currently defined for the http://www.w3.org/ns/oa#renderedVia relationship.
+     */
+    @Iri(OADM.RENDERED_VIA)
+    Set<ResourceObject> getRenderedVia();
+
+    /**
+     * Add a single value to the Set of values currently defined for the http://www.w3.org/ns/oa#renderedVia
+     * relationship.
+     *
+     * @param renderedVia   The value to add to the Set of values currently defined for the
+     *                      http://www.w3.org/ns/oa#renderedVia relationship.
+     */
+    void addRenderedVia(ResourceObject renderedVia);
 }

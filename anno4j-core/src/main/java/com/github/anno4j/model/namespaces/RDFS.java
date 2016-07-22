@@ -17,4 +17,9 @@ public class RDFS {
      * This is the class of everything. All other classes are subclasses of this class. rdfs:Resource is an instance of rdfs:Class.
      */
     public final static String RESOURCE = NS + "Resource";
+
+    /**
+     * Refers to http://www.w3.org/2000/01/rdf-schema#label
+     */
+    public final static String LABEL = NS + "label";
 }

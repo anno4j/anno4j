@@ -19,39 +19,39 @@ public class ReversePathTest extends QuerySetup {
     @Test
     public void testFirstBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:serializedAt", "07.05.2015")
+                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/dcterms:issued", "2015-01-28T12:00:00Z")
                 .execute();
 
         assertEquals(1, annotations.size());
 
         Annotation annotation = annotations.get(0);
-        assertEquals("07.05.2015", annotation.getSerializedAt());
+        assertEquals("2015-01-28T12:00:00Z", annotation.getGenerated());
 
         // Testing if the body was persisted correctly
-        InverseBody testBody = (InverseBody) annotation.getBody();
+        InverseBody testBody = (InverseBody) annotation.getBodies().iterator().next();
         assertEquals("Some Testing Value", testBody.getValue());
     }
 
     @Test
     public void testSecondBody() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:annotatedAt", "01.01.2011")
+                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/dcterms:created", "2015-01-28T12:00:00Z")
                 .execute();
 
         assertEquals(1, annotations.size());
 
         Annotation annotation = annotations.get(0);
-        assertEquals("01.01.2011", annotation.getAnnotatedAt());
+        assertEquals("2015-01-28T12:00:00Z", annotation.getCreated());
 
         // Testing if the body was persisted correctly
-        InverseBody testBody = (InverseBody) annotation.getBody();
+        InverseBody testBody = (InverseBody) annotation.getBodies().iterator().next();
         assertEquals("Another Testing Value", testBody.getValue());
     }
 
     @Test
     public void falseTest() throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         List<Annotation> annotations = queryService
-                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/oa:serzializedAt", "01.01.2011")
+                .addCriteria("oa:hasBody[is-a ex:inverseBody]/^oa:hasBody/dcterms:issued", "2014-01-28T12:00:00Z")
                 .execute();
 
         assertEquals(0, annotations.size());
@@ -61,16 +61,16 @@ public class ReversePathTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt("07.05.2015");
+        annotation.setGenerated("2015-01-28T12:00:00Z");
         InverseBody inverseBody = anno4j.createObject(InverseBody.class);
         inverseBody.setValue("Some Testing Value");
-        annotation.setBody(inverseBody);
+        annotation.addBody(inverseBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
-        annotation1.setAnnotatedAt("01.01.2011");
+        annotation1.setCreated("2015-01-28T12:00:00Z");
         InverseBody inverseBody2 = anno4j.createObject(InverseBody.class);
         inverseBody2.setValue("Another Testing Value");
-        annotation1.setBody(inverseBody2);
+        annotation1.addBody(inverseBody2);
     }
 
 

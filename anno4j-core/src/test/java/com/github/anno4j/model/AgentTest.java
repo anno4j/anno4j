@@ -38,7 +38,7 @@ public class AgentTest {
         person.setMbox("TextMbox");
         person.setOpenID("TestID");
 
-        annotation.setAnnotatedBy(person);
+        annotation.setCreator(person);
 
         // Query persisted object
         List<Person> result = anno4j.findAll(Person.class);
@@ -58,7 +58,7 @@ public class AgentTest {
         Organization organization = anno4j.createObject(Organization.class);
         organization.setName("TestName");
 
-        annotation.setAnnotatedBy(organization);
+        annotation.setCreator(organization);
 
         // Query persisted object
         List<Organization> result = anno4j.findAll(Organization.class);
@@ -77,7 +77,7 @@ public class AgentTest {
         software.setName("TestName");
         software.setHomepage("TestPage");
 
-        annotation.setAnnotatedBy(software);
+        annotation.setCreator(software);
 
         // Query persisted object
         List<Software> result = anno4j.findAll(Software.class);

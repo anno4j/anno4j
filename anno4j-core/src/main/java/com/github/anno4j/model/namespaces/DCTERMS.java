@@ -23,4 +23,29 @@ public class DCTERMS {
     public final static String CONFORMS_TO = NS + "conformsTo";
 
     public final static String FORMAT = NS + "format";
+
+    /**
+     * Refers to http://purl.org/dc/terms/creator
+     */
+    public final static String CREATOR = NS + "creator";
+
+    /**
+     * Refers to http://purl.org/dc/terms/rights
+     */
+    public final static String RIGHTS = NS + "rights";
+
+    /**
+     * Refers to http://purl.org/dc/terms/created
+     */
+    public final static String CREATED = NS + "created";
+
+    /**
+     * Refers to http://purl.org/dc/terms/modified
+     */
+    public final static String MODIFIED = NS + "modified";
+
+    /**
+     * Refers to http://purl.org/dc/terms/issued
+     */
+    public final static String ISSUED = NS + "issued";
 }

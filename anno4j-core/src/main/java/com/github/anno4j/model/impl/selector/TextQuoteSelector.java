@@ -19,7 +19,7 @@ import org.openrdf.annotations.Iri;
  *
  * Each TextQuoteSelector SHOULD have exactly 1 oa:suffix property, and MUST NOT have more than 1.
  */
-@Iri(OADM.SELECTOR_TEXT_QUOTE)
+@Iri(OADM.TEXT_QUOTE_SELECTOR)
 public interface TextQuoteSelector extends Selector {
     /**
      * Sets new Refers to http:www.w3.orgnsoa#prefix
@@ -30,7 +30,7 @@ public interface TextQuoteSelector extends Selector {
      *               A snippet of text that occurs immediately before the text which is being selected.
      *               Each TextQuoteSelector should have exactly 1 oa:prefix property, and must not have more than 1..
      */
-    @Iri(OADM.TEXT_PREFIX)
+    @Iri(OADM.PREFIX_TEXT)
     void setPrefix(String prefix);
 
     /**
@@ -90,6 +90,6 @@ public interface TextQuoteSelector extends Selector {
      * A snippet of text that occurs immediately before the text which is being selected.
      * Each TextQuoteSelector should have exactly 1 oa:prefix property, and must not have more than 1..
      */
-    @Iri(OADM.TEXT_PREFIX)
+    @Iri(OADM.PREFIX_TEXT)
     public String getPrefix();
 }

@@ -50,25 +50,25 @@ public class UnionTest extends QuerySetup {
     public void persistTestData() throws RepositoryException, InstantiationException, IllegalAccessException {
         // Persisting some data
         Annotation annotation1 =  anno4j.createObject(Annotation.class);
-        annotation1.setSerializedAt("07.05.2015");
+        annotation1.setGenerated("2015-01-28T12:00:00Z");
         UnionTestBody unionTestBody1 = anno4j.createObject(UnionTestBody.class);
         unionTestBody1.setSubBody(anno4j.createObject(UnionTestBodyAlternative.class));
         unionTestBody1.setSubBody2(anno4j.createObject(UnionTestBody.class));
-        annotation1.setBody(unionTestBody1);
+        annotation1.addBody(unionTestBody1);
 
         Annotation annotation2 =  anno4j.createObject(Annotation.class);
-        annotation2.setAnnotatedAt("01.01.2011");
+        annotation2.setGenerated("2015-01-28T12:00:00Z");
         UnionTestBody unionTestBody2 = anno4j.createObject(UnionTestBody.class);
         unionTestBody2.setSubBody(anno4j.createObject(UnionTestBodyAlternative.class));
         unionTestBody2.setSubBody2(anno4j.createObject(UnionTestBodyAlternative.class));
-        annotation2.setBody(unionTestBody2);
+        annotation2.addBody(unionTestBody2);
 
         Annotation annotation3 =  anno4j.createObject(Annotation.class);
-        annotation3.setAnnotatedAt("01.01.2011");
+        annotation3.setGenerated("2015-01-28T12:00:00Z");
         UnionTestBodyAlternative unionTestBodyAlternative = anno4j.createObject(UnionTestBodyAlternative.class);
         unionTestBodyAlternative.setSubBody(anno4j.createObject(UnionTestBody2.class));
         unionTestBodyAlternative.setSubBody2(anno4j.createObject(UnionTestBodyAlternative.class));
-        annotation3.setBody(unionTestBodyAlternative);
+        annotation3.addBody(unionTestBodyAlternative);
     }
 
     @Iri("http://www.example.com/schema#unionBody")

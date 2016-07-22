@@ -47,6 +47,11 @@ public class FOAF {
     public final static String MBOX = NS + "mbox";
 
     /**
+     * Refers to http://xmlns.com/foaf/0.1/mbox_sha1sum
+     */
+    public final static String MBOX_SHA1SUM = NS + "mbox_sha1sum";
+
+    /**
      * Refers to http://xmlns.com/foaf/spec/#term_openid
      * A openid is a property of a Agent that associates it with a document that can be used as an indirect identifier in the manner of the OpenID "Identity URL".
      */
