@@ -626,6 +626,7 @@ SPARQL query has to be generated using the Apache Jena framework.
 - Kai Schlegel (University of Passau)
 - Andreas Eisenkolb (University of Passau)
 - Emanuel Berndl (University of Passau)
+- Thomas Weißgerber (University of Passau)
 
 > This software was partially developed within the [MICO project](http://www.mico-project.eu/) (Media in Context - European Commission 7th Framework Programme grant agreement no: 610480).
 
