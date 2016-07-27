@@ -6,7 +6,6 @@ import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.model.namespaces.SCHEMA;
 import org.openrdf.annotations.Iri;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
