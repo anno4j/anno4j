@@ -15,7 +15,7 @@ import org.openrdf.annotations.Iri;
  *
  * Each oa:TextPositionSelector MUST have exactly 1 oa:end property.
  */
-@Iri(OADM.SELECTOR_TEXT_POSITION)
+@Iri(OADM.TEXT_POSITION_SELECTOR)
 public interface TextPositionSelector extends Selector {
     /**
      * Gets Refers to http:www.w3.orgnsoa#start

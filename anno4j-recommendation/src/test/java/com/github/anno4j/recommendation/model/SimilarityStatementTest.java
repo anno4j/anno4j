@@ -58,7 +58,7 @@ public class SimilarityStatementTest {
         statement.setObject(object);
 
         // Conntect annotation and body
-        annotation.setBody(statement);
+        annotation.addBody(statement);
 
         // Negative test, query for all SimilarityStatements
         List<Annotation> result = queryService.addCriteria("oa:hasBody[is-a arec:SimilarityStatement]").execute();
@@ -67,7 +67,7 @@ public class SimilarityStatementTest {
 
 //        SimilarityStatement resultObject = result.get(0);
         Annotation resultObject = result.get(0);
-        SimilarityStatement resultStatement = (SimilarityStatement) resultObject.getBody();
+        SimilarityStatement resultStatement = (SimilarityStatement) resultObject.getBodies().iterator().next();
 
         // Tests
         assertEquals(statement.getResource(), resultStatement.getResource());

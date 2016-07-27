@@ -11,7 +11,7 @@ import org.openrdf.annotations.Iri;
  *
  * [subClass of oa:Selector] The class for a Selector which defines a shape using the SVG standard.
  */
-@Iri(OADM.SELECTOR_SVG)
+@Iri(OADM.SVG_SELECTOR)
 public interface SvgSelector extends Selector {
     /**
      * Gets Refers to http:www.w3.orgTRrdf-schema#ch_value

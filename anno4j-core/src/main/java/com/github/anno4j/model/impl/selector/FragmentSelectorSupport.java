@@ -1,5 +1,6 @@
 package com.github.anno4j.model.impl.selector;
 
+import com.github.anno4j.model.SelectorSupport;
 import com.github.anno4j.model.impl.selector.enums.FragmentSpecification;
 import com.github.anno4j.annotations.Partial;
 
@@ -10,7 +11,7 @@ import java.util.regex.Pattern;
  * Created by schlegel on 05/10/15.
  */
 @Partial
-public abstract class FragmentSelectorSupport implements FragmentSelector {
+public abstract class FragmentSelectorSupport extends SelectorSupport implements FragmentSelector {
 
     /**
      * Group 1: TemporalFormat e.g. npt

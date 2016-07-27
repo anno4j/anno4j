@@ -15,7 +15,7 @@ import org.openrdf.annotations.Iri;
  *
  * See oa:TextPositionSelector for selection at normalized character level rather than bytestream level.
  */
-@Iri(OADM.SELECTOR_DATA_POSITION)
+@Iri(OADM.DATA_POSITION_SELECTOR)
 public interface DataPositionSelector extends Selector {
 
     /**

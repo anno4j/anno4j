@@ -39,7 +39,7 @@ public class QueryServiceTest {
         specificResource.setSelector(anno4j.createObject(FragmentSelector.class));
         targets.add(specificResource);
         targets.add(resource2);
-        annotation.setTarget(targets);
+        annotation.setTargets(targets);
 
     }
 

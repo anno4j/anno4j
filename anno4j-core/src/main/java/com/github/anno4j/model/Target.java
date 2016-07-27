@@ -5,6 +5,6 @@ import com.github.anno4j.model.impl.ResourceObject;
 /**
  * Conforms to OADM Target concept (http://www.openannotation.org/spec/core/core.html#BodyTargetType)
  */
-public interface Target extends ResourceObject {
+public interface Target extends ExternalWebResource {
 
 }

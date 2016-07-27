@@ -15,4 +15,10 @@ public class Anno4jNS {
      * Special RDF type for Open Annotation Data Model Agent
      */
     public final static String AGENT = NS + "Agent";
+
+    public final static String SELECTOR = NS + "Selector";
+
+    public final static String CREATION_PROVENANCE = NS + "CreationProvenance";
+
+    public final static String EXTERNAL_WEB_RESOURCE = NS + "ExternalWebResource";
 }

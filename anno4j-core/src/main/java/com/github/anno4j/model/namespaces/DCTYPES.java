@@ -29,6 +29,12 @@ public class DCTYPES {
     public final static String IMAGE = NS + "Image";
 
     /**
+     * Refers to http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=dcmitype#StillImage
+     * 	A static visual representation.
+     */
+    public final static String STILL_IMAGE = NS + "StillImage";
+
+    /**
      * Refers to http://dublincore.org/documents/dcmi-terms/#dcmitype-MovingImage
      * A series of visual representations imparting an impression of motion when shown in succession.
      */

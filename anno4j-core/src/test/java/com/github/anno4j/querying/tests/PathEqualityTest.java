@@ -26,18 +26,18 @@ public class PathEqualityTest extends QuerySetup {
         FirstPathEqualityTestBody firstTestBody = anno4j.createObject(FirstPathEqualityTestBody.class);
         firstTestBody.setValue("First Value");
         firstTestBody.setAnotherValue("Another Value");
-        annotation.setBody(firstTestBody);
+        annotation.addBody(firstTestBody);
 
         Annotation annotation1 = anno4j.createObject(Annotation.class);
         SecondPathEqualityTestBody secondTestBody = anno4j.createObject(SecondPathEqualityTestBody.class);
         secondTestBody.setValue("Second Value");
         secondTestBody.setAnotherValue("Another Value");
-        annotation1.setBody(secondTestBody);
+        annotation1.addBody(secondTestBody);
 
         Annotation annotation2 = anno4j.createObject(Annotation.class);
         FirstPathEqualityTestBody firstTestBody2 = anno4j.createObject(FirstPathEqualityTestBody.class);
         firstTestBody2.setValue("Second Value");
-        annotation2.setBody(firstTestBody2);
+        annotation2.addBody(firstTestBody2);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class PathEqualityTest extends QuerySetup {
         List<Annotation> list = queryService.addCriteria("oa:hasBody[!ex:pathEqualityTestFirstValue is \"First Value\"]").execute();
         assertEquals(1, list.size());
 
-        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list.get(0).getBody();
+        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list.get(0).getBodies().iterator().next();
         assertEquals("Second Value", firstPathEqualityTestBody.getValue());
     }
 
@@ -55,7 +55,7 @@ public class PathEqualityTest extends QuerySetup {
         List<Annotation> list = queryService.addCriteria("oa:hasBody[ex:pathEqualityTestFirstValue is \"First Value\"]").execute();
         assertEquals(1, list.size());
 
-        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list.get(0).getBody();
+        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list.get(0).getBodies().iterator().next();
         assertEquals("First Value", firstPathEqualityTestBody.getValue());
         assertEquals("Another Value", firstPathEqualityTestBody.getAnotherValue());
     }
@@ -65,7 +65,7 @@ public class PathEqualityTest extends QuerySetup {
         List<Annotation> list1 = queryService.addCriteria("oa:hasBody[ex:pathEqualityTestSecondValue is \"Second Value\"]").execute();
         assertEquals(1, list1.size());
 
-        SecondPathEqualityTestBody secondPathEqualityTestBody = (SecondPathEqualityTestBody) list1.get(0).getBody();
+        SecondPathEqualityTestBody secondPathEqualityTestBody = (SecondPathEqualityTestBody) list1.get(0).getBodies().iterator().next();
         assertEquals("Second Value", secondPathEqualityTestBody.getValue());
         assertEquals("Another Value", secondPathEqualityTestBody.getAnotherValue());
     }
@@ -75,11 +75,11 @@ public class PathEqualityTest extends QuerySetup {
         List<Annotation> list1 = queryService.addCriteria("oa:hasBody[ex:pathEqualityTestAnotherValue is \"Another Value\"]").execute();
         assertEquals(2, list1.size());
 
-        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list1.get(0).getBody();
+        FirstPathEqualityTestBody firstPathEqualityTestBody = (FirstPathEqualityTestBody) list1.get(0).getBodies().iterator().next();
         assertEquals("First Value", firstPathEqualityTestBody.getValue());
         assertEquals("Another Value", firstPathEqualityTestBody.getAnotherValue());
 
-        SecondPathEqualityTestBody secondPathEqualityTestBody = (SecondPathEqualityTestBody) list1.get(1).getBody();
+        SecondPathEqualityTestBody secondPathEqualityTestBody = (SecondPathEqualityTestBody) list1.get(1).getBodies().iterator().next();
         assertEquals("Second Value", secondPathEqualityTestBody.getValue());
         assertEquals("Another Value", secondPathEqualityTestBody.getAnotherValue());
     }

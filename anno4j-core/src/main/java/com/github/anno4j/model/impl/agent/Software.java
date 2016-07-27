@@ -12,23 +12,5 @@ import org.openrdf.annotations.Iri;
  */
 @Iri(PROV.SOFTWARE_AGENT)
 public interface Software extends Agent {
-    /**
-     * Sets new Refers to http:xmlns.comfoafspec#term_homepage
-     * homepage - A homepage for some thing..
-     *
-     * @param homepage New value of Refers to http:xmlns.comfoafspec#term_homepage
-     *                 homepage - A homepage for some thing..
-     */
-    @Iri(FOAF.HOMEPAGE)
-    void setHomepage(String homepage);
 
-    /**
-     * Gets Refers to http:xmlns.comfoafspec#term_homepage
-     * homepage - A homepage for some thing..
-     *
-     * @return Value of Refers to http:xmlns.comfoafspec#term_homepage
-     * homepage - A homepage for some thing..
-     */
-    @Iri(FOAF.HOMEPAGE)
-    String getHomepage();
 }

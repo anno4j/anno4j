@@ -1,18 +1,18 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Motivation;
-import com.github.anno4j.model.MotivationFactory;
-import com.github.anno4j.model.Target;
+import com.github.anno4j.model.*;
+import com.github.anno4j.model.impl.style.CssStylesheet;
 import com.github.anno4j.model.impl.targets.SpecificResource;
-import org.junit.After;
+import com.github.anno4j.querying.QueryService;
+import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.Resource;
+import org.openrdf.annotations.Iri;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,17 +32,19 @@ public class AnnotationTest {
 
     @Test
     public void testPersistAnnotation() throws Exception {
+        String timestamp = "2015-01-28T12:00:00Z";
+
         // Create test annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setAnnotatedAt("" + System.currentTimeMillis());
-        annotation.setSerializedAt("" + System.currentTimeMillis());
+        annotation.setGenerated(timestamp);
+        annotation.setCreated(timestamp);
 
         // query persisted object
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         assertEquals(annotation.getResource().toString(), result.getResource().toString());
-        assertEquals(annotation.getAnnotatedAt(), result.getAnnotatedAt());
-        assertEquals(annotation.getSerializedAt(), result.getSerializedAt());
+        assertEquals(annotation.getCreated(), result.getCreated());
+        assertEquals(annotation.getGenerated(), result.getGenerated());
     }
 
     @Test
@@ -73,8 +75,8 @@ public class AnnotationTest {
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         // Tests
-        assertEquals(1, result.getTarget().size());
-        assertEquals(("http://www.somepage.org/resource1/"), ((SpecificResource) result.getTarget().toArray()[0]).getSource().getResource().toString());
+        assertEquals(1, result.getTargets().size());
+        assertEquals(("http://www.somepage.org/resource1/"), ((SpecificResource) result.getTargets().toArray()[0]).getSource().getResource().toString());
     }
 
     @Test
@@ -101,13 +103,13 @@ public class AnnotationTest {
 
         // Tests
         List<String> urls = new ArrayList<>();
-        for(Target target : result.getTarget()) {
+        for(Target target : result.getTargets()) {
             urls.add(((SpecificResource) target).getSource().getResource().toString());
         }
 
         assertTrue(urls.contains("http://www.somepage.org/resource1/"));
         assertTrue(urls.contains("http://www.somepage.org/resource2/"));
-        assertEquals(2, result.getTarget().size());
+        assertEquals(2, result.getTargets().size());
     }
 
     @Test
@@ -118,20 +120,21 @@ public class AnnotationTest {
         int hours = 12;
         int minutes = 0;
         int seconds = 0;
+        String timezone = "UTC";
 
         int hours2 = 0;
         int minutes2 = 5;
         int seconds2 = 16;
 
         Annotation annotation = anno4j.createObject(Annotation.class);
-        annotation.setSerializedAt(year, month, day, hours, minutes, seconds);
-        annotation.setAnnotatedAt(year, month, day, hours2, minutes2, seconds2);
+        annotation.setGenerated(year, month, day, hours, minutes, seconds, timezone);
+        annotation.setCreated(year, month, day, hours2, minutes2, seconds2, timezone);
 
         // Query annotation
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
-        assertEquals("2015-12-16T12:00:00Z", result.getSerializedAt());
-        assertEquals("2015-12-16T00:05:16Z", result.getAnnotatedAt());
+        assertEquals("2015-12-16T12:00:00Z", result.getGenerated());
+        assertEquals("2015-12-16T00:05:16Z", result.getCreated());
     }
 
     @Test
@@ -160,5 +163,93 @@ public class AnnotationTest {
         result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         assertEquals(2, result.getMotivatedBy().size());
+    }
+
+    @Test
+    public void testBodyText() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        annotation.addBodyText("test1");
+
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertTrue(result.getBodyTexts().contains("test1"));
+
+        HashSet<String> set = new HashSet<String>();
+        set.add("test2");
+        set.add("test3");
+
+        annotation.setBodyTexts(set);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(2, result.getBodyTexts().size());
+        assertTrue(result.getBodyTexts().contains("test2"));
+        assertTrue(result.getBodyTexts().contains("test3"));
+    }
+
+    @Test
+    public void testAnnotationWithCreation() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Annotation anno = this.anno4j.createObject(Annotation.class);
+        anno.setCreated("2015-01-28T12:00:00Z");
+
+        SpecificResource target = this.anno4j.createObject(SpecificResource.class);
+        target.setCreated("2015-01-28T12:00:00+01:00");
+        anno.addTarget(target);
+
+        Annotation result = anno4j.findByID(Annotation.class, anno.getResourceAsString());
+
+        assertEquals(anno.getCreated(), result.getCreated());
+        assertEquals(((SpecificResource) anno.getTargets().toArray()[0]).getCreated(), ((SpecificResource) result.getTargets().toArray()[0]).getCreated());
+    }
+
+    @Test
+    public void testAudiences() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(0, result.getAudiences().size());
+
+        TestAudience audience = this.anno4j.createObject(TestAudience.class);
+        annotation.addAudience(audience);
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addPrefix("schema", "https://schema.org/");
+        qs.addCriteria("schema:audience[is-a schema:TestAudience]");
+
+        List<Annotation> results = qs.execute(Annotation.class);
+        result = results.get(0);
+
+        assertEquals(1, result.getAudiences().size());
+
+        HashSet<Audience> audiences = new HashSet<>();
+        audiences.add(this.anno4j.createObject(TestAudience.class));
+        audiences.add(this.anno4j.createObject(TestAudience.class));
+        annotation.setAudiences(audiences);
+
+        result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(2, result.getAudiences().size());
+    }
+
+    @Iri("https://schema.org/TestAudience")
+    public interface TestAudience extends Audience {
+
+    }
+
+    @Test
+    public void testStyle() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        CssStylesheet sheet = this.anno4j.createObject(CssStylesheet.class);
+        annotation.setStyledBy(sheet);
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addCriteria("oa:styledBy[is-a oa:CssStyle]");
+
+        List<Annotation> result = qs.execute(Annotation.class);
+
+        assertEquals(1, result.size());
     }
 }
