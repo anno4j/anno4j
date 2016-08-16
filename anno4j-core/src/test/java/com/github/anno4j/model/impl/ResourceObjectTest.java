@@ -5,11 +5,21 @@ import com.github.anno4j.example.TextAnnotationBody;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
+import com.github.anno4j.model.impl.body.TextualBody;
+import com.github.anno4j.querying.Comparison;
+import com.github.anno4j.querying.QueryService;
+import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -22,6 +32,23 @@ public class ResourceObjectTest {
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
+    }
+
+    @Test
+    public void testQueryForResource() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        TextualBody body = this.anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
+        annotation.addBody(body);
+
+        System.out.println(body.getResourceAsString());
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addCriteria("oa:hasBody", "http://example.org/resource1");
+
+        List<Annotation> result = qs.execute(Annotation.class);
+
+        assertEquals(1, result.size());
     }
 
     @Test
