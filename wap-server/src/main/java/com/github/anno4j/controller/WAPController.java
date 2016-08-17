@@ -1,7 +1,7 @@
 package com.github.anno4j.controller;
 
-import com.anno4j.anno4j.Anno4j;
-import com.anno4j.anno4j.model.Annotation;
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.Annotation;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,5 @@
 package com.github.anno4j;
 
-import com.anno4j.anno4j.Anno4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.repository.RepositoryException;
