@@ -4,10 +4,13 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.BaseWebTest;
+import com.github.anno4j.model.impl.body.TextualBody;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.annotations.Iri;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,19 +31,28 @@ public class WAPControllerTest extends BaseWebTest {
 
     private String annotationURI;
 
+    private final static String ANNO_WITHOUT_PREFIX = "annowithoutprefix";
+    private final static String CUSTOM_PREFIX = "urn:custom";
+    private final static String ANNO_WITH_PREFIX = "annowithprefix";
+
     @Before
     public void initAnnotations() throws Exception {
-        TestWAPBody body = anno4j.createObject(TestWAPBody.class);
-        body.setValue("Example Value");
+        TextualBody body = this.anno4j.createObject(TextualBody.class);
+        body.setValue("testvalue");
 
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.addBody(body);
         annotationURI = annotation.getResourceAsString();
+
+        // getAnnotationByPathWitoutPrefix()
+        Annotation annotation2 = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("urn:anno4j:" + ANNO_WITHOUT_PREFIX));
+
+//        getAnnotationByPathWithPrefix()
+        Annotation annotation3 = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl(CUSTOM_PREFIX + ":" + ANNO_WITH_PREFIX));
     }
 
     @Test
     public void getAnnotations() throws Exception {
-
         ContentResultMatchers content = content();
         mockMvc.perform(get("/annotations")
                 .param("uri", annotationURI))
@@ -49,13 +61,20 @@ public class WAPControllerTest extends BaseWebTest {
                 .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""));
     }
 
+    @Test
+    public void getAnnotationByPathWitoutPrefix() throws Exception {
+        mockMvc.perform(get("/annotations/" + ANNO_WITHOUT_PREFIX))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""));
+    }
 
-    @Iri("http://www.example.com/schema#WAPBody")
-    public static interface TestWAPBody extends Body {
-        @Iri("http://www.wapexample.com/schema#value")
-        String getValue();
-
-        @Iri("http://www.wapexample.com/schema#value")
-        void setValue(String value);
+    @Test
+    public void getAnnotationByPathWithPrefix() throws Exception {
+        mockMvc.perform(get("/annotations/" + ANNO_WITH_PREFIX)
+                .param("prefix", CUSTOM_PREFIX))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""));
     }
 }
