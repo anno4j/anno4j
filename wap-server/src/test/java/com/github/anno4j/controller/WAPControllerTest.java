@@ -31,6 +31,8 @@ public class WAPControllerTest extends BaseWebTest {
 
     private String annotationURI;
 
+    private final static String JSONLD_ACCEPT_HEADER = "application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\"";
+
     private final static String ANNO_WITHOUT_PREFIX = "annowithoutprefix";
     private final static String CUSTOM_PREFIX = "urn:custom";
     private final static String ANNO_WITH_PREFIX = "annowithprefix";
@@ -53,9 +55,10 @@ public class WAPControllerTest extends BaseWebTest {
     }
 
     @Test
-    public void getAnnotations() throws Exception {
+    public void testGetAnnotations() throws Exception {
         ContentResultMatchers content = content();
         mockMvc.perform(get("/annotations")
+                .header("Accept", JSONLD_ACCEPT_HEADER)
                 .param("uri", annotationURI))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -63,8 +66,9 @@ public class WAPControllerTest extends BaseWebTest {
     }
 
     @Test
-    public void getAnnotationByPathWitoutPrefix() throws Exception {
-        mockMvc.perform(get("/annotations/" + ANNO_WITHOUT_PREFIX))
+    public void testGetAnnotationByPathWitoutPrefix() throws Exception {
+        mockMvc.perform(get("/annotations/" + ANNO_WITHOUT_PREFIX)
+                .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""))
@@ -73,9 +77,10 @@ public class WAPControllerTest extends BaseWebTest {
     }
 
     @Test
-    public void getAnnotationByPathWithPrefix() throws Exception {
+    public void testGetAnnotationByPathWithPrefix() throws Exception {
         mockMvc.perform(get("/annotations/" + ANNO_WITH_PREFIX)
-                .param("prefix", CUSTOM_PREFIX))
+                .param("prefix", CUSTOM_PREFIX)
+                .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""))
@@ -84,9 +89,18 @@ public class WAPControllerTest extends BaseWebTest {
     }
 
     @Test
-    public void annotationNotFound() throws Exception {
-        mockMvc.perform(get("/annotations/someanno"))
+    public void testAnnotationNotFound() throws Exception {
+        mockMvc.perform(get("/annotations/someanno")
+                .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testWrongContentNegotiation() throws Exception {
+        mockMvc.perform(get("/annotations/someanno")
+                .header("Accept", "text/plain"))
+                .andDo(print())
+                .andExpect(status().isNotAcceptable());
     }
 }
