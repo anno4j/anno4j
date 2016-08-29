@@ -82,4 +82,11 @@ public class WAPControllerTest extends BaseWebTest {
                 .andExpect(jsonPath("$[0].@id", is(this.annotationByPathWithPrefix.getResourceAsString())))
                 .andExpect(jsonPath("$[0].@type.[0]", is(OADM.ANNOTATION)));
     }
+
+    @Test
+    public void annotationNotFound() throws Exception {
+        mockMvc.perform(get("/annotations/someanno"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
