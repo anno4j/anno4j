@@ -33,7 +33,7 @@ public class WAPController {
     public String getAnnotation(@PathVariable String annoId, @RequestParam(value = "prefix", defaultValue = "urn:anno4j") String prefix) throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
         String annotationID = prefix + ":" + annoId;
 
-        // TODO findByID would be the way to go, however it has a strange behaviour, when no Annotation is found
+        // findByID would be the way to go, however it has a strange behaviour, when no Annotation is found
 //        Annotation annotation = this.anno4j.findByID(Annotation.class, annotationID);
 
         QueryService qs = this.anno4j.createQueryService();
