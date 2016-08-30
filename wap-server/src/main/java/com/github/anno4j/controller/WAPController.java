@@ -16,25 +16,44 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/annotations", produces = "application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\"")
+@RequestMapping(value = "/annotations")
 public class WAPController {
 
     @Autowired
     private Anno4j anno4j;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = "application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\"")
     @ResponseStatus(value = HttpStatus.OK)
-    public String getAnnotationByParam(@RequestParam String uri) throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
-        return findAnnotation(uri).getTriples(RDFFormat.JSONLD);
+    public String getAnnotationByParamJson(@RequestParam String uri) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+        return getAnnotationByParam(uri, RDFFormat.JSONLD);
     }
 
-    @RequestMapping(value = "/{annoId}", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = "application/x-turtle")
     @ResponseStatus(value = HttpStatus.OK)
-    public String getAnnotation(@PathVariable String annoId, @RequestParam(value = "prefix", defaultValue = "urn:anno4j") String prefix) throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
+    public String getAnnotationByParamTurtle(@RequestParam String uri) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+        return getAnnotationByParam(uri, RDFFormat.TURTLE);
+    }
+
+    private String getAnnotationByParam(String uri, RDFFormat format) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+        return findAnnotation(uri).getTriples(format);
+    }
+
+    @RequestMapping(value = "/{annoId}", method = RequestMethod.GET, produces = "application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\"")
+    @ResponseStatus(value = HttpStatus.OK)
+    public String getAnnotationByPathJson(@PathVariable String annoId, @RequestParam(value = "prefix", defaultValue = "urn:anno4j") String prefix) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+        return getAnnotationByPath(annoId, prefix, RDFFormat.JSONLD);
+    }
+
+    @RequestMapping(value = "/{annoId}", method = RequestMethod.GET, produces = "application/x-turtle")
+    @ResponseStatus(value = HttpStatus.OK)
+    public String getAnnotationByPathTurtle(@PathVariable String annoId, @RequestParam(value = "prefix", defaultValue = "urn:anno4j") String prefix) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
+        return getAnnotationByPath(annoId, prefix, RDFFormat.TURTLE);
+    }
+
+    private String getAnnotationByPath(String annoId, String prefix, RDFFormat format) throws RepositoryException, QueryEvaluationException, MalformedQueryException, ParseException {
         String annotationID = prefix + ":" + annoId;
 
-        return findAnnotation(annotationID).getTriples(RDFFormat.JSONLD);
-
+        return findAnnotation(annotationID).getTriples(format);
     }
 
     private Annotation findAnnotation(String annotationId) throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {

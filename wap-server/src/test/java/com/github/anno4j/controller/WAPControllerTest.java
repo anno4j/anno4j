@@ -2,14 +2,12 @@ package com.github.anno4j.controller;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.model.Body;
 import com.github.anno4j.BaseWebTest;
 import com.github.anno4j.model.impl.body.TextualBody;
 import com.github.anno4j.model.namespaces.OADM;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,7 @@ public class WAPControllerTest extends BaseWebTest {
     private String annotationURI;
 
     private final static String JSONLD_ACCEPT_HEADER = "application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\"";
+    private final static String TURTLE_ACCEPT_HEADER = "application/x-turtle";
 
     private final static String ANNO_WITHOUT_PREFIX = "annowithoutprefix";
     private final static String CUSTOM_PREFIX = "urn:custom";
@@ -55,37 +54,67 @@ public class WAPControllerTest extends BaseWebTest {
     }
 
     @Test
-    public void testGetAnnotations() throws Exception {
+    public void testGetAnnotationsJson() throws Exception {
         ContentResultMatchers content = content();
         mockMvc.perform(get("/annotations")
                 .header("Accept", JSONLD_ACCEPT_HEADER)
                 .param("uri", annotationURI))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""));
+                .andExpect(content().contentType(JSONLD_ACCEPT_HEADER));
     }
 
     @Test
-    public void testGetAnnotationByPathWitoutPrefix() throws Exception {
+    public void testGetAnnotationsTurtle() throws Exception {
+        ContentResultMatchers content = content();
+        mockMvc.perform(get("/annotations")
+                .header("Accept", TURTLE_ACCEPT_HEADER)
+                .param("uri", annotationURI))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TURTLE_ACCEPT_HEADER));
+    }
+
+    @Test
+    public void testGetAnnotationByPathWitoutPrefixJson() throws Exception {
         mockMvc.perform(get("/annotations/" + ANNO_WITHOUT_PREFIX)
                 .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""))
+                .andExpect(content().contentType(JSONLD_ACCEPT_HEADER))
                 .andExpect(jsonPath("$[0].@id", is(this.annotationByPathWithoutPrefix.getResourceAsString())))
                 .andExpect(jsonPath("$[0].@type.[0]", is(OADM.ANNOTATION)));
     }
 
     @Test
-    public void testGetAnnotationByPathWithPrefix() throws Exception {
+    public void testGetAnnotationByPathWitoutPrefixTurtle() throws Exception {
+        mockMvc.perform(get("/annotations/" + ANNO_WITHOUT_PREFIX)
+                .header("Accept", TURTLE_ACCEPT_HEADER))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TURTLE_ACCEPT_HEADER));
+    }
+
+    @Test
+    public void testGetAnnotationByPathWithPrefixJson() throws Exception {
         mockMvc.perform(get("/annotations/" + ANNO_WITH_PREFIX)
                 .param("prefix", CUSTOM_PREFIX)
                 .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/ld+json;profile=\"http://www.w3.org/ns/anno.jsonld\""))
+                .andExpect(content().contentType(JSONLD_ACCEPT_HEADER))
                 .andExpect(jsonPath("$[0].@id", is(this.annotationByPathWithPrefix.getResourceAsString())))
                 .andExpect(jsonPath("$[0].@type.[0]", is(OADM.ANNOTATION)));
+    }
+
+    @Test
+    public void testGetAnnotationByPathWithPrefixTurtle() throws Exception {
+        mockMvc.perform(get("/annotations/" + ANNO_WITH_PREFIX)
+                .param("prefix", CUSTOM_PREFIX)
+                .header("Accept", TURTLE_ACCEPT_HEADER))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TURTLE_ACCEPT_HEADER));
     }
 
     @Test
