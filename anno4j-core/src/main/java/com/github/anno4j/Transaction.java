@@ -3,10 +3,12 @@ package com.github.anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
+import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.contextaware.ContextAwareConnection;
@@ -137,8 +139,10 @@ public class Transaction implements TransactionCommands {
     @Override
     public <T extends ResourceObject> T findByID(Class<T> type, String id) throws RepositoryException {
         try {
-            return connection.getObject(type, id);
-        } catch (QueryEvaluationException e) {
+            List<T> result = this.createQueryService().addCriteria(".", id).execute(type);
+            return (result.isEmpty()) ? null : result.get(0);
+
+        } catch (QueryEvaluationException | MalformedQueryException | ParseException e) {
             throw new RepositoryException("Couldn't evaluate query", e);
         }
     }
