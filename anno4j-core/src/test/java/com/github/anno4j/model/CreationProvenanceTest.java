@@ -122,12 +122,12 @@ public class CreationProvenanceTest {
         Annotation annotation = this.anno4j.createObject(Annotation.class);
 
         TextualBody body = this.anno4j.createObject(TextualBody.class);
-        body.addRight(this.anno4j.createObject(ResourceObject.class, RIGHT));
+        body.addRight(this.anno4j.createObject(ResourceObject.class, (Resource) RIGHT));
 
         SpecificResource target = this.anno4j.createObject(SpecificResource.class);
         HashSet<ResourceObject> rights = new HashSet<>();
-        rights.add(this.anno4j.createObject(ResourceObject.class, RIGHT2));
-        rights.add(this.anno4j.createObject(ResourceObject.class, RIGHT3));
+        rights.add(this.anno4j.createObject(ResourceObject.class, (Resource) RIGHT2));
+        rights.add(this.anno4j.createObject(ResourceObject.class, (Resource) RIGHT3));
         target.setRights(rights);
 
         annotation.addBody(body);

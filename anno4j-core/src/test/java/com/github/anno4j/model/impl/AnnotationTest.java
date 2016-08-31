@@ -9,6 +9,7 @@ import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
+import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -50,7 +51,7 @@ public class AnnotationTest {
     @Test
     public void testResourceDefinition() throws Exception {
         // Create annotation
-        Annotation annotation = anno4j.createObject(Annotation.class, new URIImpl("http://www.somepage.org/resource1/"));
+        Annotation annotation = anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://www.somepage.org/resource1/"));
 
         // Query persisted object
         Annotation result = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
