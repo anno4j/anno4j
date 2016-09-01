@@ -52,17 +52,45 @@ public class ResourceObjectTest {
     }
 
     @Test
+    public void testDoubleCreation() throws RepositoryException, IllegalAccessException, InstantiationException {
+        anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
+        anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
+
+        assertEquals(anno4j.findAll(TextualBody.class).size(), 1);
+    }
+
+    @Test
+    public void testFindAllResourceObject() throws RepositoryException, IllegalAccessException, InstantiationException {
+        anno4j.createObject(ResourceObject.class, new URIImpl("http://example.org/resource1"));
+
+        assertEquals(anno4j.findAll(ResourceObject.class).size(), 1);
+    }
+
+    @Test
     public void testSetResourceAsString() throws Exception {
         ResourceObject resourceObject = anno4j.createObject(ResourceObject.class);
         resourceObject.setResourceAsString("http://www.somepage.org/resource1/");
-        anno4j.persist(resourceObject);
 
         ResourceObject resourceObject1 = anno4j.findByID(ResourceObject.class, resourceObject.getResourceAsString());
         assertEquals("http://www.somepage.org/resource1/", resourceObject1.getResourceAsString());
     }
 
     @Test
-    public void testAutomaticResourceNaming() throws RepositoryException, InstantiationException, IllegalAccessException {
+    public void testPostSetResourceAsStringModification() throws Exception {
+        Annotation annotation = anno4j.createObject(Annotation.class);
+        annotation.setResourceAsString("http://www.somepage.org/resource1/");
+
+        TextualBody body = this.anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/body"));
+        annotation.addBody(body);
+
+        Annotation annotation1 = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+        assertEquals("http://www.somepage.org/resource1/", annotation1.getResourceAsString());
+        assertEquals(1, annotation1.getBodies().size());
+        assertEquals(body.getResourceAsString(), annotation1.getBodies().iterator().next().getResourceAsString());
+    }
+
+    @Test
+    public void testAutomaticResourceNaming() throws RepositoryException, InstantiationException, IllegalAccessException, QueryEvaluationException {
         ResourceObject resourceObject = anno4j.createObject(ResourceObject.class);
         assertNotEquals(IDGenerator.BLANK_RESOURCE, resourceObject.getResource());
 
@@ -151,7 +179,7 @@ public class ResourceObjectTest {
 
         // Create Strings that need to be contained in the JSONLD output (at some place)
         String jsonldBody = "  \"@id\" : \"" + body.getResourceAsString() + "\",\n" +
-                "  \"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\", \"https://github.com/anno4j/ns#CreationProvenance\" ],\n" +
+                "  \"@type\" : [ \"http://www.w3.org/ns/oa#EmbeddedContent\", \"https://github.com/anno4j/ns#CreationProvenance\", \"https://github.com/anno4j/ns#ExternalWebResource\", \"https://github.com/anno4j/ns#Resource\" ],\n" +
                 "  \"http://purl.org/dc/elements/1.1/format\" : [ {\n" +
                 "    \"@value\" : \"" + body.getFormat() + "\"\n" +
                 "  } ],\n" +

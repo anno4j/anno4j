@@ -4,17 +4,14 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.body.TextualBody;
 import com.github.anno4j.model.impl.targets.SpecificResource;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.idGenerator.IDGenerator;
-import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.RDFObject;
-import org.openrdf.repository.object.behaviours.RDFObjectImpl;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
 import java.util.HashSet;
@@ -141,7 +138,7 @@ public class CreationProvenanceTest {
     }
 
     @Test
-    public void testCanonical() throws RepositoryException, IllegalAccessException, InstantiationException {
+    public void testCanonical() throws RepositoryException, IllegalAccessException, InstantiationException, UpdateExecutionException, MalformedQueryException {
         String canonicalURI = "http://somepage/canonical/";
 
         Annotation annotation = this.anno4j.createObject(Annotation.class);
@@ -160,7 +157,7 @@ public class CreationProvenanceTest {
     }
 
     @Test
-    public void testVia() throws RepositoryException, IllegalAccessException, InstantiationException {
+    public void testVia() throws RepositoryException, IllegalAccessException, InstantiationException, UpdateExecutionException, MalformedQueryException {
         String viaURI = "http://somepage/via1/";
         ResourceObject via = this.anno4j.createObject(ResourceObject.class);
         via.setResourceAsString(viaURI);
