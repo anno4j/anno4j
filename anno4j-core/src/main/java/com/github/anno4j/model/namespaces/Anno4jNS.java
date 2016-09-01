@@ -21,4 +21,6 @@ public class Anno4jNS {
     public final static String CREATION_PROVENANCE = NS + "CreationProvenance";
 
     public final static String EXTERNAL_WEB_RESOURCE = NS + "ExternalWebResource";
+
+    public final static String RESOURCE = NS + "Resource";
 }
