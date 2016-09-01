@@ -32,10 +32,8 @@ import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.LookAheadIteration;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.*;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.contextaware.ContextAwareConnection;
@@ -553,6 +551,19 @@ public class ObjectConnection extends ContextAwareConnection {
 		if (cached != null && cached.getClass().equals(proxy))
 			return cached;
 		return cache(of.createBean(resource, proxy));
+	}
+
+	/**
+	 * Finds a single object of given concept and uri.
+	 */
+	public synchronized <T> T findObject(Class<T> concept, Resource resource) throws RepositoryException, QueryEvaluationException {
+		try {
+			ObjectQuery query = getObjectQuery(concept, 0);
+			query.setBinding("subj", resource);
+			return query.evaluate(concept).next();
+		} catch (MalformedQueryException e) {
+			throw new AssertionError(e);
+		}
 	}
 
 	/**
