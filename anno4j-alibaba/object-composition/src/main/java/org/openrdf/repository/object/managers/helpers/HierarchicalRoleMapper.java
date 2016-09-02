@@ -109,10 +109,10 @@ public class HierarchicalRoleMapper implements Cloneable {
 
 	public Collection<URI> findSubTypes(Class<?> role, Collection<URI> rdfTypes) {
 		URI type = findType(role);
-		if (type == null)
-			throw new ObjectCompositionException("Concept not registered: "
-					+ role.getSimpleName());
-		rdfTypes.add(type);
+		if (type != null)
+			//throw new ObjectCompositionException("Concept not registered: "
+					//+ role.getSimpleName());
+			rdfTypes.add(type);
 		Set<Class<?>> subset = subclasses.get(role);
 		if (subset == null)
 			return rdfTypes;

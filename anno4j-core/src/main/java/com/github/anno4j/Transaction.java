@@ -9,7 +9,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.contextaware.ContextAwareConnection;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectFactory;
 import org.openrdf.repository.object.ObjectRepository;
@@ -137,7 +136,7 @@ public class Transaction implements TransactionCommands {
     @Override
     public <T extends ResourceObject> T findByID(Class<T> type, String id) throws RepositoryException {
         try {
-            return connection.getObject(type, id);
+            return this.getConnection().findObject(type, new URIImpl(id));
         } catch (QueryEvaluationException e) {
             throw new RepositoryException("Couldn't evaluate query", e);
         }

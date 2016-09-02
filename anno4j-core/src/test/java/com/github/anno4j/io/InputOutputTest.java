@@ -3,21 +3,16 @@ package com.github.anno4j.io;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
-import com.github.anno4j.model.Motivation;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.namespaces.DCTYPES;
-import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.model.namespaces.RDF;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
-import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
-import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.RDFFormat;
 
 import java.net.MalformedURLException;
@@ -44,7 +39,7 @@ public class InputOutputTest {
      * It is then checked, if both the persisted and parsed Annotation have the same ID.
      */
     @Test
-    public void testInputAndPersistAnnotation() {
+    public void testInputAndPersistAnnotation() throws UpdateExecutionException, MalformedQueryException {
 
         try {
             URL url = new URL("http://baseParserURL.com/");
@@ -70,7 +65,7 @@ public class InputOutputTest {
 
             System.out.println(annotation.getTriples(RDFFormat.JSONLD));
 
-            // Persist the annotation
+            // Needed to persist the parsed annotation
             anno4j.persist(annotation);
 
             // Query for persisted annotations
@@ -88,11 +83,7 @@ public class InputOutputTest {
             // Test for the same ID on the altered and persisted annotation
             assertEquals(annotation.getResourceAsString(), resultObject.getResourceAsString());
 
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (RepositoryConfigException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
+        } catch (RepositoryException | RepositoryConfigException | MalformedURLException e) {
             e.printStackTrace();
         }
     }

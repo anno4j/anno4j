@@ -1,10 +1,13 @@
 package com.github.anno4j.model;
 
+import com.github.anno4j.annotations.Partial;
+
 import java.util.HashSet;
 
 /**
  * Support class for the ExternalWebResource interface.
  */
+@Partial
 public abstract class ExternalWebResourceSupport extends CreationProvenanceSupport implements ExternalWebResource {
 
     /**
