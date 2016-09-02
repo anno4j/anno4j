@@ -556,6 +556,19 @@ public class ObjectConnection extends ContextAwareConnection {
 	}
 
 	/**
+	 * Finds a single object of given concept and uri.
+	 */
+	public synchronized <T> T findObject(Class<T> concept, Resource resource) throws RepositoryException, QueryEvaluationException {
+		try {
+			ObjectQuery query = getObjectQuery(concept, 0);
+			query.setBinding("subj", resource);
+			return query.evaluate(concept).next();
+		} catch (MalformedQueryException e) {
+			throw new AssertionError(e);
+		}
+	}
+
+	/**
 	 * Matches objects that have the given concept rdf:type. This method will
 	 * include all objects that implement the given concept or a subclass of the
 	 * concept. The concept must be a named concept and cannot be mapped to

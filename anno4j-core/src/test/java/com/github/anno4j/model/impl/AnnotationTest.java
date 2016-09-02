@@ -13,6 +13,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class AnnotationTest {
     }
 
     @Test
-    public void testSingleTarget() throws RepositoryException, InstantiationException, IllegalAccessException {
+    public void testSingleTarget() throws RepositoryException, InstantiationException, IllegalAccessException, UpdateExecutionException, MalformedQueryException {
         // Create annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
 
@@ -81,7 +82,7 @@ public class AnnotationTest {
     }
 
     @Test
-    public void testMultipleTargets() throws RepositoryException, InstantiationException, IllegalAccessException {
+    public void testMultipleTargets() throws RepositoryException, InstantiationException, IllegalAccessException, UpdateExecutionException, MalformedQueryException {
         // Create annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
 

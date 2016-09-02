@@ -5,8 +5,10 @@ import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.traits.ObjectMessage;
@@ -46,7 +48,29 @@ public abstract class ResourceObjectSupport implements ResourceObject {
     }
 
     @Override
-    public void setResource(Resource resource) {
+    public void setResource(Resource resource) throws MalformedQueryException, RepositoryException, UpdateExecutionException {
+
+        String query = "DELETE {?s ?p ?old}" +
+                " INSERT {?s ?p ?new}" +
+                " WHERE {" +
+                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
+                " BIND(<"+resource+"> as ?new)" +
+                " ?s ?p ?old.};" +
+                " DELETE {?s ?old ?o}" +
+                " INSERT {?s ?new ?o}" +
+                " WHERE {" +
+                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
+                " BIND(<"+resource+"> as ?new)" +
+                " ?s ?old ?o.};" +
+                " DELETE {?old ?p ?o}" +
+                " INSERT {?new ?p ?o}" +
+                " WHERE {" +
+                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
+                " BIND(<"+resource+"> as ?new)" +
+                " ?old ?p ?o.};";
+
+        this.getObjectConnection().getDelegate().prepareUpdate(QueryLanguage.SPARQL, query).execute();
+
         this.resource = resource;
     }
 
@@ -74,7 +98,7 @@ public abstract class ResourceObjectSupport implements ResourceObject {
      * @param resourceAsString Textual representation of the new value of Unique identifier for the instance.
      */
     @Override
-    public void setResourceAsString(String resourceAsString) {
+    public void setResourceAsString(String resourceAsString) throws RepositoryException, MalformedQueryException, UpdateExecutionException {
         this.setResource(new URIImpl(resourceAsString));
     }
 
