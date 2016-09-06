@@ -10,9 +10,12 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -67,6 +70,12 @@ public class WAPController {
         } else {
             return result.get(0);
         }
+    }
+
+    @ModelAttribute
+    public void setLinkResponseHeader(HttpServletResponse response) {
+        response.setHeader("Link", "http://www.w3.org/ns/ldp#Resource");
+        response.setHeader("rel", "type");
     }
 
 

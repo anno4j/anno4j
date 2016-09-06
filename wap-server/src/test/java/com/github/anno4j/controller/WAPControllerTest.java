@@ -36,6 +36,11 @@ public class WAPControllerTest extends BaseWebTest {
     private final static String CUSTOM_PREFIX = "urn:custom";
     private final static String ANNO_WITH_PREFIX = "annowithprefix";
 
+    private final static String LINK_HEADER = "Link";
+    private final static String LINK_VALUE = "http://www.w3.org/ns/ldp#Resource";
+    private final static String REL_HEADER = "rel";
+    private final static String REL_VALUE = "type";
+
     private Annotation annotationByPathWithoutPrefix;
     private Annotation annotationByPathWithPrefix;
 
@@ -61,6 +66,8 @@ public class WAPControllerTest extends BaseWebTest {
                 .param("uri", annotationURI))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(LINK_HEADER, LINK_VALUE))
+                .andExpect(header().string(REL_HEADER, REL_VALUE))
                 .andExpect(content().contentType(JSONLD_ACCEPT_HEADER));
     }
 
@@ -72,6 +79,8 @@ public class WAPControllerTest extends BaseWebTest {
                 .param("uri", annotationURI))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(LINK_HEADER, LINK_VALUE))
+                .andExpect(header().string(REL_HEADER, REL_VALUE))
                 .andExpect(content().contentType(TURTLE_ACCEPT_HEADER));
     }
 
@@ -81,6 +90,8 @@ public class WAPControllerTest extends BaseWebTest {
                 .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(LINK_HEADER, LINK_VALUE))
+                .andExpect(header().string(REL_HEADER, REL_VALUE))
                 .andExpect(content().contentType(JSONLD_ACCEPT_HEADER))
                 .andExpect(jsonPath("$[0].@id", is(this.annotationByPathWithoutPrefix.getResourceAsString())))
                 .andExpect(jsonPath("$[0].@type.[0]", is(OADM.ANNOTATION)));
@@ -92,6 +103,8 @@ public class WAPControllerTest extends BaseWebTest {
                 .header("Accept", TURTLE_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(LINK_HEADER, LINK_VALUE))
+                .andExpect(header().string(REL_HEADER, REL_VALUE))
                 .andExpect(content().contentType(TURTLE_ACCEPT_HEADER));
     }
 
@@ -102,6 +115,8 @@ public class WAPControllerTest extends BaseWebTest {
                 .header("Accept", JSONLD_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(LINK_HEADER, LINK_VALUE))
+                .andExpect(header().string(REL_HEADER, REL_VALUE))
                 .andExpect(content().contentType(JSONLD_ACCEPT_HEADER))
                 .andExpect(jsonPath("$[0].@id", is(this.annotationByPathWithPrefix.getResourceAsString())))
                 .andExpect(jsonPath("$[0].@type.[0]", is(OADM.ANNOTATION)));
@@ -114,6 +129,8 @@ public class WAPControllerTest extends BaseWebTest {
                 .header("Accept", TURTLE_ACCEPT_HEADER))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(LINK_HEADER, LINK_VALUE))
+                .andExpect(header().string(REL_HEADER, REL_VALUE))
                 .andExpect(content().contentType(TURTLE_ACCEPT_HEADER));
     }
 
