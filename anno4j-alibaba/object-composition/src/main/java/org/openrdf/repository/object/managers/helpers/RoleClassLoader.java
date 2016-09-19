@@ -39,7 +39,6 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,72 +124,10 @@ public class RoleClassLoader {
 
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Iri.class, true);
         logger.debug("Search for concepts with reflections resulted in " + annotated.size() + " classes");
-
-        // For multiple inheritance reasons, the Annotation class always needs to be BEHIND the PartMMM class
-        Class annotation = null;
-
-		List<Class> sortedAnnotated = new LinkedList<>();
-		sortedAnnotated.addAll(annotated);
-
-//		sortedAnnotated.sort(new Comparator<Class>() {
-//			@Override
-//			public int compare(Class o1, Class o2) {
-//				if (o1.isAssignableFrom(o2)) {
-//					return 1;
-//				} else {
-//					return 0;
-//				}
-//
-//			}
-//		});
-
-        boolean done;
-
-        while (!done) {
-            Integer indexC1 = null;
-            Integer indexC2 = null;
-            done = true;
-            for (int i = 0; i < sortedAnnotated.size(); i++) {
-                Class c1 = sortedAnnotated.get(i);
-                indexC1 = i;
-                for (int j = 0; j < sortedAnnotated.size(); j++) {
-                    Class c2 = sortedAnnotated.get(j);
-                    if (c2.isAssignableFrom(c1)) {
-                        indexC2 = j;
-                    }
-                }
-                if (!(indexC1 == indexC2)) {
-                    done = false;
-                    break;
-                }
-            }
-
-
-        }
-
-//        for(int i = 0; i < sortedAnnotated.size(); ++i) {
-//            for(int j = i+1; j < sortedAnnotated.size(); ++j) {
-//                Class clazz1 = sortedAnnotated.get(i);
-//                Class clazz2 = sortedAnnotated.get(j);
-//
-//                if(clazz1.isAssignableFrom(clazz2)) {
-//
-//                }
-//                sortedAnnotated.
-//            }
-//        }
-
-        for (Class clazz : sortedAnnotated) {
-
-//            if (annotation == null && clazz.toString().equals("interface com.github.anno4j.model.Annotation")) {
-//                annotation = clazz;
-//            } else {
+        for (Class clazz : annotated) {
                 logger.debug("Found concept class: " + clazz.getCanonicalName());
                 roleMapper.addConcept(clazz);
-
-//            }
         }
-//        roleMapper.addConcept(annotation);
     }
 
     private Set<URL> load(CheckForConcept checker, ClassLoader cl, String forType, String roles, boolean concept, Set<URL> exclude)
