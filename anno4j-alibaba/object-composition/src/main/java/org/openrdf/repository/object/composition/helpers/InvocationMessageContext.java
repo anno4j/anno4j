@@ -29,28 +29,16 @@
  */
 package org.openrdf.repository.object.composition.helpers;
 
+import org.openrdf.annotations.Iri;
+import org.openrdf.repository.object.exceptions.BehaviourException;
+import org.openrdf.repository.object.traits.*;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.openrdf.annotations.Iri;
-import org.openrdf.repository.object.exceptions.BehaviourException;
-import org.openrdf.repository.object.traits.BooleanMessage;
-import org.openrdf.repository.object.traits.ByteMessage;
-import org.openrdf.repository.object.traits.CharacterMessage;
-import org.openrdf.repository.object.traits.DoubleMessage;
-import org.openrdf.repository.object.traits.FloatMessage;
-import org.openrdf.repository.object.traits.IntegerMessage;
-import org.openrdf.repository.object.traits.LongMessage;
-import org.openrdf.repository.object.traits.MessageContext;
-import org.openrdf.repository.object.traits.ObjectMessage;
-import org.openrdf.repository.object.traits.ShortMessage;
-import org.openrdf.repository.object.traits.VoidMessage;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implements the Message interface(s) through an InvocationHandler.
@@ -235,6 +223,50 @@ public class InvocationMessageContext implements ObjectMessage {
 				if (count >= invokeTarget.size()) {
 					return nil(responseType);
 				}
+
+				// Begin method sorting extension.
+				// Needed for multiple extensions overwritting the same method with different URIs
+				Pattern propertyTypePattern = Pattern.compile("(readMethod=)([ .a-zA-Z0-9()]*)(;)");
+				boolean done = false;
+				while (!done) {
+					Integer indexC1 = null;
+					Integer indexC2 = null;
+					done = true;
+					for (int i = 0; i < invokeTarget.size(); i++) {
+						Matcher m = propertyTypePattern.matcher(invokeTarget.get(i).toString());
+						if (m.find()) {
+							String clazzStr = m.group(2);
+							clazzStr = clazzStr.substring(0, clazzStr.lastIndexOf("."));
+							clazzStr = clazzStr.substring(clazzStr.lastIndexOf(" ")+1, clazzStr.length());
+							Class clazz = Class.forName(clazzStr);
+							indexC1 = i;
+							for (int j = 0; j < invokeTarget.size(); j++) {
+								Matcher m2 = propertyTypePattern.matcher(invokeTarget.get(j).toString());
+								if (m2.find()) {
+									String clazzStr2 = m2.group(2);
+									clazzStr2 = clazzStr2.substring(0, clazzStr2.lastIndexOf("."));
+									clazzStr2 = clazzStr2.substring(clazzStr2.lastIndexOf(" ")+1, clazzStr2.length());
+									Class clazz2 = Class.forName(clazzStr2);
+									if (clazz.isAssignableFrom(clazz2)) {
+										indexC2 = j;
+									}
+								}
+							}
+							if (indexC2 != null && !(indexC1.equals(indexC2))) {
+								done = false;
+								break;
+							}
+						}
+					}
+					if (!done) {
+						invokeTarget.add(indexC2+1, invokeTarget.get(indexC1));
+						invokeTarget.remove((int)indexC1);
+						invokeMethod.add(indexC2+1, invokeMethod.get(indexC1));
+						invokeMethod.remove((int)indexC1);
+					}
+				}
+				// End method sorting extension.
+
 				Method im = invokeMethod.get(count);
 				Object it = invokeTarget.get(count);
 				count++;
