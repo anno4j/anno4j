@@ -25,11 +25,18 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
 
     @Override
     public void setTarget(Set<Target> target) {
-        this.target = target;
+
+        if(target != null) {
+            this.target.clear();
+            this.target.addAll(target);
+        } else {
+            this.target.clear();
+        }
+
     }
 
     @Iri(OADM.HAS_TARGET)
-    private Set<Target> target;
+    private Set<Target> target = new HashSet<>();
 
     @Override
     public void addTarget(Target target) {
