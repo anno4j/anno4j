@@ -387,11 +387,6 @@ public class RoleMapper implements Cloneable {
 			boolean equiv, boolean concept, boolean primary)
 			throws ObjectStoreConfigException {
 
-		// TODO remove this, only needed for testing purposes
-		if (role != null) {
-			System.out.println("Added role: " + role.toString());
-		}
-
 		boolean hasType = false;
 		if (rdfType != null) {
 			if (concept) {

@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Partial
-public abstract class SpecificResourceSupport implements SpecificResource {
+public abstract class SpecificResourceSupport extends ResourceObjectSupport implements SpecificResource {
 
     @Override
     public String getTriples(RDFFormat format) {
