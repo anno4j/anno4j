@@ -22,7 +22,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 
 /**
- * Created by Manu on 16/09/16.
+ * Test case for the runtime error, persumably created by the multiple inheritance of the PartMMM.
  */
 public class HasTargetAnno4jTest {
 

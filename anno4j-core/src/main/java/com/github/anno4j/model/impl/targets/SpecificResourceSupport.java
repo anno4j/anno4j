@@ -59,6 +59,7 @@ public abstract class SpecificResourceSupport implements SpecificResource {
             connection.removeDesignation(this, (URI) getResource());
             // explicitly removing the rdf type triple from the repository
             connection.remove(getResource(), null, null);
+            connection.remove(null, null, getResource(), null);
         } catch (RepositoryException e) {
             e.printStackTrace();
         }

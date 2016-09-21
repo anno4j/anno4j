@@ -4,10 +4,8 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.OADM;
 import org.apache.commons.io.IOUtils;
-import org.openrdf.model.Statement;
+import org.openrdf.annotations.Iri;
 import org.openrdf.model.URI;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.*;
@@ -15,9 +13,30 @@ import org.openrdf.rio.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Set;
 
 @Partial
 public abstract class AnnotationSupport extends ResourceObjectSupport implements Annotation {
+
+    @Override
+    public Set<Target> getTarget() {
+        return target;
+    }
+
+    @Override
+    public void setTarget(Set<Target> target) {
+
+        if(target != null) {
+            this.target.clear();
+            this.target.addAll(target);
+        } else {
+            this.target.clear();
+        }
+
+    }
+
+    @Iri(OADM.HAS_TARGET)
+    private Set<Target> target = new HashSet<>();
 
     @Override
     public void addTarget(Target target) {
