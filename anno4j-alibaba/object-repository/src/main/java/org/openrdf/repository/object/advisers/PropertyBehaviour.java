@@ -28,12 +28,6 @@
  */
 package org.openrdf.repository.object.advisers;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.List;
-import java.util.Set;
-
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.advice.Advice;
@@ -42,6 +36,12 @@ import org.openrdf.repository.object.traits.Mergeable;
 import org.openrdf.repository.object.traits.ObjectMessage;
 import org.openrdf.repository.object.traits.PropertyConsumer;
 import org.openrdf.repository.object.traits.Refreshable;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Reads and writes properties from an RDF store.
@@ -65,6 +65,10 @@ public final class PropertyBehaviour implements Advice, Mergeable,
 	@Override
 	public String toString() {
 		return pd.toString();
+	}
+
+	public String getConceptName() throws IllegalAccessException, InstantiationException {
+		return concept.getName();
 	}
 
 	public void usePropertyBindings(String binding, List<BindingSet> results) {

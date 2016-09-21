@@ -37,8 +37,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Implements the Message interface(s) through an InvocationHandler.
@@ -226,36 +224,39 @@ public class InvocationMessageContext implements ObjectMessage {
 
 				// Begin method sorting extension.
 				// Needed for multiple extensions overwritting the same method with different URIs
-				Pattern propertyTypePattern = Pattern.compile("(readMethod=)([ .a-zA-Z0-9()]*)(;)");
 				boolean done = false;
 				while (!done) {
 					Integer indexC1 = null;
 					Integer indexC2 = null;
+					Class<?> clazz;
+					Class<?> clazz2;
 					done = true;
 					for (int i = 0; i < invokeTarget.size(); i++) {
-						Matcher m = propertyTypePattern.matcher(invokeTarget.get(i).toString());
-						if (m.find()) {
-							String clazzStr = m.group(2);
-							clazzStr = clazzStr.substring(0, clazzStr.lastIndexOf("."));
-							clazzStr = clazzStr.substring(clazzStr.lastIndexOf(" ")+1, clazzStr.length());
-							Class clazz = Class.forName(clazzStr);
+						Object itObj = invokeTarget.get(i);
+						Class<? extends Object> itObjClazz = itObj.getClass();
+						try {
+							Method m = itObjClazz.getMethod("getConceptName");
+							clazz = Class.forName((String)m.invoke(itObj));
 							indexC1 = i;
-							for (int j = 0; j < invokeTarget.size(); j++) {
-								Matcher m2 = propertyTypePattern.matcher(invokeTarget.get(j).toString());
-								if (m2.find()) {
-									String clazzStr2 = m2.group(2);
-									clazzStr2 = clazzStr2.substring(0, clazzStr2.lastIndexOf("."));
-									clazzStr2 = clazzStr2.substring(clazzStr2.lastIndexOf(" ")+1, clazzStr2.length());
-									Class clazz2 = Class.forName(clazzStr2);
-									if (clazz.isAssignableFrom(clazz2)) {
-										indexC2 = j;
-									}
-								}
+						} catch (NoSuchMethodException ignored) {
+							continue;
+						}
+						for (int j = 0; j < invokeTarget.size(); j++) {
+							Object itObj2 = invokeTarget.get(j);
+							Class<? extends Object> itObjClazz2 = itObj2.getClass();
+							try {
+								Method m2 = itObjClazz2.getMethod("getConceptName");
+								clazz2 = Class.forName((String)m2.invoke(itObj2));
+							} catch (NoSuchMethodException ignored) {
+								continue;
 							}
-							if (indexC2 != null && !(indexC1.equals(indexC2))) {
-								done = false;
-								break;
+							if (clazz.isAssignableFrom(clazz2)) {
+								indexC2 = j;
 							}
+						}
+						if (indexC2 != null && !(indexC1.equals(indexC2))) {
+							done = false;
+							break;
 						}
 					}
 					if (!done) {
