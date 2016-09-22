@@ -46,6 +46,10 @@
             <name>Emanuel Berndl</name>
             <email>emanuel.berndl@gmail.com</email>
         </developer>
+        <developer>
+            <name>Thomas Weißgerber</name>
+            <email>weissger@posteo.de</email>
+        </developer>
     </developers>
 
     <modules>
