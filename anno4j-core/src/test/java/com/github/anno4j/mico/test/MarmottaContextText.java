@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class MarmottaContextText {
 
     private static Anno4j anno4j;
-    protected static boolean isMarmottaAvailable = false;
+    private static boolean isMarmottaAvailable = false;
 
     @BeforeClass
     public static void setUp() throws Exception {
