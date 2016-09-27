@@ -24,7 +24,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectQuery;
-import org.openrdf.repository.object.ObjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -298,6 +297,17 @@ public class QueryService {
         // Optimize the join order
         q = queryOptimizer.optimizeJoinOrder(q);
         logger.debug("Query after join order optimization:\n " + q);
+
+
+        if (connection.getReadContexts().length > 0) {
+            int i = q.indexOf("WHERE\n");
+            String substring = q.substring(0, i);
+            for (URI uri :connection.getReadContexts()) {
+                substring += "FROM <" + uri + ">\n";
+            }
+            String substring1 = q.substring(i, q.length());
+            q = substring.concat(substring1);
+        }
 
         ObjectQuery query = connection.prepareObjectQuery(q);
 

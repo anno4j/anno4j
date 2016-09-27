@@ -8,7 +8,8 @@ import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
 import org.apache.commons.lang3.ClassUtils;
-import org.apache.http.annotation.NotThreadSafe;
+import org.apache.http.annotation.Contract;
+import org.apache.http.annotation.ThreadingBehavior;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
@@ -31,7 +32,6 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ import java.util.*;
  * <p/>
  * <br/><br/> Anno4j methods are not thread-safe. Use Anno4j transactions in threaded environment.
  */
-@NotThreadSafe
+@Contract(threading = ThreadingBehavior.UNSAFE)
 public class Anno4j implements TransactionCommands {
 
     /**
