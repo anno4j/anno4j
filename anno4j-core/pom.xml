@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-parent</artifactId>
@@ -11,9 +12,11 @@
 
     <artifactId>anno4j-core</artifactId>
     <packaging>jar</packaging>
-    
+
     <name>Anno4j Core</name>
-    <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C Open Annotation Data Model (http://www.openannotation.org/spec/core/)</description>
+    <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C
+        Open Annotation Data Model (http://www.openannotation.org/spec/core/)
+    </description>
 
     <dependencies>
         <dependency>
@@ -23,7 +26,7 @@
         <dependency>
             <groupId>org.apache.marmotta</groupId>
             <artifactId>ldpath-core</artifactId>
-         <version>3.4.0-SNAPSHOT</version>
+            <version>3.4.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j-over-slf4j</artifactId>
@@ -63,6 +66,33 @@
             <artifactId>jsonld-java-sesame</artifactId>
             <version>0.5.1</version>
         </dependency>
+
+        <!-- JUnit Testing Libraries -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.5</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mico.public</id>
+            <name>MICO Maven Proxy</name>
+            <url>http://mvn.mico-project.eu/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.anno4j</groupId>
@@ -103,7 +104,7 @@
         <project.root>${basedir}</project.root>
         <project.scm.id>github</project.scm.id>
         <!-- for JDK < 1.8 (see also 'disable-java8-doclint' profile)-->
-        <additionaljavadocparam />
+        <additionaljavadocparam/>
     </properties>
 
     <profiles>
@@ -122,7 +123,7 @@
                             <publicKeyring>local.pubring.gpg</publicKeyring>
                             <keyname>Anno4j</keyname>
                             <executable>gpg</executable>
-                            <passphrase />
+                            <passphrase/>
                         </configuration>
                         <executions>
                             <execution>
@@ -138,13 +139,13 @@
             </build>
         </profile>
         <profile>
-          <id>disable-java8-doclint</id>
-          <activation>
-            <jdk>[1.8,)</jdk>
-          </activation>
-          <properties>
-            <additionaljavadocparam>-Xdoclint:none</additionaljavadocparam>
-          </properties>
+            <id>disable-java8-doclint</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <additionaljavadocparam>-Xdoclint:none</additionaljavadocparam>
+            </properties>
         </profile>
     </profiles>
 
@@ -227,7 +228,6 @@
                 <artifactId>anno4j-ontologies-mmm</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -284,16 +284,16 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.3</version>
                 <executions>
-                  <execution>
-                    <id>attach-javadocs</id>
-                    <goals>
-                      <goal>jar</goal>
-                    </goals>
-                    <configuration>
-                      <!-- Deactivate DocLint errors with Java 8 (see http://openjdk.java.net/jeps/172 )-->
-                      <additionalparam>${additionaljavadocparam}</additionalparam>
-                    </configuration>
-                  </execution>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Deactivate DocLint errors with Java 8 (see http://openjdk.java.net/jeps/172 )-->
+                            <additionalparam>${additionaljavadocparam}</additionalparam>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -308,5 +308,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>
