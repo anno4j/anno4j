@@ -30,10 +30,12 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test case for a querying error, persumably created by missing post param support of marmotta. Only occures with marmotta as backend. Marmotta seems to ignore the default-graph parameter of the post request.
  */
-public class MarmottaContextText {
+public class ContextText {
 
     private static Anno4j anno4j;
     private static boolean isMarmottaAvailable = false;
+
+    private static Anno4j inMemoryAnno4j;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -60,6 +62,8 @@ public class MarmottaContextText {
                 response.close();
             }
         }
+
+        inMemoryAnno4j = new Anno4j();
     }
 
     @Test
@@ -87,6 +91,32 @@ public class MarmottaContextText {
         assertEquals(preresult.size()+2, result2.size());
 
         QueryService qs3 = anno4j.createQueryService((URI) item2.getResource());
+        List<PartMMM> result3 = qs3.execute(PartMMM.class);
+        assertEquals(1, result3.size());
+    }
+
+    @Test
+    public void testInMemoryContextQuery() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        QueryService preqs = inMemoryAnno4j.createQueryService();
+        List<PartMMM> preresult = preqs.execute(PartMMM.class);
+
+        ItemMMM item = inMemoryAnno4j.createObject(ItemMMM.class);
+        PartMMM part = inMemoryAnno4j.createObject(PartMMM.class, (URI) item.getResource());
+        item.addPart(part);
+
+        ItemMMM item2 = inMemoryAnno4j.createObject(ItemMMM.class);
+        PartMMM part2 = inMemoryAnno4j.createObject(PartMMM.class, (URI) item2.getResource());
+        item2.addPart(part2);
+
+        QueryService qs = inMemoryAnno4j.createQueryService((URI) item.getResource());
+        List<PartMMM> result = qs.execute(PartMMM.class);
+        assertEquals(1, result.size());
+
+        QueryService qs2 = inMemoryAnno4j.createQueryService();
+        List<PartMMM> result2 = qs2.execute(PartMMM.class);
+        assertEquals(preresult.size()+2, result2.size());
+
+        QueryService qs3 = inMemoryAnno4j.createQueryService((URI) item2.getResource());
         List<PartMMM> result3 = qs3.execute(PartMMM.class);
         assertEquals(1, result3.size());
     }
