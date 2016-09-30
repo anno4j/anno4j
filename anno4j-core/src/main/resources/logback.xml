@@ -6,10 +6,8 @@
     <logger name="org.reflections" level="ERROR"/>
     <logger name="org.openrdf.repository.object" level="INFO"/>
 
-
     <logger name="org.apache" level="WARN"/>
     <logger name="httpclient" level="WARN"/>
-
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
@@ -22,6 +20,4 @@
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
-
-
 </configuration>
