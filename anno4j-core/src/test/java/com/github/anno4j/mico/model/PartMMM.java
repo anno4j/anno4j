@@ -38,8 +38,6 @@ public interface PartMMM extends Annotation, ResourceMMM {
      *
      * @return Values of http:www.w3.org/ns/oa#hasTarget.
      */
-    @Iri(MMM.HAS_TARGET)
-    @Override
     Set<Target> getTarget();
 
     /**
@@ -47,8 +45,6 @@ public interface PartMMM extends Annotation, ResourceMMM {
      *
      * @param targets New value of http:www.w3.org/ns/oa#hasTarget.
      */
-    @Iri(MMM.HAS_TARGET)
-    @Override
     void setTarget(Set<Target> targets);
 
     /**

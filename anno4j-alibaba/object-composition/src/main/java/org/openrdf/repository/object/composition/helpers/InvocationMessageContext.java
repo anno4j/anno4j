@@ -29,20 +29,34 @@
  */
 package org.openrdf.repository.object.composition.helpers;
 
-import org.openrdf.annotations.Iri;
-import org.openrdf.repository.object.exceptions.BehaviourException;
-import org.openrdf.repository.object.traits.*;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.openrdf.annotations.Iri;
+import org.openrdf.repository.object.exceptions.BehaviourException;
+import org.openrdf.repository.object.traits.BooleanMessage;
+import org.openrdf.repository.object.traits.ByteMessage;
+import org.openrdf.repository.object.traits.CharacterMessage;
+import org.openrdf.repository.object.traits.DoubleMessage;
+import org.openrdf.repository.object.traits.FloatMessage;
+import org.openrdf.repository.object.traits.IntegerMessage;
+import org.openrdf.repository.object.traits.LongMessage;
+import org.openrdf.repository.object.traits.MessageContext;
+import org.openrdf.repository.object.traits.ObjectMessage;
+import org.openrdf.repository.object.traits.ShortMessage;
+import org.openrdf.repository.object.traits.VoidMessage;
 
 /**
  * Implements the Message interface(s) through an InvocationHandler.
- * 
+ *
  * @author James Leigh
- * 
+ *
  */
 public class InvocationMessageContext implements ObjectMessage {
 
@@ -221,53 +235,6 @@ public class InvocationMessageContext implements ObjectMessage {
 				if (count >= invokeTarget.size()) {
 					return nil(responseType);
 				}
-
-				// Begin method sorting extension.
-				// Needed for multiple extensions overwritting the same method with different URIs
-				boolean done = false;
-				while (!done) {
-					Integer indexC1 = null;
-					Integer indexC2 = null;
-					Class<?> clazz;
-					Class<?> clazz2;
-					done = true;
-					for (int i = 0; i < invokeTarget.size(); i++) {
-						Object itObj = invokeTarget.get(i);
-						Class<? extends Object> itObjClazz = itObj.getClass();
-						try {
-							Method m = itObjClazz.getMethod("getConceptName");
-							clazz = Class.forName((String)m.invoke(itObj));
-							indexC1 = i;
-						} catch (NoSuchMethodException ignored) {
-							continue;
-						}
-						for (int j = 0; j < invokeTarget.size(); j++) {
-							Object itObj2 = invokeTarget.get(j);
-							Class<? extends Object> itObjClazz2 = itObj2.getClass();
-							try {
-								Method m2 = itObjClazz2.getMethod("getConceptName");
-								clazz2 = Class.forName((String)m2.invoke(itObj2));
-							} catch (NoSuchMethodException ignored) {
-								continue;
-							}
-							if (clazz.isAssignableFrom(clazz2)) {
-								indexC2 = j;
-							}
-						}
-						if (indexC2 != null && !(indexC1.equals(indexC2))) {
-							done = false;
-							break;
-						}
-					}
-					if (!done) {
-						invokeTarget.add(indexC2+1, invokeTarget.get(indexC1));
-						invokeTarget.remove((int)indexC1);
-						invokeMethod.add(indexC2+1, invokeMethod.get(indexC1));
-						invokeMethod.remove((int)indexC1);
-					}
-				}
-				// End method sorting extension.
-
 				Method im = invokeMethod.get(count);
 				Object it = invokeTarget.get(count);
 				count++;

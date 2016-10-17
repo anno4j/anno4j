@@ -33,7 +33,6 @@ public interface Annotation extends ResourceObject {
      *
      * @return Values of http:www.w3.org/ns/oa#hasTarget.
      */
-    @Iri(OADM.HAS_TARGET)
     Set<Target> getTarget();
 
     /**
@@ -41,7 +40,6 @@ public interface Annotation extends ResourceObject {
      *
      * @param targets New value of http:www.w3.org/ns/oa#hasTarget.
      */
-    @Iri(OADM.HAS_TARGET)
     void setTarget(Set<Target> targets);
 
     /**
