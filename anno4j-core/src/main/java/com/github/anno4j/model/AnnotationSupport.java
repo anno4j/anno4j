@@ -32,8 +32,13 @@ public abstract class AnnotationSupport extends ResourceObjectSupport implements
     }
 
     @Override
-    public void setTarget(Set<Target> targets) {
-        this.targets = targets;
+    public void setTarget(Set<Target> target) {
+        if(target != null) {
+            this.targets.clear();
+            this.targets.addAll(target);
+        } else {
+            this.targets.clear();
+        }
     }
 
     /**
