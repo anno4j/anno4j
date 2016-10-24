@@ -6,7 +6,7 @@
 		<groupId>com.github.anno4j</groupId>
 		<artifactId>anno4j-alibaba</artifactId>
         <relativePath>..</relativePath>
-        <version>2.1.2.MICO-SNAPSHOT</version>
+        <version>2.2-MICO</version>
 	</parent>
 
 	<artifactId>alibaba-repository-object</artifactId>
