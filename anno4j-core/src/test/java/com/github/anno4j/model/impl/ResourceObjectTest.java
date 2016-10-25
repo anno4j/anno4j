@@ -52,6 +52,18 @@ public class ResourceObjectTest {
     }
 
     @Test
+    public void testQueryYourself() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        TextualBody body = this.anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addCriteria(".", "http://example.org/resource1");
+
+        List<TextualBody> result = qs.execute(TextualBody.class);
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
     public void testDoubleCreation() throws RepositoryException, IllegalAccessException, InstantiationException {
         anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
         anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
