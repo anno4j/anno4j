@@ -28,6 +28,7 @@ public class ExampleTest {
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
     }
+    
 
     @Test
     public void exampleTest() throws Exception {
