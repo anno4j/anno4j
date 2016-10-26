@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-alibaba</artifactId>
-        <version>2.2.0.MICO</version>
+        <version>2.2.1.MICO-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
