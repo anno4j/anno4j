@@ -57,4 +57,10 @@ public class RDF {
      * rdf:object is an instance of rdf:Property that is used to state the object of a statement.
      */
     public final static String OBJECT = NS + "object";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_property
+     * rdf:Property is the class of RDF properties. rdf:Property is an instance of rdfs:Class.
+     */
+    public final static String PROPERTY = NS + "Property";
 }
