@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Manu on 07/11/16.
+ * Support class for the RDFSProperty interface.
  */
 @Partial
 public abstract class RDFSPropertySupport extends RDFSSchemaResourceSupport implements RDFSProperty {

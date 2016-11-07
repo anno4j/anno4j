@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Manu on 07/11/16.
+ * Support class for the RDFSSchemaResource interface.
  */
 @Partial
 public abstract class RDFSSchemaResourceSupport extends ResourceObjectSupport implements RDFSSchemaResource {

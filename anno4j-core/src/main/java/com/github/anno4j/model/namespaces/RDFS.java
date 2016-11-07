@@ -25,7 +25,8 @@ public class RDFS {
     public final static String CLAZZ = NS + "Class";
 
     /**
-     * Refers to http://www.w3.org/2000/01/rdf-schema#label
+     * https://www.w3.org/TR/rdf-schema/#ch_label
+     * rdfs:label is an instance of rdf:Property that may be used to provide a human-readable version of a resource's name.
      */
     public final static String LABEL = NS + "label";
 
