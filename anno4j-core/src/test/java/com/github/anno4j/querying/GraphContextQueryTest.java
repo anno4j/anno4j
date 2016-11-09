@@ -3,6 +3,9 @@ package com.github.anno4j.querying;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
+import com.github.anno4j.model.impl.body.TextualBody;
+import com.github.anno4j.model.impl.selector.TextPositionSelector;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
@@ -151,5 +154,30 @@ public class GraphContextQueryTest {
 
         @Iri("http://www.example.com/schema#value")
         void setValue(String value);
+    }
+
+    @Test
+    public void testContextedBodySetResourceAsString() throws Exception {
+        URI uri = new URIImpl("http://www.example.com/context#test");
+
+        String resource = "http://www.example.com/resource#someResource";
+        String resource2 = "http://www.example.com/resource#someOtherResource";
+
+        Annotation annotation = anno4j.createObject(Annotation.class,uri);
+        TextualBody body = anno4j.createObject(TextualBody.class,uri);
+        annotation.addBody(body);
+        body.setResourceAsString(resource);
+
+        Annotation annotationDef = anno4j.createObject(Annotation.class,uri);
+        TextualBody bodyDef = anno4j.createObject(TextualBody.class);
+        annotationDef.addBody(bodyDef);
+        bodyDef.setResourceAsString(resource2);
+
+        List<TextualBody> result = anno4j.findAll(TextualBody.class, uri);
+        assertEquals(1, result.size());
+        assertEquals(resource, result.get(0).getResourceAsString());
+
+        TextualBody result2 = anno4j.findByID(TextualBody.class, resource2);
+        assertEquals(resource2, result2.getResourceAsString());
     }
 }
