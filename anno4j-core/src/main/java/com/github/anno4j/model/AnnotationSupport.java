@@ -1,11 +1,13 @@
 package com.github.anno4j.model;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.util.TimeHelper;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.annotations.Iri;
+import org.openrdf.annotations.Precedes;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 @Partial
+@Precedes(ResourceObjectSupport.class)
 public abstract class AnnotationSupport extends CreationProvenanceSupport implements Annotation {
 
     /**
