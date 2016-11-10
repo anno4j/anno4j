@@ -5,12 +5,12 @@ import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.schema_parsing.model.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.RDFSProperty;
 import org.apache.marmotta.ldpath.parser.ParseException;
-import org.eclipse.rdf4j.rio.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.*;
 
 import java.io.IOException;
 import java.io.InputStream;
