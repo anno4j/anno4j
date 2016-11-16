@@ -1,4 +1,4 @@
-package com.github.anno4j.schema_parsing.model;
+package com.github.anno4j.schema_parsing.model.rdfs;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
@@ -16,8 +16,8 @@ public abstract class RDFSPropertySupport extends RDFSSchemaResourceSupport impl
      * {@inheritDoc}
      */
     @Override
-    public void addSubProperty(ResourceObject subProperty) {
-        Set<ResourceObject> subProperties = new HashSet<ResourceObject>();
+    public void addSubProperty(RDFSProperty subProperty) {
+        Set<RDFSProperty> subProperties = new HashSet<RDFSProperty>();
 
         if(this.getSubProperties() != null) {
             subProperties.addAll(this.getSubProperties());

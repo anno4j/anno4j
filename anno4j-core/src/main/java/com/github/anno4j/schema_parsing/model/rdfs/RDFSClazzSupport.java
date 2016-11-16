@@ -1,4 +1,4 @@
-package com.github.anno4j.schema_parsing.model;
+package com.github.anno4j.schema_parsing.model.rdfs;
 
 import com.github.anno4j.annotations.Partial;
 
@@ -15,8 +15,8 @@ public abstract class RDFSClazzSupport extends RDFSSchemaResourceSupport impleme
      * {@inheritDoc}
      */
     @Override
-    public void addSubClazz(String subClazz) {
-        Set<String> subClazzes = new HashSet<String>();
+    public void addSubClazz(RDFSClazz subClazz) {
+        Set<RDFSClazz> subClazzes = new HashSet<RDFSClazz>();
 
         if(this.getSubClazzes() != null ) {
             subClazzes.addAll(this.getSubClazzes());

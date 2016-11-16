@@ -1,4 +1,4 @@
-package com.github.anno4j.schema_parsing.model;
+package com.github.anno4j.schema_parsing.model.rdfs;
 
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.RDF;
@@ -47,18 +47,18 @@ public interface RDFSProperty extends RDFSSchemaResource {
      * The property rdfs:subPropertyOf is an instance of rdf:Property that is used to state that all resources related by one property are also related by another.
      */
     @Iri(RDFS.SUB_PROPERTY_OF)
-    void setSubProperties(Set<ResourceObject> subProperties);
+    void setSubProperties(Set<RDFSProperty> subProperties);
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subpropertyof
      * The property rdfs:subPropertyOf is an instance of rdf:Property that is used to state that all resources related by one property are also related by another.
      */
     @Iri(RDFS.SUB_PROPERTY_OF)
-    Set<ResourceObject> getSubProperties();
+    Set<RDFSProperty> getSubProperties();
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subpropertyof
      * The property rdfs:subPropertyOf is an instance of rdf:Property that is used to state that all resources related by one property are also related by another.
      */
-    void addSubProperty(ResourceObject subProperty);
+    void addSubProperty(RDFSProperty subProperty);
 }

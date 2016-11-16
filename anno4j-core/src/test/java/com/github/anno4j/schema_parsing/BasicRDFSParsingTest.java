@@ -2,8 +2,8 @@ package com.github.anno4j.schema_parsing;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.schema_parsing.model.RDFSClazz;
-import com.github.anno4j.schema_parsing.model.RDFSProperty;
+import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +32,15 @@ public class BasicRDFSParsingTest {
     private final static String ENTITY_URI = CIDOC_NS + "E1_CRM_Entity";
     private final static String TEMPORAL_ENTITY_URI = CIDOC_NS + "E2_Temporal_Entity";
     private final static String ACTIVITY_URI = CIDOC_NS + "E7_Activity";
+    private final static String INSCRIPTION_URI = CIDOC_NS + "E34_Inscription";
+    private final static String LINGUISTIC_OBJECT_URI = CIDOC_NS + "E33_Linguistic_Object";
+    private final static String MARK_URI = CIDOC_NS + "E37_Mark";
 
     private final static String WAS_MOTIVATED_BY_URI = CIDOC_NS + "P17_was_motivated_by";
     private final static String WAS_INFLUENCED_BY_URI = CIDOC_NS + "P15_was_influenced_by";
+
+    private final static String USED_SPECIFIC_OBJECT_URI = CIDOC_NS + "P16_used_specific_object";
+    private final static String OCCURED_IN_THE_PRESENCE_OF_URI = CIDOC_NS + "P12_occurred_in_the_presence_of";
 
     @Before
     public void setUp() throws Exception {
@@ -63,6 +69,15 @@ public class BasicRDFSParsingTest {
         RDFSClazz temporalEntity = this.anno4j.createQueryService().addCriteria(".", TEMPORAL_ENTITY_URI).execute(RDFSClazz.class).get(0);
 
         assertEquals(entity.getResourceAsString(), ((ResourceObject) temporalEntity.getSubClazzes().toArray()[0]).getResourceAsString());
+
+        RDFSClazz inscription = this.anno4j.createQueryService().addCriteria(".", INSCRIPTION_URI).execute(RDFSClazz.class).get(0);
+
+        assertEquals(2, inscription.getSubClazzes().size());
+        RDFSClazz subClazz1 = (RDFSClazz) inscription.getSubClazzes().toArray()[0];
+        RDFSClazz subClazz2 = (RDFSClazz) inscription.getSubClazzes().toArray()[1];
+
+        assertTrue(subClazz1.getResourceAsString().equals(LINGUISTIC_OBJECT_URI) || subClazz1.getResourceAsString().equals(MARK_URI));
+        assertTrue(subClazz2.getResourceAsString().equals(LINGUISTIC_OBJECT_URI) || subClazz2.getResourceAsString().equals(MARK_URI));
     }
 
     @Test
@@ -78,6 +93,13 @@ public class BasicRDFSParsingTest {
         assertEquals(influenced.getResourceAsString(), ((ResourceObject) motivated.getSubProperties().toArray()[0]).getResourceAsString());
         assertEquals(activity.getResourceAsString(), motivated.getDomain().getResourceAsString());
         assertEquals(entity.getResourceAsString(), motivated.getRange().getResourceAsString());
+
+        RDFSProperty specific = this.anno4j.createQueryService().addCriteria(".", USED_SPECIFIC_OBJECT_URI).execute(RDFSProperty.class).get(0);
+        RDFSProperty subProperty1 = (RDFSProperty) specific.getSubProperties().toArray()[0];
+        RDFSProperty subProperty2 = (RDFSProperty) specific.getSubProperties().toArray()[1];
+
+        assertTrue(subProperty1.getResourceAsString().equals(OCCURED_IN_THE_PRESENCE_OF_URI) || subProperty1.getResourceAsString().equals(WAS_INFLUENCED_BY_URI));
+        assertTrue(subProperty2.getResourceAsString().equals(OCCURED_IN_THE_PRESENCE_OF_URI) || subProperty2.getResourceAsString().equals(WAS_INFLUENCED_BY_URI));
     }
 
     private void parseRDF() {

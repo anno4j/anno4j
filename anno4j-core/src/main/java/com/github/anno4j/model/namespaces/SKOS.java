@@ -16,5 +16,6 @@ public class SKOS {
      */
     public final static String PREFIX = "skos";
 
+    public final static String NOTATION = NS + "notation";
 
 }

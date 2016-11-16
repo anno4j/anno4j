@@ -1,16 +1,17 @@
-package com.github.anno4j.schema_parsing.model;
+package com.github.anno4j.schema_parsing.model.owl;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import org.openrdf.repository.object.LangString;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Support class for the RDFSSchemaResource interface.
+ * Created by Manu on 15/11/16.
  */
 @Partial
-public abstract class RDFSSchemaResourceSupport extends ResourceObjectSupport implements RDFSSchemaResource {
+public abstract class OWLSchemaResourceSupport extends ResourceObjectSupport implements OWLSchemaResource {
 
     /**
      * {@inheritDoc}

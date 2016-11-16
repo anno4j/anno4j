@@ -40,7 +40,7 @@ public class RDFS {
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subclassof
      * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
      */
-    public final static String SUB_CLAZZ_OF = NS + "subClassOf";
+    public final static String SUB_CLASS_OF = NS + "subClassOf";
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subpropertyof
