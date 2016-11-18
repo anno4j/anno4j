@@ -9,6 +9,7 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.object.LangString;
 import org.openrdf.rio.*;
 
 import java.io.*;
@@ -36,8 +37,11 @@ public class OWLParsingTest {
     private final static String ACTIVITY_URI = ERLANGEN_NS + "E7_Activity";
     private final static String PERSON_URI = ERLANGEN_NS + "E21_Person";
     private final static String PHYSICAL_THING_URI = ERLANGEN_NS + "E18_Physical_Thing";
+    private final static String ACQUISITION_URI = ERLANGEN_NS + "E8_Acquisition";
 
     private final static String TRANSFERRED_TITLE_TO_URI = ERLANGEN_NS + "P22_transferred_title_to";
+    private final static String CARRIED_OUT_BY_URI = ERLANGEN_NS + "P14_carried_out_by";
+    private final static String ACQUIRED_TITLE_THROUGH_URI = ERLANGEN_NS + "P22i_acquired_title_through";
     private final static String TRANSFERRED_CUSTODY_OF_URI = ERLANGEN_NS + "P30_transferred_custody_of";
 
     @Before
@@ -105,10 +109,18 @@ public class OWLParsingTest {
     }
 
     @Test
-    public void testQueryProperties() throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
+    public void testObjectProperties() throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
         OWLObjectProperty transferred = this.anno4j.createQueryService().addCriteria(".", TRANSFERRED_TITLE_TO_URI).execute(OWLObjectProperty.class).get(0);
 
+        assertEquals("P22", transferred.getNotation());
+        assertEquals("P22 transferred title to", ((LangString) transferred.getLabels().toArray()[0]).toString());
+        assertEquals("en", ((LangString) transferred.getLabels().toArray()[0]).getLocale().toString());
 
+        assertEquals(CARRIED_OUT_BY_URI, ((OWLObjectProperty) transferred.getSubProperties().toArray()[0]).getResourceAsString());
+
+        assertEquals(ACQUIRED_TITLE_THROUGH_URI, transferred.getInverseOf().getResourceAsString());
+
+        assertEquals(ACQUISITION_URI, transferred.getDomain().getResourceAsString());
     }
 
     @Test
