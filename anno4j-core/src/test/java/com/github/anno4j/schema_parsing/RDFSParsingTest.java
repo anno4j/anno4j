@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test suite that tests the parsing of an RDF schema and the Anno4j classes therefore.
  */
-public class BasicRDFSParsingTest {
+public class RDFSParsingTest {
 
     private Anno4j anno4j;
     private final static String CIDOC_URL = "http://new.cidoc-crm.org/sites/default/files/cidoc_crm_v5.0.4_official_release.rdfs.xml";
