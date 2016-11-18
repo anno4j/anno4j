@@ -45,7 +45,7 @@ public class BasicRDFSParsingTest {
     @Before
     public void setUp() throws Exception {
         this.anno4j = new Anno4j();
-        parseRDF();
+        this.anno4j.parseSchema(new URL(CIDOC_URL), RDFFormat.RDFXML, CIDOC_NS);
     }
 
     @Test
@@ -100,24 +100,5 @@ public class BasicRDFSParsingTest {
 
         assertTrue(subProperty1.getResourceAsString().equals(OCCURED_IN_THE_PRESENCE_OF_URI) || subProperty1.getResourceAsString().equals(WAS_INFLUENCED_BY_URI));
         assertTrue(subProperty2.getResourceAsString().equals(OCCURED_IN_THE_PRESENCE_OF_URI) || subProperty2.getResourceAsString().equals(WAS_INFLUENCED_BY_URI));
-    }
-
-    private void parseRDF() {
-        URL documentUrl = null;
-        try {
-            documentUrl = new URL(CIDOC_URL);
-            InputStream inputStream = documentUrl.openStream();
-
-            RDFParser parser = Rio.createParser(RDFFormat.RDFXML);
-
-            SchemaParsingHandler handler = new SchemaParsingHandler(this.anno4j);
-            parser.setRDFHandler(handler);
-
-            parser.parse(inputStream, CIDOC_URL);
-
-            inputStream.close();
-        } catch (RDFParseException | RDFHandlerException | IOException e) {
-            e.printStackTrace();
-        }
     }
 }

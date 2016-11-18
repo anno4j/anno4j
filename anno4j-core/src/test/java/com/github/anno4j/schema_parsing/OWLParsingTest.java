@@ -47,7 +47,9 @@ public class OWLParsingTest {
     public void setup() throws RepositoryConfigException, RepositoryException, RDFParseException, IOException, RDFHandlerException {
         this.anno4j = new Anno4j();
 
-        parseOWL();
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(ECRM).getFile());
+        this.anno4j.parseSchema(file, RDFFormat.RDFXML, CIDOC_NS);
     }
 
     @Test
@@ -120,23 +122,5 @@ public class OWLParsingTest {
         assertEquals(ACQUIRED_TITLE_THROUGH_URI, transferred.getInverseOf().getResourceAsString());
 
         assertEquals(ACQUISITION_URI, transferred.getDomain().getResourceAsString());
-    }
-
-    @Test
-    public void parseOWL() throws IOException, RDFParseException, RDFHandlerException {
-        //Get file from resources folder
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(ECRM).getFile());
-
-        assertTrue(file != null);
-
-        InputStream is = new FileInputStream(file);
-
-        RDFParser parser = Rio.createParser(RDFFormat.RDFXML);
-
-        SchemaParsingHandler handler = new SchemaParsingHandler(this.anno4j);
-        parser.setRDFHandler(handler);
-
-        parser.parse(is, CIDOC_NS);
     }
 }

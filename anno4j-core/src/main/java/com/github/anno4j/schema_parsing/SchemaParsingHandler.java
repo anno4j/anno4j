@@ -8,11 +8,11 @@ import org.openrdf.rio.helpers.RDFHandlerBase;
 /**
  * AbstractRDFHandler used to parse a given RDF schema file.
  */
-class SchemaParsingHandler extends RDFHandlerBase {
+public class SchemaParsingHandler extends RDFHandlerBase {
 
     private Anno4j anno4j;
 
-    SchemaParsingHandler(Anno4j anno4j) {
+    public SchemaParsingHandler(Anno4j anno4j) {
         this.anno4j = anno4j;
     }
 

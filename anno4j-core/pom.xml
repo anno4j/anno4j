@@ -64,6 +64,7 @@
             <version>0.5.1</version>
         </dependency>
 
+        <!-- Joda Time -->
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -75,6 +76,13 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.5.1</version>
+        </dependency>
+
+        <!-- JavaPoet -->
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>1.8.0</version>
         </dependency>
     </dependencies>
 
