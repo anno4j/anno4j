@@ -4,7 +4,8 @@ import com.github.anno4j.model.namespaces.OWL;
 import org.openrdf.annotations.Iri;
 
 /**
- * Created by Manu on 16/11/16.
+ * Refers to http://www.w3.org/2002/07/owl#DatatypeProperty
+ * A property linking to a value, rather than another RDF node.
  */
 @Iri(OWL.DATATYPE_PROPERTY)
 public interface OWLDatatypeProperty extends OWLObjectProperty {

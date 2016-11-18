@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Manu on 16/11/16.
+ * Support class for the OWLClazz interface, implementing additional behaviour.
  */
 @Partial
 public abstract class OWLClazzSupport extends OWLSchemaResourceSupport implements OWLClazz {
@@ -40,23 +40,4 @@ public abstract class OWLClazzSupport extends OWLSchemaResourceSupport implement
         restrictions.add(restriction);
         this.setRestrictions(restrictions);
     }
-
-
-
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public void addSubClazz(String subClazz) {
-//        Set<String> subClazzes = new HashSet<String>();
-//
-//        if(this.getSubClazzes() != null ) {
-//            subClazzes.addAll(this.getSubClazzes());
-//        }
-//
-//        subClazzes.add(subClazz);
-//        this.setSubClazzes(subClazzes);
-//
-//    }
 }

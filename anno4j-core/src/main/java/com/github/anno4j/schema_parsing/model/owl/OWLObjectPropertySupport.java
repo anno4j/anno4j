@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Manu on 15/11/16.
+ * Support class for the OWLObjectProperty interface, implementing additional behaviour.
  */
 @Partial
 public abstract class OWLObjectPropertySupport extends OWLSchemaResourceSupport implements OWLObjectProperty {

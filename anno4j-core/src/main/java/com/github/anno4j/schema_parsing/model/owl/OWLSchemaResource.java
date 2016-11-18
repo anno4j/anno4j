@@ -9,7 +9,8 @@ import org.openrdf.repository.object.LangString;
 import java.util.Set;
 
 /**
- * Created by Manu on 15/11/16.
+ * Superclass for the nodes and relationship associated with OWL parsing.
+ * Does not support a URI, so this class will only pass its methods to subclasses.
  */
 public interface OWLSchemaResource extends ResourceObject {
 
@@ -47,9 +48,25 @@ public interface OWLSchemaResource extends ResourceObject {
     @Iri(RDFS.COMMENT)
     String getComment();
 
+    /**
+     * Refers to http://www.w3.org/2004/02/skos/core#notation
+     * A notation is a string of characters such as "T58.5" or "303.4833" used to uniquely identify a concept within
+     * the scope of a given concept scheme.
+
+     A notation is different from a lexical label in that a notation is not normally recognizable as a word or sequence
+     of words in any natural language.
+     */
     @Iri(SKOS.NOTATION)
     void setNotation(String notation);
 
+    /**
+     * Refers to http://www.w3.org/2004/02/skos/core#notation
+     * A notation is a string of characters such as "T58.5" or "303.4833" used to uniquely identify a concept within
+     * the scope of a given concept scheme.
+
+     A notation is different from a lexical label in that a notation is not normally recognizable as a word or sequence
+     of words in any natural language.
+     */
     @Iri(SKOS.NOTATION)
     String getNotation();
 }

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by Manu on 15/11/16.
+ * Test suite for the OWL schema parsing.
  */
 public class OWLParsingTest {
 
@@ -35,7 +35,6 @@ public class OWLParsingTest {
     private final static String LINGUISTIC_OBJECT_URI = ERLANGEN_NS + "E33_Linguistic_Object";
     private final static String TRANSFER_OF_CUSTODY_URI = ERLANGEN_NS + "E10_Transfer_of_Custody";
     private final static String ACTIVITY_URI = ERLANGEN_NS + "E7_Activity";
-    private final static String PERSON_URI = ERLANGEN_NS + "E21_Person";
     private final static String PHYSICAL_THING_URI = ERLANGEN_NS + "E18_Physical_Thing";
     private final static String ACQUISITION_URI = ERLANGEN_NS + "E8_Acquisition";
 

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Manu on 15/11/16.
+ * Support class for the OWLSchemaResource interface, implementing additional behaviour.
  */
 @Partial
 public abstract class OWLSchemaResourceSupport extends ResourceObjectSupport implements OWLSchemaResource {

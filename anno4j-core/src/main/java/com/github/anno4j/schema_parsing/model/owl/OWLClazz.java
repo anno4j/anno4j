@@ -10,18 +10,31 @@ import org.openrdf.annotations.Sparql;
 import java.util.Set;
 
 /**
- * Created by Manu on 15/11/16.
+ * Refers to http://www.w3.org/2002/07/owl#Class
+ * A class defines a group of individuals that belong together because they share some properties.
  */
 @Iri(OWL.CLAZZ)
 public interface OWLClazz extends OWLSchemaResource {
 
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_subclassof
+     * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
+     */
     @Iri(RDFS.SUB_CLASS_OF)
     void setSubClazzes(Set<OWLClazz> subClazzes);
 
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_subclassof
+     * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
+     */
     @Sparql("SELECT ?subclass WHERE { $this <"+ RDFS.SUB_CLASS_OF + "> ?subclass . ?subclass <"+ RDF.TYPE +"> <"+ OWL.CLAZZ +"> }")
     @Iri(RDFS.SUB_CLASS_OF)
     Set<OWLClazz> getSubClazzes();
 
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_subclassof
+     * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
+     */
     void addSubClazz(OWLClazz subClazz);
 
     @Iri(RDFS.SUB_CLASS_OF)
