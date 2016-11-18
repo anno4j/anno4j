@@ -18,6 +18,7 @@ public interface OWLClazz extends OWLSchemaResource {
     @Iri(RDFS.SUB_CLASS_OF)
     void setSubClazzes(Set<OWLClazz> subClazzes);
 
+    @Sparql("SELECT ?subclass WHERE { $this <"+ RDFS.SUB_CLASS_OF + "> ?subclass . ?subclass <"+ RDF.TYPE +"> <"+ OWL.CLAZZ +"> }")
     @Iri(RDFS.SUB_CLASS_OF)
     Set<OWLClazz> getSubClazzes();
 

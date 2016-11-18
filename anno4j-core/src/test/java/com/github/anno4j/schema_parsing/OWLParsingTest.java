@@ -33,6 +33,7 @@ public class OWLParsingTest {
     private final static String MARK_URI = ERLANGEN_NS + "E37_Mark";
     private final static String LINGUISTIC_OBJECT_URI = ERLANGEN_NS + "E33_Linguistic_Object";
     private final static String TRANSFER_OF_CUSTODY_URI = ERLANGEN_NS + "E10_Transfer_of_Custody";
+    private final static String ACTIVITY_URI = ERLANGEN_NS + "E7_Activity";
     private final static String PERSON_URI = ERLANGEN_NS + "E21_Person";
     private final static String PHYSICAL_THING_URI = ERLANGEN_NS + "E18_Physical_Thing";
 
@@ -92,12 +93,15 @@ public class OWLParsingTest {
     public void testRestriction() throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
         OWLClazz transfer = this.anno4j.createQueryService().addCriteria(".", TRANSFER_OF_CUSTODY_URI).execute(OWLClazz.class).get(0);
 
-        // TODO Restrictions and subclasses are currently with the same relationship
         assertEquals(1, transfer.getRestrictions().size());
 
         OWLRestriction restriction = (OWLRestriction) transfer.getRestrictions().toArray()[0];
         assertEquals(restriction.getSomeValuesFrom().getResourceAsString(), PHYSICAL_THING_URI);
         assertEquals(restriction.getOnProperty().getResourceAsString(), TRANSFERRED_CUSTODY_OF_URI);
+
+        // Test the "normal" sublcasses for completeness
+        assertEquals(1, transfer.getSubClazzes().size());
+        assertEquals(ACTIVITY_URI, ((OWLClazz) transfer.getSubClazzes().toArray()[0]).getResourceAsString());
     }
 
     @Test
