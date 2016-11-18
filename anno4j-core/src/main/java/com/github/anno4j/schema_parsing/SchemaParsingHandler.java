@@ -26,30 +26,7 @@ class SchemaParsingHandler extends RDFHandlerBase {
     @Override
     public void handleStatement(Statement st) {
         try {
-            Resource subject = new URIImpl(st.getSubject().toString());
-            URI predicate = new URIImpl(st.getPredicate().toString());
-
-            // The object needs special treatment when a language is associated
-            Value object;
-            String objectString = st.getObject().toString();
-            if(objectString.length() > 3 && objectString.charAt(objectString.length() - 3) == '@') {
-                String language = objectString.substring(objectString.length() - 2);
-
-                object = ValueFactoryImpl.getInstance().createLiteral(st.getObject().stringValue(), language);
-            } else {
-                // The object of the statement is not a literal with language tag, so add the given URI
-                UrlValidator validator = new UrlValidator();
-
-                if(validator.isValid(objectString)) {
-                    object = new URIImpl(st.getObject().stringValue());
-                } else {
-                    object = ValueFactoryImpl.getInstance().createLiteral(st.getObject().stringValue());
-                }
-            }
-
-            Statement statement = new StatementImpl(subject, predicate, object);
-
-            this.anno4j.getRepository().getConnection().add(statement);
+            this.anno4j.getRepository().getConnection().add(st);
         } catch (RepositoryException e) {
             e.printStackTrace();
         }

@@ -9,7 +9,6 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
-import org.openrdf.repository.object.LangString;
 import org.openrdf.rio.*;
 
 import java.io.*;
@@ -33,7 +32,8 @@ public class OWLParsingTest {
     private final static String INSCRIPTION_URI = ERLANGEN_NS + "E34_Inscription";
     private final static String MARK_URI = ERLANGEN_NS + "E37_Mark";
     private final static String LINGUISTIC_OBJECT_URI = ERLANGEN_NS + "E33_Linguistic_Object";
-    private final static String TRANSFER_OF_CUSTORY_URI = ERLANGEN_NS + "E10_Transfer_of_Custody";
+    private final static String TRANSFER_OF_CUSTODY_URI = ERLANGEN_NS + "E10_Transfer_of_Custody";
+    private final static String PERSON_URI = ERLANGEN_NS + "E21_Person";
     private final static String PHYSICAL_THING_URI = ERLANGEN_NS + "E18_Physical_Thing";
 
     private final static String TRANSFERRED_TITLE_TO_URI = ERLANGEN_NS + "P22_transferred_title_to";
@@ -90,14 +90,14 @@ public class OWLParsingTest {
 
     @Test
     public void testRestriction() throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
-        OWLClazz transfer = this.anno4j.createQueryService().addCriteria(".", TRANSFER_OF_CUSTORY_URI).execute(OWLClazz.class).get(0);
+        OWLClazz transfer = this.anno4j.createQueryService().addCriteria(".", TRANSFER_OF_CUSTODY_URI).execute(OWLClazz.class).get(0);
 
         // TODO Restrictions and subclasses are currently with the same relationship
-//        assertEquals(1, transfer.getRestrictions().size());
+        assertEquals(1, transfer.getRestrictions().size());
 
-//        OWLRestriction restriction = (OWLRestriction) transfer.getRestrictions().toArray()[0];
-//        assertEquals(restriction.getSomeValuesFrom().getResourceAsString(), PHYSICAL_THING_URI);
-//        assertEquals(restriction.getOnProperty().getResourceAsString(), TRANSFERRED_CUSTODY_OF_URI);
+        OWLRestriction restriction = (OWLRestriction) transfer.getRestrictions().toArray()[0];
+        assertEquals(restriction.getSomeValuesFrom().getResourceAsString(), PHYSICAL_THING_URI);
+        assertEquals(restriction.getOnProperty().getResourceAsString(), TRANSFERRED_CUSTODY_OF_URI);
     }
 
     @Test
