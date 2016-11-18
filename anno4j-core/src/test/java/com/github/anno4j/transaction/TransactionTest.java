@@ -62,7 +62,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void roolbackTest() throws Exception {
+    public void rollbackTest() throws Exception {
         Transaction transaction = anno4j.createTransaction();
         transaction.begin();
 
