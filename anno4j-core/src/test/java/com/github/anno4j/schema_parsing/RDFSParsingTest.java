@@ -2,6 +2,8 @@ package com.github.anno4j.schema_parsing;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.querying.Comparison;
+import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -50,11 +52,11 @@ public class RDFSParsingTest {
 
     @Test
     public void testClazzesAndProperties() throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
-        List<RDFSClazz> clazzes = this.anno4j.createQueryService().execute(RDFSClazz.class);
+        List<RDFSClazz> clazzes = this.anno4j.createQueryService().addCriteria(".", CIDOC_NS, Comparison.STARTS_WITH).execute(RDFSClazz.class);
 
         assertEquals(82, clazzes.size());
 
-        List<RDFSProperty> properties = this.anno4j.createQueryService().execute(RDFSProperty.class);
+        List<RDFSProperty> properties = this.anno4j.createQueryService().addCriteria(".", CIDOC_NS, Comparison.STARTS_WITH).execute(RDFSProperty.class);
 
         assertEquals(262, properties.size());
     }
