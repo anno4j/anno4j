@@ -2,10 +2,8 @@ package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.util.IdentifierUtil;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
+import org.openrdf.annotations.Iri;
 
 import javax.lang.model.element.Modifier;
 import java.util.LinkedList;

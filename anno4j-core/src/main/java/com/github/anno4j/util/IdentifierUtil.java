@@ -24,4 +24,17 @@ public class IdentifierUtil {
             return input.substring(lastNamespaceChar + 1);
         }
     }
+
+    /**
+     * Identifiers between RDF Resources and Java classes have different restrictions.
+     * This method takes a RDF Resource identifier and changes it so that it is also applicable as Java class name.
+     *
+     * @param input The RDF Resource identifier to change.
+     * @return      A String representing the RDF Resource identifier, adapted so it can be also a Java class name.
+     */
+    public static String adaptToJavaIdentifier(String input) {
+        String result = input.replace('-', '_');
+
+        return result;
+    }
 }
