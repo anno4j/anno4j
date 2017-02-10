@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -90,11 +91,16 @@ public class RDFSParsingTest {
         RDFSClazz entity = this.anno4j.createQueryService().addCriteria(".", ENTITY_URI).execute(RDFSClazz.class).get(0);
         RDFSClazz activity = this.anno4j.createQueryService().addCriteria(".", ACTIVITY_URI).execute(RDFSClazz.class).get(0);
 
+        Set<RDFSClazz> motivatedDomain = motivated.getDomain();
+        Set<RDFSClazz> motivatedRange = motivated.getRange();
+
         assertEquals(6, motivated.getLabels().size());
         assertTrue(motivated.getComment().startsWith("This property describes an item"));
         assertEquals(influenced.getResourceAsString(), ((ResourceObject) motivated.getSubProperties().toArray()[0]).getResourceAsString());
-        assertEquals(activity.getResourceAsString(), motivated.getDomain().getResourceAsString());
-        assertEquals(entity.getResourceAsString(), motivated.getRange().getResourceAsString());
+        assertEquals(1, motivatedDomain.size());
+        assertEquals(1, motivatedRange.size());
+        assertEquals(activity.getResourceAsString(), motivatedDomain.iterator().next().getResourceAsString());
+        assertEquals(entity.getResourceAsString(), motivatedRange.iterator().next().getResourceAsString());
 
         RDFSProperty specific = this.anno4j.createQueryService().addCriteria(".", USED_SPECIFIC_OBJECT_URI).execute(RDFSProperty.class).get(0);
         RDFSProperty subProperty1 = (RDFSProperty) specific.getSubProperties().toArray()[0];

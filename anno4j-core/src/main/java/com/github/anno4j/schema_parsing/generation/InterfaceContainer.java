@@ -2,6 +2,7 @@ package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.Selector;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
 import com.github.anno4j.util.IdentifierUtil;
@@ -13,6 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Manu on 21/11/16.
@@ -65,14 +67,17 @@ public class InterfaceContainer {
 
         for(RDFSProperty property : properties) {
             String trimmedPropertyName = IdentifierUtil.trimNamespace(property.getResourceAsString());
-            ClassName range = ClassName.get(packagePath, IdentifierUtil.trimNamespace(property.getRange().getResourceAsString()));
-            TypeName hashSetWithRange = ParameterizedTypeName.get(hashSet, range);
+
+            // Only queries for the first range resource:
+            ResourceObject range = (ResourceObject) property.getRange().toArray()[0];
+            ClassName parameter = ClassName.get(packagePath, IdentifierUtil.trimNamespace(range.getResourceAsString()));
+            TypeName hashSetWithRange = ParameterizedTypeName.get(hashSet, parameter);
 
             MethodSpec methodSpec = MethodSpec.methodBuilder("add" + trimmedPropertyName)
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
-                    .addParameter(range, "element")
+                    .addParameter(parameter, "element")
                     .addStatement("$T elements = new $T<>()", hashSetWithRange, hashSet)
                     .beginControlFlow("if(this.get" + trimmedPropertyName + "() != null)")
                     .addStatement("elements.addAll(this.get" + trimmedPropertyName + "())")
@@ -111,9 +116,10 @@ public class InterfaceContainer {
         String trimmedPropertyName = IdentifierUtil.trimNamespace(property.getResourceAsString());
 
         // Create classes that are needed for the getters and setters
-        ClassName range = ClassName.get(packagePath, IdentifierUtil.trimNamespace(property.getRange().getResourceAsString()));
+        ResourceObject range = (ResourceObject) property.getRange().toArray()[0];
+        ClassName rangeInterface = ClassName.get(packagePath, IdentifierUtil.trimNamespace(range.getResourceAsString()));
         ClassName set = ClassName.get("java.util", "Set");
-        TypeName setOfRanges = ParameterizedTypeName.get(set, range);
+        TypeName setOfRanges = ParameterizedTypeName.get(set, rangeInterface);
 
         AnnotationSpec annotationIri = AnnotationSpec.builder(Iri.class)
                 .addMember("value", "$S", property.getResourceAsString())
@@ -137,7 +143,7 @@ public class InterfaceContainer {
         MethodSpec add = MethodSpec.methodBuilder("add" + trimmedPropertyName)
                 .returns(void.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addParameter(range, "value")
+                .addParameter(rangeInterface, "value")
                 .build();
         methods.add(add);
 

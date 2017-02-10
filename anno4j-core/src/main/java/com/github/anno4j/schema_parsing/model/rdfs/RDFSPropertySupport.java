@@ -12,6 +12,30 @@ import java.util.Set;
 @Partial
 public abstract class RDFSPropertySupport extends RDFSSchemaResourceSupport implements RDFSProperty {
 
+    @Override
+    public void addRangeClazz(RDFSClazz clazz) {
+        Set<RDFSClazz> range = new HashSet<>();
+
+        if (getRange() != null) {
+            range.addAll(getRange());
+        }
+
+        range.add(clazz);
+        setRange(range);
+    }
+
+    @Override
+    public void addDomainClazz(RDFSClazz clazz) {
+        Set<RDFSClazz> domain = new HashSet<>();
+
+        if(getDomain() != null) {
+            domain.addAll(getDomain());
+        }
+
+        domain.add(clazz);
+        setDomain(domain);
+    }
+
     /**
      * {@inheritDoc}
      */

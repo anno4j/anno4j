@@ -1,6 +1,7 @@
 package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
 import com.github.anno4j.util.IdentifierUtil;
@@ -48,7 +49,8 @@ public class RDFSGenerator extends ModelGenerator {
         }
 
         for(RDFSProperty property : properties) {
-            map.get(IdentifierUtil.trimNamespace(property.getDomain().getResourceAsString())).addProperty(property);
+            ResourceObject domain = (ResourceObject) property.getDomain().toArray()[0];
+            map.get(IdentifierUtil.trimNamespace(domain.getResourceAsString())).addProperty(property);
         }
 
         List<JavaFile> files = new LinkedList<>();
