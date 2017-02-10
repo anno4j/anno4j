@@ -20,4 +20,25 @@ public class MethodNameBuilderTest {
                                                             .name);
     }
 
+    @Test
+    public void setterSpec() throws Exception {
+        assertEquals("setName", MethodNameBuilder.builder("http://example.com/ont#name")
+                .setterSpec()
+                .name);
+
+        assertEquals("setName", MethodNameBuilder.builder("http://example.com/name")
+                .setterSpec()
+                .name);
+    }
+
+    @Test
+    public void adderSpec() throws Exception {
+        assertEquals("addName", MethodNameBuilder.builder("http://example.com/ont#name")
+                .adderSpec()
+                .name);
+
+        assertEquals("addName", MethodNameBuilder.builder("http://example.com/name")
+                .adderSpec()
+                .name);
+    }
 }

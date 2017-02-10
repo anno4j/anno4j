@@ -38,6 +38,32 @@ public class MethodNameBuilder extends IdentifierBuilder {
         return MethodSpec.methodBuilder("get" + capitalizedIdentifier()).build();
     }
 
+    /**
+     * Generates a JavaPoet method spec for an empty setter representing the property resource.
+     * The method is named according to Java naming conventions with preceeding "set".
+     * @return JavaPoet method object. Can be modified by calling
+     * {@link MethodSpec#toBuilder()} on it.
+     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
+     * requirement for a hostname component.
+     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     */
+    public MethodSpec setterSpec() throws URISyntaxException, NameBuildingException {
+        return MethodSpec.methodBuilder("set" + capitalizedIdentifier()).build();
+    }
+
+    /**
+     * Generates a JavaPoet method spec for an empty add method representing the property resource.
+     * The method is named with preceeding "set".
+     * @return JavaPoet method object. Can be modified by calling
+     * {@link MethodSpec#toBuilder()} on it.
+     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
+     * requirement for a hostname component.
+     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     */
+    public MethodSpec adderSpec() throws URISyntaxException, NameBuildingException {
+        return MethodSpec.methodBuilder("add" + capitalizedIdentifier()).build();
+    }
+
     @Override
     public MethodNameBuilder withRDFSLabel(String label) {
         super.withRDFSLabel(label);
