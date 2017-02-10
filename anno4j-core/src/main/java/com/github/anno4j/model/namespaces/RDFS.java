@@ -59,4 +59,16 @@ public class RDFS {
      * rdfs:domain is an instance of rdf:Property that is used to state that any resource that has a given property is an instance of one or more classes.
      */
     public final static String DOMAIN = NS + "domain";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_literal
+     * The class rdfs:Literal is the class of literal values such as strings and integers.
+     */
+    public final static String LITERAL = NS + "Literal";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_datatype
+     * rdfs:Datatype is the class of datatypes.
+     */
+    public final static String DATATYPE = NS + "Datatype";
 }

@@ -63,4 +63,22 @@ public class RDF {
      * rdf:Property is the class of RDF properties. rdf:Property is an instance of rdfs:Class.
      */
     public final static String PROPERTY = NS + "Property";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_langstring
+     * The class rdf:langString is the class of language-tagged string values.
+     */
+    public final static String LANG_STRING = NS + "langString";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_html
+     * The class rdf:HTML is the class of HTML literal values.
+     */
+    public final static String HTML = NS + "HTML";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#ch_xmlliteral
+     * The class rdf:XMLLiteral is the class of XML literal values.
+     */
+    public final static String XMLLiteral = NS + "XMLLiteral";
 }
