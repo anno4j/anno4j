@@ -84,6 +84,14 @@
             <artifactId>javapoet</artifactId>
             <version>1.8.0</version>
         </dependency>
+
+        <!-- Apache Jena -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>3.1.1</version>
+        </dependency>
     </dependencies>
 
 </project>
