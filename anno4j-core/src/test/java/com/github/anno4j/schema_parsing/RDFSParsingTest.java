@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.LangString;
 import org.openrdf.rio.*;
 
 import java.io.IOException;
@@ -66,8 +67,14 @@ public class RDFSParsingTest {
     public void testClazzFields() throws RepositoryException, ParseException, MalformedQueryException, QueryEvaluationException {
         RDFSClazz entity = this.anno4j.createQueryService().addCriteria(".", ENTITY_URI).execute(RDFSClazz.class).get(0);
 
+        Set<CharSequence> comments = entity.getComments();
+
         assertEquals(6, entity.getLabels().size());
-        assertTrue(entity.getComment().startsWith("This class comprises"));
+        assertEquals(1, comments.size());
+
+        CharSequence comment = comments.iterator().next();
+        assertEquals(LangString.class, comment.getClass());
+        assertTrue(((LangString) comment).startsWith("This class comprises"));
 
         RDFSClazz temporalEntity = this.anno4j.createQueryService().addCriteria(".", TEMPORAL_ENTITY_URI).execute(RDFSClazz.class).get(0);
 
@@ -94,8 +101,13 @@ public class RDFSParsingTest {
         Set<RDFSClazz> motivatedDomain = motivated.getDomain();
         Set<RDFSClazz> motivatedRange = motivated.getRange();
 
+        Set<CharSequence> motivatedComments = motivated.getComments();
         assertEquals(6, motivated.getLabels().size());
-        assertTrue(motivated.getComment().startsWith("This property describes an item"));
+        assertEquals(1, motivatedComments.size());
+
+        CharSequence comment = motivatedComments.iterator().next();
+        assertEquals(LangString.class, comment.getClass());
+        assertTrue(((LangString) comment).startsWith("This property describes an item"));
         assertEquals(influenced.getResourceAsString(), ((ResourceObject) motivated.getSubProperties().toArray()[0]).getResourceAsString());
         assertEquals(1, motivatedDomain.size());
         assertEquals(1, motivatedRange.size());

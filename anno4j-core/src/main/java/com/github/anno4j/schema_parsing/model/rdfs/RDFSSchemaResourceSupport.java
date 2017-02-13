@@ -16,8 +16,8 @@ public abstract class RDFSSchemaResourceSupport extends ResourceObjectSupport im
      * {@inheritDoc}
      */
     @Override
-    public void addLabel(String label) {
-        Set<String> labels = new HashSet<String>();
+    public void addLabel(CharSequence label) {
+        Set<CharSequence> labels = new HashSet<>();
 
         if(this.getLabels() != null) {
             labels.addAll(this.getLabels());
@@ -25,5 +25,20 @@ public abstract class RDFSSchemaResourceSupport extends ResourceObjectSupport im
 
         labels.add(label);
         this.setLabels(labels);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addComment(CharSequence comment) {
+        Set<CharSequence> comments = new HashSet<>();
+
+        if(this.getComments() != null) {
+            comments.addAll(getComments());
+        }
+
+        comments.add(comment);
+        setComments(comments);
     }
 }
