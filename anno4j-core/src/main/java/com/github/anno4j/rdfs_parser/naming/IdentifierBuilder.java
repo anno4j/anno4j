@@ -264,8 +264,10 @@ public class IdentifierBuilder {
             pivotUnderscore = rawName.indexOf("_", pivotUnderscore);
             pivotWhitespace = rawName.indexOf(" ", pivotWhitespace);
 
-            if(pivotUnderscore != -1 && pivotUnderscore + 1 < rawName.length() && Character.isLowerCase(rawName.charAt(pivotUnderscore + 1))) {
-                rawName.setCharAt(pivotUnderscore + 1, Character.toUpperCase(rawName.charAt(pivotUnderscore + 1)));
+            if(pivotUnderscore != -1) {
+                if(pivotUnderscore + 1 < rawName.length() && Character.isLowerCase(rawName.charAt(pivotUnderscore + 1))) {
+                    rawName.setCharAt(pivotUnderscore + 1, Character.toUpperCase(rawName.charAt(pivotUnderscore + 1)));
+                }
                 rawName.deleteCharAt(pivotUnderscore);
                 // If the pivot for whitespace was ahead set it one back, because one character was deleted:
                 if(pivotUnderscore < pivotWhitespace) {
@@ -273,8 +275,10 @@ public class IdentifierBuilder {
                 }
             }
 
-            if(pivotWhitespace != -1 && pivotWhitespace + 1 < rawName.length() && Character.isLowerCase(rawName.charAt(pivotWhitespace + 1))) {
-                rawName.setCharAt(pivotWhitespace + 1, Character.toUpperCase(rawName.charAt(pivotWhitespace + 1)));
+            if(pivotWhitespace != -1) {
+                if(pivotWhitespace + 1 < rawName.length() && Character.isLowerCase(rawName.charAt(pivotWhitespace + 1))) {
+                    rawName.setCharAt(pivotWhitespace + 1, Character.toUpperCase(rawName.charAt(pivotWhitespace + 1)));
+                }
                 rawName.deleteCharAt(pivotWhitespace);
                 // If the pivot for underscore was ahead set it one back, because one character was deleted:
                 if(pivotUnderscore > pivotWhitespace) {
