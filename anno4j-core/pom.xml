@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.anno4j</groupId>
         <artifactId>anno4j-parent</artifactId>
-        <version>2.2.0.MICO</version>
+        <version>2.2.1.MICO-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -82,12 +82,14 @@
 
     <repositories>
         <repository>
-            <id>apache-snapshots</id>
-            <name>apache-snapshots</name>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
+            <id>mico.public</id>
+            <name>MICO Maven Proxy</name>
+            <url>http://mvn.mico-project.eu/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
     </repositories>
