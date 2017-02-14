@@ -82,14 +82,12 @@
 
     <repositories>
         <repository>
-            <id>mico.public</id>
-            <name>MICO Maven Proxy</name>
-            <url>http://mvn.mico-project.eu/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
+            <id>apache-snapshots</id>
+            <name>apache-snapshots</name>
+            <url>https://repository.apache.org/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
     </repositories>
