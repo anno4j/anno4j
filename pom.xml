@@ -4,7 +4,7 @@
 
     <groupId>com.github.anno4j</groupId>
     <artifactId>anno4j-parent</artifactId>
-    <version>2.2.1.MICO</version>
+    <version>2.2.2.MICO-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Anno4j Parent</name>
     <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C
@@ -18,7 +18,7 @@
     <scm>
         <developerConnection>scm:git:https://github.com/anno4j/anno4j.git</developerConnection>
         <url>https://github.com/anno4j/anno4j.git</url>
-        <tag>v2.2.1.MICO</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <organization>
