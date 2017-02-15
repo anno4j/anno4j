@@ -202,17 +202,6 @@
                 <artifactId>anno4j-ontologies</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.anno4j</groupId>
-                <artifactId>anno4j-ontologies-mico</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.anno4j</groupId>
-                <artifactId>anno4j-ontologies-mmm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
