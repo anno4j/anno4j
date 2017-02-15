@@ -19,7 +19,7 @@ public interface RDFSProperty extends RDFSSchemaResource {
      * rdfs:range is an instance of rdf:Property that is used to state that the values of a property are instances of one or more classes.
      */
     @Iri(RDFS.RANGE)
-    void setRange(Set<RDFSClazz> range);
+    void setRanges(Set<RDFSClazz> range);
 
     /**
      * Adds a clazz to the range of the property.
@@ -27,21 +27,21 @@ public interface RDFSProperty extends RDFSSchemaResource {
      * rdfs:range is an instance of rdf:Property that is used to state that the values of a property are instances of one or more classes.
      * @param clazz The class to add.
      */
-    void addRangeClazz(RDFSClazz clazz);
+    void addRange(RDFSClazz clazz);
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_range
      * rdfs:range is an instance of rdf:Property that is used to state that the values of a property are instances of one or more classes.
      */
     @Iri(RDFS.RANGE)
-    Set<RDFSClazz> getRange();
+    Set<RDFSClazz> getRanges();
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_domain
      * rdfs:domain is an instance of rdf:Property that is used to state that any resource that has a given property is an instance of one or more classes.
      */
     @Iri(RDFS.DOMAIN)
-    void setDomain(Set<RDFSClazz> domain);
+    void setDomains(Set<RDFSClazz> domain);
 
     /**
      * Adds a clazz to the domain of the property.
@@ -49,14 +49,14 @@ public interface RDFSProperty extends RDFSSchemaResource {
      * rdfs:domain is an instance of rdf:Property that is used to state that any resource that has a given property is an instance of one or more classes.
      * @param clazz The class to add.
      */
-    void addDomainClazz(RDFSClazz clazz);
+    void addDomain(RDFSClazz clazz);
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_domain
      * rdfs:domain is an instance of rdf:Property that is used to state that any resource that has a given property is an instance of one or more classes.
      */
     @Iri(RDFS.DOMAIN)
-    Set<RDFSClazz> getDomain();
+    Set<RDFSClazz> getDomains();
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subpropertyof

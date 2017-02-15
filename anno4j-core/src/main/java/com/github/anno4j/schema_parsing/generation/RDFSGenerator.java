@@ -49,7 +49,7 @@ public class RDFSGenerator extends ModelGenerator {
         }
 
         for(RDFSProperty property : properties) {
-            ResourceObject domain = (ResourceObject) property.getDomain().toArray()[0];
+            ResourceObject domain = (ResourceObject) property.getDomains().toArray()[0];
             map.get(IdentifierUtil.trimNamespace(domain.getResourceAsString())).addProperty(property);
         }
 

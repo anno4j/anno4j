@@ -3,7 +3,6 @@ package com.github.anno4j.schema_parsing;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.querying.Comparison;
-import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
 import org.apache.marmotta.ldpath.parser.ParseException;
@@ -15,8 +14,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.LangString;
 import org.openrdf.rio.*;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
@@ -98,8 +95,8 @@ public class RDFSParsingTest {
         RDFSClazz entity = this.anno4j.createQueryService().addCriteria(".", ENTITY_URI).execute(RDFSClazz.class).get(0);
         RDFSClazz activity = this.anno4j.createQueryService().addCriteria(".", ACTIVITY_URI).execute(RDFSClazz.class).get(0);
 
-        Set<RDFSClazz> motivatedDomain = motivated.getDomain();
-        Set<RDFSClazz> motivatedRange = motivated.getRange();
+        Set<RDFSClazz> motivatedDomain = motivated.getDomains();
+        Set<RDFSClazz> motivatedRange = motivated.getRanges();
 
         Set<CharSequence> motivatedComments = motivated.getComments();
         assertEquals(6, motivated.getLabels().size());

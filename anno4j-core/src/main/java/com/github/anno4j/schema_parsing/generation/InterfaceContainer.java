@@ -1,20 +1,15 @@
 package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.Selector;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
 import com.github.anno4j.util.IdentifierUtil;
 import com.squareup.javapoet.*;
 import org.openrdf.annotations.Iri;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Manu on 21/11/16.
@@ -69,7 +64,7 @@ public class InterfaceContainer {
             String trimmedPropertyName = IdentifierUtil.trimNamespace(property.getResourceAsString());
 
             // Only queries for the first range resource:
-            ResourceObject range = (ResourceObject) property.getRange().toArray()[0];
+            ResourceObject range = (ResourceObject) property.getRanges().toArray()[0];
             ClassName parameter = ClassName.get(packagePath, IdentifierUtil.trimNamespace(range.getResourceAsString()));
             TypeName hashSetWithRange = ParameterizedTypeName.get(hashSet, parameter);
 
@@ -116,7 +111,7 @@ public class InterfaceContainer {
         String trimmedPropertyName = IdentifierUtil.trimNamespace(property.getResourceAsString());
 
         // Create classes that are needed for the getters and setters
-        ResourceObject range = (ResourceObject) property.getRange().toArray()[0];
+        ResourceObject range = (ResourceObject) property.getRanges().toArray()[0];
         ClassName rangeInterface = ClassName.get(packagePath, IdentifierUtil.trimNamespace(range.getResourceAsString()));
         ClassName set = ClassName.get("java.util", "Set");
         TypeName setOfRanges = ParameterizedTypeName.get(set, rangeInterface);

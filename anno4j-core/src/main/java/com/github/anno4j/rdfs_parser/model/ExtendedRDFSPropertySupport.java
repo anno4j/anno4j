@@ -26,7 +26,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
         if(updateInverse) {
             clazz.addOutgoingProperty(this, false);
         }
-        super.addDomainClazz(clazz);
+        super.addDomain(clazz);
     }
 
     @Override
@@ -39,7 +39,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
         if(updateInverse) {
             clazz.addIncomingProperty(this, false);
         }
-        super.addRangeClazz(clazz);
+        super.addRange(clazz);
     }
 
     private CharSequence getPreferredRDFSLabel(OntGenerationConfig config) {
@@ -67,7 +67,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
 
     @Override
     public MethodSpec buildGetter(OntGenerationConfig config) {
-        if(getRange() != null) {
+        if(getRanges() != null) {
             MethodSpec getter;
             try {
                 MethodNameBuilder builder = MethodNameBuilder.builder(getResourceAsString());
@@ -101,7 +101,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
 
             ClassName set = ClassName.get("java.util", "Set");
             // TODO Support multiple range classes!
-            ExtendedRDFSClazz rangeClazz = (ExtendedRDFSClazz) getRange().iterator().next();
+            ExtendedRDFSClazz rangeClazz = (ExtendedRDFSClazz) getRanges().iterator().next();
 
             TypeName returnType;
             try {
@@ -125,7 +125,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
 
     @Override
     public MethodSpec buildSetter(OntGenerationConfig config) {
-        if (getRange() != null) {
+        if (getRanges() != null) {
             MethodSpec setter;
             try {
                 MethodNameBuilder builder = MethodNameBuilder.builder(getResourceAsString());
@@ -159,7 +159,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
 
                 ClassName set = ClassName.get("java.util", "Set");
                 // TODO Support multiple range classes!
-                ExtendedRDFSClazz rangeClazz = (ExtendedRDFSClazz) getRange().iterator().next();
+                ExtendedRDFSClazz rangeClazz = (ExtendedRDFSClazz) getRanges().iterator().next();
 
                 TypeName returnType;
                 try {

@@ -1,7 +1,6 @@
 package com.github.anno4j.schema_parsing.model.rdfs;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.impl.ResourceObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,27 +12,27 @@ import java.util.Set;
 public abstract class RDFSPropertySupport extends RDFSSchemaResourceSupport implements RDFSProperty {
 
     @Override
-    public void addRangeClazz(RDFSClazz clazz) {
+    public void addRange(RDFSClazz clazz) {
         Set<RDFSClazz> range = new HashSet<>();
 
-        if (getRange() != null) {
-            range.addAll(getRange());
+        if (getRanges() != null) {
+            range.addAll(getRanges());
         }
 
         range.add(clazz);
-        setRange(range);
+        setRanges(range);
     }
 
     @Override
-    public void addDomainClazz(RDFSClazz clazz) {
+    public void addDomain(RDFSClazz clazz) {
         Set<RDFSClazz> domain = new HashSet<>();
 
-        if(getDomain() != null) {
-            domain.addAll(getDomain());
+        if(getDomains() != null) {
+            domain.addAll(getDomains());
         }
 
         domain.add(clazz);
-        setDomain(domain);
+        setDomains(domain);
     }
 
     /**
