@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for generating Java compliant names for resources.
@@ -45,6 +47,12 @@ public class IdentifierBuilder {
             "return", "short", "static", "strictfp", "super", "switch",
             "synchronized", "this", "throw", "throws", "transient", "true",
             "try", "void", "volatile", "while" };
+
+    /**
+     * Regex for validating well-formed URIs as defined in
+     * <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a> Appendix B.
+     */
+    private static final Pattern URI_VALIDATION_REGEX = Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
     /**
      * The resource to build a name for.
@@ -102,14 +110,15 @@ public class IdentifierBuilder {
     /**
      * @return Returns true iff the resource is a blank node.
      */
-    private boolean isBlankNode() {
+    protected boolean isBlankNode() {
         // IDs of blank nodes do not conform to URI specification:
-        try {
-            new URI(resource);
-        } catch (URISyntaxException e) {
-            return true;
-        }
-        return false;
+        Matcher matcher = URI_VALIDATION_REGEX.matcher(resource);
+
+        // Require that the URI has at least a scheme and authority part:
+        return !(matcher.matches()
+                && matcher.groupCount() >= 4
+                && matcher.group(2) != null
+                && matcher.group(4) != null);
     }
 
     /**

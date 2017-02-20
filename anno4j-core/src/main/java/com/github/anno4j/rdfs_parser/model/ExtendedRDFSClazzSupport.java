@@ -204,6 +204,14 @@ public abstract class ExtendedRDFSClazzSupport extends RDFSClazzSupport implemen
             }
         }
 
+        // Add information about incoming and outgoing properties:
+        for (ExtendedRDFSProperty incomingProp : incomingProperties) {
+            nameBuilder = nameBuilder.withIncomingProperty(incomingProp);
+        }
+        for (ExtendedRDFSProperty outgoingProp : outgoingProperties) {
+            nameBuilder = nameBuilder.withOutgoingProperty(outgoingProp);
+        }
+
         return nameBuilder.className();
     }
 

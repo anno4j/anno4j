@@ -4,7 +4,8 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for {@link ClassNameBuilder}.
@@ -34,4 +35,21 @@ public class ClassNameBuilderTest {
         assertEquals("Person", typeSpec.name);
     }
 
+    @Test
+    public void testBlankNode() throws Exception {
+        ClassNameBuilder builder = ClassNameBuilder.builder("someblanknode");
+
+        assertEquals("Someblanknode", builder.className().simpleName());
+
+        ClassName cn = builder.withIncomingProperty("http://example.com/has_ingredient")
+                              .className();
+        assertEquals("HasIngredientTarget", cn.simpleName());
+
+        cn = builder.withOutgoingProperty("http://example.com/ingredient")
+                      .withOutgoingProperty("http://example.com/amount")
+                      .className();
+
+        assertTrue(cn.simpleName().equals("IngredientAmountNode")
+                || cn.simpleName().equals("AmountIngredientNode"));
+    }
 }
