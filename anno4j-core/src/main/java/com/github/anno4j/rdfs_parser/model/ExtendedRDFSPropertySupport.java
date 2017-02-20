@@ -5,12 +5,16 @@ import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.naming.ClassNameBuilder;
 import com.github.anno4j.rdfs_parser.naming.IdentifierBuilder;
 import com.github.anno4j.rdfs_parser.naming.MethodNameBuilder;
+import com.github.anno4j.rdfs_parser.util.LowestCommonSuperclass;
+import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.rdfs.RDFSPropertySupport;
 import com.squareup.javapoet.*;
 import org.openrdf.annotations.Iri;
 
 import javax.lang.model.element.Modifier;
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.HashSet;
 
 
 @Partial
@@ -100,8 +104,14 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
                                                         .build();
 
             ClassName set = ClassName.get("java.util", "Set");
-            // TODO Support multiple range classes!
-            ExtendedRDFSClazz rangeClazz = (ExtendedRDFSClazz) getRanges().iterator().next();
+
+            // Get the range classes of this property:
+            Collection<ExtendedRDFSClazz> ranges = new HashSet<>();
+            for (RDFSClazz range : getRanges()) {
+                ranges.add((ExtendedRDFSClazz) range);
+            }
+            // Find most specific common superclass:
+            ExtendedRDFSClazz rangeClazz = LowestCommonSuperclass.getLowestCommonSuperclass(ranges);
 
             TypeName returnType;
             try {
@@ -158,8 +168,13 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
                                                             .build();
 
                 ClassName set = ClassName.get("java.util", "Set");
-                // TODO Support multiple range classes!
-                ExtendedRDFSClazz rangeClazz = (ExtendedRDFSClazz) getRanges().iterator().next();
+                // Get the range classes of this property:
+                Collection<ExtendedRDFSClazz> ranges = new HashSet<>();
+                for (RDFSClazz range : getRanges()) {
+                    ranges.add((ExtendedRDFSClazz) range);
+                }
+                // Find most specific common superclass:
+                ExtendedRDFSClazz rangeClazz = LowestCommonSuperclass.getLowestCommonSuperclass(ranges);
 
                 TypeName returnType;
                 try {
