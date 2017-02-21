@@ -331,6 +331,7 @@ class RDFSModelBuilder
     public void build() throws RDFSModelBuildingException {
         try {
             Transaction transaction = anno4j.createTransaction();
+            transaction.begin();
             extractRDFSClazzes(transaction);
             extractRDFSProperties(transaction);
 
