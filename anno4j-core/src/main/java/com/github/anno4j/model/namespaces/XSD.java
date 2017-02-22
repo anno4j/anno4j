@@ -112,4 +112,80 @@ public class XSD {
      * NOTATION represents the NOTATION attribute type from XML.
      */
     public final static String NOTATION = NS + "NOTATION";
+
+    /**
+     * normalizedString represents white space normalized strings.
+     */
+    public final static String NORMALIZED_STRING = NS + "normalizedString";
+
+    /**
+     * token represents tokenized strings.
+     */
+    public final static String TOKEN = NS + "token";
+
+    /**
+     * language represents formal natural language identifiers
+     */
+    public final static String LANGUAGE = NS + "language";
+
+    /**
+     *  integer is ·derived· from decimal by fixing the value of ·fractionDigits· to be 0
+     *  and disallowing the trailing decimal point.  This results in the standard mathematical
+     *  concept of the integer numbers.
+     */
+    public final static String INTEGER = NS + "integer";
+
+    /**
+     * negativeInteger is ·derived· from nonPositiveInteger by setting the value of ·maxInclusive· to be -1.
+     */
+    public final static String NEGATIVE_INTEGER = NS + "negativeInteger";
+
+    /**
+     * long is ·derived· from integer by setting the value of ·maxInclusive·
+     * to be 9223372036854775807 and ·minInclusive· to be -9223372036854775808.
+     */
+    public final static String LONG = NS + "long";
+
+    /**
+     * int is ·derived· from long by setting the value
+     * of ·maxInclusive· to be 2147483647 and ·minInclusive· to be -2147483648.
+     */
+    public final static String INT = NS + "int";
+
+    /**
+     *  short is ·derived· from int by setting the value of ·maxInclusive·
+     *  to be 32767 and ·minInclusive· to be -32768.
+     */
+    public final static String SHORT = NS + "short";
+
+    /**
+     * byte is ·derived· from short by setting the value of ·maxInclusive· to be
+     * 127 and ·minInclusive· to be -128.
+     */
+    public final static String BYTE = NS + "byte";
+
+    /**
+     * nonNegativeInteger is ·derived· from integer by setting the value of ·minInclusive· to be 0.
+     */
+    public final static String NON_NEGATIVE_INTEGER = NS + "nonNegativeInteger";
+
+    /**
+     * unsignedInt is ·derived· from unsignedLong by setting the value of ·maxInclusive· to be 4294967295.
+     */
+    public final static String UNSIGNED_INT = NS + "unsignedInt";
+
+    /**
+     * unsignedShort is ·derived· from unsignedInt by setting the value of ·maxInclusive· to be 65535.
+     */
+    public final static String UNSIGNED_SHORT = NS + "unsignedShort";
+
+    /**
+     * unsignedByte is ·derived· from unsignedShort by setting the value of ·maxInclusive· to be 255.
+     */
+    public final static String UNSIGNED_BYTE = NS + "unsignedByte";
+
+    /**
+     * positiveInteger is ·derived· from nonNegativeInteger by setting the value of ·minInclusive· to be 1.
+     */
+    public final static String POSITIVE_INTEGER = NS + "positiveInteger";
 }
