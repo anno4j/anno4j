@@ -132,6 +132,15 @@ public interface ExtendedRDFSClazz extends RDFSClazz {
      */
     boolean isLiteral();
 
+    /**
+     * Checks whether this clazz or one of its transitive superclass closure
+     * is the domain of a certain property.
+     * @param property The property to check for.
+     * @return Returns true if the property is a outgoing property of the class
+     * or of its transitive superclass closure.
+     */
+    boolean hasPropertyTransitive(ExtendedRDFSProperty property);
+
     String getJavaPackageName();
 
     ClassName getJavaPoetClassName(OntGenerationConfig config) throws URISyntaxException, IdentifierBuilder.NameBuildingException;

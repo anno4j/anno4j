@@ -211,9 +211,9 @@ class RDFSModelBuilder
      * resource objects for them, which are stored in {@link #clazzes}.
      * The resource objects are augmented with rdfs:label, rdfs:comment and rdfs:subClassOf information.
      * @param transaction The Anno4j transaction to use when creating resource objects.
-     * @throws RepositoryException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @throws RepositoryException If an error occurs while creating objects <code>transaction</code>.
+     * @throws IllegalAccessException If an error occurs while creating objects <code>transaction</code>.
+     * @throws InstantiationException If an error occurs while creating objects <code>transaction</code>.
      */
     private void extractRDFSClazzes(Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
         // Iterate all classes from the inferred ontology
@@ -232,7 +232,7 @@ class RDFSModelBuilder
                 while (labelIter.hasNext()) {
                     clazz.addLabel(getStringLiteral(labelIter.next()));
                 }
-                ExtendedIterator<RDFNode> commentIter = ontClazz.listLabels(null);
+                ExtendedIterator<RDFNode> commentIter = ontClazz.listComments(null);
                 while (commentIter.hasNext()) {
                     clazz.addComment(getStringLiteral(commentIter.next()));
                 }
@@ -256,9 +256,9 @@ class RDFSModelBuilder
      * resource objects for them, which are stored in {@link #properties}.
      * The resource objects are augmented with rdfs:label, rdfs:comment and rdfs:subPropertyOf information.
      * @param transaction The Anno4j transaction to use when creating resource objects.
-     * @throws RepositoryException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @throws RepositoryException If an error occurs while creating objects <code>transaction</code>.
+     * @throws IllegalAccessException If an error occurs while creating objects <code>transaction</code>.
+     * @throws InstantiationException If an error occurs while creating objects <code>transaction</code>.
      */
     private void extractRDFSProperties(Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
         ExtendedIterator<OntProperty> propertyIter = model.listOntProperties();
@@ -273,7 +273,7 @@ class RDFSModelBuilder
             while (labelIter.hasNext()) {
                 property.addLabel(getStringLiteral(labelIter.next()));
             }
-            ExtendedIterator<RDFNode> commentIter = ontProperty.listLabels(null);
+            ExtendedIterator<RDFNode> commentIter = ontProperty.listComments(null);
             while (commentIter.hasNext()) {
                 property.addComment(getStringLiteral(commentIter.next()));
             }

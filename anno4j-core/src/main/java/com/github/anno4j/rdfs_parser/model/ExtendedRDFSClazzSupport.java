@@ -179,18 +179,23 @@ public abstract class ExtendedRDFSClazzSupport extends RDFSClazzSupport implemen
 
     @Override
     public ClassName getJavaPoetClassName(OntGenerationConfig config) throws URISyntaxException, IdentifierBuilder.NameBuildingException {
-        if (getResourceAsString().equals(RDFS.CLAZZ)) {
+        if (getResourceAsString().equals(RDFS.CLAZZ) || getResourceAsString().equals(RDFS.RESOURCE)) {
             return ClassName.get(ResourceObject.class);
 
-        } else if(hasParent(RDFS.LITERAL)) {
-            switch (getResourceAsString()) {
-                case XSD.STRING: return ClassName.get(String.class);
-                case XSD.BOOLEAN: return ClassName.get(boolean.class);
-                case XSD.DECIMAL: return ClassName.get(double.class);
-                case XSD.FLOAT: return ClassName.get(float.class);
-                case XSD.DOUBLE: return ClassName.get(double.class);
-                default: return ClassName.get(String.class);
-            }
+        }
+
+        // Capture XSD datatypes:
+        switch (getResourceAsString()) {
+            case XSD.STRING: return ClassName.get(String.class);
+            case XSD.BOOLEAN: return ClassName.get(Boolean.class);
+            case XSD.DECIMAL: return ClassName.get(Double.class);
+            case XSD.FLOAT: return ClassName.get(Float.class);
+            case XSD.DOUBLE: return ClassName.get(Double.class);
+            case XSD.INTEGER: return ClassName.get(Integer.class);
+            case XSD.LONG: return ClassName.get(Long.class);
+            case XSD.INT: return ClassName.get(Integer.class);
+            case XSD.SHORT: return ClassName.get(Short.class);
+            case XSD.BYTE: return ClassName.get(Byte.class);
         }
 
 
@@ -239,6 +244,24 @@ public abstract class ExtendedRDFSClazzSupport extends RDFSClazzSupport implemen
     }
 
     @Override
+    public boolean hasPropertyTransitive(ExtendedRDFSProperty property) {
+        // If the class has the property, immediately return:
+        if(getOutgoingProperties().contains(property)) {
+            return true;
+        }
+
+        // Recursively search in superclasses:
+        for (ExtendedRDFSClazz superClazz : getSuperclazzes()) {
+            if(superClazz.hasPropertyTransitive(property)) {
+                return true;
+            }
+        }
+
+        // The property was neither found in this class or any superclass:
+        return false;
+    }
+
+    @Override
     public TypeSpec buildTypeSpec(OntGenerationConfig config) throws URISyntaxException {
         // First try to find a name for this class:
         ClassName clazzName;
@@ -276,8 +299,17 @@ public abstract class ExtendedRDFSClazzSupport extends RDFSClazzSupport implemen
         Collection<MethodSpec> getters = new HashSet<>();
         Collection<MethodSpec> setters = new HashSet<>();
         for (ExtendedRDFSProperty property : getOutgoingProperties()) {
-            getters.add(property.buildGetter(config));
-            setters.add(property.buildSetter(config));
+            // Check if the property is present in any superclass:
+            boolean definedInSuper = false;
+            for (ExtendedRDFSClazz superClazz : getSuperclazzes()) {
+                definedInSuper |= superClazz.hasPropertyTransitive(property);
+            }
+
+            // Only add the method to the type spec if it was not already defined in a superclass:
+            if(!definedInSuper) {
+                getters.add(property.buildGetter(config));
+                setters.add(property.buildSetter(config));
+            }
         }
 
         // JavaDoc of the class:
@@ -286,9 +318,10 @@ public abstract class ExtendedRDFSClazzSupport extends RDFSClazzSupport implemen
             CharSequence preferredComment = getPreferredRDFSComment(config);
             if(preferredComment != null) {
                 javaDoc.add(preferredComment.toString());
+                javaDoc.add("\n");
             }
         }
-        javaDoc.add("\nGenerated class for $L", getResourceAsString());
+        javaDoc.add("Generated class for $L", getResourceAsString());
 
         // IRI annotation of the class:
         AnnotationSpec iriAnnotation = AnnotationSpec.builder(Iri.class)

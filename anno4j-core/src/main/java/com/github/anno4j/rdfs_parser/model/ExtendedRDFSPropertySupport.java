@@ -84,7 +84,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
                     }
                 }
 
-                getter = builder.getterSpec();
+                getter = builder.getterSpecPlural();
             } catch (URISyntaxException | IdentifierBuilder.NameBuildingException e) {
                 return null;
             }
@@ -151,7 +151,7 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
                     }
                 }
 
-                setter = builder.setterSpec();
+                setter = builder.setterSpecPlural();
 
                 // JavaDoc of the method:
                 CodeBlock.Builder javaDoc = CodeBlock.builder();
