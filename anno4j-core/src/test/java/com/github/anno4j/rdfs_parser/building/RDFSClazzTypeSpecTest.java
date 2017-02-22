@@ -1,19 +1,12 @@
 package com.github.anno4j.rdfs_parser.building;
 
-import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.rdfs_parser.building.RDFSModelBuilder;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazzSupport;
 import com.squareup.javapoet.*;
-import com.sun.tools.internal.ws.processor.modeler.annotation.ModelBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
 import javax.lang.model.element.Modifier;
-import java.io.File;
 import java.util.*;
 
 import static org.junit.Assert.*;
