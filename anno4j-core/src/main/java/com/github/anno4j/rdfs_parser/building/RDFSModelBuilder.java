@@ -25,6 +25,7 @@ import org.openrdf.repository.object.LangString;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -32,8 +33,7 @@ import java.util.Map;
  * between classes and properties not explicitly stated in the RDF data.
  * Optionally also persists the ontology information to a provided {@link Anno4j}.
  */
-class RDFSModelBuilder
-{
+class RDFSModelBuilder {
     /**
      * Signalizes an error while building the ontology model from a set of RDF statements.
      */
@@ -67,6 +67,11 @@ class RDFSModelBuilder
     private Map<Resource, ExtendedRDFSProperty> properties = new HashMap<>();
 
     /**
+     * The classes that are direct subclass of rdfs:Class.
+     */
+    private Collection<ExtendedRDFSClazz> rootClazzes = new HashSet<>();
+
+    /**
      * Creates a parser instance with in memory triple store.
      */
     public RDFSModelBuilder() throws RepositoryConfigException, RepositoryException {
@@ -80,6 +85,7 @@ class RDFSModelBuilder
 
     /**
      * Creates a parser instance. Read and inferred RDFS data will be persisted to the given Anno4j instance.
+     *
      * @param anno4j The Anno4j instance to work on.
      *               It will contain all inferred ontology information after a call to {@link #build()}.
      */
@@ -95,8 +101,9 @@ class RDFSModelBuilder
 
     /**
      * Adds RDF statements to the underlying model.
+     *
      * @param rdfInput An input stream to RDF/XML data.
-     * @param base The base uri to be used when converting relative URI's to absolute URI's.
+     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
      */
     public void addRDF(InputStream rdfInput, String base) {
         model.read(rdfInput, base);
@@ -106,7 +113,8 @@ class RDFSModelBuilder
      * Returns a RDFS class object from the used Anno4j instance.
      * If a class object for the given resource was already created then it will be returned.
      * If no such object exists then it will be created using {@link #anno4j}.
-     * @param resource The resource the returned object should represent.
+     *
+     * @param resource    The resource the returned object should represent.
      * @param transaction The Anno4j transaction to use when creating resource objects.
      * @return The RDFS class object for the given resource.
      * @throws RepositoryException
@@ -115,7 +123,7 @@ class RDFSModelBuilder
      */
     private ExtendedRDFSClazz createRDFSClazzOnDemand(Resource resource, Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
         ExtendedRDFSClazz clazz;
-        if(clazzes.containsKey(resource)) {
+        if (clazzes.containsKey(resource)) {
             clazz = clazzes.get(resource);
         } else {
             clazz = transaction.createObject(ExtendedRDFSClazz.class, (Resource) resource);
@@ -128,7 +136,8 @@ class RDFSModelBuilder
      * Returns a RDFS property object from the used Anno4j instance.
      * If a property object for the given resource was already created then it will be returned.
      * If no such object exists then it will be created using {@link #anno4j}.
-     * @param resource The resource the returned object should represent.
+     *
+     * @param resource    The resource the returned object should represent.
      * @param transaction The Anno4j transaction to use when creating resource objects.
      * @return The RDFS property object for the given resource.
      * @throws RepositoryException
@@ -137,7 +146,7 @@ class RDFSModelBuilder
      */
     private ExtendedRDFSProperty createRDFSPropertyOnDemand(Resource resource, Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
         ExtendedRDFSProperty property;
-        if(properties.containsKey(resource)) {
+        if (properties.containsKey(resource)) {
             property = properties.get(resource);
         } else {
             property = transaction.createObject(ExtendedRDFSProperty.class, resource);
@@ -148,6 +157,7 @@ class RDFSModelBuilder
 
     /**
      * Adds RDF statements to the underlying model.
+     *
      * @param fileName Path to a RDF/XML file containing the RDF data to be added.
      */
     public void addRDF(String fileName) {
@@ -157,6 +167,7 @@ class RDFSModelBuilder
     /**
      * Returns the extended resource objects of RDFS classes that were found during
      * the last call to {@link #build()}.
+     *
      * @return Returns the RDFS classes in the model built.
      */
     public Collection<ExtendedRDFSClazz> getRDFSClazzes() {
@@ -166,6 +177,7 @@ class RDFSModelBuilder
     /**
      * Returns the extended resource objects of RDFS properties that were found during
      * the last call to {@link #build()}.
+     *
      * @return Returns the RDFS properties in the model built.
      */
     public Collection<ExtendedRDFSProperty> getProperties() {
@@ -174,12 +186,13 @@ class RDFSModelBuilder
 
     /**
      * Returns a validity report for the model build during the last call of {@link #build()}.
+     *
      * @return The validatiy report for the model. Use {@link ValidityReport#isValid()} to
      * check if the model built is valid.
      * @throws IllegalStateException Thrown if the model was not previously built.
      */
     public ValidityReport validate() throws IllegalStateException {
-        if(model != null) {
+        if (model != null) {
             return model.validate();
         } else {
             throw new IllegalStateException("Model has not been built.");
@@ -189,14 +202,15 @@ class RDFSModelBuilder
     /**
      * Converts a Jena {@link RDFNode} representing a string literal into a representation
      * valid for Anno4j.
+     *
      * @param node The literal node to convert.
      * @return Returns a {@link LangString} if language information is present. Else a
      * {@link String} is returned.
      */
     private CharSequence getStringLiteral(RDFNode node) {
-        if(node.isLiteral()) {
+        if (node.isLiteral()) {
             Literal literal = node.asLiteral();
-            if(literal.getLanguage() != null && !literal.getLanguage().isEmpty()) {
+            if (literal.getLanguage() != null && !literal.getLanguage().isEmpty()) {
                 return new LangString(literal.getString(), literal.getLanguage());
             } else { // Untyped literal:
                 return literal.getString();
@@ -210,8 +224,9 @@ class RDFSModelBuilder
      * Extracts the RDFS classes from {@link #model} and constructs {@link ExtendedRDFSClazz}
      * resource objects for them, which are stored in {@link #clazzes}.
      * The resource objects are augmented with rdfs:label, rdfs:comment and rdfs:subClassOf information.
+     *
      * @param transaction The Anno4j transaction to use when creating resource objects.
-     * @throws RepositoryException If an error occurs while creating objects <code>transaction</code>.
+     * @throws RepositoryException    If an error occurs while creating objects <code>transaction</code>.
      * @throws IllegalAccessException If an error occurs while creating objects <code>transaction</code>.
      * @throws InstantiationException If an error occurs while creating objects <code>transaction</code>.
      */
@@ -223,7 +238,7 @@ class RDFSModelBuilder
             Resource ontClazzUri = new URIImpl(ontClazz.toString());
 
             // We're only handling non-property classes here. Those are handled in extractrDFSProperties():
-            if(!ontClazz.hasSuperClass(model.createOntResource(RDF.PROPERTY))) {
+            if (!ontClazz.hasSuperClass(model.createOntResource(RDF.PROPERTY))) {
                 // Get the clazz by its resource or create a new Anno4j instance on demand if not yet existing:
                 ExtendedRDFSClazz clazz = createRDFSClazzOnDemand(ontClazzUri, transaction);
 
@@ -247,6 +262,19 @@ class RDFSModelBuilder
                     ExtendedRDFSClazz superClazz = createRDFSClazzOnDemand(ontSuperClazzUri, transaction);
                     clazz.addSuperclazz(superClazz);
                 }
+
+                // Check if the class is a root class:
+                boolean isRootClass = clazz.getSuperclazzes().isEmpty();
+                if (!clazz.getSuperclazzes().isEmpty()) {
+                    // It is a root class if its single superclass is rdfs:Class or rdfs:Resource:
+                    ExtendedRDFSClazz firstSuper = clazz.getSuperclazzes().iterator().next();
+                    isRootClass |= clazz.getSuperclazzes().size() == 1
+                            && (firstSuper.getResourceAsString().equals(RDFS.CLAZZ)
+                            || firstSuper.getResourceAsString().equals(RDFS.RESOURCE));
+                }
+                if (isRootClass) {
+                    rootClazzes.add(clazz);
+                }
             }
         }
     }
@@ -255,8 +283,9 @@ class RDFSModelBuilder
      * Extracts the RDFS properties from {@link #model} and constructs {@link ExtendedRDFSProperty}
      * resource objects for them, which are stored in {@link #properties}.
      * The resource objects are augmented with rdfs:label, rdfs:comment and rdfs:subPropertyOf information.
+     *
      * @param transaction The Anno4j transaction to use when creating resource objects.
-     * @throws RepositoryException If an error occurs while creating objects <code>transaction</code>.
+     * @throws RepositoryException    If an error occurs while creating objects <code>transaction</code>.
      * @throws IllegalAccessException If an error occurs while creating objects <code>transaction</code>.
      * @throws InstantiationException If an error occurs while creating objects <code>transaction</code>.
      */
@@ -279,13 +308,23 @@ class RDFSModelBuilder
             }
 
             ExtendedIterator<? extends OntResource> domainClazzIter = ontProperty.listDomain();
-            while(domainClazzIter.hasNext()) {
-                OntResource ontDomainClazz = domainClazzIter.next();
-                Resource ontDomainClazzUri = new URIImpl(ontDomainClazz.toString());
+            if (domainClazzIter.hasNext()) {
+                while (domainClazzIter.hasNext()) {
+                    OntResource ontDomainClazz = domainClazzIter.next();
+                    Resource ontDomainClazzUri = new URIImpl(ontDomainClazz.toString());
 
-                if(ontDomainClazz instanceof OntClass) {
-                    ExtendedRDFSClazz domainClazz = createRDFSClazzOnDemand(ontDomainClazzUri, transaction);
-                    property.addDomainClazz(domainClazz);
+                    if (ontDomainClazz instanceof OntClass) {
+                        ExtendedRDFSClazz domainClazz = createRDFSClazzOnDemand(ontDomainClazzUri, transaction);
+                        property.addDomainClazz(domainClazz);
+                    }
+                }
+            } else {
+                // No domain specified for this property.
+                // Add all root classes as the properties domain (everything not from RDF(S)):
+                if (!property.getResourceAsString().startsWith(RDFS.NS) && !property.getResourceAsString().startsWith(RDF.NS)) {
+                    for (ExtendedRDFSClazz rootClazz : rootClazzes) {
+                        property.addDomainClazz(rootClazz);
+                    }
                 }
             }
 
@@ -294,17 +333,18 @@ class RDFSModelBuilder
             Not explicitly specified ranges are not set to rdfs:Class by the reasoner. Thus we have to set it manually:
              */
             ExtendedIterator<? extends OntResource> rangeClazzIter = ontProperty.listRange();
-            if(rangeClazzIter.hasNext()) { // range explicitly specified?
+            if (rangeClazzIter.hasNext()) { // range explicitly specified?
                 while (rangeClazzIter.hasNext()) {
                     OntResource ontRangeClazz = rangeClazzIter.next();
                     Resource ontRangeClazzUri = new URIImpl(ontRangeClazz.toString());
 
-                    if(ontRangeClazz instanceof OntClass) {
+                    if (ontRangeClazz instanceof OntClass) {
                         ExtendedRDFSClazz rangeClazz = createRDFSClazzOnDemand(ontRangeClazzUri, transaction);
                         property.addRangeClazz(rangeClazz);
                     }
                 }
             } else {
+                // No range specified for this property.
                 // Add rdfs:Class as the range of the property, i.e. everything:
                 property.addRangeClazz(createRDFSClazzOnDemand(new URIImpl(RDFS.CLAZZ), transaction));
             }
@@ -326,6 +366,7 @@ class RDFSModelBuilder
      * is persisted to the underlying {@link Anno4j} instance if the built model is valid.
      * If the resulting model would not be valid, no information is persisted and
      * {@link #validate()} gives more details about the failed validation.
+     *
      * @throws RDFSModelBuildingException Thrown if an error occurs during building the model.
      */
     public void build() throws RDFSModelBuildingException {
@@ -336,7 +377,7 @@ class RDFSModelBuilder
             extractRDFSProperties(transaction);
 
             ValidityReport validityReport = validate();
-            if(validityReport.isValid()) {
+            if (validityReport.isValid()) {
                 transaction.commit();
             } else {
                 transaction.rollback();
