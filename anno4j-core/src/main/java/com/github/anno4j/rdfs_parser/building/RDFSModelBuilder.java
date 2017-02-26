@@ -110,6 +110,40 @@ class RDFSModelBuilder {
     }
 
     /**
+     * Adds RDF statements to the underlying model.
+     *
+     * @param url      An URL to RDF data in RDF/XML format.
+     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     */
+    public void addRDF(String url, String base) {
+        model.read(url, base);
+    }
+
+    /**
+     * Adds RDF statements to the underlying model.
+     *
+     * @param rdfInput An input stream to the RDF data. Its format is defined by the <code>format</code> parameter.
+     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * @param format   The format of the RDF data. One of "RDF/XML", "N-TRIPLE", "TURTLE" (or "TTL") and "N3"
+     *                 or <code>null</code> for the default format.
+     */
+    public void addRDF(InputStream rdfInput, String base, String format) {
+        model.read(rdfInput, base, format);
+    }
+
+    /**
+     * Adds RDF statements to the underlying model.
+     *
+     * @param url      An URL to RDF data in the specified format.
+     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * @param format   The format of the RDF data. One of "RDF/XML", "N-TRIPLE", "TURTLE" (or "TTL") and "N3"
+     *                 or <code>null</code> for the default format.
+     */
+    public void addRDF(String url, String base, String format) {
+        model.read(url, base, format);
+    }
+
+    /**
      * Returns a RDFS class object from the used Anno4j instance.
      * If a class object for the given resource was already created then it will be returned.
      * If no such object exists then it will be created using {@link #anno4j}.
