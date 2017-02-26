@@ -1,10 +1,10 @@
 package com.github.anno4j.rdfs_parser.model;
 
-import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
-import com.squareup.javapoet.MethodSpec;
-import org.openrdf.annotations.Iri;
 import com.github.anno4j.model.namespaces.RDF;
+import com.github.anno4j.rdfs_parser.building.BuildableOntologyProperty;
+import org.openrdf.annotations.Iri;
+
+import java.util.Set;
 
 /**
  * Represents a rdfs:Property.
@@ -12,7 +12,7 @@ import com.github.anno4j.model.namespaces.RDF;
  * from RDF data.
  */
 @Iri(RDF.PROPERTY)
-public interface ExtendedRDFSProperty extends RDFSProperty {
+public interface ExtendedRDFSProperty extends RDFSProperty, BuildableOntologyProperty {
 
     /**
      * Adds a class to the domain of the property.
@@ -51,8 +51,31 @@ public interface ExtendedRDFSProperty extends RDFSProperty {
      */
     void addRangeClazz(ExtendedRDFSClazz clazz, boolean updateInverse);
 
-    MethodSpec buildGetter(OntGenerationConfig config);
+    /**
+     * Returns the superproperties of this property.
+     * Thus this property denotes the subject and each of the returned resources denotes the
+     * object in a statement with predicate rdfs:subPropertyOf.
+     * @return The superproperties of this property.
+     */
+    Set<ExtendedRDFSProperty> getSuperproperties();
 
-    MethodSpec buildSetter(OntGenerationConfig config);
+    /**
+     * Adds a property as a superproperty of this one.
+     * Thus this property denotes the subject and <code>superProperty</code> denotes the
+     * object in a statement with predicate rdfs:subPropertyOf.
+     * Also adds this property as a subproperty to <code>superProperty</code> with
+     * {@link RDFSProperty#addSubProperty(RDFSProperty)}.
+     * @param superProperty The property to add as a superproperty.
+     */
+    void addSuperproperty(ExtendedRDFSProperty superProperty);
 
+    /**
+     * Adds a property as a superproperty of this one.
+     * Thus this property denotes the subject and <code>superProperty</code> denotes the
+     * object in a statement with predicate rdfs:subPropertyOf.
+     * @param superProperty The property to add as a superproperty.
+     * @param updateInverse Whether this property should be added as subproperty to
+     *                      <code>superProperty</code> with {@link RDFSProperty#addSubProperty(RDFSProperty)}.
+     */
+    void addSuperproperty(ExtendedRDFSProperty superProperty, boolean updateInverse);
 }

@@ -1,6 +1,6 @@
 package com.github.anno4j.rdfs_parser.naming;
 
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
+import com.github.anno4j.rdfs_parser.model.RDFSProperty;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 
@@ -52,7 +52,7 @@ public class ClassNameBuilder extends IdentifierBuilder {
      * @throws NameBuildingException If the required information for building the name is not contained in the URI.
      */
     public ClassName className() throws URISyntaxException, NameBuildingException {
-        if(isBlankNode()) {
+        if(isBlankNode() && getRdfsLabel() == null) {
             if(!outgoingProperties.isEmpty()) {
                 StringBuilder name = new StringBuilder();
                 for (String property : outgoingProperties) {

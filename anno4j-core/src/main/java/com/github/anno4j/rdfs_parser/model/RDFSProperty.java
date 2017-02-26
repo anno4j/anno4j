@@ -1,9 +1,7 @@
-package com.github.anno4j.schema_parsing.model.rdfs;
+package com.github.anno4j.rdfs_parser.model;
 
 import com.github.anno4j.model.namespaces.RDF;
 import com.github.anno4j.model.namespaces.RDFS;
-import com.github.anno4j.rdfs_parser.model.RDFSClazz;
-import com.github.anno4j.rdfs_parser.model.RDFSSchemaResource;
 import org.openrdf.annotations.Iri;
 
 import java.util.Set;

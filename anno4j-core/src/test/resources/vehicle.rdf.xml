@@ -37,7 +37,7 @@
 
   <rdfs:Property rdf:about="http://example.de/ont#seat_num">
     <rdfs:domain rdf:resource="http://example.de/ont#Vehicle"/>
-    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#unsignedInteger"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#unsignedInt"/>
     <rdfs:label xml:lang="en">Number of seats</rdfs:label>
     <rdfs:label xml:lang="de">Anzahl Sitzplätze</rdfs:label>
     <rdfs:comment xml:lang="en">Describes how many seats the vehicle has.</rdfs:comment>

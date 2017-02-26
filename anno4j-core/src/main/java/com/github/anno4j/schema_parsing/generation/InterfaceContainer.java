@@ -2,7 +2,7 @@ package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
+import com.github.anno4j.rdfs_parser.model.RDFSProperty;
 import com.github.anno4j.util.IdentifierUtil;
 import com.squareup.javapoet.*;
 import org.openrdf.annotations.Iri;

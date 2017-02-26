@@ -388,8 +388,7 @@ class RDFSModelBuilder {
             while (superPropIter.hasNext()) {
                 OntProperty ontSuperProp = superPropIter.next();
                 ExtendedRDFSProperty superProp = createRDFSPropertyOnDemand(new URIImpl(ontSuperProp.toString()), transaction);
-
-                superProp.addSubProperty(property);
+                property.addSuperproperty(superProp);
             }
         }
     }

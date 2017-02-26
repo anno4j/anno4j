@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  * Test for the building capabilities of {@link ExtendedRDFSClazz}/{@link ExtendedRDFSClazzSupport}
  * for generating JavaPoet {@link TypeSpec}.
  */
-public class RDFSClazzTypeSpecTest {
+public class InterfaceTypeSpecTest {
 
     private static RDFSModelBuilder modelBuilder;
 
@@ -104,11 +104,15 @@ public class RDFSClazzTypeSpecTest {
         assertNotNull(vehicleSpec.javadoc);
         assertTrue(vehicleSpec.javadoc.toString().startsWith("A mobile machine that"));
 
-        // Vehicles have the seat_num property and thus a getter and setter for it:
-        assertEquals(2, vehicleSpec.methodSpecs.size());
+        // Vehicles have the seat_num, name and official_name properties
+        // and thus a getter, setter, adder, addAll and remover for it:
+        assertEquals(15, vehicleSpec.methodSpecs.size());
         Set<String> methodNames = getMethodNames(vehicleSpec);
         assertTrue(methodNames.contains("getNumberOfSeats"));
         assertTrue(methodNames.contains("setNumberOfSeats"));
+        assertTrue(methodNames.contains("addNumberOfSeats"));
+        assertTrue(methodNames.contains("addAllNumberOfSeats"));
+        assertTrue(methodNames.contains("removeNumberOfSeats"));
 
         // Vehicle is the topmost class in the vehicle ontology inheritance tree.
         // Its superinterface must be ResourceObject:
@@ -143,8 +147,8 @@ public class RDFSClazzTypeSpecTest {
         assertNotNull(truckSpec.javadoc);
         assertTrue(truckSpec.javadoc.toString().startsWith("Ein LKW ist ein"));
 
-        // Trucks have the load_capacity property and thus a getter and setter for it:
-        assertEquals(2, truckSpec.methodSpecs.size());
+        // Trucks have the load_capacity property and thus a getter, setter, adder, addAll and remover for it:
+        assertEquals(5, truckSpec.methodSpecs.size());
         Set<String> methodNames = getMethodNames(truckSpec);
         assertTrue(methodNames.contains("getMaximumLoadCapacities"));
         assertTrue(methodNames.contains("setMaximumLoadCapacities"));

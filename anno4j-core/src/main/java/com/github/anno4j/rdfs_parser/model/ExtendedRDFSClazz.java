@@ -1,14 +1,9 @@
 package com.github.anno4j.rdfs_parser.model;
 
 import com.github.anno4j.model.namespaces.RDFS;
-import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
-import com.github.anno4j.rdfs_parser.naming.IdentifierBuilder;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeSpec;
+import com.github.anno4j.rdfs_parser.building.BuildableOntologyClazz;
 import org.openrdf.annotations.Iri;
 
-import java.net.URISyntaxException;
 import java.util.Set;
 
 /**
@@ -17,7 +12,7 @@ import java.util.Set;
  * This additional information is not persisted by Anno4j but serves solely for Java class generation.
  */
 @Iri(RDFS.CLAZZ)
-public interface ExtendedRDFSClazz extends RDFSClazz {
+public interface ExtendedRDFSClazz extends RDFSClazz, BuildableOntologyClazz {
 
     /**
      * Returns those properties of which this class is part of the domain.
@@ -140,10 +135,4 @@ public interface ExtendedRDFSClazz extends RDFSClazz {
      * or of its transitive superclass closure.
      */
     boolean hasPropertyTransitive(ExtendedRDFSProperty property);
-
-    String getJavaPackageName();
-
-    ClassName getJavaPoetClassName(OntGenerationConfig config) throws URISyntaxException, IdentifierBuilder.NameBuildingException;
-
-    TypeSpec buildTypeSpec(OntGenerationConfig config) throws URISyntaxException;
 }

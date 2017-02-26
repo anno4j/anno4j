@@ -1,8 +1,5 @@
 package com.github.anno4j.rdfs_parser.building;
 
-import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
-import com.github.anno4j.rdfs_parser.building.RDFSModelBuilder;
-import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSPropertySupport;
 import com.squareup.javapoet.AnnotationSpec;
@@ -14,9 +11,7 @@ import org.junit.Test;
 
 import javax.lang.model.element.Modifier;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +19,7 @@ import static org.junit.Assert.*;
  * Test for the building capabilities of {@link ExtendedRDFSProperty}/{@link ExtendedRDFSPropertySupport}
  * for generating JavaPoet {@link MethodSpec}.
  */
-public class RDFSPropertyTypeSpecTest {
+public class PropertySpecTest {
 
     private static RDFSModelBuilder modelBuilder;
 
@@ -106,5 +101,69 @@ public class RDFSPropertyTypeSpecTest {
         assertEquals("org.openrdf.annotations.Iri", annotation.type.toString());
         assertEquals(1, annotation.members.size());
         assertEquals("\"http://example.de/ont#load_capacity\"", annotation.members.get("value").get(0).toString());
+    }
+
+    @Test
+    public void testAdder() throws Exception {
+        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        assertNotNull(loadCap);
+
+        MethodSpec loadCapSpec = loadCap.buildAdder(generationConfig);
+
+        // Test signature:
+        assertEquals("addMaximumLoadCapacity", loadCapSpec.name);
+        assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
+        assertEquals(1, loadCapSpec.parameters.size());
+        assertEquals(ClassName.get(Float.class), loadCapSpec.parameters.get(0).type);
+
+        // Test JavaDoc:
+        assertNotNull(loadCapSpec.javadoc);
+        assertTrue(loadCapSpec.javadoc.toString().startsWith("Ladung in Tonnen"));
+
+        // Test annotation:
+        assertEquals(0, loadCapSpec.annotations.size());
+    }
+
+    @Test
+    public void testAdderAll() throws Exception {
+        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        assertNotNull(loadCap);
+
+        MethodSpec loadCapSpec = loadCap.buildAdderAll(generationConfig);
+
+        // Test signature:
+        assertEquals("addAllMaximumLoadCapacities", loadCapSpec.name);
+        assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
+        assertEquals(1, loadCapSpec.parameters.size());
+        ClassName setClass = ClassName.get("java.util", "Set");
+        assertEquals(ParameterizedTypeName.get(setClass, ClassName.get(Float.class)), loadCapSpec.parameters.get(0).type);
+
+        // Test JavaDoc:
+        assertNotNull(loadCapSpec.javadoc);
+        assertTrue(loadCapSpec.javadoc.toString().startsWith("Ladung in Tonnen"));
+
+        // Test annotation:
+        assertEquals(0, loadCapSpec.annotations.size());
+    }
+
+    @Test
+    public void testRemover() throws Exception {
+        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        assertNotNull(loadCap);
+
+        MethodSpec loadCapSpec = loadCap.buildRemover(generationConfig);
+
+        // Test signature:
+        assertEquals("removeMaximumLoadCapacity", loadCapSpec.name);
+        assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
+        assertEquals(1, loadCapSpec.parameters.size());
+        assertEquals(ClassName.get(Float.class), loadCapSpec.parameters.get(0).type);
+
+        // Test JavaDoc:
+        assertNotNull(loadCapSpec.javadoc);
+        assertTrue(loadCapSpec.javadoc.toString().startsWith("Ladung in Tonnen"));
+
+        // Test annotation:
+        assertEquals(0, loadCapSpec.annotations.size());
     }
 }

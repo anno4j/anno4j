@@ -1,12 +1,8 @@
 package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
-import com.github.anno4j.util.IdentifierUtil;
-import com.squareup.javapoet.ClassName;
+import com.github.anno4j.rdfs_parser.model.RDFSProperty;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,13 +11,8 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
 import java.net.URL;
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by Manu on 24/11/16.

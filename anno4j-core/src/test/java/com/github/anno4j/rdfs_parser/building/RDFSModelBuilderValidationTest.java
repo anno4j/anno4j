@@ -1,13 +1,11 @@
 package com.github.anno4j.rdfs_parser.building;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSClazz;
-import com.github.anno4j.schema_parsing.model.rdfs.RDFSProperty;
+import com.github.anno4j.rdfs_parser.model.RDFSClazz;
 import com.hp.hpl.jena.reasoner.ValidityReport;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.*;

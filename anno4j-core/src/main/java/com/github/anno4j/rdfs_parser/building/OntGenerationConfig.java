@@ -1,5 +1,6 @@
 package com.github.anno4j.rdfs_parser.building;
 
+import com.github.anno4j.rdfs_parser.validation.ValidatorChain;
 import org.openrdf.repository.object.LangString;
 
 import java.io.File;
@@ -42,12 +43,19 @@ public class OntGenerationConfig {
     private File outputDirectory;
 
     /**
+     * The validators used to validate setter and adder arguments.
+     */
+    private ValidatorChain validators;
+
+    /**
      * Initializes the configuration with preference for untyped literals
-     * for identifiers and JavaDoc.s
+     * for identifiers and JavaDoc.
+     * Uses the default validator chain for RDFS (see {@link ValidatorChain#getRDFSDefault()}).
      */
     public OntGenerationConfig() {
         identifierLangPreference.add(UNTYPED_LITERAL);
         javadocLangPreference.add(UNTYPED_LITERAL);
+        validators = ValidatorChain.getRDFSDefault();
     }
 
     /**
@@ -108,6 +116,22 @@ public class OntGenerationConfig {
     public void setJavaDocLanguagePreference(String[] preference) {
         javadocLangPreference.clear();
         javadocLangPreference.addAll(Arrays.asList(preference));
+    }
+
+    /**
+     * @return The validator chain used for checking that arguments of resource object set- and add-methods
+     * comply to the value space of their datatype.
+     */
+    public ValidatorChain getValidators() {
+        return validators;
+    }
+
+    /**
+     * @param validators The validator chain used for checking that arguments of resource object set- and add-methods
+     * comply to the value space of their datatype.
+     */
+    public void setValidators(ValidatorChain validators) {
+        this.validators = validators;
     }
 
     /**
