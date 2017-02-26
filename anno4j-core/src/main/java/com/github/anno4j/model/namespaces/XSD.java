@@ -136,6 +136,11 @@ public class XSD {
     public final static String INTEGER = NS + "integer";
 
     /**
+     * nonPositiveInteger is ·derived· from integer by setting the value of ·maxInclusive· to be 0.
+     */
+    public final static String NON_POSITIVE_INTEGER = NS + "nonPositiveInteger";
+
+    /**
      * negativeInteger is ·derived· from nonPositiveInteger by setting the value of ·maxInclusive· to be -1.
      */
     public final static String NEGATIVE_INTEGER = NS + "negativeInteger";
@@ -168,6 +173,12 @@ public class XSD {
      * nonNegativeInteger is ·derived· from integer by setting the value of ·minInclusive· to be 0.
      */
     public final static String NON_NEGATIVE_INTEGER = NS + "nonNegativeInteger";
+
+    /**
+     * unsignedLong is ·derived· from nonNegativeInteger by setting the value
+     * of ·maxInclusive· to be 18446744073709551615.
+     */
+    public final static String UNSIGNED_LONG = NS + "unsignedLong";
 
     /**
      * unsignedInt is ·derived· from unsignedLong by setting the value of ·maxInclusive· to be 4294967295.
