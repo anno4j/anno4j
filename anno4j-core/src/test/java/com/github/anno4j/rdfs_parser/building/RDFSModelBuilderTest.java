@@ -6,10 +6,7 @@ import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfigException;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -66,9 +63,9 @@ public class RDFSModelBuilderTest {
 
         ExtendedRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
         assertNotNull(vehicle);
-        assertEquals(1, vehicle.getOutgoingProperties().size());
+        assertEquals(3, vehicle.getOutgoingProperties().size());
         Set<ExtendedRDFSProperty> vehicleOutProps = vehicle.getOutgoingProperties();
-        assertEquals("http://example.de/ont#seat_num", vehicleOutProps.iterator().next().getResourceAsString());
+        assertTrue(getResourcesAsStrings(vehicleOutProps).contains("http://example.de/ont#seat_num"));
 
         ExtendedRDFSClazz car = getClazzFromModel("http://example.de/ont#Car");
         assertNotNull(car);
@@ -82,13 +79,13 @@ public class RDFSModelBuilderTest {
         Set<String> truckOutProps = getResourcesAsStrings(truck.getOutgoingProperties());
         assertEquals(1, truckInProps.size());
         assertTrue(truckInProps.contains("http://example.de/ont#parking_for"));
-        assertEquals(2, truckOutProps.size());
+        assertEquals(4, truckOutProps.size());
         assertTrue(truckOutProps.contains("http://example.de/ont#load_capacity"));
         assertTrue(truckOutProps.contains("http://example.de/ont#seat_num"));
 
         ExtendedRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
         assertNotNull(camper);
-        assertEquals(2, camper.getOutgoingProperties().size());
+        assertEquals(4, camper.getOutgoingProperties().size());
         assertEquals(0, camper.getIncomingProperties().size());
     }
 
@@ -130,4 +127,19 @@ public class RDFSModelBuilderTest {
         assertEquals(1, carClazzes.size());
     }
 
+    @Test
+    public void testDomainRooting() throws Exception {
+        // The ex:name property has no domain explicitly specified.
+        // So its domain is inferred as rdfs:Class, but this should be shifted
+        // to the root classes.
+        ExtendedRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
+        ExtendedRDFSClazz home = getClazzFromModel("http://example.de/ont#Home");
+        assertNotNull(vehicle);
+        assertNotNull(home);
+
+        Collection<String> vehicleProps = getResourcesAsStrings(vehicle.getOutgoingProperties());
+        Collection<String> homeProps = getResourcesAsStrings(home.getOutgoingProperties());
+        assertTrue(vehicleProps.contains("http://example.de/ont#name"));
+        assertTrue(homeProps.contains("http://example.de/ont#name"));
+    }
 }
