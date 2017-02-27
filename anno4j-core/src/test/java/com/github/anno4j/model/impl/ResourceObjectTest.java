@@ -35,6 +35,30 @@ public class ResourceObjectTest {
     }
 
     @Test
+    public void testPrefix() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation anno = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://example.org/anno1"));
+        Annotation anno2 = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://xmlns.com/foaf/0.1/anno2"));
+        Annotation anno3 = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://purl.org/dc/terms/anno3"));
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addPrefix("ex", "http://example.org/");
+
+        List<Annotation> result = qs.addCriteria(".", "ex:anno1").execute(Annotation.class);
+
+        assertEquals(1, result.size());
+
+        QueryService qs2 = this.anno4j.createQueryService();
+        List<Annotation> result2 = qs2.addCriteria(".", "foaf:anno2").execute(Annotation.class);
+
+        assertEquals(1, result2.size());
+
+        QueryService qs3 = this.anno4j.createQueryService();
+        List<Annotation> result3 = qs3.addCriteria(".", "dcterms:anno3").execute(Annotation.class);
+
+        assertEquals(1, result3.size());
+    }
+
+    @Test
     public void testQueryForResource() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
         Annotation annotation = this.anno4j.createObject(Annotation.class);
 
