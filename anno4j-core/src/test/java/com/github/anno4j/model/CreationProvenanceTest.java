@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.body.TextualBody;
 import com.github.anno4j.model.impl.targets.SpecificResource;
+import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
@@ -113,6 +114,25 @@ public class CreationProvenanceTest {
         result = this.anno4j.findByID(SpecificResource.class, spec.getResourceAsString());
 
         assertEquals("2015-12-16T12:00:00-03:00", result.getModified());
+    }
+
+    /**
+     * Test with LocalDateTime.now() Java 8 functionality. Required to cut milliseconds at the end.
+     */
+    @Test
+    public void testSetModified3() throws RepositoryException, IllegalAccessException, InstantiationException {
+        String time = LocalDateTime.now().toString();
+        time = time.substring(0, time.indexOf('.')) + "Z";
+
+        System.out.println(time);
+
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        annotation.setModified(time);
+
+        Annotation result = this.anno4j.findByID(Annotation.class, annotation.getResourceAsString());
+
+        assertEquals(time, result.getModified());
     }
 
     @Test
