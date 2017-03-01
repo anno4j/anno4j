@@ -122,7 +122,11 @@ public class CreationProvenanceTest {
     @Test
     public void testSetModified3() throws RepositoryException, IllegalAccessException, InstantiationException {
         String time = LocalDateTime.now().toString();
-        time = time.substring(0, time.indexOf('.')) + "Z";
+        if(time.contains(".")) {
+            time = time.substring(0, time.indexOf('.')) + "Z";
+        } else {
+            time += "Z";
+        }
 
         System.out.println(time);
 
