@@ -49,13 +49,14 @@ public abstract class RemoverAllSupport extends PropertyBuildingSupport implemen
                 javaDoc.add(preferredComment.toString());
             }
             javaDoc.add("\n@param values The elements to be removed.");
+            javaDoc.add("\n@return Returns true if any value was removed.");
 
 
             return MethodSpec.methodBuilder(methodName)
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(paramType, "values")
                     .addJavadoc(javaDoc.build())
-                    .returns(void.class)
+                    .returns(boolean.class)
                     .build();
 
         } else {

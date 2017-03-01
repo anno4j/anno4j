@@ -39,8 +39,10 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             MethodSpec remover = buildRemover(config);
 
             // Iterate the input values and check if the value was actually removed from this property:
-            removerAllBuilder.beginControlFlow("for($T $N : $N)", rangeClassName, current, param)
-                    .beginControlFlow("if($N($N))", remover, current);
+            removerAllBuilder.addStatement("boolean changed = false")
+                    .beginControlFlow("for($T $N : $N)", rangeClassName, current, param)
+                    .beginControlFlow("if($N($N))", remover, current)
+                    .addStatement("changed = true");
 
             // If the value was actually removed, we can safely remove it also from superproperties:
             for (ExtendedRDFSProperty superProp : getSuperproperties()) {
@@ -49,7 +51,8 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             }
 
             removerAllBuilder.endControlFlow()
-                             .endControlFlow();
+                             .endControlFlow()
+                             .addStatement("return changed");
 
             // Add the override annotation and output:
             return removerAllBuilder.addAnnotation(overrideAnnotation)
