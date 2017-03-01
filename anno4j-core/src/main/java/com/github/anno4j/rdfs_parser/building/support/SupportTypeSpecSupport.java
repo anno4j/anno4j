@@ -32,6 +32,7 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
         Collection<MethodSpec> adders  = new HashSet<>();
         Collection<MethodSpec> addersAll  = new HashSet<>();
         Collection<MethodSpec> removers = new HashSet<>();
+        Collection<MethodSpec> removersAll = new HashSet<>();
         for (ExtendedRDFSProperty property : getOutgoingProperties()) {
             // Check if the property is present in any superclass:
             boolean definedInSuper = false;
@@ -45,6 +46,7 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
                 adders.add(property.buildAdderImplementation(config));
                 addersAll.add(property.buildAdderAllImplementation(config));
                 removers.add(property.buildRemoverImplementation(config));
+                removersAll.add(property.buildRemoverAllImplementation(config));
             }
         }
 
@@ -64,6 +66,7 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
                 .addMethods(adders)
                 .addMethods(addersAll)
                 .addMethods(removers)
+                .addMethods(removersAll)
                 .build();
     }
 }

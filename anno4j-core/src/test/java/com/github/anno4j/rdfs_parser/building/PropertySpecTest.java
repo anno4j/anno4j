@@ -166,4 +166,26 @@ public class PropertySpecTest {
         // Test annotation:
         assertEquals(0, loadCapSpec.annotations.size());
     }
+
+    @Test
+    public void testRemoverAll() throws Exception {
+        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        assertNotNull(loadCap);
+
+        MethodSpec loadCapSpec = loadCap.buildRemoverAll(generationConfig);
+
+        // Test signature:
+        assertEquals("removeAllMaximumLoadCapacities", loadCapSpec.name);
+        assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
+        assertEquals(1, loadCapSpec.parameters.size());
+        ClassName setClass = ClassName.get("java.util", "Set");
+        assertEquals(ParameterizedTypeName.get(setClass, ClassName.get(Float.class)), loadCapSpec.parameters.get(0).type);
+
+        // Test JavaDoc:
+        assertNotNull(loadCapSpec.javadoc);
+        assertTrue(loadCapSpec.javadoc.toString().startsWith("Ladung in Tonnen"));
+
+        // Test annotation:
+        assertEquals(0, loadCapSpec.annotations.size());
+    }
 }

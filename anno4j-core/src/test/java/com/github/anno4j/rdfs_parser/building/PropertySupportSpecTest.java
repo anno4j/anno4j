@@ -184,4 +184,35 @@ public class PropertySupportSpecTest {
         Matcher matcher = Pattern.compile("if\\s*\\(((.+)\\s*==\\s*null|null\\s*==\\s*(.+))\\)").matcher(code);
         assertFalse(matcher.find());
     }
+
+    @Test
+    public void testRemoverAllImplementation() throws Exception {
+        ExtendedRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
+        assertNotNull(seatNumProp);
+
+        MethodSpec adderAll = seatNumProp.buildRemoverAllImplementation(generationConfig);
+
+        // Override annotation:
+        AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
+        assertEquals(1, adderAll.annotations.size());
+        assertEquals(overrideAnnotation, adderAll.annotations.get(0));
+
+        // Modifiers:
+        assertEquals(1, adderAll.modifiers.size());
+        assertTrue(adderAll.modifiers.contains(Modifier.PUBLIC));
+
+        // Name:
+        assertEquals("removeAllNumberOfSeats", adderAll.name);
+
+        // Parameter:
+        ClassName set = ClassName.get(Set.class);
+        ParameterizedTypeName paramType = ParameterizedTypeName.get(set, ClassName.get(Integer.class));
+        assertEquals(1, adderAll.parameters.size());
+        assertEquals(paramType, adderAll.parameters.get(0).type);
+
+        // Test validation code:
+        String code = adderAll.code.toString();
+        Matcher matcher = Pattern.compile("if\\s*\\(((.+)\\s*==\\s*null|null\\s*==\\s*(.+))\\)").matcher(code);
+        assertFalse(matcher.find());
+    }
 }

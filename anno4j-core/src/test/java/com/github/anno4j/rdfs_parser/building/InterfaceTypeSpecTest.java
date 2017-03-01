@@ -105,8 +105,8 @@ public class InterfaceTypeSpecTest {
         assertTrue(vehicleSpec.javadoc.toString().startsWith("A mobile machine that"));
 
         // Vehicles have the seat_num, name and official_name properties
-        // and thus a getter, setter, adder, addAll and remover for it:
-        assertEquals(15, vehicleSpec.methodSpecs.size());
+        // and thus a getter, setter, adder, addAll, remover and removerAll for it:
+        assertEquals(18, vehicleSpec.methodSpecs.size());
         Set<String> methodNames = getMethodNames(vehicleSpec);
         assertTrue(methodNames.contains("getNumberOfSeats"));
         assertTrue(methodNames.contains("setNumberOfSeats"));
@@ -147,8 +147,8 @@ public class InterfaceTypeSpecTest {
         assertNotNull(truckSpec.javadoc);
         assertTrue(truckSpec.javadoc.toString().startsWith("Ein LKW ist ein"));
 
-        // Trucks have the load_capacity property and thus a getter, setter, adder, addAll and remover for it:
-        assertEquals(5, truckSpec.methodSpecs.size());
+        // Trucks have the load_capacity property and thus a getter, setter, adder, addAll, remover, removerAll for it:
+        assertEquals(6, truckSpec.methodSpecs.size());
         Set<String> methodNames = getMethodNames(truckSpec);
         assertTrue(methodNames.contains("getMaximumLoadCapacities"));
         assertTrue(methodNames.contains("setMaximumLoadCapacities"));

@@ -105,4 +105,26 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * if no range was provided for this property or an error occurs.
      */
     MethodSpec buildRemoverImplementation(OntGenerationConfig config);
+
+    /**
+     * Generates a JavaPoet method specification for a Anno4j resource object removeAll-method
+     * for this property.
+     * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
+     * configuration provided.
+     * @param config The configuration for building the method specification.
+     * @return The JavaPoet method specification for this property or null
+     * if no range was provided for this property.
+     */
+    MethodSpec buildRemoverAll(OntGenerationConfig config);
+
+    /**
+     * Generates a JavaPoet method specification for a Support class removeAll-method
+     * for this property.
+     * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
+     * configuration provided.
+     * @param config The configuration for building the method specification.
+     * @return The JavaPoet method specification for this property or null
+     * if no range was provided for this property or an error occurs.
+     */
+    MethodSpec buildRemoverAllImplementation(OntGenerationConfig config);
 }

@@ -34,6 +34,7 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
         Collection<MethodSpec> adders  = new HashSet<>();
         Collection<MethodSpec> adderAll  = new HashSet<>();
         Collection<MethodSpec> removers = new HashSet<>();
+        Collection<MethodSpec> removerAll = new HashSet<>();
         for (ExtendedRDFSProperty property : getOutgoingProperties()) {
             // Check if the property is present in any superclass:
             boolean definedInSuper = false;
@@ -51,6 +52,7 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
                 adders.add(property.buildAdder(config));
                 adderAll.add(property.buildAdderAll(config));
                 removers.add(property.buildRemover(config));
+                removerAll.add(property.buildRemoverAll(config));
             }
         }
 
@@ -79,6 +81,7 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
                 .addMethods(adders)
                 .addMethods(adderAll)
                 .addMethods(removers)
+                .addMethods(removerAll)
                 .addJavadoc(javaDoc.build())
                 .build();
     }
