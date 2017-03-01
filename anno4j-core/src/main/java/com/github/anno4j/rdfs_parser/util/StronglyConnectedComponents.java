@@ -125,7 +125,7 @@ public class StronglyConnectedComponents {
     }
 
     /**
-     * Finds strongly connected components with more than than one class in it.
+     * Finds strongly connected components in the inheritance tree having <code>clazz</code> as its root.
      * @param clazz The current class to start DFS from.
      * @param sccs The collection of SCCs already detected. Found SCCs will be inserted into this collection.
      * @param visitedNodes The nodes already visited by the algorithm indexed by the class they wrap.
