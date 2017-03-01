@@ -41,10 +41,17 @@ public abstract class SetterImplementationSupport extends SetterSupport implemen
                 }
             }
 
-            // Generate code for adding also to superproperties:
+            // Remove all currently stored values by using removeAll-method
+            // This ensures that values are also (safely) removed from superproperties:
+            MethodSpec removerAll = buildRemoverAll(config);
+            MethodSpec getter = buildGetter(config);
+            setterBuilder.addStatement("$N($N())", removerAll, getter);
+
+            // Generate code for adding new values also to superproperties:
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
                 MethodSpec superAdderAll = superProperty.buildAdderAll(config);
-                setterBuilder.addStatement(superAdderAll.name + "(" + paramName + ")");
+
+                setterBuilder.addStatement("$N(" + paramName + ")", superAdderAll);
             }
 
             return setterBuilder.addAnnotation(overrideAnnotation)

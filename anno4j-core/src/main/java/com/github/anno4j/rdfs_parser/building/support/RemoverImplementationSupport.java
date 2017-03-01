@@ -39,19 +39,23 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
             TypeName rangeSet = ParameterizedTypeName.get(set, rangeClassName);
             ParameterSpec param = signature.parameters.get(0);
 
-            // Generate code for adding also to superproperties:
+            // Add the actual removal code:
+            removerBuilder.addStatement("$T values = $N()", rangeSet, getter)
+                    .addStatement("boolean removed = values.remove($N)", param)
+                    .addStatement("$N(values)", setter)
+                    .beginControlFlow("if(removed)");
+
+            // The value can be safely removed also from superproperties
+            // if it was actually removed from this one (see above generated if-clause):
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
                 MethodSpec superRemover = superProperty.buildRemover(config);
-                removerBuilder.addStatement(superRemover.name + "(" + param.name + ")");
+                removerBuilder.addStatement("$N($N)", superRemover, param);
             }
 
-            // Add the actual removal code:
-            removerBuilder.addStatement("$T values = " + getter.name + "()", rangeSet)
-                    .addStatement("boolean removed = values.remove($N)", param)
-                    .addStatement(setter.name + "(values)")
-                    .addStatement("return removed");
+            removerBuilder.endControlFlow()
+                          .addStatement("return removed");
 
-            // Build the adders method specification:
+            // Build the removers method specification:
             return removerBuilder.addAnnotation(overrideAnnotation)
                     .build();
 

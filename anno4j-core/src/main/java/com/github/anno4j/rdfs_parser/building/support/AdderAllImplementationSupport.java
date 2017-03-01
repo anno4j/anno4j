@@ -42,7 +42,7 @@ public abstract class AdderAllImplementationSupport extends AdderAllSupport impl
             // Generate code for adding also to superproperties:
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
                 MethodSpec superAdderAll = superProperty.buildAdderAll(config);
-                adderBuilder.addStatement(superAdderAll.name + "(" + paramName + ")");
+                adderBuilder.addStatement("$N(" + paramName + ")", superAdderAll);
             }
 
             TypeName set = ParameterizedTypeName.get(ClassName.get("java.util", "Set"), rangeClassName);
@@ -52,11 +52,11 @@ public abstract class AdderAllImplementationSupport extends AdderAllSupport impl
 
             return adderBuilder.addAnnotation(overrideAnnotation)
                     .addStatement("$T set = new $T()", set, hashSet)
-                    .beginControlFlow("if(" + getter.name + "() != null)")
-                    .addStatement("set.addAll(" + getter.name + "())")
+                    .beginControlFlow("if($N() != null)", getter)
+                    .addStatement("set.addAll($N())", getter)
                     .endControlFlow()
                     .addStatement("set.addAll(values)")
-                    .addStatement(setter.name + "(set)")
+                    .addStatement("$N(set)", setter)
                     .build();
 
         } else {
