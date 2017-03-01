@@ -84,4 +84,31 @@ public class StronglyConnectedComponentsTest {
         assertEquals(sccs, StronglyConnectedComponents.findSCCs(seeds));
     }
 
+    @Test
+    public void findSCCsInIsolatedForest() throws Exception {
+        Anno4j anno4j = new Anno4j();
+        Collection<Collection<RDFSClazz>> sccs = new HashSet<>();
+
+        RDFSClazz a = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/a"));
+        RDFSClazz b = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/b"));
+        RDFSClazz c = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/c"));
+        RDFSClazz d = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/d"));
+        RDFSClazz e = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/e"));
+        a.addSubClazz(c);
+        b.addSubClazz(a);
+        c.addSubClazz(b);
+        d.addSubClazz(c);
+        c.addSubClazz(e);
+        e.addSubClazz(d);
+        sccs.add(Sets.newHashSet(a, b, c, d, e));
+
+        RDFSClazz f = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/k"));
+        RDFSClazz g = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://ex.de/l"));
+        f.addSubClazz(g);
+        g.addSubClazz(f);
+        sccs.add(Sets.newHashSet(f, g));
+
+        Collection<RDFSClazz> seeds = Sets.newHashSet(a, f);
+        assertEquals(sccs, StronglyConnectedComponents.findSCCs(seeds));
+    }
 }
