@@ -6,11 +6,10 @@ import com.github.anno4j.model.namespaces.RDF;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
+import com.github.anno4j.rdfs_parser.util.StronglyConnectedComponents;
 import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.reasoner.Reasoner;
 import com.hp.hpl.jena.reasoner.ReasonerRegistry;
 import com.hp.hpl.jena.reasoner.ValidityReport;
@@ -23,31 +22,17 @@ import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.LangString;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Builds an ontology model from RDFS data by inferencing relationships
  * between classes and properties not explicitly stated in the RDF data.
  * Optionally also persists the ontology information to a provided {@link Anno4j}.
  */
-class RDFSModelBuilder {
-    /**
-     * Signalizes an error while building the ontology model from a set of RDF statements.
-     */
-    public class RDFSModelBuildingException extends Exception {
-        public RDFSModelBuildingException() {
-        }
-
-        public RDFSModelBuildingException(String message) {
-            super(message);
-        }
-    }
+class RDFSModelBuilder implements OntologyModelBuilder {
 
     /**
-     * The ontology model with underlying RDFS inference.
+     * The ontology model without RDFS inference.
      */
     private OntModel model;
 
@@ -72,15 +57,17 @@ class RDFSModelBuilder {
     private Collection<ExtendedRDFSClazz> rootClazzes = new HashSet<>();
 
     /**
+     * A report about the validity of the model built by the last call to
+     * {@link #build()}.
+     */
+    private ValidityReport lastValidityReport;
+
+    /**
      * Creates a parser instance with in memory triple store.
      */
     public RDFSModelBuilder() throws RepositoryConfigException, RepositoryException {
         anno4j = new Anno4j();
-        // Use a RDFS reasoner for inferring implicit knowledge and wrap the inferred model with a ontology view:
-        Reasoner reasoner = ReasonerRegistry.getRDFSReasoner();
-        reasoner.setParameter(ReasonerVocabulary.PROPsetRDFSLevel, ReasonerVocabulary.RDFS_SIMPLE);
-        Model inferenceModel = ModelFactory.createInfModel(reasoner, ModelFactory.createDefaultModel());
-        model = ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF, inferenceModel);
+        model = ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM);
     }
 
     /**
@@ -100,47 +87,43 @@ class RDFSModelBuilder {
     }
 
     /**
-     * Adds RDF statements to the underlying model.
-     *
-     * @param rdfInput An input stream to RDF/XML data.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * {@inheritDoc}
      */
+    @Override
     public void addRDF(InputStream rdfInput, String base) {
         model.read(rdfInput, base);
     }
 
     /**
-     * Adds RDF statements to the underlying model.
-     *
-     * @param url      An URL to RDF data in RDF/XML format.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * {@inheritDoc}
      */
+    @Override
     public void addRDF(String url, String base) {
         model.read(url, base);
     }
 
     /**
-     * Adds RDF statements to the underlying model.
-     *
-     * @param rdfInput An input stream to the RDF data. Its format is defined by the <code>format</code> parameter.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
-     * @param format   The format of the RDF data. One of "RDF/XML", "N-TRIPLE", "TURTLE" (or "TTL") and "N3"
-     *                 or <code>null</code> for the default format.
+     * {@inheritDoc}
      */
+    @Override
     public void addRDF(InputStream rdfInput, String base, String format) {
         model.read(rdfInput, base, format);
     }
 
     /**
-     * Adds RDF statements to the underlying model.
-     *
-     * @param url      An URL to RDF data in the specified format.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
-     * @param format   The format of the RDF data. One of "RDF/XML", "N-TRIPLE", "TURTLE" (or "TTL") and "N3"
-     *                 or <code>null</code> for the default format.
+     * {@inheritDoc}
      */
+    @Override
     public void addRDF(String url, String base, String format) {
         model.read(url, base, format);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRDF(String url) {
+        model.read(url);
     }
 
     /**
@@ -190,44 +173,28 @@ class RDFSModelBuilder {
     }
 
     /**
-     * Adds RDF statements to the underlying model.
-     *
-     * @param fileName Path to a RDF/XML file containing the RDF data to be added.
+     * {@inheritDoc}
      */
-    public void addRDF(String fileName) {
-        model.read(fileName);
-    }
-
-    /**
-     * Returns the extended resource objects of RDFS classes that were found during
-     * the last call to {@link #build()}.
-     *
-     * @return Returns the RDFS classes in the model built.
-     */
-    public Collection<ExtendedRDFSClazz> getRDFSClazzes() {
+    @Override
+    public Collection<ExtendedRDFSClazz> getClazzes() {
         return clazzes.values();
     }
 
     /**
-     * Returns the extended resource objects of RDFS properties that were found during
-     * the last call to {@link #build()}.
-     *
-     * @return Returns the RDFS properties in the model built.
+     * {@inheritDoc}
      */
+    @Override
     public Collection<ExtendedRDFSProperty> getProperties() {
         return properties.values();
     }
 
     /**
-     * Returns a validity report for the model build during the last call of {@link #build()}.
-     *
-     * @return The validatiy report for the model. Use {@link ValidityReport#isValid()} to
-     * check if the model built is valid.
-     * @throws IllegalStateException Thrown if the model was not previously built.
+     * {@inheritDoc}
      */
+    @Override
     public ValidityReport validate() throws IllegalStateException {
-        if (model != null) {
-            return model.validate();
+        if (lastValidityReport != null) {
+            return lastValidityReport;
         } else {
             throw new IllegalStateException("Model has not been built.");
         }
@@ -260,11 +227,12 @@ class RDFSModelBuilder {
      * The resource objects are augmented with rdfs:label, rdfs:comment and rdfs:subClassOf information.
      *
      * @param transaction The Anno4j transaction to use when creating resource objects.
+     * @param model The ontology model from which the {@link ExtendedRDFSClazz}es should be extracted.
      * @throws RepositoryException    If an error occurs while creating objects <code>transaction</code>.
      * @throws IllegalAccessException If an error occurs while creating objects <code>transaction</code>.
      * @throws InstantiationException If an error occurs while creating objects <code>transaction</code>.
      */
-    private void extractRDFSClazzes(Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
+    private void extractRDFSClazzes(Transaction transaction, OntModel model) throws RepositoryException, IllegalAccessException, InstantiationException {
         // Iterate all classes from the inferred ontology
         ExtendedIterator<OntClass> clazzIter = model.listClasses();
         while (clazzIter.hasNext()) {
@@ -319,11 +287,12 @@ class RDFSModelBuilder {
      * The resource objects are augmented with rdfs:label, rdfs:comment and rdfs:subPropertyOf information.
      *
      * @param transaction The Anno4j transaction to use when creating resource objects.
+     * @param model The ontology model from which the {@link ExtendedRDFSClazz}es should be extracted.
      * @throws RepositoryException    If an error occurs while creating objects <code>transaction</code>.
      * @throws IllegalAccessException If an error occurs while creating objects <code>transaction</code>.
      * @throws InstantiationException If an error occurs while creating objects <code>transaction</code>.
      */
-    private void extractRDFSProperties(Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
+    private void extractRDFSProperties(Transaction transaction, OntModel model) throws RepositoryException, IllegalAccessException, InstantiationException {
         ExtendedIterator<OntProperty> propertyIter = model.listOntProperties();
         while (propertyIter.hasNext()) {
             OntProperty ontProperty = propertyIter.next();
@@ -394,30 +363,164 @@ class RDFSModelBuilder {
     }
 
     /**
+     * Copies the subclass- and property relationships of some classes to another class.
+     * The former classes (which are considered equivalent to <code>target</code>)
+     * are removed from the {@link OntModel} they belong to.
+     * @param target The class which should receive the ontology information of all classes
+     *               in <code>equivalents</code>.
+     * @param equivalents The classes from which ontology information is copied and which will
+     *                    be removed from the ontology model they belong to.
+     */
+    private void mergeOntClasses(OntClass target, Collection<OntClass> equivalents) {
+        for(OntClass equivalentClazz : equivalents) {
+            // For all (direct) outgoing properties of the equivalent class,
+            // exchange the equivalent class with the target in the domain specification:
+            ExtendedIterator<OntProperty> propertyIter = equivalentClazz.listDeclaredProperties(true);
+            while (propertyIter.hasNext()) {
+                OntProperty property = propertyIter.next();
+                property.removeDomain(equivalentClazz);
+                property.addDomain(target);
+            }
+
+            // Add the superclasses of the equivalent class to the target class:
+            ExtendedIterator<OntClass> superClazzIter = equivalentClazz.listSuperClasses(true);
+            while(superClazzIter.hasNext()) {
+                target.addSuperClass(superClazzIter.next());
+            }
+
+            // Remove the class from the OntModel it belongs to:
+            equivalentClazz.remove();
+        }
+    }
+
+    /**
+     * Extracts the ontology classes from a {@link OntModel} where this is not directly possible
+     * with {@link OntModel#listClasses()}, because the hierarchy may contain cycles.
+     * Ignores blank node classes.
+     * @param model The model from which to extract classes.
+     * @return The classes from the model.
+     * @throws RDFSModelBuildingException Thrown if the model is found invalid.
+     */
+    private Collection<OntClass> getOntClazzesFromModel(OntModel model) throws RDFSModelBuildingException {
+        Collection<OntClass> clazzes = new HashSet<>();
+
+        Property subClassOf = model.createProperty(RDFS.SUB_CLASS_OF);
+        Property rdfType = model.createProperty(RDF.TYPE);
+        OntClass rdfsClazz = model.createClass(RDFS.CLAZZ);
+
+        ResIterator subjectIter = model.listSubjectsWithProperty(subClassOf);
+        while (subjectIter.hasNext()) {
+            com.hp.hpl.jena.rdf.model.Resource subject = subjectIter.next();
+
+            // By specification the subjects of rdfs:subClassOf have rdf:type rdfs:Class:
+            model.add(new StatementImpl(subject, rdfType, rdfsClazz));
+
+            OntClass clazz = model.getOntClass(subject.getURI());
+
+            if(clazz != null) {
+                clazzes.add(clazz);
+            } else if (!subject.isAnon()){ // Ignore blank nodes
+                throw new RDFSModelBuildingException(subject.toString() + " denotes a subject of rdfs:subClassOf statement, but is not a class.");
+            }
+        }
+
+        NodeIterator objectIter = model.listObjectsOfProperty(subClassOf);
+        while (objectIter.hasNext()) {
+            RDFNode object = objectIter.next();
+            if(object.isResource()) {
+                // By specification the objects of rdfs:subClassOf have rdf:type rdfs:Class:
+                model.add(new StatementImpl((com.hp.hpl.jena.rdf.model.Resource) object, rdfType, rdfsClazz));
+
+                OntClass clazz = model.getOntClass(((com.hp.hpl.jena.rdf.model.Resource) object).getURI());
+
+                if(clazz != null) {
+                    clazzes.add(clazz);
+                } else if (!object.isAnon()){ // Ignore blank nodes
+                    throw new RDFSModelBuildingException(object.toString() + " denotes a object of rdfs:subClassOf statement, but is not a class.");
+                }
+            } else {
+                throw new RDFSModelBuildingException(object.toString() + " denotes a object of rdfs:subClassOf statement, but is not a resource.");
+            }
+        }
+        return clazzes;
+    }
+
+    private void normalizeRDFSEquivalence() throws RDFSModelBuildingException {
+        /*
+        Classes are considered equivalent by the RDFS specification if their rdfs:subClassOf
+        relationship is cyclic.
+        This property of being strongly connected implies a equivalence relationship and
+        the strongly connected components (SCC) are the equivalence classes.
+        Find the SCCs of the inheritance trees in the model:
+         */
+
+        /*
+        Get the classes of the model.
+        The listClasses() method can't be used, because it returns empty if a cycle is contained.
+        Find the classes explicitly:
+         */
+        Collection<OntClass> seeds = getOntClazzesFromModel(model);
+
+        Collection<Collection<OntClass>> sccs = StronglyConnectedComponents.findSCCs(seeds);
+
+        for (Collection<OntClass> scc : sccs) {
+            // By definition a node is always strongly connected to itself.
+            // Only consider SCCs with more than one components:
+            if(scc.size() > 1) {
+                // All equivalent classes must be merged into a single one. Take the first:
+                Iterator<OntClass> iter = scc.iterator();
+                OntClass sccRoot = iter.next();
+
+                // All others are considered equivalent and will be removed by mergeRDFSClasses():
+                Collection<OntClass> equivalentClazzes = new HashSet<>();
+                while(iter.hasNext()) {
+                    equivalentClazzes.add(iter.next());
+                }
+
+                // Merge the classes into the root class:
+                mergeOntClasses(sccRoot, equivalentClazzes);
+            }
+        }
+    }
+
+    /**
      * Builds an ontology model for the RDF data added before using <code>addRDF</code> methods.
-     * The subclass-, subproperty-, domain and range relationships are inferred and information.
+     * The subclass-, subproperty-, domain and range relationships are inferred and information
      * is persisted to the underlying {@link Anno4j} instance if the built model is valid.
      * If the resulting model would not be valid, no information is persisted and
      * {@link #validate()} gives more details about the failed validation.
      *
-     * @throws RDFSModelBuildingException Thrown if an error occurs during building the model.
+     * @throws OntologyModelBuilder.RDFSModelBuildingException Thrown if an error occurs during building the model.
      */
-    public void build() throws RDFSModelBuildingException {
+    @Override
+    public void build() throws OntologyModelBuilder.RDFSModelBuildingException {
+
+        // First merge equivalent classes (the Jena reasoner doesn't do that):
+        normalizeRDFSEquivalence();
+
+        // Use a RDFS reasoner for inferring implicit knowledge and wrap the inferred model with a ontology view:
+        Reasoner reasoner = ReasonerRegistry.getRDFSReasoner();
+        reasoner.setParameter(ReasonerVocabulary.PROPsetRDFSLevel, ReasonerVocabulary.RDFS_SIMPLE);
+        Model inferenceModel = ModelFactory.createInfModel(reasoner, model);
+        OntModel inferenceOntModel = ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF, inferenceModel);
+
         try {
             Transaction transaction = anno4j.createTransaction();
             transaction.begin();
-            extractRDFSClazzes(transaction);
-            extractRDFSProperties(transaction);
 
-            ValidityReport validityReport = validate();
-            if (validityReport.isValid()) {
+            extractRDFSClazzes(transaction, inferenceOntModel);
+            extractRDFSProperties(transaction, inferenceOntModel);
+            normalizeRDFSEquivalence();
+
+            lastValidityReport = inferenceOntModel.validate();
+            if (lastValidityReport.isValid()) {
                 transaction.commit();
             } else {
                 transaction.rollback();
             }
 
         } catch (RepositoryException | IllegalAccessException | InstantiationException e) {
-            throw new RDFSModelBuildingException(e.getMessage());
+            throw new OntologyModelBuilder.RDFSModelBuildingException(e.getMessage());
         }
     }
 }

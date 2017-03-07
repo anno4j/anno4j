@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * Utility class for finding strongly connected components (SCC) in inheritance trees
- * of {@link OntClass}es.
+ * of {@link OntClass}es. Uses the subclass relationship to traverse the inheritance forest.
  * The SCCs of a graph are maximal partitions where every node is reachable from every other node.
  *
  * Uses the algorithm presented by R. Tarjan in
@@ -142,7 +142,7 @@ public class StronglyConnectedComponents {
         node.setOnStack(true);
 
         // DFS on the subclasses:
-        ExtendedIterator<OntClass> subClazzIter = clazz.listSuperClasses();
+        ExtendedIterator<OntClass> subClazzIter = clazz.listSubClasses();
         while (subClazzIter.hasNext()) {
             OntClass subClazz = subClazzIter.next();
             // Subclass not yet visited?

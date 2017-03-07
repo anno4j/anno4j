@@ -101,8 +101,9 @@ public class StronglyConnectedComponentsTest {
 
     @Test
     public void findSCCsSingleSource() throws Exception {
+        // All classes are subclasses of ex:J:
         Collection<OntClass> seeds = Sets.newHashSet(
-            model.getOntClass("http://example.de/ont#A")
+            model.getOntClass("http://example.de/ont#J")
         );
         assertEquals(sccs, StronglyConnectedComponents.findSCCs(seeds));
     }
