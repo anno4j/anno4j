@@ -1,12 +1,13 @@
 package com.github.anno4j.rdfs_parser.util;
 
-import com.github.anno4j.rdfs_parser.model.RDFSClazz;
+import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 import java.util.*;
 
 /**
  * Utility class for finding strongly connected components (SCC) in inheritance trees
- * of {@link RDFSClazz}es.
+ * of {@link OntClass}es.
  * The SCCs of a graph are maximal partitions where every node is reachable from every other node.
  *
  * Uses the algorithm presented by R. Tarjan in
@@ -17,7 +18,7 @@ import java.util.*;
 public class StronglyConnectedComponents {
 
     /**
-     * Wrapper for {@link RDFSClazz} storing additional information required
+     * Wrapper for {@link OntClass} storing additional information required
      * in the Tarjan algorithm for strongly connected components.
      */
     private static class Node {
@@ -25,7 +26,7 @@ public class StronglyConnectedComponents {
         /**
          * The wrapped class.
          */
-        private RDFSClazz clazz;
+        private OntClass clazz;
 
         /**
          * The unique index the algorithm assigned to this class.
@@ -50,7 +51,7 @@ public class StronglyConnectedComponents {
          * @param clazz The clazz to store in this node.
          * @param index The index of the stored class.
          */
-        public Node(RDFSClazz clazz, int index) {
+        public Node(OntClass clazz, int index) {
             this.clazz = clazz;
             this.index = index;
             this.lowLink = index;
@@ -60,14 +61,14 @@ public class StronglyConnectedComponents {
         /**
          * @return The class stored in this node.
          */
-        public RDFSClazz getClazz() {
+        public OntClass getClazz() {
             return clazz;
         }
 
         /**
          * @param clazz The class stored in this node.
          */
-        public void setClazz(RDFSClazz clazz) {
+        public void setClazz(OntClass clazz) {
             this.clazz = clazz;
         }
 
@@ -132,8 +133,8 @@ public class StronglyConnectedComponents {
      * @param stack The stack maintained by the algorithm.
      * @param indexGenerator Generator for creating unique indices for classes.
      */
-    private static void strongConnect(RDFSClazz clazz, Collection<Collection<RDFSClazz>> sccs,
-                               Map<RDFSClazz, Node> visitedNodes, Stack<Node> stack, IndexGenerator indexGenerator) {
+    private static void strongConnect(OntClass clazz, Collection<Collection<OntClass>> sccs,
+                               Map<OntClass, Node> visitedNodes, Stack<Node> stack, IndexGenerator indexGenerator) {
         // Assign an index to the clazz and put it on the stack:
         Node node = new Node(clazz, indexGenerator.nextIndex());
         visitedNodes.put(clazz, node);
@@ -141,7 +142,9 @@ public class StronglyConnectedComponents {
         node.setOnStack(true);
 
         // DFS on the subclasses:
-        for (RDFSClazz subClazz : clazz.getSubClazzes()) {
+        ExtendedIterator<OntClass> subClazzIter = clazz.listSuperClasses();
+        while (subClazzIter.hasNext()) {
+            OntClass subClazz = subClazzIter.next();
             // Subclass not yet visited?
             if(!visitedNodes.containsKey(subClazz)) {
                 // Recursively continue DFS on the subclass:
@@ -159,7 +162,7 @@ public class StronglyConnectedComponents {
         // Output a SCC if this node is the root of one:
         // The root of a SCC is defined as the node with the lowest index (the lowlink):
         if(node.getIndex() == node.getLowLink()) {
-            Collection<RDFSClazz> scc = new HashSet<>();
+            Collection<OntClass> scc = new HashSet<>();
             Node sccParticipant = null;
 
 
@@ -179,11 +182,11 @@ public class StronglyConnectedComponents {
      * @return The strongly connected components found in the subtrees. Each subcollection
      * contains a subgraph which is a SCC.
      */
-    public static Collection<Collection<RDFSClazz>> findSCCs(Collection<RDFSClazz> seeds) {
-        Collection<Collection<RDFSClazz>> cycles = new HashSet<>();
+    public static Collection<Collection<OntClass>> findSCCs(Collection<? extends OntClass> seeds) {
+        Collection<Collection<OntClass>> cycles = new HashSet<>();
 
-        for (RDFSClazz clazz : seeds) {
-            strongConnect(clazz, cycles, new HashMap<RDFSClazz, Node>(), new Stack<Node>(), new IndexGenerator());
+        for (OntClass clazz : seeds) {
+            strongConnect(clazz, cycles, new HashMap<OntClass, Node>(), new Stack<Node>(), new IndexGenerator());
         }
 
         return cycles;

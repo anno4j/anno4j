@@ -1,0 +1,34 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.de/ont#> .
+
+ex:A rdfs:subClassOf ex:C .
+ex:C rdfs:subClassOf ex:B .
+ex:B rdfs:subClassOf ex:A .
+ex:D rdfs:subClassOf ex:C .
+ex:C rdfs:subClassOf ex:E .
+ex:E rdfs:subClassOf ex:D .
+ex:B rdfs:subClassOf ex:F .
+ex:E rdfs:subClassOf ex:F .
+
+ex:F rdfs:subClassOf ex:G .
+ex:F rdfs:subClassOf ex:I .
+ex:F rdfs:subClassOf ex:K .
+
+ex:I rdfs:subClassOf ex:G .
+ex:G rdfs:subClassOf ex:H .
+ex:H rdfs:subClassOf ex:I .
+ex:H rdfs:subClassOf ex:J .
+ex:I rdfs:subClassOf ex:J .
+
+ex:K rdfs:subClassOf ex:J .
+ex:L rdfs:subClassOf ex:K .
+ex:K rdfs:subClassOf ex:L .
+
+ex:D rdfs:subClassOf ex:M .
+ex:E rdfs:subClassOf ex:N .
+ex:M rdfs:subClassOf ex:N .
+ex:N rdfs:subClassOf ex:P .
+ex:N rdfs:subClassOf ex:O .
+ex:P rdfs:subClassOf ex:O .
+ex:O rdfs:subClassOf ex:M .
+ex:P rdfs:subClassOf ex:K .
