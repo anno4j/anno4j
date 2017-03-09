@@ -14,11 +14,7 @@ import java.util.Set;
  */
 public class VehicleOntologyRuntimeTest {
 
-    private Anno4j anno4j;
-
     public void run() throws Exception {
-        anno4j = new Anno4j();
-
         testXSDValidation();
         testSubProperty();
     }
