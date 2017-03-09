@@ -265,6 +265,66 @@ Annotation annotation = anno4j.createObject(Annotation.class);
 String annotationAsTurtle = annotation.getTriples(RDFFormat.TURTLE);
 ```
 
+## Generating annotated Java files from an existing ontology
+
+To make working with an existing RDFS ontology even easier, the Java classes required by Anno4j can be automatically generated.
+In order to do so a `OntGenerationConfig` object must be created suiting your requirements.
+
+This configuration object is then used to create the Java files:
+```java
+JavaFileGenerator generator = new RDFSJavaFileGenerator();
+generator.addRDF("http://example.com/your_ontology.xml");
+
+File outputDir = new File("/path/to/destination");
+generator.generateJavaFiles(config, outputDir);
+```
+
+For each RDFS class a Anno4j resource object class and a support class is created.
+If you want to have the ontology information persisted to your Anno4j underlying
+triplestore, you can do so by passing the Anno4j object to the generator.
+
+```java
+Anno4j anno4j = new Anno4j();
+anno4j.setRepository(...);
+// ...
+JavaFileGenerator generator = new RDFSJavaFileGenerator(anno4j);
+```
+
+
+### Language preferences
+
+The purpose of the `OntGenerationConfig` basically is defining a preference for the languages to use for class names and JavaDoc.
+Those are extracted from `rdfs:label` and `rdfs:comment` literals.
+
+```
+OntGenerationConfig config = new OntGenerationConfig();
+
+// Set which language you prefer for class names and for JavaDoc:
+config.setIdentifierLanguagePreference(new String[] {"en", "de"});
+config.setJavaDocLanguagePreference(new String[] {"de"});
+```
+
+In this example only german JavaDoc should be generated, but the names of Java classes should be preferably in english.
+See [BCP47](https://tools.ietf.org/html/bcp47) for the language codes.
+
+### Validation of datatypes
+
+Validation code can be automatically generated, checking that the value set for a property
+is actually allowed by the datatype defined in the ontology.
+
+For example a call `addFoo(-42)` for a property `foo` with datatype `xsd:nonNegativeInteger` will throw a `IllegalArgumentException`.
+The generation of such checks can controlled by providing validators to the `OntGenerationConfig`.
+
+```java
+ValidatorChain validators = new ValidatorChain();
+validators.add(new NotNullValidator());
+config.setValidators(validators);
+```
+In this example only checks for the value being not null will be added to the generated method implementations.
+If no validator chain is explicitly provided, checks for `null` and the XSD datatypes are generated.
+If you want checks for your custom datatypes, you can implement the `Validator` interface.
+
+
 ## Example
 
 The following will guide through an exemplary process of producing a whole annotation from scratch. The exemplary annotation that is
