@@ -29,7 +29,7 @@ import java.util.*;
  * between classes and properties not explicitly stated in the RDF data.
  * Optionally also persists the ontology information to a provided {@link Anno4j}.
  */
-class RDFSModelBuilder implements OntologyModelBuilder {
+public class RDFSModelBuilder implements OntologyModelBuilder {
 
     /**
      * The ontology model without RDFS inference.
@@ -494,6 +494,11 @@ class RDFSModelBuilder implements OntologyModelBuilder {
      */
     @Override
     public void build() throws OntologyModelBuilder.RDFSModelBuildingException {
+
+        // Clear information from last build:
+        clazzes.clear();
+        properties.clear();
+        rootClazzes.clear();
 
         // First merge equivalent classes (the Jena reasoner doesn't do that):
         normalizeRDFSEquivalence();

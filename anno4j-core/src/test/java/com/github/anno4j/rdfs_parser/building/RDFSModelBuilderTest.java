@@ -7,6 +7,8 @@ import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +28,7 @@ public class RDFSModelBuilderTest {
     private static RDFSModelBuilder modelBuilder;
 
     private static ExtendedRDFSClazz getClazzFromModel(String uri) {
-        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getRDFSClazzes();
+        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getClazzes();
         for (ExtendedRDFSClazz clazz : clazzes) {
             if(clazz.getResourceAsString().equals(uri)) {
                 return clazz;
@@ -56,7 +58,7 @@ public class RDFSModelBuilderTest {
 
     @Test
     public void testClazzProperties() throws Exception {
-        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getRDFSClazzes();
+        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getClazzes();
 
         // Model must contain the classes from the ontology plus RDFS build-in classes:
         assertTrue(clazzes.size() >= 5);
@@ -141,5 +143,24 @@ public class RDFSModelBuilderTest {
         Collection<String> homeProps = getResourcesAsStrings(home.getOutgoingProperties());
         assertTrue(vehicleProps.contains("http://example.de/ont#name"));
         assertTrue(homeProps.contains("http://example.de/ont#name"));
+    }
+
+    @Test
+    public void testCyclicEquivalence() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL cyclicOntUrl = classLoader.getResource("cyclic_equivalence.ttl");
+
+        RDFSModelBuilder modelBuilder = new RDFSModelBuilder();
+        modelBuilder.addRDF(new FileInputStream(cyclicOntUrl.getFile()), "http://example.de/ont#", "TURTLE");
+
+        modelBuilder.build();
+
+        Collection<String> ontClazzes = new HashSet<>();
+        for (String clazz : getResourcesAsStrings(modelBuilder.getClazzes())) {
+            if(clazz.startsWith("http://example.de/ont#")) {
+                ontClazzes.add(clazz);
+            }
+        }
+        assertEquals(3, ontClazzes.size());
     }
 }

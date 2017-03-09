@@ -28,7 +28,7 @@ public class InterfaceTypeSpecTest {
      * @return The class object or null if no class with the given URI is in the model.
      */
     private static ExtendedRDFSClazz getClazzFromModel(String uri) {
-        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getRDFSClazzes();
+        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getClazzes();
         for (ExtendedRDFSClazz clazz : clazzes) {
             if(clazz.getResourceAsString().equals(uri)) {
                 return clazz;

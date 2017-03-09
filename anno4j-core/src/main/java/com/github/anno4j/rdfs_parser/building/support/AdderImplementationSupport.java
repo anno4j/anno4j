@@ -40,7 +40,7 @@ public abstract class AdderImplementationSupport extends AdderSupport implements
             // Generate code for adding also to superproperties:
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
                 MethodSpec superAdder = superProperty.buildAdder(config);
-                adderBuilder.addStatement(superAdder.name + "(" + param + ")");
+                adderBuilder.addStatement("$N($N)", superAdder, param);
             }
 
             // Add actual adding code:
@@ -53,11 +53,11 @@ public abstract class AdderImplementationSupport extends AdderSupport implements
             TypeName rangeHashSet = ParameterizedTypeName.get(hashSet, rangeClassName);
 
             adderBuilder.addStatement("$T values = new $T()", rangeSet, rangeHashSet)
-                    .beginControlFlow("if(" + getter.name + "() != null)")
-                    .addStatement("values.addAll(" + getter.name + "())")
+                    .beginControlFlow("if($N() != null)", getter)
+                    .addStatement("values.addAll($N())", getter)
                     .endControlFlow()
                     .addStatement("values.add($N)", param)
-                    .addStatement(setter.name + "(values)");
+                    .addStatement("$N(values)", setter);
 
             // Build the adders method specification:
             return adderBuilder.addAnnotation(overrideAnnotation)

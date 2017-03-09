@@ -42,7 +42,7 @@ public class XSDValueSpaceValidator implements Validator {
                 // Check that value is normalized:
                 addNormalizedStringValidation(builder, param)
                         // Check that value does not start or end with whitespace:
-                        .beginControlFlow("if($N.startsWith($S)) || $N.endsWith($S))", param, " ", param, " ")
+                        .beginControlFlow("if($N.startsWith($S) || $N.endsWith($S))", param, " ", param, " ")
                         .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                                 "Value must be a XSD token. Must not start or end with whitespace.")
                         .endControlFlow()

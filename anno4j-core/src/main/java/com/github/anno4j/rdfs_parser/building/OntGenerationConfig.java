@@ -3,7 +3,6 @@ package com.github.anno4j.rdfs_parser.building;
 import com.github.anno4j.rdfs_parser.validation.ValidatorChain;
 import org.openrdf.repository.object.LangString;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,10 +36,6 @@ public class OntGenerationConfig {
      */
     private List<String> javadocLangPreference = new ArrayList<>();
 
-    /**
-     * The directory where generated Java files are written to.
-     */
-    private File outputDirectory;
 
     /**
      * The validators used to validate setter and adder arguments.
@@ -265,19 +260,5 @@ public class OntGenerationConfig {
      */
     public boolean isPreferredForJavaDoc(CharSequence s, CharSequence other) {
         return isStringPreferred(s, other, javadocLangPreference);
-    }
-
-    /**
-     * @return The directory where generated Java files and packages are written to.
-     */
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    /**
-     * @param outputDirectory The directory where generated Java files and packages are written to.
-     */
-    public void setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
     }
 }
