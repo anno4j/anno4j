@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * An implementation of the VehicleSupport class
- * simulating Anno4j behaviour.
+ * simulating Anno4j behaviour (see Issue #129).
  */
 public class VehicleSupportImpl extends VehicleSupport {
 
