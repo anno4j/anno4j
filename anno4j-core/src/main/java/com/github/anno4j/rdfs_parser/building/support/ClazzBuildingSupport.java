@@ -41,7 +41,7 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
         if (getResourceAsString().startsWith(XSD.NS)) {
             switch (getResourceAsString()) {
                 case XSD.STRING:
-                    return ClassName.get(String.class);
+                    return ClassName.get(CharSequence.class);
                 case XSD.BOOLEAN:
                     return ClassName.get(Boolean.class);
                 case XSD.DECIMAL:
@@ -55,11 +55,11 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
                 case XSD.BASE64_BINARY:
                     return ClassName.get(String.class);
                 case XSD.ANY_URI:
-                    return ClassName.get(String.class);
+                    return ClassName.get(CharSequence.class);
                 case XSD.NORMALIZED_STRING:
-                    return ClassName.get(String.class);
+                    return ClassName.get(CharSequence.class);
                 case XSD.TOKEN:
-                    return ClassName.get(String.class);
+                    return ClassName.get(CharSequence.class);
                 case XSD.LANGUAGE:
                     return ClassName.get(String.class);
                 case XSD.INTEGER:
@@ -89,7 +89,7 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
                 case XSD.POSITIVE_INTEGER:
                     return ClassName.get(Integer.class);
                 default:
-                    return ClassName.get(String.class);
+                    return ClassName.get(CharSequence.class);
             }
         }
 
