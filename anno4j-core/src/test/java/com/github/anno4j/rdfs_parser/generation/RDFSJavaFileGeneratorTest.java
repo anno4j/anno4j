@@ -52,7 +52,7 @@ public class RDFSJavaFileGeneratorTest {
             SystemCommand.runCommand("javac -help");
             SystemCommand.runCommand("mvn -help");
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             commandsFound = false;
         }
         boolean mavenTargetExists = new File("target").isDirectory();
@@ -134,7 +134,7 @@ public class RDFSJavaFileGeneratorTest {
             SystemCommand.runCommand("javac -help");
             SystemCommand.runCommand("mvn -help");
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             Logger.getGlobal().warning("Skipped test, because javac/mvn was not found.");
             return;
         }
