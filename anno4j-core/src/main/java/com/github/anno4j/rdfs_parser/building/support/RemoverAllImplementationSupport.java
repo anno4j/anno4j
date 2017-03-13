@@ -38,11 +38,24 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
             MethodSpec remover = buildRemover(config);
 
+            // Prepare Set and HashSet types:
+            TypeName set = ParameterizedTypeName.get(ClassName.get("java.util", "Set"), rangeClassName);
+            TypeName hashSet = ParameterizedTypeName.get(ClassName.get("java.util", "HashSet"), rangeClassName);
+
+            // Prepare used methods:
+            MethodSpec getter = buildGetter(config);
+
             // Iterate the input values and check if the value was actually removed from this property:
             removerAllBuilder.addStatement("boolean changed = false")
+                    .addStatement("$T removedValues = new $T()", set, hashSet)
                     .beginControlFlow("for($T $N : $N)", rangeClassName, current, param)
-                    .beginControlFlow("if($N($N))", remover, current)
-                    .addStatement("changed = true");
+                    .beginControlFlow("if($N().contains($N))", getter, current) // If the value is actual a value of this property
+                    .addStatement("changed |= true") // Set changed flag
+                    .addStatement("removedValues.add($N)", current) // Add to collection of removed values
+                    .endControlFlow() // End if
+                    .endControlFlow() // End for
+                    .beginControlFlow("for($T $N : removedValues)", rangeClassName, current)
+                    .addStatement("$N($N)", remover, current);
 
             // If the value was actually removed, we can safely remove it also from superproperties:
             for (ExtendedRDFSProperty superProp : getSuperproperties()) {
@@ -50,8 +63,7 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
                 removerAllBuilder.addStatement("$N($N)", superPropRemover, current);
             }
 
-            removerAllBuilder.endControlFlow()
-                             .endControlFlow()
+            removerAllBuilder.endControlFlow() // Add second for
                              .addStatement("return changed");
 
             // Add the override annotation and output:
