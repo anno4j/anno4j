@@ -4,16 +4,15 @@ import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.validation.ValidatorChain;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -22,8 +21,15 @@ import static org.junit.Assume.assumeTrue;
  * Test for {@link RDFSJavaFileGenerator}.
  * This test class utilizes compilation of generated Java Code at runtime
  * and thus the Java compiler (<code>javac</code>) and Maven (<code>mvn</code>)
- * must be available on the running system.
+ * must be available on the running system.<br>
+ * <br>
+ * <strong>This test is ignored by default.</strong>
+ * This test is ignored by default when running multiple tests, because requirements
+ * for it are not satisfied on continous integration server.
+ * If you want to run this test either remove the <code>@Ignore</code> annotation
+ * below or run it explicitly.
  */
+@Ignore
 public class RDFSJavaFileGeneratorTest {
 
     /**
@@ -57,9 +63,6 @@ public class RDFSJavaFileGeneratorTest {
         }
         boolean mavenTargetExists = new File("target").isDirectory();
         assumeTrue(commandsFound && mavenTargetExists);
-        if(!commandsFound || !mavenTargetExists) {
-            return;
-        }
 
         // For the compilation of Anno4j resource classes, Anno4j must be provided as a dependency.
         // Build and package Anno4j as a single JAR if it does not exist yet:
@@ -130,15 +133,6 @@ public class RDFSJavaFileGeneratorTest {
 
     @Test
     public void generateJavaFiles() throws Exception {
-        try {
-            SystemCommand.runCommand("javac -help");
-            SystemCommand.runCommand("mvn -help");
-
-        } catch (Exception e) {
-            Logger.getGlobal().warning("Skipped test, because javac/mvn was not found.");
-            return;
-        }
-
         // Get the vehicle ontology from test resources:
         URL vehicleOntUrl = getClass().getClassLoader().getResource("vehicle.rdf.xml");
         InputStream vehicleOntStream = new FileInputStream(vehicleOntUrl.getFile());
