@@ -2,6 +2,7 @@ package com.github.anno4j.rdfs_parser.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
@@ -34,10 +35,11 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
         Collection<MethodSpec> removers = new HashSet<>();
         Collection<MethodSpec> removersAll = new HashSet<>();
         for (ExtendedRDFSProperty property : getOutgoingProperties()) {
-            // Check if the property is present in any superclass:
+            // Check if the property is present in any (non RDFS) superclass:
             boolean definedInSuper = false;
             for (ExtendedRDFSClazz superClazz : getSuperclazzes()) {
-                definedInSuper |= superClazz.hasPropertyTransitive(property);
+                definedInSuper |= superClazz.hasPropertyTransitive(property)
+                        && !superClazz.getResourceAsString().startsWith(RDFS.NS);
             }
 
             // Only add the method to the type spec if it was not already defined in a superclass:
