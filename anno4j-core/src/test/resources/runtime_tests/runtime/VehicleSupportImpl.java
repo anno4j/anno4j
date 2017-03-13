@@ -13,19 +13,19 @@ import java.util.Set;
  */
 public class VehicleSupportImpl extends VehicleSupport {
 
-    private Set<String> names = new HashSet<>();
+    private Set<CharSequence> names = new HashSet<>();
 
-    private Set<String> officialNames = new HashSet<>();
+    private Set<CharSequence> officialNames = new HashSet<>();
 
     private Set<Integer> numberOfSeats = new HashSet<>();
 
     @Override
-    public Set<String> getHasOfficialNames() {
+    public Set<? extends CharSequence> getHasOfficialNames() {
         return officialNames;
     }
 
     @Override
-    public Set<String> getHasNames() {
+    public Set<? extends CharSequence> getHasNames() {
         return names;
     }
 
@@ -35,8 +35,8 @@ public class VehicleSupportImpl extends VehicleSupport {
     }
 
     @Override
-    public void setHasNames(Set<String> names) {
-        this.names.clear();
+    public void setHasNames(Set<? extends CharSequence> names) {
+        this.names = new HashSet<>();
         this.names.addAll(names);
     }
 
@@ -51,36 +51,36 @@ public class VehicleSupportImpl extends VehicleSupport {
     }
 
     @Override
-    public void addHasName(String value) {
-        names.add(value);
+    public void addHasName(CharSequence value) {
+        super.addHasName(value);
     }
 
     @Override
-    public void addAllHasNames(Set<String> values) {
-        names.addAll(values);
+    public void addAllHasNames(Set<? extends CharSequence> values) {
+        super.addAllHasNames(values);
     }
 
     @Override
-    public boolean removeHasName(String value) {
-        return names.remove(value);
+    public boolean removeHasName(CharSequence value) {
+        return super.removeHasName(value);
     }
 
     @Override
-    public boolean removeAllHasNames(Set<String> values) {
-        return names.removeAll(values);
+    public boolean removeAllHasNames(Set<? extends CharSequence> values) {
+        return super.removeAllHasNames(values);
     }
 
     @Override
     public void setNumberOfSeats(Set<Integer> values) {
         super.setNumberOfSeats(values);
-        numberOfSeats.clear();
+        numberOfSeats = new HashSet<>();
         numberOfSeats.addAll(values);
     }
 
     @Override
-    public void setHasOfficialNames(Set<String> values) {
+    public void setHasOfficialNames(Set<? extends CharSequence> values) {
         super.setHasOfficialNames(values);
-        officialNames.clear();
+        officialNames = new HashSet<>();
         officialNames.addAll(values);
     }
 }

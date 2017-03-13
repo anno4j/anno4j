@@ -28,30 +28,35 @@ public abstract class SetterImplementationSupport extends SetterSupport implemen
 
             MethodSpec.Builder setterBuilder = signature.toBuilder();
 
-            // Add validation code:
             ExtendedRDFSClazz range = findSingleRangeClazz();
             ClassName rangeClassName = range.getJavaPoetClassName(config);
             String paramName = signature.parameters.get(0).name;
+            ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
+
+            // Add validation code:
             for (Validator validator : config.getValidators()) {
                 if(validator.isValueSpaceConstrained(range)) {
-                    ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
-                    setterBuilder.beginControlFlow("for($T $N : " + paramName + ")", rangeClassName, current);
+                    setterBuilder.beginControlFlow("for($T $N : $N)", rangeClassName, current, paramName);
                     validator.addValueSpaceCheck(setterBuilder, current, range);
                     setterBuilder.endControlFlow();
                 }
             }
 
-            // Remove all currently stored values by using removeAll-method
-            // This ensures that values are also (safely) removed from superproperties:
-            MethodSpec removerAll = buildRemoverAll(config);
+            // Remove all old values from superproperties:
             MethodSpec getter = buildGetter(config);
-            setterBuilder.addStatement("$N($N())", removerAll, getter);
+            for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
+                MethodSpec superRemover = superProperty.buildRemover(config);
+
+                setterBuilder.beginControlFlow("for($T $N : $N())", rangeClassName, current, getter)
+                            .addStatement("$N($N)", superRemover, current)
+                            .endControlFlow();
+            }
 
             // Generate code for adding new values also to superproperties:
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
                 MethodSpec superAdderAll = superProperty.buildAdderAll(config);
 
-                setterBuilder.addStatement("$N(" + paramName + ")", superAdderAll);
+                setterBuilder.addStatement("$N($N)", superAdderAll, paramName);
             }
 
             return setterBuilder.addAnnotation(overrideAnnotation)

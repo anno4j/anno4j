@@ -106,7 +106,7 @@ public class JavaSourceFileLoader {
                     }
                 }
             }
-            command.append(" -d ")
+            command.append(" -g -d ")
                     .append(outputDirectory.getAbsolutePath())
                     .append(" @")
                     .append(sourceList.getAbsolutePath());
