@@ -69,7 +69,15 @@ public abstract class SetterSupport extends PropertyBuildingSupport implements E
                 // Add a throws declaration if the value space is constrained:
                 addJavaDocExceptionInfo(javaDoc, rangeClazz, config);
 
-                TypeName paramType = ParameterizedTypeName.get(set, rangeClazz.getJavaPoetClassName(config));;
+                // Get the type of parameter type elements:
+                TypeName setType = rangeClazz.getJavaPoetClassName(config);
+
+                // For convenience the parameter type for strings should be a wildcard, i.e. Set<? extends CharSequence>:
+                if(setType.equals(ClassName.get(CharSequence.class))) {
+                    setType = WildcardTypeName.subtypeOf(setType);
+                }
+
+                TypeName paramType = ParameterizedTypeName.get(set, setType);
 
                 return setter
                         .addModifiers(Modifier.PUBLIC)

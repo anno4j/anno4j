@@ -40,7 +40,16 @@ public abstract class RemoverAllSupport extends PropertyBuildingSupport implemen
             // Get the most specific class describing all of the properties range classes:
             ExtendedRDFSClazz range = findSingleRangeClazz();
             ClassName set = ClassName.get("java.util", "Set");
-            TypeName paramType = ParameterizedTypeName.get(set, range.getJavaPoetClassName(config));
+
+            // Get the type of parameter type elements:
+            TypeName setType = range.getJavaPoetClassName(config);
+
+            // For convenience the parameter type for strings should be a wildcard, i.e. Set<? extends CharSequence>:
+            if(setType.equals(ClassName.get(CharSequence.class))) {
+                setType = WildcardTypeName.subtypeOf(setType);
+            }
+
+            TypeName paramType = ParameterizedTypeName.get(set, setType);
 
             // Generate Javadoc if a rdfs:comment literal is available:
             CodeBlock.Builder javaDoc = CodeBlock.builder();

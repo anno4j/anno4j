@@ -32,11 +32,16 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
 
             // Get the class name of the properties range:
             ExtendedRDFSClazz range = findSingleRangeClazz();
-            ClassName rangeClassName = range.getJavaPoetClassName(config);
+            TypeName rangeType = range.getJavaPoetClassName(config);
+
+            // For string types the return type of getters is a wildcard type:
+            if(rangeType.equals(ClassName.get(CharSequence.class))) {
+                rangeType = WildcardTypeName.subtypeOf(rangeType);
+            }
 
             // Prepare class names of used types:
             ClassName set = ClassName.get(Set.class);
-            TypeName rangeSet = ParameterizedTypeName.get(set, rangeClassName);
+            TypeName rangeSet = ParameterizedTypeName.get(set, rangeType);
             ParameterSpec param = signature.parameters.get(0);
 
             // Add the actual removal code:

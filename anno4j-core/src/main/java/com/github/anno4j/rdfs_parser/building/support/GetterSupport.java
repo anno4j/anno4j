@@ -58,7 +58,15 @@ public abstract class GetterSupport extends PropertyBuildingSupport implements E
             // Find most specific common superclass:
             ExtendedRDFSClazz rangeClazz = findSingleRangeClazz();
 
-            TypeName returnType = ParameterizedTypeName.get(set, rangeClazz.getJavaPoetClassName(config));
+            // Get the type of return type elements:
+            TypeName setType = rangeClazz.getJavaPoetClassName(config);
+
+            // For convenience the return type for strings should be a wildcard, i.e. Set<? extends CharSequence>:
+            if(setType.equals(ClassName.get(CharSequence.class))) {
+                setType = WildcardTypeName.subtypeOf(setType);
+            }
+
+            TypeName returnType = ParameterizedTypeName.get(set, setType);
 
             return getter
                     .addModifiers(Modifier.PUBLIC)
