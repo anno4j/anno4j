@@ -13,10 +13,9 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -58,6 +57,9 @@ public class RDFSJavaFileGeneratorTest {
         }
         boolean mavenTargetExists = new File("target").isDirectory();
         assumeTrue(commandsFound && mavenTargetExists);
+        if(!commandsFound || !mavenTargetExists) {
+            return;
+        }
 
         // For the compilation of Anno4j resource classes, Anno4j must be provided as a dependency.
         // Build and package Anno4j as a single JAR if it does not exist yet:
@@ -128,6 +130,15 @@ public class RDFSJavaFileGeneratorTest {
 
     @Test
     public void generateJavaFiles() throws Exception {
+        try {
+            SystemCommand.runCommand("javac -help");
+            SystemCommand.runCommand("mvn -help");
+
+        } catch (IOException e) {
+            Logger.getGlobal().warning("Skipped test, because javac/mvn was not found.");
+            return;
+        }
+
         // Get the vehicle ontology from test resources:
         URL vehicleOntUrl = getClass().getClassLoader().getResource("vehicle.rdf.xml");
         InputStream vehicleOntStream = new FileInputStream(vehicleOntUrl.getFile());
