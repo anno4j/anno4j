@@ -5,6 +5,8 @@ import com.github.anno4j.rdfs_parser.model.RDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
+import org.openrdf.repository.object.LangString;
 
 import java.util.Arrays;
 
@@ -30,28 +32,78 @@ public class XSDValueSpaceValidator implements Validator {
     }
 
     private static MethodSpec.Builder addNormalizedStringValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return builder.beginControlFlow("if($N.indexOf($S) != -1 || $N.indexOf($S) != -1 || $N.indexOf($S) != -1)",
-                param, "\r", param, "\n", param, "\t")
+        TypeName string = ClassName.get(String.class);
+        TypeName langString = ClassName.get(LangString.class);
+
+        // Add check for Java's String type:
+        builder.beginControlFlow("if($N instanceof $T)", param, string)
+                .beginControlFlow("if((($T)$N).indexOf($S) != -1 || (($T)$N).indexOf($S) != -1 || (($T)$N).indexOf($S) != -1)",
+                        string, param, "\r", string, param, "\n", string, param, "\t")
                 .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                         "Value must be a normalized string. Must not contain carriage return, line feed or tab.")
+                .endControlFlow()
                 .endControlFlow();
+
+        // Add check for LangString:
+        builder.beginControlFlow("else if($N instanceof $T)", param, langString)
+                .beginControlFlow("if((($T)$N).indexOf($S) != -1 || (($T)$N).indexOf($S) != -1 || (($T)$N).indexOf($S) != -1)",
+                        langString, param, "\r", langString, param, "\n", langString, param, "\t")
+                .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
+                        "Value must be a normalized string. Must not contain carriage return, line feed or tab.")
+                .endControlFlow()
+                .endControlFlow();
+
+        // Throw exception if its neither String nor LangString:
+        builder.beginControlFlow("else")
+                .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
+                        "Parameter type must either be String or LangString")
+                .endControlFlow();
+
+        return builder;
     }
 
     private static MethodSpec.Builder addTokenValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return
-                // Check that value is normalized:
-                addNormalizedStringValidation(builder, param)
-                        // Check that value does not start or end with whitespace:
-                        .beginControlFlow("if($N.startsWith($S) || $N.endsWith($S))", param, " ", param, " ")
-                        .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
-                                "Value must be a XSD token. Must not start or end with whitespace.")
-                        .endControlFlow()
-                        // Check that the value does nor contain subsequences of two or more whitespaces:
-                        .beginControlFlow("if($N.indexOf($S) != -1)", param, "  ")
-                        .addStatement("throw new $T($S)",
-                                ClassName.get(IllegalArgumentException.class),
-                                "Value must be a XSD token. Must not contain subsequences of two or more whitespaces.")
-                        .endControlFlow();
+        TypeName string = ClassName.get(String.class);
+        TypeName langString = ClassName.get(LangString.class);
+
+        // Check that value is normalized:
+        addNormalizedStringValidation(builder, param);
+
+        // Check that value does not start or end with whitespace for String and LangString types:
+
+        builder.beginControlFlow("if($N instanceof $T)", param, string)
+                .beginControlFlow("if((($T)$N).startsWith($S) || (($T)$N).endsWith($S))", string, param, " ", string, param, " ")
+                .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
+                        "Value must be a XSD token. Must not start or end with whitespace.")
+                .endControlFlow()
+                // Check that the value does nor contain subsequences of two or more whitespaces:
+                .beginControlFlow("if((($T)$N).indexOf($S) != -1)", string, param, "  ")
+                .addStatement("throw new $T($S)",
+                        ClassName.get(IllegalArgumentException.class),
+                        "Value must be a XSD token. Must not contain subsequences of two or more whitespaces.")
+                .endControlFlow()
+                .endControlFlow();
+
+        builder.beginControlFlow("else if($N instanceof $T)", param, langString)
+                .beginControlFlow("if((($T)$N).startsWith($S) || (($T)$N).endsWith($S))", langString, param, " ", langString, param, " ")
+                .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
+                        "Value must be a XSD token. Must not start or end with whitespace.")
+                .endControlFlow()
+                // Check that the value does nor contain subsequences of two or more whitespaces:
+                .beginControlFlow("if((($T)$N).indexOf($S) != -1)", langString, param, "  ")
+                .addStatement("throw new $T($S)",
+                        ClassName.get(IllegalArgumentException.class),
+                        "Value must be a XSD token. Must not contain subsequences of two or more whitespaces.")
+                .endControlFlow()
+                .endControlFlow();
+
+        // Throw exception if its neither String nor LangString:
+        builder.beginControlFlow("else")
+                .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
+                        "Parameter type must either be String or LangString")
+                .endControlFlow();
+
+        return builder;
     }
 
     private static MethodSpec.Builder addLanguageValidation(MethodSpec.Builder builder, ParameterSpec param) {
