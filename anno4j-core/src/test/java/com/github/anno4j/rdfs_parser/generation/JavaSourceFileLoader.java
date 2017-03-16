@@ -50,17 +50,34 @@ public class JavaSourceFileLoader {
         String osName = System.getProperty("os.name");
 
         try {
+            String whereisOutput;
             // On Windows use the "where" command:
             if(osName != null && osName.toLowerCase().contains("win")) {
-                return SystemCommand.runCommand("where javac");
+                whereisOutput = SystemCommand.runCommand("where javac");
 
                 // On Unix and Unix-like systems use the whereis command:
             } else if(osName != null) {
-                return SystemCommand.runCommand("whereis javac");
+                whereisOutput = SystemCommand.runCommand("whereis -b javac");
 
             } else {
                 throw new FileNotFoundException("Unable to detect operating system");
             }
+
+            if(!whereisOutput.isEmpty()) {
+                // whereis may return multiple binaries. Split command output at non-escaped whitespaces:
+                String[] tokens = whereisOutput.split("(?<!\\\\)\\s+");
+                // List of binaries may be preceded by "javac: ". Skip it if its there:
+                if(tokens.length >= 2 && tokens[0].equals("javac:")) {
+                    return tokens[1];
+                } else if(tokens.length >= 1) {
+                    return tokens[0];
+                } else {
+                    throw new FileNotFoundException("javac could not be found.");
+                }
+            } else {
+                throw new FileNotFoundException("javac could not be found.");
+            }
+
         } catch (IOException e) {
             throw new FileNotFoundException(e.getMessage());
         }

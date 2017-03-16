@@ -29,7 +29,6 @@ import static org.junit.Assume.assumeTrue;
  * If you want to run this test either remove the <code>@Ignore</code> annotation
  * below or run it explicitly.
  */
-@Ignore
 public class RDFSJavaFileGeneratorTest {
 
     /**
