@@ -2,9 +2,9 @@ package com.github.anno4j.rdfs_parser.generation;
 
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.validation.ValidatorChain;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -176,4 +176,38 @@ public class RDFSJavaFileGeneratorTest {
         }
     }
 
+    @Test
+    public void testInvalidOntology() throws Exception {
+        JavaFileGenerator generator = new RDFSJavaFileGenerator();
+
+        // Get the vehicle ontology from test resources:
+        URL vehicleOntUrl = getClass().getClassLoader().getResource("vehicle.rdf.xml");
+        InputStream vehicleOntStream = new FileInputStream(vehicleOntUrl.getFile());
+        generator.addRDF(vehicleOntStream, "http://example.de/ont#");
+
+        // Set range of ex:seat_num to something not numeric (violates range constraint):
+        generator.addRDF(IOUtils.toInputStream("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+                "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" +
+                "         xmlns:ns0=\"http://example.de/ont#\">\n" +
+                "  <rdf:Description rdf:about=\"http://example.de/ont#VWGolf\">\n" +
+                "    <rdf:type rdf:resource=\"http://example.de/ont#Car\"/>\n" +
+                "    <ns0:seat_num>Some non-numeric string</ns0:seat_num>\n" +
+                "  </rdf:Description>\n" +
+                "</rdf:RDF>"), "http://example.de/ont#");
+
+        // Setup the configuration:
+        OntGenerationConfig config = new OntGenerationConfig();
+        config.setIdentifierLanguagePreference(new String[] {"en"});
+        config.setJavaDocLanguagePreference(new String[] {"en"});
+        config.setValidators(ValidatorChain.getRDFSDefault());
+
+        boolean exceptionThrown = false;
+        try {
+            generator.generateJavaFiles(config, outputDir);
+        } catch (JavaFileGenerator.InvalidOntologyException e) {
+            exceptionThrown = true;
+        }
+
+        assertTrue(exceptionThrown);
+    }
 }

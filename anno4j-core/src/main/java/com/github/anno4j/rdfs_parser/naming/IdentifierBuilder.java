@@ -29,6 +29,10 @@ public class IdentifierBuilder {
      * Thrown if a name should be extracted from URI while this is a blank node.
      */
     public class BlankNodeException extends NameBuildingException {
+
+        /**
+         * {@inheritDoc}
+         */
         public BlankNodeException(String message) {
             super(message);
         }

@@ -57,7 +57,7 @@ public class JavaSourceFileLoader {
 
                 // On Unix and Unix-like systems use the whereis command:
             } else if(osName != null) {
-                whereisOutput = SystemCommand.runCommand("whereis -b javac");
+                whereisOutput = SystemCommand.runCommand("whereis javac");
 
             } else {
                 throw new FileNotFoundException("Unable to detect operating system");
