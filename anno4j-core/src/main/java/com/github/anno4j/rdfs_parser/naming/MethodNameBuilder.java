@@ -12,7 +12,7 @@ public class MethodNameBuilder extends IdentifierBuilder {
     /**
      * @param resource The resource to build a name for.
      */
-    protected MethodNameBuilder(String resource) {
+    private MethodNameBuilder(String resource) {
         super(resource);
     }
 
@@ -26,82 +26,38 @@ public class MethodNameBuilder extends IdentifierBuilder {
     }
 
     /**
-     * Generates a JavaPoet method spec for an empty getter representing the property resource.
-     * The method is named according to Java naming conventions with preceeding "get".
-     * @return JavaPoet method object. Can be modified by calling
-     * {@link MethodSpec#toBuilder()} on it.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
-     * requirement for a hostname component.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * Returns a JavaPoet {@link MethodSpec} object for a property described by the builders resource.
+     * Only the name of the method is set in the method specification, i.e. this is a equivalent to
+     * <code>MethodSpec.methodBuilder(prefix + ci).build();</code>, where
+     * <code>ci</code> is a capitalized identifier for the resource.
+     * The generation of the methods name if preferably done on basis of the RDFS label set.
+     * If it is not possible to derive a meaningful name, then an unambiguous name is picked.
+     * @param prefix The part preceding the properties name in the method name, e.g. "set", "addAll", ...
+     * @param pluralName Whether a plural form should be picked for the methods name.
+     * @return A {@link MethodSpec} object for a method for the resource.
      */
-    public MethodSpec getterSpec() throws URISyntaxException, NameBuildingException {
-        return MethodSpec.methodBuilder("get" + capitalizedIdentifier()).build();
-    }
+    public MethodSpec getJavaPoetMethodSpec(String prefix, boolean pluralName) {
+        StringBuilder methodName = new StringBuilder(prefix);
 
-    /**
-     * Extracts a plural form for this resource.
-     * A trailing "s" is added and some simple grammatical rules (for english) are applied.
-     * @return Same as {@link #lowercaseIdentifier()}, but in a plural form.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
-     */
-    public String lowercasePluralIdentifier() throws URISyntaxException, NameBuildingException {
-        StringBuilder identifier = new StringBuilder();
-        identifier.append(capitalizedIdentifier());
-
-        // Replace trailing "y" with "ie". E.g. "capacity" will be transformed to "capacities":
-        if(identifier.charAt(identifier.length() - 1) == 'y') {
-            identifier.deleteCharAt(identifier.length() - 1);
-            identifier.append("ie");
+        try {
+            if(pluralName) {
+                methodName.append(capitalizedPluralIdentifier());
+            } else {
+                methodName.append(capitalizedIdentifier());
+            }
+        } catch (NameBuildingException | URISyntaxException e) {
+            // Find some unambiguous name for the property by using hashCode():
+            int hashCode = getResource().hashCode();
+            methodName.append("UnnamedProperty");
+            if(hashCode < 0) {
+                methodName.append(-hashCode)
+                          .append("_");
+            } else {
+                methodName.append(hashCode);
+            }
         }
 
-        // Only append trailing "s" if the name does not yet end with one:
-        if(identifier.charAt(identifier.length() - 1) != 's') {
-            identifier.append("s");
-        }
-
-        return identifier.toString();
-    }
-
-    /**
-     * Extracts a capitalized plural form for this resource.
-     * A trailing "s" is added and some simple grammatical rules (for english) are applied.
-     * @return Same as {@link #capitalizedIdentifier()}, but in a plural form.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
-     */
-    public String capitalizedPluralIdentifier() throws URISyntaxException, NameBuildingException {
-        StringBuilder identifier = new StringBuilder(lowercasePluralIdentifier());
-        if(identifier.length() > 0) {
-            identifier.setCharAt(0, Character.toUpperCase(identifier.charAt(0)));
-        }
-        return identifier.toString();
-    }
-
-    /**
-     * Generates a JavaPoet method spec for an empty setter representing the property resource.
-     * The method is named according to Java naming conventions with preceeding "set".
-     * @return JavaPoet method object. Can be modified by calling
-     * {@link MethodSpec#toBuilder()} on it.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
-     * requirement for a hostname component.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
-     */
-    public MethodSpec setterSpec() throws URISyntaxException, NameBuildingException {
-        return MethodSpec.methodBuilder("set" + capitalizedIdentifier()).build();
-    }
-
-    /**
-     * Generates a JavaPoet method spec for an empty add method representing the property resource.
-     * The method is named with preceeding "set".
-     * @return JavaPoet method object. Can be modified by calling
-     * {@link MethodSpec#toBuilder()} on it.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
-     * requirement for a hostname component.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
-     */
-    public MethodSpec adderSpec() throws URISyntaxException, NameBuildingException {
-        return MethodSpec.methodBuilder("add" + capitalizedIdentifier()).build();
+        return MethodSpec.methodBuilder(methodName.toString()).build();
     }
 
     @Override

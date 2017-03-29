@@ -4,13 +4,14 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
+import com.github.anno4j.rdfs_parser.model.RDFSProperty;
 import com.squareup.javapoet.*;
 
 import java.util.Set;
 
 /**
- * Support class (of {@link ExtendedRDFSProperty}) for generating reomve-methods for
- * the corrpesonding property.
+ * Support class (of {@link ExtendedRDFSProperty}) for generating remove-methods for
+ * the corresponding property.
  */
 @Partial
 public abstract class RemoverImplementationSupport extends RemoverSupport implements ExtendedRDFSProperty {
@@ -18,17 +19,13 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
     @Override
     public MethodSpec buildRemoverImplementation(OntGenerationConfig config) {
         // Get the signature of a remove* method for this property:
-        MethodSpec signature = buildRemoverSignature(config);
+        MethodSpec signature = buildSignature(config);
         if(signature != null) {
             MethodSpec.Builder removerBuilder = signature.toBuilder();
 
             // Implementations in support classes have the @Override annotation:
             AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class)
                     .build();
-
-            // Add actual adding code:
-            MethodSpec getter = buildGetter(config);
-            MethodSpec setter = buildSetter(config);
 
             // Get the class name of the properties range:
             ExtendedRDFSClazz range = findSingleRangeClazz();
@@ -44,21 +41,34 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
             TypeName rangeSet = ParameterizedTypeName.get(set, rangeType);
             ParameterSpec param = signature.parameters.get(0);
 
+            // Get the annotated field for this property:
+            FieldSpec field = buildAnnotatedField(config);
+
             // Add the actual removal code:
-            removerBuilder.addStatement("$T values = $N()", rangeSet, getter)
-                    .addStatement("boolean removed = values.remove($N)", param)
-                    .addStatement("$N(values)", setter)
-                    .beginControlFlow("if(removed)");
+            removerBuilder.addStatement("boolean contained = this.$N.contains($N)", field, param)
+                    .addStatement("this.$N.remove($N)", field, param)
+                    .addComment("Cascade changes if value was actually set for this property:")
+                    .beginControlFlow("if(contained)");
 
             // The value can be safely removed also from superproperties
             // if it was actually removed from this one (see above generated if-clause):
+            removerBuilder.addComment("Remove from superproperties:");
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                MethodSpec superRemover = superProperty.buildRemover(config);
-                removerBuilder.addStatement("$N($N)", superRemover, param);
+                String superRemoverName = superProperty.buildRemover(config).name;
+                removerBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superRemoverName, param);
             }
 
-            removerBuilder.endControlFlow()
-                          .addStatement("return removed");
+            // Same for subproperties. The value can be safely removed from subproperties
+            // if it was actually removed from this one (see above generated if-clause):
+            removerBuilder.addComment("Remove from subproperties:");
+            for(RDFSProperty subProperty : getSubProperties()) {
+                String subPropertyRemoverName = ((ExtendedRDFSProperty) subProperty).buildRemover(config).name;
+
+                removerBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", subPropertyRemoverName, param);
+            }
+
+            removerBuilder.endControlFlow() // End if(removed)
+                          .addStatement("return contained");
 
             // Build the removers method specification:
             return removerBuilder.addAnnotation(overrideAnnotation)

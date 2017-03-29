@@ -66,7 +66,7 @@ public class LowestCommonSuperclass {
      * @return A lowest common superclass of all given classes.
      */
     public static ExtendedRDFSClazz getLowestCommonSuperclass(Collection<ExtendedRDFSClazz> clazzes) {
-        // If only one class is given, immediatly return it for performance reasons:
+        // If only one class is given, immediately return it for performance reasons:
         if(clazzes.size() == 1) {
             return clazzes.iterator().next();
         }

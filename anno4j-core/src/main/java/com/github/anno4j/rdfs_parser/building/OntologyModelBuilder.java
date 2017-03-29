@@ -28,7 +28,7 @@ public interface OntologyModelBuilder {
 
     /**
      * Adds RDF statements to the model.
-     * A subsequent call to {@link #build()} is required for commiting the data to the model.
+     * A subsequent call to {@link #build()} is required for committing the data to the model.
      *
      * @param rdfInput An input stream to RDF/XML data.
      * @param base     The base uri to be used when converting relative URI's to absolute URI's.
@@ -37,7 +37,7 @@ public interface OntologyModelBuilder {
 
     /**
      * Adds RDF statements to the model.
-     * A subsequent call to {@link #build()} is required for commiting the data to the model.
+     * A subsequent call to {@link #build()} is required for committing the data to the model.
      *
      * @param url      An URL to RDF data in RDF/XML format.
      * @param base     The base uri to be used when converting relative URI's to absolute URI's.
@@ -46,7 +46,7 @@ public interface OntologyModelBuilder {
 
     /**
      * Adds RDF statements to the model.
-     * A subsequent call to {@link #build()} is required for commiting the data to the model.
+     * A subsequent call to {@link #build()} is required for committing the data to the model.
      *
      * @param rdfInput An input stream to the RDF data. Its format is defined by the <code>format</code> parameter.
      * @param base     The base uri to be used when converting relative URI's to absolute URI's.
@@ -56,7 +56,7 @@ public interface OntologyModelBuilder {
     void addRDF(InputStream rdfInput, String base, String format);
     /**
      * Adds RDF statements to the model.
-     * A subsequent call to {@link #build()} is required for commiting the data to the model.
+     * A subsequent call to {@link #build()} is required for committing the data to the model.
      *
      * @param url      An URL to RDF data in the specified format.
      * @param base     The base uri to be used when converting relative URI's to absolute URI's.
@@ -91,7 +91,7 @@ public interface OntologyModelBuilder {
     /**
      * Returns a validity report for the model build during the last call of {@link #build()}.
      *
-     * @return The validatiy report for the model. Use {@link ValidityReport#isValid()} to
+     * @return The validity report for the model. Use {@link ValidityReport#isValid()} to
      * check if the model built is valid.
      * @throws IllegalStateException Thrown if the model was not previously built.
      */

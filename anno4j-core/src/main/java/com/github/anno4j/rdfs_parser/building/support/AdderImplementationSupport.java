@@ -5,14 +5,14 @@ import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
 import com.github.anno4j.rdfs_parser.validation.Validator;
-import com.squareup.javapoet.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 
 /**
  * Support class (of {@link ExtendedRDFSProperty}) for generating add-methods for
- * the corrpesonding property.
+ * the corresponding property.
  */
 @Partial
 public abstract class AdderImplementationSupport extends AdderSupport implements ExtendedRDFSProperty {
@@ -39,28 +39,16 @@ public abstract class AdderImplementationSupport extends AdderSupport implements
 
             // Generate code for adding also to superproperties:
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                MethodSpec superAdder = superProperty.buildAdder(config);
-                adderBuilder.addStatement("$N($N)", superAdder, param);
+                String superAdderName = superProperty.buildAdder(config).name;
+                adderBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderName, param);
             }
 
-            // Add actual adding code:
-            MethodSpec getter = buildGetter(config);
-            MethodSpec setter = buildSetter(config);
-            ClassName rangeClassName = range.getJavaPoetClassName(config);
-            ClassName set = ClassName.get(Set.class);
-            TypeName rangeSet = ParameterizedTypeName.get(set, rangeClassName);
-            ClassName hashSet = ClassName.get(HashSet.class);
-            TypeName rangeHashSet = ParameterizedTypeName.get(hashSet, rangeClassName);
-
-            adderBuilder.addStatement("$T values = new $T()", rangeSet, rangeHashSet)
-                    .beginControlFlow("if($N() != null)", getter)
-                    .addStatement("values.addAll($N())", getter)
-                    .endControlFlow()
-                    .addStatement("values.add($N)", param)
-                    .addStatement("$N(values)", setter);
+            // Get the annotated field for this property:
+            FieldSpec field = buildAnnotatedField(config);
 
             // Build the adders method specification:
             return adderBuilder.addAnnotation(overrideAnnotation)
+                                .addStatement("this.$N.add($N)", field, param) // Actual adding code
                                 .build();
 
         } else {

@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * Builds an ontology model from RDFS data by inferencing relationships
+ * Builds an ontology model from RDFS data by inferring relationships
  * between classes and properties not explicitly stated in the RDF data.
  * Optionally also persists the ontology information to a provided {@link Anno4j}.
  */
@@ -134,16 +134,16 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
      * @param resource    The resource the returned object should represent.
      * @param transaction The Anno4j transaction to use when creating resource objects.
      * @return The RDFS class object for the given resource.
-     * @throws RepositoryException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @throws RepositoryException Thrown if an error occurs when instantiating the class with Anno4j.
+     * @throws IllegalAccessException Thrown if an error occurs when instantiating the class with Anno4j.
+     * @throws InstantiationException Thrown if an error occurs when instantiating the class with Anno4j.
      */
     private ExtendedRDFSClazz createRDFSClazzOnDemand(Resource resource, Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
         ExtendedRDFSClazz clazz;
         if (clazzes.containsKey(resource)) {
             clazz = clazzes.get(resource);
         } else {
-            clazz = transaction.createObject(ExtendedRDFSClazz.class, (Resource) resource);
+            clazz = transaction.createObject(ExtendedRDFSClazz.class, resource);
             clazzes.put(resource, clazz);
         }
         return clazz;
@@ -157,9 +157,9 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
      * @param resource    The resource the returned object should represent.
      * @param transaction The Anno4j transaction to use when creating resource objects.
      * @return The RDFS property object for the given resource.
-     * @throws RepositoryException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @throws RepositoryException Thrown if an error occurs when instantiating the property with Anno4j.
+     * @throws IllegalAccessException Thrown if an error occurs when instantiating the property with Anno4j.
+     * @throws InstantiationException Thrown if an error occurs when instantiating the property with Anno4j.
      */
     private ExtendedRDFSProperty createRDFSPropertyOnDemand(Resource resource, Transaction transaction) throws RepositoryException, IllegalAccessException, InstantiationException {
         ExtendedRDFSProperty property;
@@ -239,7 +239,7 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
             OntClass ontClazz = clazzIter.next();
             Resource ontClazzUri = new URIImpl(ontClazz.toString());
 
-            // We're only handling non-property classes here. Those are handled in extractrDFSProperties():
+            // We're only handling non-property classes here. Those are handled in extractRDFSProperties():
             if (!ontClazz.hasSuperClass(model.createOntResource(RDF.PROPERTY))) {
                 // Get the clazz by its resource or create a new Anno4j instance on demand if not yet existing:
                 ExtendedRDFSClazz clazz = createRDFSClazzOnDemand(ontClazzUri, transaction);

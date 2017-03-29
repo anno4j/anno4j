@@ -27,36 +27,32 @@ public abstract class AdderAllImplementationSupport extends AdderAllSupport impl
 
             ExtendedRDFSClazz range = findSingleRangeClazz();
             ClassName rangeClassName = range.getJavaPoetClassName(config);
-            String paramName = signature.parameters.get(0).name;
+            ParameterSpec param = signature.parameters.get(0);
             ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
 
             // Add validation code:
             for (Validator validator : config.getValidators()) {
                 if(validator.isValueSpaceConstrained(range)) {
-                    adderBuilder.beginControlFlow("for($T $N : " + paramName + ")", rangeClassName, current);
+                    adderBuilder.beginControlFlow("for($T $N : $N)", rangeClassName, current, param);
                     validator.addValueSpaceCheck(adderBuilder, current, range);
                     adderBuilder.endControlFlow();
                 }
             }
 
             // Generate code for adding also to superproperties:
+            adderBuilder.addComment("Add values also to superproperties:")
+                        .beginControlFlow("if(!$N.isEmpty())", param);
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                MethodSpec superAdderAll = superProperty.buildAdderAll(config);
-                adderBuilder.addStatement("$N(" + paramName + ")", superAdderAll);
+                String superAdderAllName = superProperty.buildAdderAll(config).name;
+                adderBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderAllName, param);
             }
+            adderBuilder.endControlFlow(); // End if(!param.isEmpty())
 
-            TypeName set = ParameterizedTypeName.get(ClassName.get("java.util", "Set"), rangeClassName);
-            TypeName hashSet = ParameterizedTypeName.get(ClassName.get("java.util", "HashSet"), rangeClassName);
-            MethodSpec getter = buildGetter(config);
-            MethodSpec setter = buildSetter(config);
+            // Get the annotated field for this property:
+            FieldSpec field = buildAnnotatedField(config);
 
             return adderBuilder.addAnnotation(overrideAnnotation)
-                    .addStatement("$T set = new $T()", set, hashSet)
-                    .beginControlFlow("if($N() != null)", getter)
-                    .addStatement("set.addAll($N())", getter)
-                    .endControlFlow()
-                    .addStatement("set.addAll(values)")
-                    .addStatement("$N(set)", setter)
+                    .addStatement("this.$N.addAll(values)", field)
                     .build();
 
         } else {

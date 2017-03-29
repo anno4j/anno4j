@@ -6,12 +6,12 @@ import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.rdfs_parser.building.support.SupportTypeSpecSupport;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.annotations.Iri;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,11 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for {@link SupportTypeSpecSupport}.
  */
-public class SupportTypeSpecTest {
+public class SupportTypeSpecTest extends TypeSpecTest {
 
     private static ExtendedRDFSClazz clazz;
 
@@ -37,7 +38,7 @@ public class SupportTypeSpecTest {
         clazz.addLabel("MyClazz");
 
         Set<ExtendedRDFSProperty> props = new HashSet<>();
-        ExtendedRDFSProperty foo = anno4j.createObject(ExtendedRDFSProperty.class);
+        ExtendedRDFSProperty foo = anno4j.createObject(ExtendedRDFSProperty.class, (Resource) new URIImpl("http://example.org/#foo"));
         foo.addLabel("foo");
         foo.addRangeClazz(clazz);
         props.add(foo);
@@ -68,6 +69,27 @@ public class SupportTypeSpecTest {
         ClassName superInterface = clazz.getJavaPoetClassName(generationConfig);
         assertEquals(1, typeSpec.superinterfaces.size());
         assertEquals(superInterface, typeSpec.superinterfaces.get(0));
+
+        // Test methods:
+        Set<String> methodNames = getMethodNames(typeSpec);
+        assertEquals(6, methodNames.size());
+        assertTrue(methodNames.contains("getFoos"));
+        assertTrue(methodNames.contains("setFoos"));
+        assertTrue(methodNames.contains("addFoo"));
+        assertTrue(methodNames.contains("addAllFoos"));
+        assertTrue(methodNames.contains("removeFoo"));
+        assertTrue(methodNames.contains("removeAllFoos"));
+
+        // Test fields:
+        Set<String> fieldNames = getFieldNames(typeSpec);
+        assertEquals(1, fieldNames.size());
+        assertTrue(fieldNames.contains("foos"));
+
+        AnnotationSpec iriAnnotation = AnnotationSpec.builder(Iri.class)
+                                                    .addMember("value", "$S", "http://example.org/#foo")
+                                                    .build();
+        FieldSpec fooField = typeSpec.fieldSpecs.get(0);
+        assertTrue(fooField.annotations.contains(iriAnnotation));
     }
 
 }

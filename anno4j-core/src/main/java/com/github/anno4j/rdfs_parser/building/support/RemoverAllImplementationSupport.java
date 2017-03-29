@@ -4,6 +4,7 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
+import com.github.anno4j.rdfs_parser.model.RDFSProperty;
 import com.squareup.javapoet.*;
 
 /**
@@ -42,29 +43,44 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             TypeName set = ParameterizedTypeName.get(ClassName.get("java.util", "Set"), rangeClassName);
             TypeName hashSet = ParameterizedTypeName.get(ClassName.get("java.util", "HashSet"), rangeClassName);
 
-            // Prepare used methods:
-            MethodSpec getter = buildGetter(config);
+            // Get the annotated field for this property:
+            FieldSpec field = buildAnnotatedField(config);
 
             // Iterate the input values and check if the value was actually removed from this property:
             removerAllBuilder.addStatement("boolean changed = false")
-                    .addStatement("$T removedValues = new $T()", set, hashSet)
+                    .addStatement("$T _containedValues = new $T()", set, hashSet)
                     .beginControlFlow("for($T $N : $N)", rangeClassName, current, param)
-                    .beginControlFlow("if($N().contains($N))", getter, current) // If the value is actual a value of this property
+                    .beginControlFlow("if(this.$N.contains($N))", field, current) // If the value is actual a value of this property
                     .addStatement("changed |= true") // Set changed flag
-                    .addStatement("removedValues.add($N)", current) // Add to collection of removed values
+                    .addStatement("_containedValues.add($N)", current) // Add to collection of removed values
                     .endControlFlow() // End if
-                    .endControlFlow() // End for
-                    .beginControlFlow("for($T $N : removedValues)", rangeClassName, current)
-                    .addStatement("$N($N)", remover, current);
+                    .endControlFlow(); // End for
 
-            // If the value was actually removed, we can safely remove it also from superproperties:
-            for (ExtendedRDFSProperty superProp : getSuperproperties()) {
-                MethodSpec superPropRemover = superProp.buildRemover(config);
-                removerAllBuilder.addStatement("$N($N)", superPropRemover, current);
+            // Only propagate removal if there is actually something to be removed:
+            removerAllBuilder.beginControlFlow("if(!_containedValues.isEmpty())");
+
+            removerAllBuilder.addStatement("this.$N.removeAll(_containedValues)", field);
+
+            // The values can be safely removed also from superproperties
+            // if they were actually removed from this one (see above generated if-clause):
+            removerAllBuilder.addComment("Remove from superproperties:");
+            for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
+                String superRemoverAllName = superProperty.buildRemoverAll(config).name;
+                removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", superRemoverAllName);
             }
 
-            removerAllBuilder.endControlFlow() // Add second for
-                             .addStatement("return changed");
+            // The value can be safely removed from subproperties
+            // if it was actually removed from this one (see above generated if-clause):
+            removerAllBuilder.addComment("Remove values from subproperties:");
+            for(RDFSProperty subProperty : getSubProperties()) {
+                String subPropertyRemoverAllName = ((ExtendedRDFSProperty) subProperty).buildRemoverAll(config).name;
+
+                removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", subPropertyRemoverAllName);
+            }
+
+            removerAllBuilder.endControlFlow(); // End if(!_containedValues.isEmpty())
+
+            removerAllBuilder.addStatement("return changed");
 
             // Add the override annotation and output:
             return removerAllBuilder.addAnnotation(overrideAnnotation)

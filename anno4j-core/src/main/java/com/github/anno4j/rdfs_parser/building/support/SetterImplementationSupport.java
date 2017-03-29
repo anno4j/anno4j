@@ -4,11 +4,11 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
+import com.github.anno4j.rdfs_parser.model.RDFSProperty;
 import com.github.anno4j.rdfs_parser.validation.Validator;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.*;
+
+import java.util.HashSet;
 
 /**
  * Support class (of {@link ExtendedRDFSProperty}) for generating
@@ -42,25 +42,38 @@ public abstract class SetterImplementationSupport extends SetterSupport implemen
                 }
             }
 
+            // Get the annotated field for this property:
+            FieldSpec field = buildAnnotatedField(config);
+
             // Remove all old values from superproperties:
-            MethodSpec getter = buildGetter(config);
+            setterBuilder.addComment("Remove old values from superproperties:")
+                         .beginControlFlow("if(!this.$N.isEmpty())", field);
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                MethodSpec superRemover = superProperty.buildRemover(config);
-
-                setterBuilder.beginControlFlow("for($T $N : $N())", rangeClassName, current, getter)
-                            .addStatement("$N($N)", superRemover, current)
-                            .endControlFlow();
+                MethodSpec superPropertyRemoverAll = superProperty.buildRemoverAll(config);
+                setterBuilder.addStatement("$N($N)", superPropertyRemoverAll, field);
             }
+            setterBuilder.endControlFlow(); // End if(!field.isEmpty())
 
-            // Generate code for adding new values also to superproperties:
+            // Add new values to superproperties:
+            setterBuilder.addComment("Add new values to superproperties:")
+                         .beginControlFlow("if(!$N.isEmpty())", paramName);
             for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                MethodSpec superAdderAll = superProperty.buildAdderAll(config);
+                String superAdderAllName = superProperty.buildAdderAll(config).name;
+                setterBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderAllName, paramName);
+            }
+            setterBuilder.endControlFlow();
 
-                setterBuilder.addStatement("$N($N)", superAdderAll, paramName);
+            // Generate code for clearing subproperties:
+            setterBuilder.addComment("All subproperties loose their values:");
+            for(RDFSProperty subProperty : getSubProperties()) {
+                String subPropertySetterName = ((ExtendedRDFSProperty) subProperty).buildSetter(config).name;
+
+                setterBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, new $T())", subPropertySetterName, ClassName.get(HashSet.class));
             }
 
             return setterBuilder.addAnnotation(overrideAnnotation)
-                                .addStatement("return")
+                                .addStatement("this.$N.clear()", field)
+                                .addStatement("this.$N.addAll($N)", field, paramName)
                                 .build();
 
         } else {

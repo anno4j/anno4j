@@ -136,7 +136,7 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
      * @param config The configuration object.
      * @return The preferred rdfs:label literal.
      */
-    CharSequence getPreferredRDFSLabel(OntGenerationConfig config) {
+    private CharSequence getPreferredRDFSLabel(OntGenerationConfig config) {
         // Get the label in the preferred language:
         CharSequence preferredLabel = null;
         for (CharSequence label : getLabels()) {

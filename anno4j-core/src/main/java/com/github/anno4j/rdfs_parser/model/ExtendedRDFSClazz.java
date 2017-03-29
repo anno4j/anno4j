@@ -99,7 +99,7 @@ public interface ExtendedRDFSClazz extends RDFSClazz, BuildableOntologyClazz {
     /**
      * Adds a clazz as a superclass of this class, i.e. a class that occurs as the object in
      * a rdfs:subClassOf statement with this class as the subject.
-     * @param superClazz
+     * @param superClazz The class to add.
      */
     void addSuperclazz(ExtendedRDFSClazz superClazz);
 

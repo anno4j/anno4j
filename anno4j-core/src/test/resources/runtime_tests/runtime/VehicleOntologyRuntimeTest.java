@@ -176,5 +176,10 @@ public class VehicleOntologyRuntimeTest {
         names.add("Ente");
         assertFalse(vehicle.removeHasOfficialName("Ente"));
         assertEquals(names, vehicle.getHasNames());
+
+        // Test clearing of subproperties when setting values:
+        vehicle.setHasNames(Sets.newHashSet("Schnauferl"));
+        assertEquals(Sets.newHashSet(), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("Schnauferl"), vehicle.getHasNames());
     }
 }

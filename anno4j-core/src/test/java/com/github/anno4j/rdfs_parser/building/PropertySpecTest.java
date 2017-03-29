@@ -70,11 +70,7 @@ public class PropertySpecTest {
         assertEquals(ParameterizedTypeName.get(setClass, ClassName.get(Float.class)), loadCapSpec.returnType);
 
         // Test annotation:
-        assertEquals(1, loadCapSpec.annotations.size());
-        AnnotationSpec annotation = loadCapSpec.annotations.iterator().next();
-        assertEquals("org.openrdf.annotations.Iri", annotation.type.toString());
-        assertEquals(1, annotation.members.size());
-        assertEquals("\"http://example.de/ont#load_capacity\"", annotation.members.get("value").get(0).toString());
+        assertEquals(0, loadCapSpec.annotations.size()); // @Iri annotation was moved to private field. Setters must not have an annotation.
     }
 
     @Test
@@ -96,11 +92,7 @@ public class PropertySpecTest {
         assertTrue(loadCapSpec.javadoc.toString().startsWith("Ladung in Tonnen"));
 
         // Test annotation:
-        assertEquals(1, loadCapSpec.annotations.size());
-        AnnotationSpec annotation = loadCapSpec.annotations.iterator().next();
-        assertEquals("org.openrdf.annotations.Iri", annotation.type.toString());
-        assertEquals(1, annotation.members.size());
-        assertEquals("\"http://example.de/ont#load_capacity\"", annotation.members.get("value").get(0).toString());
+        assertEquals(0, loadCapSpec.annotations.size()); // @Iri annotation was moved to private field. Setters must not have an annotation.
     }
 
     @Test

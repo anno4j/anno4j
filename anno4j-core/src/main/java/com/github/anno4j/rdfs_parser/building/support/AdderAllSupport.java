@@ -4,12 +4,10 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
-import com.github.anno4j.rdfs_parser.naming.IdentifierBuilder;
 import com.github.anno4j.rdfs_parser.naming.MethodNameBuilder;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
-import java.net.URISyntaxException;
 
 /**
  * Support class (of {@link ExtendedRDFSProperty}) for generating resource class addAll-methods
@@ -21,22 +19,6 @@ public abstract class AdderAllSupport extends PropertyBuildingSupport implements
     @Override
     MethodSpec buildSignature(OntGenerationConfig config) {
         if(getRanges() != null) {
-            // Find a name for this method:
-            String methodName;
-            try {
-                // Name building is enhanced by rdfs:label literals.
-                // Find one matching the preference defined in the configuration:
-                MethodNameBuilder nameBuilder = MethodNameBuilder.builder(getResourceAsString());
-                CharSequence preferredLabel = getPreferredRDFSLabel(config);
-                if (preferredLabel != null) {
-                    nameBuilder = nameBuilder.withRDFSLabel(preferredLabel.toString());
-                }
-
-                methodName = "addAll" + nameBuilder.capitalizedPluralIdentifier();
-            } catch (IdentifierBuilder.NameBuildingException | URISyntaxException e) {
-                return null;
-            }
-
             // Get the most specific class describing all of the properties range classes:
             ExtendedRDFSClazz range = findSingleRangeClazz();
             ClassName set = ClassName.get("java.util", "Set");
@@ -62,8 +44,16 @@ public abstract class AdderAllSupport extends PropertyBuildingSupport implements
             // Add a throws declaration if the value space is constrained:
             addJavaDocExceptionInfo(javaDoc, range, config);
 
+            // Create name builder with the preferred RDFS label if available:
+            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
+            CharSequence preferredLabel = getPreferredRDFSLabel(config);
+            if (preferredLabel != null) {
+                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
+            }
 
-            return MethodSpec.methodBuilder(methodName)
+            return methodNameBuilder
+                    .getJavaPoetMethodSpec("addAll", true)
+                    .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(paramType, "values")
                     .addJavadoc(javaDoc.build())

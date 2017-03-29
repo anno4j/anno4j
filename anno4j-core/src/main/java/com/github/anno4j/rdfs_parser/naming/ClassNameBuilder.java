@@ -31,7 +31,7 @@ public class ClassNameBuilder extends IdentifierBuilder {
     /**
      * @param resource The resource to build a name for.
      */
-    protected ClassNameBuilder(String resource) {
+    private ClassNameBuilder(String resource) {
         super(resource);
     }
 

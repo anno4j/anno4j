@@ -78,4 +78,12 @@ public interface ExtendedRDFSProperty extends RDFSProperty, BuildableOntologyPro
      *                      <code>superProperty</code> with {@link RDFSProperty#addSubProperty(RDFSProperty)}.
      */
     void addSuperproperty(ExtendedRDFSProperty superProperty, boolean updateInverse);
+
+    /**
+     * Returns the collection of all {@link ExtendedRDFSProperty} instances that are direct
+     * or indirect subproperties of this property, i.e. properties that are connected over one or more
+     * rdfs:subPropertyOf edges in the graph and are instances of {@link ExtendedRDFSProperty}.
+     * @return The transitive closure of subproperties of this property.
+     */
+    Set<ExtendedRDFSProperty> getSubpropertyClosure();
 }

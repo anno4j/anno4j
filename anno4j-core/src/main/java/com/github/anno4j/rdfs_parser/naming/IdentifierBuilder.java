@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class IdentifierBuilder {
 
     /**
-     * Signalizes that an error occured while extracting a Java type name from a URI.
+     * Signalizes that an error occurred while extracting a Java type name from a URI.
      */
     public class NameBuildingException extends Exception {
         public NameBuildingException(String message) {
@@ -130,8 +130,9 @@ public class IdentifierBuilder {
      * <a href="https://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html">Naming a Package</a>.
      * @param name The name that should be escaped.
      * @return The escaped name. Returns the name '_' if the given name is empty.
+     * @throws IllegalArgumentException Thrown if <code>name</code> is empty or null.
      */
-    private String toJavaName(String name) {
+    private String toJavaName(String name) throws IllegalArgumentException {
         StringBuilder builder = new StringBuilder(name);
         if(!name.isEmpty()) {
             // Remove illegal characters:
@@ -162,7 +163,7 @@ public class IdentifierBuilder {
 
         } else {
             // If a empty name is provided:
-            return "_";
+            throw new IllegalArgumentException("The provided name must not be null or empty.");
         }
     }
 
@@ -221,9 +222,12 @@ public class IdentifierBuilder {
                     // Package names can't be empty, only numbers (IPv4 addresses) or contain colons (IPv6):
                     if(!splits[i].isEmpty() && !splits[i].matches("[0-9]+") && !splits[i].contains(":")) {
 
-                        String portion = toJavaName(splits[i]); // Make Java compliant
+                        String portion;
+                        try {
+                            portion = toJavaName(splits[i]); // Make Java compliant
+                            packageNamePortions.add(portion);
 
-                        packageNamePortions.add(portion);
+                        } catch (IllegalArgumentException ignored) { }
                     }
                 }
 
@@ -305,7 +309,11 @@ public class IdentifierBuilder {
             rawName.setCharAt(0, Character.toLowerCase(rawName.charAt(0)));
         }
 
-        return toJavaName(rawName.toString());
+        try {
+            return toJavaName(rawName.toString());
+        } catch (IllegalArgumentException e) {
+            throw new NameBuildingException("No name could be determined.");
+        }
     }
 
     /**
@@ -328,5 +336,43 @@ public class IdentifierBuilder {
         return identifier.toString();
     }
 
+    /**
+     * Extracts a plural form for this resource.
+     * A trailing "s" is added and some simple grammatical rules (for english) are applied.
+     * @return Same as {@link #lowercaseIdentifier()}, but in a plural form.
+     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
+     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     */
+    public String lowercasePluralIdentifier() throws URISyntaxException, NameBuildingException {
+        StringBuilder identifier = new StringBuilder();
+        identifier.append(lowercaseIdentifier());
 
+        // Replace trailing "y" with "ie". E.g. "capacity" will be transformed to "capacities":
+        if(identifier.charAt(identifier.length() - 1) == 'y') {
+            identifier.deleteCharAt(identifier.length() - 1);
+            identifier.append("ie");
+        }
+
+        // Only append trailing "s" if the name does not yet end with one:
+        if(identifier.charAt(identifier.length() - 1) != 's') {
+            identifier.append("s");
+        }
+
+        return identifier.toString();
+    }
+
+    /**
+     * Extracts a capitalized plural form for this resource.
+     * A trailing "s" is added and some simple grammatical rules (for english) are applied.
+     * @return Same as {@link #capitalizedIdentifier()}, but in a plural form.
+     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
+     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     */
+    public String capitalizedPluralIdentifier() throws URISyntaxException, NameBuildingException {
+        StringBuilder identifier = new StringBuilder(lowercasePluralIdentifier());
+        if(identifier.length() > 0) {
+            identifier.setCharAt(0, Character.toUpperCase(identifier.charAt(0)));
+        }
+        return identifier.toString();
+    }
 }

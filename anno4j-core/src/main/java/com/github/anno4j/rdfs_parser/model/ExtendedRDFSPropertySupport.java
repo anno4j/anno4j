@@ -9,6 +9,10 @@ import java.util.Set;
 @Partial
 public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport implements ExtendedRDFSProperty {
 
+    /**
+     * The direct superproperties of this property, i.e. the objects of statements
+     * with this property as subject and a rdfs:subPropertyOf predicate.
+     */
     private Set<ExtendedRDFSProperty> superProperties = new HashSet<>();
 
     @Override
@@ -53,5 +57,21 @@ public abstract class ExtendedRDFSPropertySupport extends RDFSPropertySupport im
             superProperty.addSubProperty(this);
         }
         superProperties.add(superProperty);
+    }
+
+    @Override
+    public Set<ExtendedRDFSProperty> getSubpropertyClosure() {
+        Set<ExtendedRDFSProperty> closure = new HashSet<>();
+
+        for (RDFSProperty subProperty : getSubProperties()) {
+            if(subProperty instanceof ExtendedRDFSProperty) {
+                // Add the subproperty:
+                closure.add((ExtendedRDFSProperty) subProperty);
+                // Recursively add all its subproperties:
+                closure.addAll(((ExtendedRDFSProperty) subProperty).getSubpropertyClosure());
+            }
+        }
+
+        return closure;
     }
 }

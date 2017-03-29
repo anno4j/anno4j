@@ -16,7 +16,7 @@ public abstract class RDFSClazzSupport extends RDFSSchemaResourceSupport impleme
      */
     @Override
     public void addSubClazz(RDFSClazz subClazz) {
-        Set<RDFSClazz> subClazzes = new HashSet<RDFSClazz>();
+        Set<RDFSClazz> subClazzes = new HashSet<>();
 
         if(this.getSubClazzes() != null ) {
             subClazzes.addAll(this.getSubClazzes());
@@ -24,6 +24,5 @@ public abstract class RDFSClazzSupport extends RDFSSchemaResourceSupport impleme
 
         subClazzes.add(subClazz);
         this.setSubClazzes(subClazzes);
-
     }
 }

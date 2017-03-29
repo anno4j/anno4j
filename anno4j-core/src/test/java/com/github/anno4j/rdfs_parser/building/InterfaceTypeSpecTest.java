@@ -20,11 +20,14 @@ import static org.junit.Assert.*;
  * Test for the building capabilities of {@link ExtendedRDFSClazz}/{@link ExtendedRDFSClazzSupport}
  * for generating JavaPoet {@link TypeSpec}.
  */
-public class InterfaceTypeSpecTest {
+public class InterfaceTypeSpecTest extends TypeSpecTest {
+
+    /**
+     * The configuration object used for building the TypeSpec.
+     */
+    private static OntGenerationConfig generationConfig;
 
     private static RDFSModelBuilder modelBuilder;
-
-    private static OntGenerationConfig generationConfig;
 
     /**
      * Returns a {@link ExtendedRDFSClazz} instance from {@link #modelBuilder}
@@ -40,32 +43,6 @@ public class InterfaceTypeSpecTest {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the fully qualified names of all superinterfaces of the given type.
-     * @param typeSpec The type spec to get the superinterfaces for.
-     * @return The names of the types superinterfaces.
-     */
-    private static Set<String> getSuperinterfaceNames(TypeSpec typeSpec) {
-        Set<String> superInterfaceNames = new HashSet<>();
-        for (TypeName superInterface : typeSpec.superinterfaces) {
-            superInterfaceNames.add(superInterface.toString());
-        }
-        return superInterfaceNames;
-    }
-
-    /**
-     * Returns the names of all methods of the given type.
-     * @param typeSpec The type to get methods for.
-     * @return The method names.
-     */
-    private static Set<String> getMethodNames(TypeSpec typeSpec) {
-        Set<String> methodNames = new HashSet<>();
-        for (MethodSpec methodSpec : typeSpec.methodSpecs) {
-            methodNames.add(methodSpec.name);
-        }
-        return methodNames;
     }
 
     @Before

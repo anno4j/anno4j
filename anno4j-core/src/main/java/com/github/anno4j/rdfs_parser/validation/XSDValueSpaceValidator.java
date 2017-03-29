@@ -31,7 +31,7 @@ public class XSDValueSpaceValidator implements Validator {
         Arrays.sort(CONSTRAINED_TYPES);
     }
 
-    private static MethodSpec.Builder addNormalizedStringValidation(MethodSpec.Builder builder, ParameterSpec param) {
+    private static void addNormalizedStringValidation(MethodSpec.Builder builder, ParameterSpec param) {
         TypeName string = ClassName.get(String.class);
         TypeName langString = ClassName.get(LangString.class);
 
@@ -59,10 +59,9 @@ public class XSDValueSpaceValidator implements Validator {
                         "Parameter type must either be String or LangString")
                 .endControlFlow();
 
-        return builder;
     }
 
-    private static MethodSpec.Builder addTokenValidation(MethodSpec.Builder builder, ParameterSpec param) {
+    private static void addTokenValidation(MethodSpec.Builder builder, ParameterSpec param) {
         TypeName string = ClassName.get(String.class);
         TypeName langString = ClassName.get(LangString.class);
 
@@ -103,32 +102,31 @@ public class XSDValueSpaceValidator implements Validator {
                         "Parameter type must either be String or LangString")
                 .endControlFlow();
 
-        return builder;
     }
 
-    private static MethodSpec.Builder addLanguageValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return builder.beginControlFlow("if(!$N.matches($S))", param, "[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*")
+    private static void addLanguageValidation(MethodSpec.Builder builder, ParameterSpec param) {
+        builder.beginControlFlow("if(!$N.matches($S))", param, "[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*")
                 .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                         "Value must be a language identifier, as defined by BCP 47.")
                 .endControlFlow();
     }
 
-    private static MethodSpec.Builder addNonPositiveValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return builder.beginControlFlow("if($N > 0)", param)
+    private static void addNonPositiveValidation(MethodSpec.Builder builder, ParameterSpec param) {
+        builder.beginControlFlow("if($N > 0)", param)
                 .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                         "Value must be non-positive.")
                 .endControlFlow();
     }
 
-    private static MethodSpec.Builder addNegativeValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return builder.beginControlFlow("if($N >= 0)", param)
+    private static void addNegativeValidation(MethodSpec.Builder builder, ParameterSpec param) {
+        builder.beginControlFlow("if($N >= 0)", param)
                 .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                         "Value must be negative.")
                 .endControlFlow();
     }
 
-    private static MethodSpec.Builder addNonNegativeValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return builder.beginControlFlow("if($N < 0)", param)
+    private static void addNonNegativeValidation(MethodSpec.Builder builder, ParameterSpec param) {
+        builder.beginControlFlow("if($N < 0)", param)
                 .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                         "Value must be non-negative.")
                 .endControlFlow();
@@ -149,23 +147,23 @@ public class XSDValueSpaceValidator implements Validator {
                 .endControlFlow();
     }
 
-    private static MethodSpec.Builder addUnsignedIntegerValidation(MethodSpec.Builder builder, ParameterSpec param) {
+    private static void addUnsignedIntegerValidation(MethodSpec.Builder builder, ParameterSpec param) {
         builder = addUnsignedValidation(builder, param);
-        return addMaximumValidation(builder, param, 2147483647);
+        addMaximumValidation(builder, param, 2147483647);
     }
 
-    private static MethodSpec.Builder addUnsignedShortValidation(MethodSpec.Builder builder, ParameterSpec param) {
+    private static void addUnsignedShortValidation(MethodSpec.Builder builder, ParameterSpec param) {
         builder = addUnsignedValidation(builder, param);
-        return addMaximumValidation(builder, param, 65535);
+        addMaximumValidation(builder, param, 65535);
     }
 
-    private static MethodSpec.Builder addUnsignedByteValidation(MethodSpec.Builder builder, ParameterSpec param) {
+    private static void addUnsignedByteValidation(MethodSpec.Builder builder, ParameterSpec param) {
         builder = addUnsignedValidation(builder, param);
-        return addMaximumValidation(builder, param, 255);
+        addMaximumValidation(builder, param, 255);
     }
 
-    private static MethodSpec.Builder addPositiveValidation(MethodSpec.Builder builder, ParameterSpec param) {
-        return builder.beginControlFlow("if($N <= 0)", param)
+    private static void addPositiveValidation(MethodSpec.Builder builder, ParameterSpec param) {
+        builder.beginControlFlow("if($N <= 0)", param)
                 .addStatement("throw new $T($S)", ILLEGAL_ARG_EXCEPTION,
                         "Value must be positive")
                 .endControlFlow();

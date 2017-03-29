@@ -1,8 +1,16 @@
 package runtime;
 
+import com.github.anno4j.model.impl.ResourceObject;
 import de.example.VehicleSupport;
 import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectFactory;
+import org.openrdf.repository.object.ObjectRepository;
+import org.openrdf.repository.object.TypeManager;
+import org.openrdf.store.blob.BlobStore;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,11 +21,17 @@ import java.util.Set;
  */
 public class VehicleSupportImpl extends VehicleSupport {
 
-    private Set<CharSequence> names = new HashSet<>();
+    public VehicleSupportImpl() {
+        // Initialize the property fields:
+        seatNums = new HashSet<>();
+        names = new HashSet<>();
+        officialNames = new HashSet<>();
+    }
 
-    private Set<CharSequence> officialNames = new HashSet<>();
-
-    private Set<Integer> numberOfSeats = new HashSet<>();
+    @Override
+    protected Object _getResourceObject() {
+        return this;
+    }
 
     @Override
     public Set<? extends CharSequence> getHasOfficialNames() {
@@ -31,13 +45,12 @@ public class VehicleSupportImpl extends VehicleSupport {
 
     @Override
     public Set<Integer> getNumberOfSeats() {
-        return numberOfSeats;
+        return seatNums;
     }
 
     @Override
     public void setHasNames(Set<? extends CharSequence> names) {
-        this.names = new HashSet<>();
-        this.names.addAll(names);
+        super.setHasNames(names);
     }
 
     @Override
@@ -47,7 +60,7 @@ public class VehicleSupportImpl extends VehicleSupport {
 
     @Override
     public Resource getResource() {
-        return null;
+        return new URIImpl("http://example.org/ont#someResource");
     }
 
     @Override
@@ -73,14 +86,10 @@ public class VehicleSupportImpl extends VehicleSupport {
     @Override
     public void setNumberOfSeats(Set<Integer> values) {
         super.setNumberOfSeats(values);
-        numberOfSeats = new HashSet<>();
-        numberOfSeats.addAll(values);
     }
 
     @Override
     public void setHasOfficialNames(Set<? extends CharSequence> values) {
         super.setHasOfficialNames(values);
-        officialNames = new HashSet<>();
-        officialNames.addAll(values);
     }
 }

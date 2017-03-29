@@ -1,44 +1,35 @@
 package com.github.anno4j.rdfs_parser.naming;
 
-import com.github.anno4j.model.namespaces.FOAF;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for {@link MethodNameBuilder}.
  */
 public class MethodNameBuilderTest {
+
     @Test
-    public void getterSpec() throws Exception {
-        assertEquals("getName", MethodNameBuilder.builder("http://example.com/ont#name")
-                                                            .getterSpec()
+    public void testJavaPoetMethodSpec() throws Exception {
+        // Test singular:
+        assertEquals("getAge", MethodNameBuilder.builder("http://example.org/#age")
+                                                            .getJavaPoetMethodSpec("get", false)
                                                             .name);
 
-        assertEquals("getName", MethodNameBuilder.builder("http://example.com/name")
-                                                            .getterSpec()
+        // Test plural:
+        assertEquals("getAges", MethodNameBuilder.builder("http://example.org/#age")
+                                                        .getJavaPoetMethodSpec("get", true)
+                                                        .name);
+
+        // Test building with RDFS label:
+        assertEquals("getAlter", MethodNameBuilder.builder("http://example.org/#age")
+                                                            .withRDFSLabel("Alter")
+                                                            .getJavaPoetMethodSpec("get", false)
                                                             .name);
-    }
 
-    @Test
-    public void setterSpec() throws Exception {
-        assertEquals("setName", MethodNameBuilder.builder("http://example.com/ont#name")
-                .setterSpec()
-                .name);
-
-        assertEquals("setName", MethodNameBuilder.builder("http://example.com/name")
-                .setterSpec()
-                .name);
-    }
-
-    @Test
-    public void adderSpec() throws Exception {
-        assertEquals("addName", MethodNameBuilder.builder("http://example.com/ont#name")
-                .adderSpec()
-                .name);
-
-        assertEquals("addName", MethodNameBuilder.builder("http://example.com/name")
-                .adderSpec()
-                .name);
+        // Test resource for which no name can be extracted:
+        assertTrue(MethodNameBuilder.builder("http://example.org/#")
+                .getJavaPoetMethodSpec("foo", false)
+                .name.startsWith("fooUnnamed"));
     }
 }
