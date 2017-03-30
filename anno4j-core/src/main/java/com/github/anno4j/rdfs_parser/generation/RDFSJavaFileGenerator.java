@@ -99,7 +99,7 @@ public class RDFSJavaFileGenerator implements JavaFileGenerator {
      * {@inheritDoc}
      */
     @Override
-    public void generateJavaFiles(OntGenerationConfig config, File outputDirectory) throws JavaFileGenerationException, InvalidOntologyException, IOException {
+    public void generateJavaFiles(OntGenerationConfig config, File outputDirectory) throws JavaFileGenerationException, IOException {
         // Check if the output directory is actually a directory:
         if (!outputDirectory.exists()) {
             // Try to create it:
@@ -124,7 +124,8 @@ public class RDFSJavaFileGenerator implements JavaFileGenerator {
 
         // Write the .java files:
         for (ExtendedRDFSClazz clazz : modelBuilder.getClazzes()) {
-            if (!isFromSpecialVocabulary(clazz)) {
+            // Don't output files for classes that are from RDF/RDFS/... vocab and not for literal types:
+            if (!isFromSpecialVocabulary(clazz) && !clazz.isLiteral()) {
 
                 String clazzPackage = clazz.getJavaPackageName();
 

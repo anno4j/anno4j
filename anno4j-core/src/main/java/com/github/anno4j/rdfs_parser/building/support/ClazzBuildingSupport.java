@@ -93,6 +93,13 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
             }
         }
 
+        /**
+         * If this class is an unknown literal, return char sequence:
+         */
+        if(isLiteral()) {
+            return ClassName.get(CharSequence.class);
+        }
+
         // First try to find a name for this class:
         try {
             ClassNameBuilder nameBuilder = ClassNameBuilder.builder(getResourceAsString());
