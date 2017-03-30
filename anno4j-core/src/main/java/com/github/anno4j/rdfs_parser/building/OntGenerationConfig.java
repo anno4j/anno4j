@@ -1,10 +1,12 @@
 package com.github.anno4j.rdfs_parser.building;
 
+import com.github.anno4j.rdfs_parser.mapping.DatatypeMapper;
 import com.github.anno4j.rdfs_parser.validation.ValidatorChain;
 import org.openrdf.repository.object.LangString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -41,6 +43,11 @@ public class OntGenerationConfig {
      * The validators used to validate setter and adder arguments.
      */
     private ValidatorChain validators;
+
+    /**
+     * Used to map RDF datatypes to Java types.
+     */
+    private Collection<DatatypeMapper> datatypeMappers = new ArrayList<>();
 
     /**
      * Initializes the configuration with preference for untyped literals
@@ -260,5 +267,32 @@ public class OntGenerationConfig {
      */
     public boolean isPreferredForJavaDoc(CharSequence s, CharSequence other) {
         return isStringPreferred(s, other, javadocLangPreference);
+    }
+
+    /**
+     * Returns the datatype mappers that are used to map RDF datatypes
+     * (subclasses of <code>rdfs:Datatype</code>) to Java types.
+     * @return The mappers to be used during Java file generation.
+     */
+    public Collection<DatatypeMapper> getDatatypeMappers() {
+        return datatypeMappers;
+    }
+
+    /**
+     * Sets the datatype mappers that are used to map RDF datatypes
+     * (subclasses of <code>rdfs:Datatype</code>) to Java types.
+     * @param datatypeMappers The mappers to be used during Java file generation.
+     */
+    public void setDatatypeMappers(Collection<DatatypeMapper> datatypeMappers) {
+        this.datatypeMappers = datatypeMappers;
+    }
+
+    /**
+     * Sets the datatype mappers that are used to map RDF datatypes
+     * (subclasses of <code>rdfs:Datatype</code>) to Java types.
+     * @param datatypeMappers The mappers to be used during Java file generation.
+     */
+    public void setDatatypeMappers(DatatypeMapper[] datatypeMappers) {
+        this.datatypeMappers = Arrays.asList(datatypeMappers);
     }
 }

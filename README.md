@@ -27,6 +27,7 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
     - [Transactions](#transactions)
     - [Graph Context](#graph-context)
     - [Input and Output](#input-and-output)
+    - [Java file generation](#Generating-annotated-java-files-from-an-existing-ontology)
 - [Example](#example)
 - [Restrictions](#restrictions)
 - [Contributors](#contributors)
@@ -413,8 +414,8 @@ class OddIntegerValidator implements Validator {
 The first method generates the actual validation code. For details on the syntax see
 [JavaPoet](https://github.com/square/javapoet).
 The convention for validators is that they throw an `IllegalArgumentException` if the value is not in the datatypes value space.
-Note also that Anno4j Java file generation maps all unknown datatypes (must be subclass of `rdfs:Literal`) to the Java type `CharSequence`.
-Thus it may be necessary to convert types, as above with `Integer.parseInt()`.
+Note also that Anno4j Java file generation maps all unknown datatypes (must be subclass of `rdfs:Datatype`) by default to the Java type `CharSequence`.
+Thus it may be necessary to convert types, as above with `Integer.parseInt()`. See next section on how to define your own mappings.
 
 The second method simply returns a human readable definition of the value space, which is used in generated JavaDoc.
 The third method checks if the given class is covered by this validator (thus a check should be generated).
@@ -440,6 +441,34 @@ public void setHasOddNums(Set<? extends CharSequence> hasOddNums) {
     }
     // ...
 }
+```
+
+#### Mappings for custom datatypes
+
+As seen in the above example, Java file generation by default maps all RDF datatypes unknown to it to the Java type
+`CharSequence`. This makes conversions necessary and thus using the custom datatypes inconvenient.
+But the `OntGenerationConfig` allows you to define your own mappings from RDF datatypes
+to Java types. To do so you must define a `DatatypeMapper` and add it to the generation configuration:
+
+```java
+class OddIntegerMapper implements DatatypeMapper {
+    @Override
+    public Class<?> mapType(RDFSClazz type) {
+        if(type.getResourceAsString().equals("http://example.de/ont#oddInt")) {
+            return Integer.class;
+        } else {
+            return null;
+        }
+    }
+}
+// ...
+config.setDatatypeMappers(new DatatypeMapper[] {new OddIntegerMapper()});
+```
+Now the datatype of the parameters of generated methods will be `Integer` for this datatype
+and you can omit the above conversion in your validation code.
+
+```java
+public void setHasOddNums(Set<Integer> hasOddNums);
 ```
 
 ## Example

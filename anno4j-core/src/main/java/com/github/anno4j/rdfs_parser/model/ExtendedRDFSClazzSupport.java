@@ -155,4 +155,9 @@ public abstract class ExtendedRDFSClazzSupport extends RDFSClazzSupport implemen
     public boolean isLiteral() {
         return hasParent(RDFS.LITERAL);
     }
+
+    @Override
+    public boolean isDatatype() {
+        return hasParent(RDFS.DATATYPE);
+    }
 }

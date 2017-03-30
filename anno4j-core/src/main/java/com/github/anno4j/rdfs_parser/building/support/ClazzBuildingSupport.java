@@ -5,14 +5,19 @@ import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.model.namespaces.XSD;
 import com.github.anno4j.rdfs_parser.building.OntGenerationConfig;
+import com.github.anno4j.rdfs_parser.mapping.DatatypeMapper;
+import com.github.anno4j.rdfs_parser.mapping.IllegalMappingException;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
 import com.github.anno4j.rdfs_parser.model.RDFSClazzSupport;
 import com.github.anno4j.rdfs_parser.naming.ClassNameBuilder;
 import com.github.anno4j.rdfs_parser.naming.IdentifierBuilder;
 import com.squareup.javapoet.ClassName;
+import org.openrdf.repository.object.LangString;
 
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Support class for {@link ExtendedRDFSClazz} implementing basic methods
@@ -28,6 +33,32 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
         } catch (URISyntaxException e) {
             return "";
         }
+    }
+
+    /**
+     * Checks if the given type is a Anno4j supported Java type. These are:
+     * <ul>
+     *  <li>Java primitive corresponding classes ({@link Integer}, {@link Double}, ...)</li>
+     *  <li>{@link CharSequence}</li>
+     *  <li>{@link String}</li>
+     *  <li>{@link org.openrdf.repository.object.LangString}</li>
+     * </ul>
+     * @param type The type to check.
+     * @return Returns true iff the type is allowed.
+     */
+    private static boolean isSupportedJavaType(Class<?> type) {
+        Collection<Class<?>> supportedTypes = Arrays.asList(Boolean.class,
+                Byte.class,
+                Character.class,
+                Double.class,
+                Float.class,
+                Integer.class,
+                Long.class,
+                Short.class,
+                CharSequence.class,
+                String.class,
+                LangString.class);
+        return supportedTypes.contains(type);
     }
 
     @Override
@@ -96,7 +127,22 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
         /**
          * If this class is an unknown literal, return char sequence:
          */
-        if(isLiteral()) {
+        if(isDatatype()) {
+
+            // Check if there is a datatype mapper for this datatype:
+            for(DatatypeMapper mapper : config.getDatatypeMappers()) {
+
+                Class<?> javaType = mapper.mapType(this);
+                if(javaType != null) {
+                    // Validate that the mapping is a Anno4j supported type:
+                    if(isSupportedJavaType(javaType)) {
+                        return ClassName.get(javaType);
+                    } else {
+                        throw new IllegalMappingException(javaType.getName() + " is not a Java type supported by Anno4j.");
+                    }
+                }
+            }
+            // If no mapper was found, return CharSequence as a general type:
             return ClassName.get(CharSequence.class);
         }
 

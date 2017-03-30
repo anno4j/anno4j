@@ -32,6 +32,9 @@ public interface BuildableOntologyClazz extends BuildableOntologyResource {
      * @param config The configuration for building the class name
      *               (see {@link OntGenerationConfig#setIdentifierLanguagePreference(List)}).
      * @return The class name of a Java class for this RDFS class.
+     * @throws com.github.anno4j.rdfs_parser.mapping.IllegalMappingException Thrown if a
+     * {@link com.github.anno4j.rdfs_parser.mapping.DatatypeMapper} returns a Java type
+     * that is not supported by Anno4j.
      */
     ClassName getJavaPoetClassName(OntGenerationConfig config);
 

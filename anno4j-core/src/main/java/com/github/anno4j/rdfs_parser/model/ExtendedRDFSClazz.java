@@ -128,6 +128,12 @@ public interface ExtendedRDFSClazz extends RDFSClazz, BuildableOntologyClazz {
     boolean isLiteral();
 
     /**
+     * Returns whether this class is a rdfs:Datatype.
+     * @return Returns true iff this class is rdfs:Datatype or a subclass of it.
+     */
+    boolean isDatatype();
+
+    /**
      * Checks whether this clazz or one of its transitive superclass closure
      * is the domain of a certain property.
      * @param property The property to check for.
