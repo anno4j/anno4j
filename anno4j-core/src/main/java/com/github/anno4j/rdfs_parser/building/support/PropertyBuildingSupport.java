@@ -196,15 +196,16 @@ public abstract class PropertyBuildingSupport extends RDFSPropertySupport implem
         StringBuilder valueSpaceDefinitions = new StringBuilder();
         for (Validator validator : config.getValidators()) {
             if (validator.isValueSpaceConstrained(datatype)) {
-                valueSpaceDefinitions.append("<li>")
+                valueSpaceDefinitions.append("\t<li>")
                         .append(validator.getValueSpaceDefinition(datatype))
-                        .append("</li>")
+                        .append("</li>\n")
                         .append(System.lineSeparator());
             }
         }
         if (valueSpaceDefinitions.length() > 0) {
-            javaDoc.add("\n@throws IllegalArgumentException If <code>value</code> is not in the value space. <ol>"
-                    + valueSpaceDefinitions.toString() + "</ol>");
+            javaDoc.add("\n@throws IllegalArgumentException If the element(s) are not in the value space.\n" +
+                    "The value space is defined as:<ol>\n" +
+                    valueSpaceDefinitions.toString() + "</ol>");
         }
     }
 }
