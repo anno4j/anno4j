@@ -268,18 +268,72 @@ String annotationAsTurtle = annotation.getTriples(RDFFormat.TURTLE);
 ## Generating annotated Java files from an existing ontology
 
 To make working with an existing RDFS ontology even easier, the Java classes required by Anno4j can be automatically generated.
-In order to do so a `OntGenerationConfig` object must be created suiting your requirements.
 
-This configuration object is then used to create the Java files:
+Simply add your ontology data to a `RDFSJavaFileGenerator`. 
+It does the inferencing, type checking and schema logic for you:
 ```java
+OntGenerationConfig config = new OntGenerationConfig();
+// Set your preferences with config (see below)...
+
 JavaFileGenerator generator = new RDFSJavaFileGenerator();
-generator.addRDF("http://example.com/your_ontology.xml");
+generator.addRDF("http://example.com/your_ontology.rdf.xml");
 
 File outputDir = new File("/path/to/destination");
 generator.generateJavaFiles(config, outputDir);
 ```
 
-For each RDFS class a Anno4j resource object class and a support class is created.
+For each RDFS class a Anno4j resource object class and a support class is created in `outputDir`.
+Consider the following definition of a RDFS class in the input:
+
+```xml
+<rdfs:Class rdf:about="http://example.de/#Player">
+    <rdfs:comment>A user playing a game.</rdfs:comment>
+</rdfs:Class>
+
+<rdf:Description rdf:about="http://example.de/#score">
+    <rdfs:domain rdf:resource="http://example.de/#Player"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+</rdf:Description>
+```
+
+The following resource object class would be generated:
+
+```java
+/**
+ * A user playing a game.
+ * Generated class for http://example.de/#Player */
+@Iri("http://example.de/#Player")
+public interface Player extends ResourceObject {
+
+    Set<Integer> getScores();
+    
+    void setScores(Set<Integer> scores);
+
+    // ...
+}
+```
+
+Furthermore a support class is generated implementing checks:
+```java
+// ...
+/**
+   *
+   * @param scores The elements to set.
+   * @throws IllegalArgumentException If values is not in the value space.
+   * The value space is defined as:<ol>
+   * 	<li>The value space is the infinite set {0,1,2,...}.</li>
+   * </ol> */
+  @Override
+  public void setScores(Set<Integer> scores) {
+    for(Integer current : scores) {
+        if(current < 0) {
+            throw new IllegalArgumentException("Value must be non-negative.");
+        }
+    }
+  }
+// ...
+```
+
 If you want to have the ontology information persisted to your Anno4j underlying
 triplestore, you can do so by passing the Anno4j object to the generator.
 
@@ -293,7 +347,7 @@ JavaFileGenerator generator = new RDFSJavaFileGenerator(anno4j);
 
 ### Language preferences
 
-The purpose of the `OntGenerationConfig` basically is defining a preference for the languages to use for class names and JavaDoc.
+The purpose of the `OntGenerationConfig` basically is defining a preference for the natural languages to use for class names and JavaDoc.
 Those are extracted from `rdfs:label` and `rdfs:comment` literals.
 
 ```
@@ -312,8 +366,8 @@ See [BCP47](https://tools.ietf.org/html/bcp47) for the language codes.
 Validation code can be automatically generated, checking that the value set for a property
 is actually allowed by the datatype defined in the ontology.
 
-For example a call `addFoo(-42)` for a property `foo` with datatype `xsd:nonNegativeInteger` will throw a `IllegalArgumentException`.
-The generation of such checks can controlled by providing validators to the `OntGenerationConfig`.
+For example a call `addWeight(-42)` for a property `weight` with datatype `xsd:nonNegativeInteger` will throw a `IllegalArgumentException`.
+The generation of such checks can be controlled by providing validators to the `OntGenerationConfig`.
 
 ```java
 ValidatorChain validators = new ValidatorChain();
@@ -322,8 +376,71 @@ config.setValidators(validators);
 ```
 In this example only checks for the value being not null will be added to the generated method implementations.
 If no validator chain is explicitly provided, checks for `null` and the XSD datatypes are generated.
-If you want checks for your custom datatypes, you can implement the `Validator` interface.
 
+#### Validators for custom datatypes
+
+Maybe your ontology uses some datatypes that are not from the XSD vocabulary.
+In this case you can define your own validators and add them to the `OntGenerationConfig`s
+validator chain.
+Assume there is a datatype `ex:oddInt` which has as value space all integers that are odd.
+Lets define a validator class for this datatype:
+
+```java
+class OddIntegerValidator implements Validator {
+
+    @Override
+    public void addValueSpaceCheck(MethodSpec.Builder methodBuilder, ParameterSpec symbol, RDFSClazz range) {
+        // Generate the value space check:
+        methodBuilder.addStatement("int i = $T.parseInt($N.toString())", ClassName.get(Integer.class), symbol) // Convert to int
+                     .beginControlFlow("if(i % 2 == 0)")
+                     .addStatement("throw new $T($S)", ClassName.get(IllegalArgumentException.class), "Value must be odd.")
+                     .endControlFlow();
+    }
+
+    @Override
+    public String getValueSpaceDefinition(RDFSClazz clazz) {
+        // Human readable value space definition as used in JavaDoc:
+        return "Value must be an odd integer.";
+    }
+
+    @Override
+    public boolean isValueSpaceConstrained(RDFSClazz clazz) {
+        // This validator only constrains ex:oddInt:
+        return clazz.getResourceAsString().equals("http://example.de/ont#oddInt");
+    }
+}
+```
+The first method generates the actual validation code. For details on the syntax see
+[JavaPoet](https://github.com/square/javapoet).
+The convention for validators is that they throw an `IllegalArgumentException` if the value is not in the datatypes value space.
+Note also that Anno4j Java file generation maps all unknown datatypes (must be subclass of `rdfs:Literal`) to the Java type `CharSequence`.
+Thus it may be necessary to convert types, as above with `Integer.parseInt()`.
+
+The second method simply returns a human readable definition of the value space, which is used in generated JavaDoc.
+The third method checks if the given class is covered by this validator (thus a check should be generated).
+
+Now you can add an instance of your custom validator to the generation configuration object.
+
+```java
+ValidatorChain chain = ValidatorChain.getRDFSDefault();
+chain.add(new OddIntegerValidator());
+config.setValidators(chain);
+```
+
+The set- and add-methods of properties with `ex:oddInt` will now throw an exception if they get an value that is even.
+
+```java
+public void setHasOddNums(Set<? extends CharSequence> hasOddNums) {
+    // ...
+    for(CharSequence current : hasOddNums) {
+      int i = Integer.parseInt(current.toString());
+      if(i % 2 == 0) {
+        throw new IllegalArgumentException("Value must be odd.");
+      }
+    }
+    // ...
+}
+```
 
 ## Example
 
