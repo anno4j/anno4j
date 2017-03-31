@@ -4,13 +4,15 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.model.namespaces.RDF;
-import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.query.Update;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.rio.*;
 
 import java.io.ByteArrayInputStream;
@@ -63,6 +65,29 @@ public class ObjectParser {
     }
 
     /**
+     * Clears the Anno4j underlying triplestore.
+     * This is required in order to prevent a drop in throughput while parsing.
+     * @throws RepositoryException Thrown if no connection to the object repository could be made.
+     * @throws UpdateExecutionException Thrown if an error occurred while executing the clearing query.
+     */
+    private void clear() throws RepositoryException, UpdateExecutionException {
+        String deleteUpdate = "DELETE {?s ?p ?o}\n" +
+                "WHERE {?s ?p ?o}";
+
+        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
+
+        Update update;
+        try {
+            update = connection.prepareUpdate(deleteUpdate);
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        update.execute();
+    }
+
+    /**
      * Shutdown method, closing all repositories and corresponding connection
      * objects.
      *
@@ -97,6 +122,8 @@ public class ObjectParser {
     /**
      * Used to parse a given text content, supported in a given serialization
      * format.
+     * The Annotations are then returned as a list.
+     * For performance reasons, the local memorystore in then cleared.
      *
      * @param content The String representation of the textcontent.
      * @param documentURL The basic URL used for namespaces.
@@ -117,6 +144,15 @@ public class ObjectParser {
             e.printStackTrace();
         }
 
-        return getAnnotations();
+        List<Annotation> annotations = getAnnotations();
+
+        // Clear all triples in the triplestore:
+        try {
+            clear();
+        } catch (RepositoryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return annotations;
     }
 }
