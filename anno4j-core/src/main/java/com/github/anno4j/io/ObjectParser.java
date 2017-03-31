@@ -122,6 +122,8 @@ public class ObjectParser {
     /**
      * Used to parse a given text content, supported in a given serialization
      * format.
+     * The Annotations are then returned as a list.
+     * For performance reasons, the local memorystore in then cleared.
      *
      * @param content The String representation of the textcontent.
      * @param documentURL The basic URL used for namespaces.
