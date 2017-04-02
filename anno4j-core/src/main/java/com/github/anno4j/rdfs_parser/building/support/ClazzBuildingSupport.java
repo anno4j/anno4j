@@ -127,7 +127,7 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
         /**
          * If this class is an unknown literal, return char sequence:
          */
-        if(isDatatype()) {
+        if(isLiteral()) {
 
             // Check if there is a datatype mapper for this datatype:
             for(DatatypeMapper mapper : config.getDatatypeMappers()) {

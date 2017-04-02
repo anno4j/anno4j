@@ -414,7 +414,7 @@ class OddIntegerValidator implements Validator {
 The first method generates the actual validation code. For details on the syntax see
 [JavaPoet](https://github.com/square/javapoet).
 The convention for validators is that they throw an `IllegalArgumentException` if the value is not in the datatypes value space.
-Note also that Anno4j Java file generation maps all unknown datatypes (must be subclass of `rdfs:Datatype`) by default to the Java type `CharSequence`.
+Note also that Anno4j Java file generation maps all unknown datatypes (must be subclass of `rdfs:Literal`) by default to the Java type `CharSequence`.
 Thus it may be necessary to convert types, as above with `Integer.parseInt()`. See next section on how to define your own mappings.
 
 The second method simply returns a human readable definition of the value space, which is used in generated JavaDoc.

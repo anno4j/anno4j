@@ -54,7 +54,7 @@ public class DatatypeMappingTest {
             "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . " +
             "@prefix ex: <http://example.de/ont#> . " +
             "ex:A rdf:type rdfs:Class . " +
-            "ex:oddInt rdfs:subClassOf rdfs:Datatype . " +
+            "ex:oddInt rdfs:subClassOf rdfs:Literal . " +
             "ex:foo rdfs:domain ex:A . " +
             "ex:foo rdfs:range ex:oddInt . ";
 
