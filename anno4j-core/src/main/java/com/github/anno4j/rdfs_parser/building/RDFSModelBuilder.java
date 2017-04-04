@@ -362,6 +362,58 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
         }
     }
 
+    private Collection<OntProperty> collectSubjectsAsProperties(StmtIterator iterator) {
+        Collection<OntProperty> properties = new HashSet<>();
+        while (iterator.hasNext()) {
+            Statement statement = iterator.nextStatement();
+            com.hp.hpl.jena.rdf.model.Resource subject = statement.getSubject();
+
+            // Infer the subject is a property:
+            model.add(new StatementImpl(subject, model.getProperty(RDF.TYPE), model.createClass(RDF.PROPERTY)));
+
+            // Adjust the domain:
+            OntProperty property = model.getOntProperty(subject.getURI());
+            if(property != null) {
+                properties.add(property);
+            }
+        }
+        return properties;
+    }
+
+    /**
+     * Replaces <code>equivalentClazz</code> in the rdfs:domain specifications of all properties
+     * by the class <code>target</code>.
+     * @param target The class which should replace <code>equivalentClazz</code> in the domain
+     *               of every property in {@link #model}.
+     * @param equivalentClazz The class to replace.
+     */
+    private void replaceOntClassInDomains(OntClass target, OntClass equivalentClazz) {
+        StmtIterator domainStatementIter = model.listStatements(new SimpleSelector(null, model.getProperty(RDFS.DOMAIN), equivalentClazz));
+
+        Collection<OntProperty> affectedProperties = collectSubjectsAsProperties(domainStatementIter);
+        for (OntProperty affectedProperty : affectedProperties) {
+            affectedProperty.removeDomain(equivalentClazz);
+            affectedProperty.addDomain(target);
+        }
+    }
+
+    /**
+     * Replaces <code>equivalentClazz</code> in the rdfs:range specifications of all properties
+     * by the class <code>target</code>.
+     * @param target The class which should replace <code>equivalentClazz</code> in the range
+     *               of every property in {@link #model}.
+     * @param equivalentClazz The class to replace.
+     */
+    private void replaceOntClassInRanges(OntClass target, OntClass equivalentClazz) {
+        StmtIterator rangeStatementIter = model.listStatements(new SimpleSelector(null, model.getProperty(RDFS.RANGE), equivalentClazz));
+
+        Collection<OntProperty> affectedProperties = collectSubjectsAsProperties(rangeStatementIter);
+        for (OntProperty affectedProperty : affectedProperties) {
+            affectedProperty.removeRange(equivalentClazz);
+            affectedProperty.addRange(target);
+        }
+    }
+
     /**
      * Copies the subclass- and property relationships of some classes to another class.
      * The former classes (which are considered equivalent to <code>target</code>)
@@ -373,23 +425,23 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
      */
     private void mergeOntClasses(OntClass target, Collection<OntClass> equivalents) {
         for(OntClass equivalentClazz : equivalents) {
-            // For all (direct) outgoing properties of the equivalent class,
-            // exchange the equivalent class with the target in the domain specification:
-            ExtendedIterator<OntProperty> propertyIter = equivalentClazz.listDeclaredProperties(true);
-            while (propertyIter.hasNext()) {
-                OntProperty property = propertyIter.next();
-                property.removeDomain(equivalentClazz);
-                property.addDomain(target);
-            }
+            // Replace the class with the target in domain specifications:
+            replaceOntClassInDomains(target, equivalentClazz);
+            // Replace the class with the target in range specifications:
+            replaceOntClassInRanges(target, equivalentClazz);
 
             // Add the superclasses of the equivalent class to the target class:
-            ExtendedIterator<OntClass> superClazzIter = equivalentClazz.listSuperClasses(true);
-            while(superClazzIter.hasNext()) {
-                target.addSuperClass(superClazzIter.next());
+            if(!equivalentClazz.equals(target)) {
+                ExtendedIterator<OntClass> superClazzIter = equivalentClazz.listSuperClasses(true);
+                while(superClazzIter.hasNext()) {
+                    target.addSuperClass(superClazzIter.next());
+                }
             }
 
-            // Remove the class from the OntModel it belongs to:
-            equivalentClazz.remove();
+            // Remove the class from the OntModel it belongs to if its not the target:
+            if (!equivalentClazz.equals(target)) {
+                equivalentClazz.remove();
+            }
         }
     }
 
@@ -445,6 +497,13 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
         return clazzes;
     }
 
+    /**
+     * Eliminates class equivalence from the {@link #model} by finding the groups of equivalent classes
+     * and removing all but one class from each group.
+     * <a href="https://www.w3.org/2000/03/rdf-tracking/#rdfs-no-cycles-in-subClassOf">RDF Issue "rdfs-no-cycles-in-subClassOf"</a>
+     * defines classes as equivalent if they participate in a cyclic rdfs:subClassOf relationship.
+     * @throws RDFSModelBuildingException Thrown if {@link #model} is found to be invalid.
+     */
     private void normalizeRDFSEquivalence() throws RDFSModelBuildingException {
         /*
         Classes are considered equivalent by the RDFS specification if their rdfs:subClassOf
@@ -469,12 +528,16 @@ public class RDFSModelBuilder implements OntologyModelBuilder {
             if(scc.size() > 1) {
                 // All equivalent classes must be merged into a single one. Take the first:
                 Iterator<OntClass> iter = scc.iterator();
-                OntClass sccRoot = iter.next();
+                OntClass sccRoot = null;
 
                 // All others are considered equivalent and will be removed by mergeRDFSClasses():
                 Collection<OntClass> equivalentClazzes = new HashSet<>();
                 while(iter.hasNext()) {
-                    equivalentClazzes.add(iter.next());
+                    OntClass current = iter.next();
+                    if (sccRoot == null) {
+                        sccRoot = current;
+                    }
+                    equivalentClazzes.add(current);
                 }
 
                 // Merge the classes into the root class:

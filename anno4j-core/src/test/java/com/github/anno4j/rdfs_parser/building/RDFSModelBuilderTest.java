@@ -162,5 +162,19 @@ public class RDFSModelBuilderTest {
             }
         }
         assertEquals(3, ontClazzes.size());
+
+        // Find the class that was picked as a representative of the equivalent classes:
+        ExtendedRDFSClazz equivalentClass = null;
+        for (ExtendedRDFSClazz clazz : modelBuilder.getClazzes()) {
+            if(clazz.getResourceAsString().equals("http://example.de/ont#B") || clazz.getResourceAsString().equals("http://example.de/ont#C")) {
+                equivalentClass = clazz;
+            }
+        }
+        assertNotNull(equivalentClass);
+        assertEquals(1, equivalentClass.getOutgoingProperties().size());
+        ExtendedRDFSProperty property = equivalentClass.getOutgoingProperties().iterator().next();
+        assertEquals("http://example.de/ont#foo", property.getResourceAsString());
+        assertEquals(1, property.getRanges().size());
+        assertEquals(equivalentClass.getResourceAsString(), property.getRanges().iterator().next().getResourceAsString());
     }
 }

@@ -6,3 +6,6 @@ ex:C rdfs:subClassOf ex:A .
 ex:B rdfs:subClassOf ex:C .
 ex:C rdfs:subClassOf ex:B .
 ex:D rdfs:subClassOf ex:C .
+
+ex:foo rdfs:domain ex:B .
+ex:foo rdfs:range ex:C .
