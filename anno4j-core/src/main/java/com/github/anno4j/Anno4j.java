@@ -7,8 +7,6 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
-import com.github.anno4j.schema_parsing.SchemaParsingHandler;
-import com.github.anno4j.schema_parsing.model.Schema;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -27,7 +25,6 @@ import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.repository.object.config.ObjectRepositoryConfig;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.rio.*;
 import org.openrdf.sail.memory.MemoryStore;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -38,7 +35,6 @@ import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -407,56 +403,5 @@ public class Anno4j implements TransactionCommands {
 
     public Transaction createTransaction() throws RepositoryException {
         return new Transaction(objectRepository, evaluatorConfiguration);
-    }
-
-    /**
-     * Private method to parse the supported schema as inputstream. Will create a parser and add all triples contained
-     * in the schema into this Anno4j instance.
-     *
-     * @param inputStream   The inputstream of the schema.
-     * @param format        The format that the schema is supported in.
-     * @param baseURI       URI that is used for basic namespacing.
-     * @throws RDFParseException
-     * @throws IOException
-     * @throws RDFHandlerException
-     */
-    private void parseSchema(InputStream inputStream, RDFFormat format, String baseURI) throws RDFParseException, IOException, RDFHandlerException {
-        // Parse the schema and add its triples to this Anno4j instance
-        RDFParser parser = Rio.createParser(RDFFormat.RDFXML);
-
-        SchemaParsingHandler handler = new SchemaParsingHandler(this);
-        parser.setRDFHandler(handler);
-
-        parser.parse(inputStream, baseURI);
-    }
-
-    /**
-     * Method to parse a RDF schema supported in the respective format. All triples associated in the schema will be
-     * added to this Anno4j instance.
-     *
-     * @param file      The file containing the schema.
-     * @param format    The formatthat the schema is supported in.
-     * @param baseURI   URI that is used for basic namespacing.
-     * @throws IOException
-     * @throws RDFParseException
-     * @throws RDFHandlerException
-     */
-    public void parseSchema(File file, RDFFormat format, String baseURI) throws IOException, RDFParseException, RDFHandlerException {
-        this.parseSchema(new FileInputStream(file), format, baseURI);
-    }
-
-    /**
-     * Method to parse a RDF schema supported in the respective format. All triples associated in the schema will be
-     * added to this Anno4j instance.
-     *
-     * @param documentURL   The URL linking to the online schema.
-     * @param format        The formatthat the schema is supported in.
-     * @param baseURI       URI that is used for basic namespacing.
-     * @throws IOException
-     * @throws RDFParseException
-     * @throws RDFHandlerException
-     */
-    public void parseSchema(URL documentURL, RDFFormat format, String baseURI) throws IOException, RDFParseException, RDFHandlerException {
-        this.parseSchema(documentURL.openStream(), format, baseURI);
     }
 }
