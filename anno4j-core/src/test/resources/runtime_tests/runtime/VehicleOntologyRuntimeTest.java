@@ -149,37 +149,123 @@ public class VehicleOntologyRuntimeTest {
     private void testSubProperty() throws Exception {
         Vehicle vehicle = new runtime.VehicleSupportImpl();
 
-        Set<String> names = Sets.newHashSet();
+        // Test setters:
+        // Setter on subproperty:
+        vehicle.setHasOfficialNames(Sets.<CharSequence>newHashSet("item1", "item2"));
+        assertEquals(Sets.<CharSequence>newHashSet("item1", "item2"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.<CharSequence>newHashSet("item1", "item2"), vehicle.getHasNames());
+        // Setter on superproperty:
+        vehicle.setHasNames(Sets.<CharSequence>newHashSet("item1"));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.<CharSequence>newHashSet("item1"), vehicle.getHasNames());
+        // Clear values:
+        vehicle.setHasNames(Sets.newHashSet());
+        assertEquals(0, vehicle.getHasNames().size());
+        assertEquals(0, vehicle.getHasOfficialNames().size());
 
-        // Test setter:
-        names.add("Citroen 2CV");
-        vehicle.setHasOfficialNames(Sets.newHashSet("Citroen 2CV"));
-        assertEquals(names, vehicle.getHasNames());
+        // Test adders:
+        // Adder on subproperty:
+        vehicle.addHasOfficialName("item1");
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasNames());
+        // Adder on superproperty:
+        vehicle.addHasName("item2");
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item2"), vehicle.getHasNames());
+        // Adder on subproperty intersecting superproperty values:
+        vehicle.addHasOfficialName("item2");
+        assertEquals(Sets.newHashSet("item1", "item2"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item2"), vehicle.getHasNames());
+        // Clear values:
+        vehicle.setHasNames(Sets.newHashSet());
+        assertEquals(0, vehicle.getHasNames().size());
+        assertEquals(0, vehicle.getHasOfficialNames().size());
 
-        // Test adder:
-        vehicle.addHasOfficialName("VW Golf V");
-        names.add("VW Golf V");
-        assertEquals(names, vehicle.getHasNames());
+        // Test adder-all:
+        // Adder-all on subproperty:
+        vehicle.addAllHasOfficialNames(Sets.<CharSequence>newHashSet("item1", "item2"));
+        assertEquals(Sets.<CharSequence>newHashSet("item1", "item2"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.<CharSequence>newHashSet("item1", "item2"), vehicle.getHasNames());
+        // Adder-all on superproperty:
+        vehicle.addAllHasNames(Sets.newHashSet("item3"));
+        assertEquals(Sets.newHashSet("item1", "item2"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item2", "item3"), vehicle.getHasNames());
+        // Adder-all on subproperty intersecting suproperty values:
+        vehicle.addAllHasOfficialNames(Sets.newHashSet("item2", "item3"));
+        assertEquals(Sets.newHashSet("item1", "item2", "item3"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item2", "item3"), vehicle.getHasNames());
+        // Clear values:
+        vehicle.setHasNames(Sets.newHashSet());
+        assertEquals(0, vehicle.getHasNames().size());
+        assertEquals(0, vehicle.getHasOfficialNames().size());
 
-        // Test adder all:
-        vehicle.addAllHasOfficialNames(Sets.newHashSet("BMW M3", "Audi A3"));
-        names.addAll(Sets.newHashSet("BMW M3", "Audi A3"));
-        assertEquals(names, vehicle.getHasNames());
+        // Test remover:
+        vehicle.addAllHasOfficialNames(Sets.<CharSequence>newHashSet("item1", "item2"));
+        vehicle.addHasName("item3");
+        // Test remover on subproperty with existing value:
+        assertTrue(vehicle.removeHasOfficialName("item2"));
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item3"), vehicle.getHasNames());
+        // Test remover on subproperty with non-existing value:
+        assertFalse(vehicle.removeHasOfficialName("item2"));
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item3"), vehicle.getHasNames());
+        // Test remover on subproperty with superproperty-only value:
+        assertFalse(vehicle.removeHasOfficialName("item3"));
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item3"), vehicle.getHasNames());
+        // Test remover on superproperty with existing value:
+        assertTrue(vehicle.removeHasName("item1"));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.newHashSet("item3"), vehicle.getHasNames());
+        // Test remover on superproperty with non-existing value:
+        assertFalse(vehicle.removeHasName("item1"));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.newHashSet("item3"), vehicle.getHasNames());
+        // Remove superproperty value only:
+        assertTrue(vehicle.removeHasName("item3"));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(0, vehicle.getHasNames().size());
 
-        // Test remover on actual official name:
-        names.remove("BMW M3");
-        assertTrue(vehicle.removeHasOfficialName("BMW M3"));
-        assertEquals(names, vehicle.getHasNames());
-
-        // Test remover on non-official name:
-        vehicle.addHasName("Ente");
-        names.add("Ente");
-        assertFalse(vehicle.removeHasOfficialName("Ente"));
-        assertEquals(names, vehicle.getHasNames());
-
-        // Test clearing of subproperties when setting values:
-        vehicle.setHasNames(Sets.newHashSet("Schnauferl"));
-        assertEquals(Sets.newHashSet(), vehicle.getHasOfficialNames());
-        assertEquals(Sets.newHashSet("Schnauferl"), vehicle.getHasNames());
+        // Test remover-all:
+        vehicle.addAllHasOfficialNames(Sets.<CharSequence>newHashSet("item1", "item2"));
+        vehicle.addAllHasNames(Sets.newHashSet("item3", "item4"));
+        // Test remover-all on subproperty with only existing values:
+        assertTrue(vehicle.removeAllHasOfficialNames(Sets.<CharSequence>newHashSet("item2")));
+        assertEquals(Sets.newHashSet("item1"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item1", "item3", "item4"), vehicle.getHasNames());
+        // Test remover-all on subproperty with partially existing values:
+        assertTrue(vehicle.removeAllHasOfficialNames(Sets.<CharSequence>newHashSet("item1", "item5")));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.newHashSet("item3", "item4"), vehicle.getHasNames());
+        // Test remover-all on subproperty with value from superproperty:
+        assertFalse(vehicle.removeAllHasOfficialNames(Sets.<CharSequence>newHashSet("item3")));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.newHashSet("item3", "item4"), vehicle.getHasNames());
+        // Test remover-all on subproperty with non existing values:
+        assertFalse(vehicle.removeAllHasOfficialNames(Sets.<CharSequence>newHashSet("item5")));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.newHashSet("item3", "item4"), vehicle.getHasNames());
+        vehicle.addAllHasOfficialNames(Sets.<CharSequence>newHashSet("item1", "item2"));
+        // Test remover-all on superproperty with only existing values intersecting subproperty:
+        assertTrue(vehicle.removeAllHasNames(Sets.<CharSequence>newHashSet("item1")));
+        assertEquals(Sets.newHashSet("item2"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item2", "item3", "item4"), vehicle.getHasNames());
+        // Test remover-all on superproperty with only existing values not intersecting subproperty:
+        assertTrue(vehicle.removeAllHasNames(Sets.<CharSequence>newHashSet("item3")));
+        assertEquals(Sets.newHashSet("item2"), vehicle.getHasOfficialNames());
+        assertEquals(Sets.newHashSet("item2", "item4"), vehicle.getHasNames());
+        // Test remover-all on superproperty with partially existing values intersecting subproperty:
+        assertTrue(vehicle.removeAllHasNames(Sets.<CharSequence>newHashSet("item2", "item5")));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(Sets.newHashSet("item4"), vehicle.getHasNames());
+        // Test remover-all on superproperty with partially existing values not intersecting subproperty:
+        assertTrue(vehicle.removeAllHasNames(Sets.<CharSequence>newHashSet("item4", "item5")));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(0, vehicle.getHasNames().size());
+        // Test remover-all on superproperty with not existing values not intersecting subproperty:
+        assertFalse(vehicle.removeAllHasNames(Sets.<CharSequence>newHashSet("item5")));
+        assertEquals(0, vehicle.getHasOfficialNames().size());
+        assertEquals(0, vehicle.getHasNames().size());
     }
 }

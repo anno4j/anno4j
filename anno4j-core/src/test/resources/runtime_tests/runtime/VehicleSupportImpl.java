@@ -1,19 +1,12 @@
 package runtime;
 
-import com.github.anno4j.model.impl.ResourceObject;
-import de.example.VehicleSupport;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
-import org.openrdf.repository.object.ObjectFactory;
-import org.openrdf.repository.object.ObjectRepository;
-import org.openrdf.repository.object.TypeManager;
-import org.openrdf.store.blob.BlobStore;
 
 import java.util.HashSet;
 import java.util.Set;
+import de.example.VehicleSupport;
 
 /**
  * An implementation of the VehicleSupport class
