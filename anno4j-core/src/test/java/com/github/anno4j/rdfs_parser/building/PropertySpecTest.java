@@ -1,13 +1,18 @@
 package com.github.anno4j.rdfs_parser.building;
 
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.namespaces.RDFS;
+import com.github.anno4j.rdfs_parser.model.ExtendedRDFSClazz;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSProperty;
 import com.github.anno4j.rdfs_parser.model.ExtendedRDFSPropertySupport;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 
 import javax.lang.model.element.Modifier;
 import java.util.Arrays;
@@ -179,5 +184,17 @@ public class PropertySpecTest {
 
         // Test annotation:
         assertEquals(0, loadCapSpec.annotations.size());
+    }
+
+    @Test
+    public void testUnspecifiedDomain() throws Exception {
+        Anno4j anno4j = new Anno4j();
+        ExtendedRDFSProperty property = anno4j.createObject(ExtendedRDFSProperty.class);
+
+        ExtendedRDFSClazz rdfsClazz = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(RDFS.CLAZZ));
+        property.addRangeClazz(rdfsClazz);
+
+        ClassName range = property.getRangeJavaPoetClassName(generationConfig);
+        assertEquals(ClassName.get(ResourceObject.class), range);
     }
 }
