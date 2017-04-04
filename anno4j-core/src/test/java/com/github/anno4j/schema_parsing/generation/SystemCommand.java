@@ -1,6 +1,7 @@
 package com.github.anno4j.schema_parsing.generation;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -21,7 +22,11 @@ class SystemCommand {
 
         try {
             // Launch the process:
-            Process process = Runtime.getRuntime().exec(command);
+            ProcessBuilder builder = new ProcessBuilder();
+            builder.redirectErrorStream(true); // This is the important part
+            builder.command(command.split("(?<!\\\\\\\\)\\s+"));
+            builder.directory(new File("."));
+            Process process = builder.start();
 
             // Get stream of the console running the command:
             InputStreamReader streamReader = new InputStreamReader(process.getInputStream());
