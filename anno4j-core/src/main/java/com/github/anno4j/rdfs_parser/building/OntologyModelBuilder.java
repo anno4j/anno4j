@@ -18,9 +18,15 @@ public interface OntologyModelBuilder {
      * Signalizes an error while building the ontology model from a set of RDF statements.
      */
     class RDFSModelBuildingException extends Exception {
+        /**
+         * {@inheritDoc}
+         */
         public RDFSModelBuildingException() {
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public RDFSModelBuildingException(String message) {
             super(message);
         }

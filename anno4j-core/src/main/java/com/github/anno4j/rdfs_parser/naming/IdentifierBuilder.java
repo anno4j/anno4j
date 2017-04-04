@@ -20,6 +20,9 @@ public class IdentifierBuilder {
      * Signalizes that an error occurred while extracting a Java type name from a URI.
      */
     public class NameBuildingException extends Exception {
+        /**
+         * {@inheritDoc}
+         */
         public NameBuildingException(String message) {
             super(message);
         }
