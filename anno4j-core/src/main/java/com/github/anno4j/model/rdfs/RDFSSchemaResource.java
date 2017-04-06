@@ -1,4 +1,4 @@
-package com.github.anno4j.schema_parsing.model;
+package com.github.anno4j.model.rdfs;
 
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.RDFS;

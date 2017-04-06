@@ -1,6 +1,7 @@
 package com.github.anno4j.schema_parsing.model;
 
 import com.github.anno4j.model.namespaces.RDFS;
+import com.github.anno4j.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.BuildableOntologyClazz;
 import org.openrdf.annotations.Iri;
 

@@ -1,6 +1,8 @@
 package com.github.anno4j.schema_parsing.model;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.rdfs.RDFSProperty;
+import com.github.anno4j.model.rdfs.RDFSPropertySupport;
 
 import java.util.HashSet;
 import java.util.Set;
