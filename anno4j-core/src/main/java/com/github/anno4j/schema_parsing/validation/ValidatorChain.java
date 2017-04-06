@@ -1,6 +1,6 @@
 package com.github.anno4j.schema_parsing.validation;
 
-import com.github.anno4j.schema_parsing.model.RDFSClazz;
+import com.github.anno4j.model.rdfs.RDFSClazz;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 

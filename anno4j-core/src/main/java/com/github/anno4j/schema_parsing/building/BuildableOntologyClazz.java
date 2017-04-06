@@ -1,6 +1,6 @@
 package com.github.anno4j.schema_parsing.building;
 
-import com.github.anno4j.schema_parsing.model.RDFSClazz;
+import com.github.anno4j.model.rdfs.RDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.openrdf.annotations.Iri;

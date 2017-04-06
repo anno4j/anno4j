@@ -9,7 +9,7 @@ import com.github.anno4j.schema_parsing.mapping.DatatypeMapper;
 import com.github.anno4j.schema_parsing.mapping.IllegalMappingException;
 import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
 import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
-import com.github.anno4j.schema_parsing.model.RDFSClazzSupport;
+import com.github.anno4j.model.rdfs.RDFSClazzSupport;
 import com.github.anno4j.schema_parsing.naming.ClassNameBuilder;
 import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.squareup.javapoet.ClassName;
