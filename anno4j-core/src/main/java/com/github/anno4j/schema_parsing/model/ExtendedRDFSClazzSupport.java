@@ -2,8 +2,8 @@ package com.github.anno4j.schema_parsing.model;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.namespaces.RDFS;
-import com.github.anno4j.model.rdfs.RDFSClazz;
-import com.github.anno4j.model.rdfs.RDFSClazzSupport;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazzSupport;
 
 import java.util.HashSet;
 import java.util.Set;

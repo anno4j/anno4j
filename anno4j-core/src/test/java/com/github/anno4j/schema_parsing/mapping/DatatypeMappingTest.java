@@ -3,7 +3,7 @@ package com.github.anno4j.schema_parsing.mapping;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.building.RDFSModelBuilder;
 import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
-import com.github.anno4j.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import org.apache.commons.io.IOUtils;

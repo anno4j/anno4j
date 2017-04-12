@@ -1,6 +1,6 @@
 package com.github.anno4j.schema_parsing.mapping;
 
-import com.github.anno4j.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 
 /**
  * Implementations map a RDF datatype to a Java datatype.

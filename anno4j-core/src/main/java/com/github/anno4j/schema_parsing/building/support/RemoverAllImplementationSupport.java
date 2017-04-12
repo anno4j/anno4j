@@ -4,7 +4,7 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
 import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
-import com.github.anno4j.model.rdfs.RDFSProperty;
+import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.squareup.javapoet.*;
 
 /**

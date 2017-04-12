@@ -6,15 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation specifying how many values a property must at most have.
- * Corresponds to <a href="https://www.w3.org/TR/owl-ref/#maxCardinality-def">owl:maxCardinality</a>.
+ * An annotation specifying the cardinality of a property.
+ * This means the numbers of values that the property may have.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD})
-public @interface MaxCardinality {
+public @interface Cardinality {
 
     /**
-     * @return Returns the number of values that the property can at most have.
+     * @return Returns the number of values the annotated property must have.
      */
     int value();
 }

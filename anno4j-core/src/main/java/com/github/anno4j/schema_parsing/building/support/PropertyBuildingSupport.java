@@ -1,8 +1,8 @@
 package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.rdfs.RDFSClazz;
-import com.github.anno4j.model.rdfs.RDFSPropertySupport;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSPropertySupport;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.*;
 import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;

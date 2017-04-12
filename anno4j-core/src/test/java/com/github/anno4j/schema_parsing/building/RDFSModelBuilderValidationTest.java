@@ -1,7 +1,7 @@
 package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.Anno4j;
-import com.github.anno4j.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.hp.hpl.jena.reasoner.ValidityReport;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;

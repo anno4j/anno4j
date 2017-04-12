@@ -1,6 +1,6 @@
 package com.github.anno4j.schema_parsing.naming;
 
-import com.github.anno4j.model.rdfs.RDFSProperty;
+import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 
