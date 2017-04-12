@@ -78,6 +78,21 @@ public class OWL {
     public final static String ON_PROPERTY = NS + "onProperty";
 
     /**
+     * Refers to https://www.w3.org/2002/07/owl#onClass
+     * The property that determines the class that a qualified object cardinality restriction refers to.
+     */
+    public final static String ON_CLAZZ = NS + "onClass";
+
+    /**
+     * Refers to https://www.w3.org/TR/owl-guide/#owl_allValuesFrom
+     * The restriction allValuesFrom is stated on a property with respect to a class. It means that this property on
+     * this particular class has a local range restriction associated with it.
+     * Thus if an instance of the class is related by the property to a second individual, then the second individual
+     * can be inferred to be an instance of the local range restriction class.
+     */
+    public final static String ALL_VALUES_FROM = NS + "allValuesFrom";
+
+    /**
      * Refers to http://www.w3.org/2002/07/owl#someValuesFrom
      * The restriction someValuesFrom is stated on a property with respect to a class. A particular class may have a
      * restriction on a property that at least one value for that property is of a certain type.
@@ -85,7 +100,7 @@ public class OWL {
     public final static String SOME_VALUES_FROM = NS + "someValuesFrom";
 
     /**
-     * Refers to http://www.w3.org/2002/07/owl#minCardinality
+     * Refers to https://www.w3.org/TR/owl-guide/#owl_allValuesFrom
      * Cardinality is stated on a property with respect to a particular class. If a minCardinality of 1 is stated on a
      * property with respect to a class, then any instance of that class will be related to at least one individual by
      * that property. This restriction is another way of saying that the property is required to have a value for all
@@ -100,4 +115,11 @@ public class OWL {
      * that property. A maxCardinality 1 restriction is sometimes called a functional or unique property.
      */
     public final static String MAX_CARDINALITY = NS + "maxCardinality";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#cardinality
+     * Cardinality is provided as a convenience when it is useful to state that a property on a class has
+     * both minCardinality 0 and maxCardinality 0 or both minCardinality 1 and maxCardinality 1.
+     */
+    public final static String CARDINALITY = NS + "cardinality";
 }
