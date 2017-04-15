@@ -464,7 +464,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      * @return The created restriction object.s
      * @throws RepositoryException Thrown if an error occurs while creating the restriction object.
      */
-    private Restriction buildRestrictionForProperty(AccessibleObject propertyObject) throws RepositoryException {
+    private Restriction buildRestrictionForProperty(AccessibleObject propertyObject, String onClazzIri) throws RepositoryException {
         ObjectConnection connection = getConnection();
 
         // Get the IRI of the object:
@@ -493,8 +493,23 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         }
 
         Restriction restriction = createObject(Restriction.class, null);
-        restriction.setOnClazz(Sets.<OWLClazz>newHashSet(clazz));
         restriction.setOnProperty(Sets.<RDFSProperty>newHashSet(property));
+
+        // Set the class against which the restriction is stated, if it is provided:
+        if(onClazzIri != null) {
+            restriction.setOnClazz(Sets.newHashSet(createClazzOnDemand(onClazzIri)));
+        }
+
+        // Set the restriction as superclass of the declaring class:
+        try {
+            Update query = connection.prepareUpdate(QUERY_PREFIX + "INSERT DATA { " +
+                    "   <" + clazz.getResourceAsString() + "> rdfs:subClassOf <" + restriction.getResourceAsString() + "> ." +
+                    "}");
+            query.execute();
+
+        } catch (MalformedQueryException | UpdateExecutionException e) {
+            throw new RepositoryException(e);
+        }
 
         return restriction;
     }
@@ -673,7 +688,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             }
 
             // Add the classes to the restriction:
-            Restriction restriction = buildRestrictionForProperty(object);
+            Restriction restriction = buildRestrictionForProperty(object, null);
             restriction.setAllValuesFrom(clazzes);
         }
     }
@@ -689,7 +704,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         Collection<AccessibleObject> someValuesFromObjects = filterObjectsWithAnnotation(annotatedObjects, SomeValuesFrom.class);
 
         for (AccessibleObject object : someValuesFromObjects) {
-            Restriction restriction = buildRestrictionForProperty(object);
+            Restriction restriction = buildRestrictionForProperty(object, null);
 
             // Get the IRIs of the classes defined in the annotation:
             SomeValuesFrom allValuesFrom = object.getAnnotation(SomeValuesFrom.class);
@@ -719,8 +734,13 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             MinCardinality minCardinalityAnnotation = object.getAnnotation(MinCardinality.class);
             int minCardinality = minCardinalityAnnotation.value();
 
+            String onClazzIri = null;
+            if(minCardinalityAnnotation.onClass() != OWLClazz.class) {
+                onClazzIri = getIriFromObject(minCardinalityAnnotation.onClass());
+            }
+
             // Add the cardinality to the restriction:
-            Restriction restriction = buildRestrictionForProperty(object);
+            Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
             restriction.setMinCardinality(Sets.<Integer>newHashSet(minCardinality));
         }
     }
@@ -736,10 +756,16 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         Collection<AccessibleObject> maxCardinalityObjects = filterObjectsWithAnnotation(annotatedObjects, MaxCardinality.class);
 
         for (AccessibleObject object : maxCardinalityObjects) {
-            Restriction restriction = buildRestrictionForProperty(object);
 
             MaxCardinality maxCardinalityAnnotation = object.getAnnotation(MaxCardinality.class);
             int minCardinality = maxCardinalityAnnotation.value();
+
+            String onClazzIri = null;
+            if(maxCardinalityAnnotation.onClass() != OWLClazz.class) {
+                onClazzIri = getIriFromObject(maxCardinalityAnnotation.onClass());
+            }
+
+            Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
 
             // Add the cardinality to the restriction:
             restriction.setMaxCardinality(Sets.<Integer>newHashSet(minCardinality));
@@ -755,7 +781,12 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             Cardinality cardinalityAnnotation = object.getAnnotation(Cardinality.class);
             int cardinality = cardinalityAnnotation.value();
 
-            Restriction restriction = buildRestrictionForProperty(object);
+            String onClazzIri = null;
+            if(cardinalityAnnotation.onClass() != OWLClazz.class) {
+                onClazzIri = getIriFromObject(cardinalityAnnotation.onClass());
+            }
+
+            Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
             // Add the cardinality to the restriction:
             restriction.setMaxCardinality(Sets.<Integer>newHashSet(cardinality));
             restriction.setMinCardinality(Sets.<Integer>newHashSet(cardinality));

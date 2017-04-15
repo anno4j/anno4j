@@ -78,7 +78,7 @@ public class OWLSchemaPersistingManagerTest {
     public static abstract class ValidlyAnnotatedPersonSupport extends ResourceObjectSupport implements ValidlyAnnotatedPerson {
 
         @Symmetric
-        @MinCardinality(0) @MaxCardinality(1)
+        @MinCardinality(value = 0, onClass = ValidlyAnnotatedPerson.class) @MaxCardinality(1)
         @Iri("http://example.de/#partner")
         private Set<ValidlyAnnotatedPerson> partners;
 
@@ -133,25 +133,26 @@ public class OWLSchemaPersistingManagerTest {
         // Query property restrictions:
         q = QUERY_PREFIX + "ASK { " +
                 "   ?r1 a owl:Restriction . " +
-                "   ?r1 owl:onClass <http://example.de/#validly_annotated_person> . " +
+                "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r1 . " +
                 "   ?r1 owl:onProperty <http://example.de/#id> . " +
                 "   ?r1 owl:minCardinality ?v1 . " +
                 "   FILTER ( ?v1 = 1 )" +
 
                 "   ?r2 a owl:Restriction . " +
-                "   ?r2 owl:onClass <http://example.de/#validly_annotated_person> . " +
+                "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r2 . " +
                 "   ?r2 owl:onProperty <http://example.de/#id> . " +
                 "   ?r2 owl:maxCardinality ?v2 . " +
                 "   FILTER ( ?v2 = 1 )" +
 
                 "   ?r3 a owl:Restriction . " +
-                "   ?r3 owl:onClass <http://example.de/#validly_annotated_person> . " +
+                "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r3 . " +
                 "   ?r3 owl:onProperty <http://example.de/#partner> . " +
+                "   ?r3 owl:onClass <http://example.de/#validly_annotated_person> . " +
                 "   ?r3 owl:minCardinality ?v3 . " +
                 "   FILTER ( ?v3 = 0 )" +
 
                 "   ?r4 a owl:Restriction . " +
-                "   ?r4 owl:onClass <http://example.de/#validly_annotated_person> . " +
+                "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r4 . " +
                 "   ?r4 owl:onProperty <http://example.de/#has_boss> . " +
                 "   ?r4 owl:allValuesFrom <http://example.de/#validly_annotated_person> . " +
                 "}";
