@@ -653,7 +653,9 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                     .append(" INSERT DATA { ");
             for (String inversePropertyIri : inverseOfAnnotation.value()) {
                 query.append("<").append(iri).append("> owl:inverseOf ")
-                        .append("<").append(inversePropertyIri).append("> . ");
+                        .append("<").append(inversePropertyIri).append("> . ")
+                     .append("<").append(inversePropertyIri).append("> owl:inverseOf ")
+                     .append("<").append(iri).append("> . ");
             }
             query.append("}");
 
