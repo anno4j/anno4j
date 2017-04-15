@@ -66,7 +66,6 @@ public class OWLSchemaPersistingManagerTest {
         public void setBosses(Set<ValidlyAnnotatedPerson> bosses);
 
         @Transitive
-        @InverseOf({"http://example.de/#has_boss"})
         @Iri("http://example.de/#has_subordinate")
         public Set<ValidlyAnnotatedPerson> getSubordinates();
 
