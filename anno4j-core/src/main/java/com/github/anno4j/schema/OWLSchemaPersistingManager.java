@@ -1,5 +1,6 @@
 package com.github.anno4j.schema;
 
+import arq.iri;
 import com.github.anno4j.annotations.*;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OWL;
@@ -169,6 +170,35 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      * @throws InconsistentAnnotationException Thrown if the annotations are found to be inconsistent.
      */
     private void checkSchemaAnnotationConsistency(Collection<AccessibleObject> annotatedObjects) throws InconsistentAnnotationException {
+        // Cardinalities must be non-negative:
+        for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MinCardinality.class)) {
+            Iri iri = object.getAnnotation(Iri.class);
+            MinCardinality cardinality = object.getAnnotation(MinCardinality.class);
+
+            if(cardinality.value() < 0) {
+                throw new InconsistentAnnotationException("Minimum cardinality of property " + iri.value() +
+                        " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
+            }
+        }
+        for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MaxCardinality.class)) {
+            Iri iri = object.getAnnotation(Iri.class);
+            MaxCardinality maxCardinality = object.getAnnotation(MaxCardinality.class);
+
+            if(maxCardinality.value() < 0) {
+                throw new InconsistentAnnotationException("Maximum cardinality of property " + iri.value() +
+                        " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
+            }
+
+            // The maximum cardinality must also not be less than the minimum cardinality:
+            if(object.isAnnotationPresent(MinCardinality.class)) {
+                MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
+                if(minCardinality.value() > maxCardinality.value()) {
+                    throw new InconsistentAnnotationException("The maximum cardinality of property " + iri.value() +
+                            " in " + getDeclaringJavaClazz(object).getName() + " must not be less than the minimum cardinality.");
+                }
+            }
+        }
+
         // Objects may not have different values for @MinCardinality/@MaxCardinality and @Cardinality annotations:
         for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, Cardinality.class)) {
             Cardinality cardinalityAnnotation = object.getAnnotation(Cardinality.class);
@@ -194,6 +224,26 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                     throw new InconsistentAnnotationException("Mapping for property " + propertyIri
                             + " in class mapping for " + clazzIri + " has different values ("
                             + maxCardinalityAnnotation.value() + "vs. " + cardinality + ") for @MaxCardinality and @Cardinality");
+                }
+            }
+        }
+
+        // Being functional implies that (min) cardinality is 0 or 1:
+        for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, Functional.class)) {
+            Iri iri = object.getAnnotation(Iri.class);
+
+            if (object.isAnnotationPresent(MinCardinality.class)) {
+                MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
+                if(minCardinality.value() > 1) {
+                    throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
+                            " can not be at the same time functional and have a minimum cardinality of " + minCardinality.value());
+                }
+            }
+            if (object.isAnnotationPresent(Cardinality.class)) {
+                Cardinality cardinality = object.getAnnotation(Cardinality.class);
+                if(cardinality.value() > 1) {
+                    throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
+                            " can not be at the same time functional and have a cardinality of " + cardinality.value());
                 }
             }
         }
