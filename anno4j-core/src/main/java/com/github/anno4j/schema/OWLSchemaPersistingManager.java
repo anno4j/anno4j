@@ -248,6 +248,26 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             }
         }
 
+        // Being bijective implies (min) cardinality is 0 or 1:
+        for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, Bijective.class)) {
+            Iri iri = object.getAnnotation(Iri.class);
+
+            if (object.isAnnotationPresent(MinCardinality.class)) {
+                MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
+                if(minCardinality.value() > 1) {
+                    throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
+                            " can not be at the same time bijective and have a minimum cardinality of " + minCardinality.value());
+                }
+            }
+            if (object.isAnnotationPresent(Cardinality.class)) {
+                Cardinality cardinality = object.getAnnotation(Cardinality.class);
+                if(cardinality.value() > 1) {
+                    throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
+                            " can not be at the same time bijective and have a cardinality of " + cardinality.value());
+                }
+            }
+        }
+
         // Index for those annotations that impose a property characteristic.
         // Mapping is: Property IRI -> Annotation class -> Annotation:
         Map<String, Map<Class<?>, Annotation>> characteristics = new HashMap<>();
