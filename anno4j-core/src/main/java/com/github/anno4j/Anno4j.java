@@ -7,6 +7,8 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
+import com.github.anno4j.schema.OWLSchemaPersistingManager;
+import com.github.anno4j.schema.SchemaPersistingManager;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -27,6 +29,8 @@ import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -76,6 +80,13 @@ public class Anno4j implements TransactionCommands {
      * Annotation interface.
      */
     private Set<Class<?>> partialClasses;
+
+
+    /**
+     * Flag indicating whether a scan for schema annotations was already performed
+     * and the RDF schema information was persisted.
+     */
+    private boolean schemaPersisted = false;
 
 
     public Anno4j() throws RepositoryException, RepositoryConfigException {
@@ -403,5 +414,39 @@ public class Anno4j implements TransactionCommands {
 
     public Transaction createTransaction() throws RepositoryException {
         return new Transaction(objectRepository, evaluatorConfiguration);
+    }
+
+    /**
+     * Creates a new transaction which provides schema validation services at commit time.
+     * @return The validated transaction.
+     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     */
+    public ValidatedTransaction createValidatedTransaction() throws RepositoryException, SchemaPersistingManager.ContradictorySchemaException, SchemaPersistingManager.InconsistentAnnotationException {
+        // If this is the first time a validated transaction is created,
+        // scan and persist schema information:
+        if(!schemaPersisted) {
+            Set<URL> classpath = new HashSet<>();
+            classpath.addAll(ClasspathHelper.forClassLoader());
+            classpath.addAll(ClasspathHelper.forJavaClassPath());
+            classpath.addAll(ClasspathHelper.forManifest());
+            classpath.addAll(ClasspathHelper.forPackage(""));
+
+            Reflections types = new Reflections(new ConfigurationBuilder()
+                    .setUrls(classpath)
+                    .useParallelExecutor()
+                    .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
+                    .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner()));
+
+            Transaction transaction = createTransaction();
+            transaction.begin();
+
+            SchemaPersistingManager persistingManager = new OWLSchemaPersistingManager(transaction.getConnection());
+            persistingManager.persistSchema(types);
+
+            transaction.commit();
+            schemaPersisted = true;
+        }
+
+        return new ValidatedTransaction(objectRepository, evaluatorConfiguration);
     }
 }

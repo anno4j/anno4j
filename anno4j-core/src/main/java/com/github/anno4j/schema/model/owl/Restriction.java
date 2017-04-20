@@ -54,4 +54,10 @@ public interface Restriction extends ResourceObject {
 
     @Iri(OWL.SOME_VALUES_FROM)
     void setSomeValuesFrom(Set<OWLClazz> clazzes);
+
+    @Iri(OWL.HAS_VALUE)
+    Set<Object> getHasValue();
+
+    @Iri(OWL.HAS_VALUE)
+    void setHasValue(Set<Object> values);
 }

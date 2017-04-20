@@ -100,7 +100,7 @@ public class OWL {
     public final static String SOME_VALUES_FROM = NS + "someValuesFrom";
 
     /**
-     * Refers to https://www.w3.org/TR/owl-guide/#owl_allValuesFrom
+     * Refers to https://www.w3.org/TR/owl-guide/#owl_minCardinality
      * Cardinality is stated on a property with respect to a particular class. If a minCardinality of 1 is stated on a
      * property with respect to a class, then any instance of that class will be related to at least one individual by
      * that property. This restriction is another way of saying that the property is required to have a value for all
@@ -122,4 +122,12 @@ public class OWL {
      * both minCardinality 0 and maxCardinality 0 or both minCardinality 1 and maxCardinality 1.
      */
     public final static String CARDINALITY = NS + "cardinality";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#hasValue
+     * hasValue allows us to specify classes based on the existence of particular property values.
+     * Hence, an individual will be a member of such a class whenever at least one of its property values is equal to
+     * the hasValue resource.
+     */
+    public final static String HAS_VALUE = NS + "hasValue";
 }

@@ -13,14 +13,12 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.Update;
-import org.openrdf.query.UpdateExecutionException;
+import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectFactory;
 import org.openrdf.repository.object.ObjectQuery;
+import org.openrdf.result.Result;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -68,8 +66,31 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         validateAgainstExistingSchema(iriAnnotatedObjects);
 
         // Persist the schema information to the triplestore:
+        persistInheritance(types.getTypesAnnotatedWith(Iri.class));
         persistPropertyCharacteristics(iriAnnotatedObjects);
         persistPropertyRestrictions(iriAnnotatedObjects);
+    }
+
+    private void persistInheritance(Collection<Class<?>> concepts) throws RepositoryException {
+        StringBuilder q = new StringBuilder(QUERY_PREFIX + "INSERT DATA {");
+        for (Class<?> concept : concepts) {
+            Iri conceptIri = concept.getAnnotation(Iri.class);
+
+            for (Class<?> superConcept : concept.getInterfaces()) {
+                if(conceptIri != null && superConcept.isAnnotationPresent(Iri.class)) {
+                    Iri superConceptIri = superConcept.getAnnotation(Iri.class);
+
+                    q.append("<").append(conceptIri.value()).append("> rdfs:subClassOf <").append(superConceptIri.value()).append("> . ");
+                }
+            }
+        }
+        q.append("}");
+
+        try {
+            getConnection().prepareUpdate(q.toString()).execute();
+        } catch (MalformedQueryException | UpdateExecutionException e) {
+            throw new RepositoryException(e);
+        }
     }
 
     /**
@@ -120,6 +141,33 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
     }
 
     /**
+     * Constructs a SPARQL VALUES clause for successive binding of the given objects {@link Iri} mappings,
+     * to the SPARQL variable <code>binding</code>.
+     * The IRIs of the resources are enclosed in <code>&lt;&gt;</code> brackets.
+     * @param objects The values to successively bind.
+     * @param binding The name of the binding without a leading <code>"?"</code>.
+     * @return Returns a SPARQL VALUES clause with the given resources and binding.
+     */
+    private String buildValuesClause(Collection<AccessibleObject> objects, String binding) {
+        StringBuilder clause = new StringBuilder("VALUES ?")
+                .append(binding)
+                .append(" {");
+
+        for (AccessibleObject object : objects) {
+            if(object.isAnnotationPresent(Iri.class)) {
+                Iri iri = object.getAnnotation(Iri.class);
+
+                clause.append(" <")
+                        .append(iri.value())
+                        .append("> ");
+            }
+        }
+        clause.append("}");
+
+        return clause.toString();
+    }
+
+    /**
      * Checks whether the schema annotation provided through annotations (at <code>annotatedObjects</code>)
      * contradicts the schema information that is already present in the default graph of the connected triplestore.
      * @param annotatedObjects Methods and fields that have the {@link Iri} annotation and (optional) schema annotations.
@@ -129,12 +177,40 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      */
     private void validateAgainstExistingSchema(Collection<AccessibleObject> annotatedObjects) throws ContradictorySchemaException, RepositoryException {
 
+        // Check that any functional property has no (min) cardinality greater than 1 in the schema:
+        Collection<AccessibleObject> functionalObjects = filterObjectsWithAnnotation(annotatedObjects, Functional.class);
+        functionalObjects.addAll(filterObjectsWithAnnotation(annotatedObjects, Bijective.class));
+        try {
+            ObjectQuery query = getConnection().prepareObjectQuery(QUERY_PREFIX + "SELECT ?p {" +
+                    buildValuesClause(functionalObjects, "p") +
+                    "   VALUES ?cardType { owl:minCardinality owl:cardinality } " +
+                    "   ?s rdfs:subClassOf ?r . " +
+                    "   ?r a owl:Restriction . " +
+                    "   ?r owl:onProperty ?p . " +
+                    "   ?r ?cardType ?card . " +
+                    "   FILTER( ?card > 1 )" +
+                    "}");
+            Result result = query.evaluate();
+
+            if(result.hasNext()) {
+                Object item = result.next();
+                if(item != null) {
+                    String propertyIri = item.toString();
+                    throw new ContradictorySchemaException("Property " + propertyIri + " is annotated being functional, " +
+                            "but has (minimum) cardinality greater than 1 in existing schema.");
+                }
+            }
+
+        } catch (MalformedQueryException | QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+
         // Check owl:allValuesFrom:
         for(AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, AllValuesFrom.class)) {
             AllValuesFrom allValuesFrom = object.getAnnotation(AllValuesFrom.class);
             Set<String> annotatedTargets = getIrisFromObjects(Sets.<AnnotatedElement>newHashSet(allValuesFrom.value()));
 
-            validateRestriction(object, OWL.ALL_VALUES_FROM, annotatedTargets);
+            validateRestriction(object, OWL.ALL_VALUES_FROM, annotatedTargets, null);
         }
 
         // Check owl:someValuesFrom:
@@ -142,23 +218,33 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             SomeValuesFrom someValuesFrom = object.getAnnotation(SomeValuesFrom.class);
             Set<String> annotatedTargets = getIrisFromObjects(Sets.<AnnotatedElement>newHashSet(someValuesFrom.value()));
 
-            validateRestriction(object, OWL.SOME_VALUES_FROM, annotatedTargets);
+            validateRestriction(object, OWL.SOME_VALUES_FROM, annotatedTargets, null);
         }
 
         // Check owl:minCardinality:
         for(AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MinCardinality.class)) {
             MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
 
-            validateRestriction(object, OWL.MIN_CARDINALITY, Sets.<Integer>newHashSet(minCardinality.value()));
-            validateRestriction(object, OWL.CARDINALITY, Sets.<Integer>newHashSet(minCardinality.value()));
+            String onClazz = null;
+            if(!minCardinality.onClass().equals(OWLClazz.class) && minCardinality.onClass().isAnnotationPresent(Iri.class)) {
+                onClazz = minCardinality.onClass().getAnnotation(Iri.class).value();
+            }
+
+            validateRestriction(object, OWL.MIN_CARDINALITY, Sets.newHashSet(Integer.toString(minCardinality.value())), onClazz);
+            validateRestriction(object, OWL.CARDINALITY, Sets.newHashSet(Integer.toString(minCardinality.value())), onClazz);
         }
 
         // Check owl:maxCardinality:
         for(AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MaxCardinality.class)) {
             MaxCardinality maxCardinality = object.getAnnotation(MaxCardinality.class);
 
-            validateRestriction(object, OWL.MAX_CARDINALITY, Sets.<Integer>newHashSet(maxCardinality.value()));
-            validateRestriction(object, OWL.CARDINALITY, Sets.<Integer>newHashSet(maxCardinality.value()));
+            String onClazz = null;
+            if(!maxCardinality.onClass().equals(OWLClazz.class) && maxCardinality.onClass().isAnnotationPresent(Iri.class)) {
+                onClazz = maxCardinality.onClass().getAnnotation(Iri.class).value();
+            }
+
+            validateRestriction(object, OWL.MAX_CARDINALITY, Sets.newHashSet(Integer.toString(maxCardinality.value())), onClazz);
+            validateRestriction(object, OWL.CARDINALITY, Sets.newHashSet(Integer.toString(maxCardinality.value())), onClazz);
         }
     }
 
@@ -228,8 +314,10 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             }
         }
 
-        // Being functional implies that (min) cardinality is 0 or 1:
-        for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, Functional.class)) {
+        // Being functional/bijective implies that (min) cardinality is 0 or 1:
+        Collection<AccessibleObject> functionalObjects = filterObjectsWithAnnotation(annotatedObjects, Functional.class);
+        functionalObjects.addAll(filterObjectsWithAnnotation(annotatedObjects, Bijective.class));
+        for (AccessibleObject object : functionalObjects) {
             Iri iri = object.getAnnotation(Iri.class);
 
             if (object.isAnnotationPresent(MinCardinality.class)) {
@@ -244,26 +332,6 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                 if(cardinality.value() > 1) {
                     throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
                             " can not be at the same time functional and have a cardinality of " + cardinality.value());
-                }
-            }
-        }
-
-        // Being bijective implies (min) cardinality is 0 or 1:
-        for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, Bijective.class)) {
-            Iri iri = object.getAnnotation(Iri.class);
-
-            if (object.isAnnotationPresent(MinCardinality.class)) {
-                MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
-                if(minCardinality.value() > 1) {
-                    throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
-                            " can not be at the same time bijective and have a minimum cardinality of " + minCardinality.value());
-                }
-            }
-            if (object.isAnnotationPresent(Cardinality.class)) {
-                Cardinality cardinality = object.getAnnotation(Cardinality.class);
-                if(cardinality.value() > 1) {
-                    throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
-                            " can not be at the same time bijective and have a cardinality of " + cardinality.value());
                 }
             }
         }
@@ -383,7 +451,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
     public Set<String> getIrisFromResourceObjects(Collection<? extends ResourceObject> resourceObjects) {
         Set<String> iris = new HashSet<>();
         for(ResourceObject object : resourceObjects) {
-            iris.add(object.getResourceAsString());
+            iris.add(object.toString());
         }
         return iris;
     }
@@ -429,11 +497,12 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      *                        be a fully qualified URI.
      * @param allowedValues The allowed values for the restriction. Thus an already present restriction must not restrict
      *                      to any value that is not in this set.
+     * @param onClazz The <code>owl:onClass</code> value if qualified restrictions should be checked. Otherwise null.
      * @param <T> The type of the values of the restriction, e.g. {@link Integer} for <code>owl:minCardinality</code>.
      * @throws RepositoryException Thrown if an error occurs while querying the connected triplestore.
      * @throws ContradictorySchemaException Thrown if the validation fails.
      */
-    private <T> void validateRestriction(AccessibleObject propertyObject, String restrictionType, Set<T> allowedValues) throws RepositoryException, ContradictorySchemaException {
+    private <T> void validateRestriction(AccessibleObject propertyObject, String restrictionType, Set<String> allowedValues, String onClazz) throws RepositoryException, ContradictorySchemaException {
         // Get IRIs of the property and its declaring class:
         String iri = getIriFromObject(propertyObject);
         String clazz = getIriFromObject(getDeclaringJavaClazz(propertyObject));
@@ -442,19 +511,27 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         ObjectQuery query;
         ObjectConnection connection = getConnection();
         try {
-            query = connection.prepareObjectQuery(QUERY_PREFIX + " SELECT ?v { ?r a owl:Restriction . " +
-                    "?r owl:onClass <" + clazz + "> . " +
-                    "?r owl:onProperty <" + iri + "> . " +
-                    "?r <" + restrictionType + "> ?v . }");
+            String q = QUERY_PREFIX + " SELECT ?v { " +
+                    "<" + clazz + "> rdfs:subClassOf+ ?r . " +
+                    "?r a owl:Restriction . ";
+            if(onClazz != null) {
+                q += "?r owl:onClass <" + onClazz + "> . ";
+            }
+            q += "?r owl:onProperty <" + iri + "> . " +
+                 "?r <" + restrictionType + "> ?v . }";
+
+            query = connection.prepareObjectQuery(q);
 
         } catch (MalformedQueryException e) {
             throw new RepositoryException(e);
         }
 
         // Execute the query:
-        Set<String> result;
+        Set<String> result = new HashSet<>();
         try {
-            result = getIrisFromResourceObjects(query.evaluate(OWLClazz.class).asSet());
+            for (Object current : query.evaluate().asSet()) {
+                result.add(current.toString());
+            }
         } catch (QueryEvaluationException e) {
             throw new RepositoryException("Error evaluating query.");
         }

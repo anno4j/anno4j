@@ -1,6 +1,7 @@
 package com.github.anno4j.schema.model.owl;
 
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 
 import java.util.Set;
@@ -60,6 +61,18 @@ public abstract class RestrictionSupport extends ResourceObjectSupport implement
         }
         if(cardinality.iterator().next() < 0) {
             throw new IllegalArgumentException("The cardinality of a property must be non-negative.");
+        }
+    }
+
+    @Override
+    public void setHasValue(Set<Object> values) {
+        for (Object value : values) {
+            if(value instanceof RDFSClazz) {
+                throw new IllegalArgumentException("The value of owl:hasValue must be an instance, not a class.");
+            }
+            if(value instanceof RDFSProperty) {
+                throw new IllegalArgumentException("The value of owl:hasValue must be an instance, not a property.");
+            }
         }
     }
 }

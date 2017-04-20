@@ -23,6 +23,8 @@ import org.openrdf.query.QueryLanguage;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -107,7 +109,7 @@ public class OWLSchemaPersistingManagerTest {
                         ClasspathHelper.forClass(ValidlyAnnotatedPerson.class, ClasspathHelper.staticClassLoader()),
                         ClasspathHelper.forClass(ValidlyAnnotatedPersonSupport.class, ClasspathHelper.staticClassLoader())
                 )
-                .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner())
+                .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner())
         );
 
         Transaction transaction = anno4j.createTransaction();
@@ -178,7 +180,7 @@ public class OWLSchemaPersistingManagerTest {
                                 ClasspathHelper.forClass(ValidlyAnnotatedPerson.class, ClasspathHelper.staticClassLoader()),
                                 ClasspathHelper.forClass(ValidlyAnnotatedPersonSupport.class, ClasspathHelper.staticClassLoader())
                         )
-                        .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner())
+                        .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner())
         );
 
         Transaction transaction = anno4j.createTransaction();
@@ -198,14 +200,15 @@ public class OWLSchemaPersistingManagerTest {
     public void testContradictoryExistingSchema() throws Exception {
         Anno4j anno4j = new Anno4j();
 
-        OWLClazz myPerson = anno4j.createObject(OWLClazz.class, (Resource) new URIImpl("http://example.de/#validly_annotated_person"));
-        OWLClazz foafOrganization = anno4j.createObject(OWLClazz.class, (Resource) new URIImpl(FOAF.ORGANIZATION));
-        RDFSProperty bossProperty = anno4j.createObject(RDFSProperty.class, (Resource) new URIImpl("http://example.de/#has_boss"));
-
-        Restriction bossAllValuesFromRestr = anno4j.createObject(Restriction.class);
-        bossAllValuesFromRestr.setOnClazz(Sets.newHashSet(myPerson));
-        bossAllValuesFromRestr.setOnProperty(Sets.newHashSet(bossProperty));
-        bossAllValuesFromRestr.setAllValuesFrom(Sets.newHashSet(myPerson, foafOrganization));
+        Transaction setupTransaction = anno4j.createTransaction();
+        setupTransaction.begin();
+        setupTransaction.getConnection().prepareUpdate("INSERT DATA {" +
+                "  <http://example.de/#validly_annotated_person> rdfs:subClassOf _:restr . " +
+                "  _:restr a owl:Restriction . " +
+                "  _:restr owl:onProperty <http://example.de/#id> . " +
+                "  _:restr owl:minCardinality '42'^^xsd:nonNegativeInteger . " +
+                "}").execute();
+        setupTransaction.commit();
 
         Transaction transaction = anno4j.createTransaction();
         transaction.begin();
@@ -217,7 +220,7 @@ public class OWLSchemaPersistingManagerTest {
                                 ClasspathHelper.forClass(ValidlyAnnotatedPerson.class, ClasspathHelper.staticClassLoader()),
                                 ClasspathHelper.forClass(ValidlyAnnotatedPersonSupport.class, ClasspathHelper.staticClassLoader())
                         )
-                        .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner())
+                        .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner())
         );
 
         boolean exceptionThrown = false;
