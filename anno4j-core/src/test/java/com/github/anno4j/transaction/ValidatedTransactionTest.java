@@ -1,10 +1,11 @@
-package com.github.anno4j.schema;
+package com.github.anno4j.transaction;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.Transaction;
 import com.github.anno4j.ValidatedTransaction;
 import com.github.anno4j.annotations.*;
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.schema.SchemaPersistingManager;
 import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
