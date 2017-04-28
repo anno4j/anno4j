@@ -1,8 +1,6 @@
 package com.github.anno4j.schema;
 
-import arq.iri;
 import com.github.anno4j.annotations.*;
-import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.OWL;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.schema.model.owl.OWLClazz;
@@ -13,7 +11,10 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.query.*;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.Update;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectFactory;
@@ -71,6 +72,13 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         persistPropertyRestrictions(iriAnnotatedObjects);
     }
 
+    /**
+     * Persists inheritance information for the given concepts to the default graph of the connected
+     * triplestore.
+     * The inheritance is modelled using <code>rdfs:subClassOf</code> predicate.
+     * @param concepts The {@link Iri} annotated concept types which inheritance structure should be persisted.
+     * @throws RepositoryException Thrown if an error occurs while inserting into the connected triplestore.
+     */
     private void persistInheritance(Collection<Class<?>> concepts) throws RepositoryException {
         StringBuilder q = new StringBuilder(QUERY_PREFIX + "INSERT DATA {");
         for (Class<?> concept : concepts) {
@@ -223,28 +231,32 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
 
         // Check owl:minCardinality:
         for(AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MinCardinality.class)) {
-            MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
+            Collection<MinCardinality> minCardinalities = unpackAnnotations(object, MinCardinality.class);
 
-            String onClazz = null;
-            if(!minCardinality.onClass().equals(OWLClazz.class) && minCardinality.onClass().isAnnotationPresent(Iri.class)) {
-                onClazz = minCardinality.onClass().getAnnotation(Iri.class).value();
+            for(MinCardinality minCardinality : minCardinalities) {
+                String onClazz = null;
+                if(!minCardinality.onClass().equals(OWLClazz.class) && minCardinality.onClass().isAnnotationPresent(Iri.class)) {
+                    onClazz = minCardinality.onClass().getAnnotation(Iri.class).value();
+                }
+
+                validateRestriction(object, OWL.MIN_CARDINALITY, Sets.newHashSet(Integer.toString(minCardinality.value())), onClazz);
+                validateRestriction(object, OWL.CARDINALITY, Sets.newHashSet(Integer.toString(minCardinality.value())), onClazz);
             }
-
-            validateRestriction(object, OWL.MIN_CARDINALITY, Sets.newHashSet(Integer.toString(minCardinality.value())), onClazz);
-            validateRestriction(object, OWL.CARDINALITY, Sets.newHashSet(Integer.toString(minCardinality.value())), onClazz);
         }
 
         // Check owl:maxCardinality:
         for(AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MaxCardinality.class)) {
-            MaxCardinality maxCardinality = object.getAnnotation(MaxCardinality.class);
+            Collection<MaxCardinality> maxCardinalities = unpackAnnotations(object, MaxCardinality.class);
 
-            String onClazz = null;
-            if(!maxCardinality.onClass().equals(OWLClazz.class) && maxCardinality.onClass().isAnnotationPresent(Iri.class)) {
-                onClazz = maxCardinality.onClass().getAnnotation(Iri.class).value();
+            for(MaxCardinality maxCardinality : maxCardinalities) {
+                String onClazz = null;
+                if(!maxCardinality.onClass().equals(OWLClazz.class) && maxCardinality.onClass().isAnnotationPresent(Iri.class)) {
+                    onClazz = maxCardinality.onClass().getAnnotation(Iri.class).value();
+                }
+
+                validateRestriction(object, OWL.MAX_CARDINALITY, Sets.newHashSet(Integer.toString(maxCardinality.value())), onClazz);
+                validateRestriction(object, OWL.CARDINALITY, Sets.newHashSet(Integer.toString(maxCardinality.value())), onClazz);
             }
-
-            validateRestriction(object, OWL.MAX_CARDINALITY, Sets.newHashSet(Integer.toString(maxCardinality.value())), onClazz);
-            validateRestriction(object, OWL.CARDINALITY, Sets.newHashSet(Integer.toString(maxCardinality.value())), onClazz);
         }
     }
 
@@ -259,76 +271,81 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         // Cardinalities must be non-negative:
         for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MinCardinality.class)) {
             Iri iri = object.getAnnotation(Iri.class);
-            MinCardinality cardinality = object.getAnnotation(MinCardinality.class);
+            Collection<MinCardinality> cardinalities = unpackAnnotations(object, MinCardinality.class);
 
-            if(cardinality.value() < 0) {
-                throw new InconsistentAnnotationException("Minimum cardinality of property " + iri.value() +
-                        " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
+            for(MinCardinality cardinality : cardinalities) {
+                if(cardinality.value() < 0) {
+                    throw new InconsistentAnnotationException("Minimum cardinality of property " + iri.value() +
+                            " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
+                }
             }
         }
         for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MaxCardinality.class)) {
             Iri iri = object.getAnnotation(Iri.class);
-            MaxCardinality maxCardinality = object.getAnnotation(MaxCardinality.class);
+            Collection<MinCardinality> minCardinalities = unpackAnnotations(object, MinCardinality.class);
+            Collection<MaxCardinality> maxCardinalities = unpackAnnotations(object, MaxCardinality.class);
 
-            if(maxCardinality.value() < 0) {
-                throw new InconsistentAnnotationException("Maximum cardinality of property " + iri.value() +
-                        " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
-            }
+            for(MaxCardinality maxCardinality : maxCardinalities) {
+                if(maxCardinality.value() < 0) {
+                    throw new InconsistentAnnotationException("Maximum cardinality of property " + iri.value() +
+                            " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
+                }
 
-            // The maximum cardinality must also not be less than the minimum cardinality:
-            if(object.isAnnotationPresent(MinCardinality.class)) {
-                MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
-                if(minCardinality.value() > maxCardinality.value()) {
-                    throw new InconsistentAnnotationException("The maximum cardinality of property " + iri.value() +
-                            " in " + getDeclaringJavaClazz(object).getName() + " must not be less than the minimum cardinality.");
+                // The maximum cardinality must also not be less than the minimum cardinality:
+                for(MinCardinality minCardinality : minCardinalities) {
+                    if(minCardinality.value() > maxCardinality.value()) {
+                        throw new InconsistentAnnotationException("The maximum cardinality of property " + iri.value() +
+                                " in " + getDeclaringJavaClazz(object).getName() + " must not be less than the minimum cardinality.");
+                    }
                 }
             }
         }
 
         // Objects may not have different values for @MinCardinality/@MaxCardinality and @Cardinality annotations:
         for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, Cardinality.class)) {
-            Cardinality cardinalityAnnotation = object.getAnnotation(Cardinality.class);
-            int cardinality = cardinalityAnnotation.value();
+            Collection<Cardinality> cardinalities = unpackAnnotations(object, Cardinality.class);
+            Collection<MinCardinality> minCardinalities = unpackAnnotations(object, MinCardinality.class);
+            Collection<MaxCardinality> maxCardinalities = unpackAnnotations(object, MaxCardinality.class);
 
-            if(object.isAnnotationPresent(MinCardinality.class)) {
-                MinCardinality minCardinalityAnnotation = object.getAnnotation(MinCardinality.class);
+            for(Cardinality cardinalityAnnotation : cardinalities) {
+                int cardinality = cardinalityAnnotation.value();
 
-                if(minCardinalityAnnotation.value() != cardinality) {
-                    String propertyIri = getIriFromObject(object);
-                    String clazzIri = getIriFromObject(getDeclaringJavaClazz(object));
-                    throw new InconsistentAnnotationException("Mapping for property " + propertyIri
-                            + " in class mapping for " + clazzIri + " has different values ("
-                            + minCardinalityAnnotation.value() + "vs. " + cardinality + ") for @MinCardinality and @Cardinality");
+                for(MinCardinality minCardinalityAnnotation : minCardinalities) {
+                    if(minCardinalityAnnotation.value() != cardinality) {
+                        String propertyIri = getIriFromObject(object);
+                        String clazzIri = getIriFromObject(getDeclaringJavaClazz(object));
+                        throw new InconsistentAnnotationException("Mapping for property " + propertyIri
+                                + " in class mapping for " + clazzIri + " has different values ("
+                                + minCardinalityAnnotation.value() + "vs. " + cardinality + ") for @MinCardinality and @Cardinality");
+                    }
                 }
-            }
-            if(object.isAnnotationPresent(MaxCardinality.class)) {
-                MaxCardinality maxCardinalityAnnotation = object.getAnnotation(MaxCardinality.class);
-
-                if(maxCardinalityAnnotation.value() != cardinality) {
-                    String propertyIri = getIriFromObject(object);
-                    String clazzIri = getIriFromObject(getDeclaringJavaClazz(object));
-                    throw new InconsistentAnnotationException("Mapping for property " + propertyIri
-                            + " in class mapping for " + clazzIri + " has different values ("
-                            + maxCardinalityAnnotation.value() + "vs. " + cardinality + ") for @MaxCardinality and @Cardinality");
+                for(MaxCardinality maxCardinalityAnnotation : maxCardinalities) {
+                    if(maxCardinalityAnnotation.value() != cardinality) {
+                        String propertyIri = getIriFromObject(object);
+                        String clazzIri = getIriFromObject(getDeclaringJavaClazz(object));
+                        throw new InconsistentAnnotationException("Mapping for property " + propertyIri
+                                + " in class mapping for " + clazzIri + " has different values ("
+                                + maxCardinalityAnnotation.value() + "vs. " + cardinality + ") for @MaxCardinality and @Cardinality");
+                    }
                 }
             }
         }
 
         // Being functional/bijective implies that (min) cardinality is 0 or 1:
         Collection<AccessibleObject> functionalObjects = filterObjectsWithAnnotation(annotatedObjects, Functional.class);
-        functionalObjects.addAll(filterObjectsWithAnnotation(annotatedObjects, Bijective.class));
+        functionalObjects.addAll(filterObjectsWithAnnotation(annotatedObjects, Bijective.class)); // Bijective properties are also functional
         for (AccessibleObject object : functionalObjects) {
             Iri iri = object.getAnnotation(Iri.class);
+            Collection<MinCardinality> minCardinalities = unpackAnnotations(object, MinCardinality.class);
+            Collection<Cardinality> cardinalities = unpackAnnotations(object, Cardinality.class);
 
-            if (object.isAnnotationPresent(MinCardinality.class)) {
-                MinCardinality minCardinality = object.getAnnotation(MinCardinality.class);
+            for(MinCardinality minCardinality : minCardinalities) {
                 if(minCardinality.value() > 1) {
                     throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
                             " can not be at the same time functional and have a minimum cardinality of " + minCardinality.value());
                 }
             }
-            if (object.isAnnotationPresent(Cardinality.class)) {
-                Cardinality cardinality = object.getAnnotation(Cardinality.class);
+            for(Cardinality cardinality : cardinalities) {
                 if(cardinality.value() > 1) {
                     throw new InconsistentAnnotationException("Property " + iri.value() + " in " + getDeclaringJavaClazz(object).getName() +
                             " can not be at the same time functional and have a cardinality of " + cardinality.value());
@@ -355,7 +372,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
             }
 
 
-            for(Annotation annotation : object.getAnnotations()) {
+            for(Annotation annotation : unpackAnnotations(object)) {
 
                 // If the current annotation imposes an characteristic (not class dependent):
                 if (isPropertyCharacteristicAnnotation(annotation)) {
@@ -398,7 +415,73 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
     }
 
     /**
+     * Unpacks all annotations that are present at the given object.
+     * Some annotations (e.g. {@link MinCardinality}) may be packed in a container annotation (e.g. {@link MinCardinalities}).
+     * In contrast to {@link AccessibleObject#getAnnotations()} these contained annotations are unpacked and the container
+     * is omitted.
+     * @param object The object for which to get the annotations.
+     * @return The unpacked annotations of the object.
+     */
+    private Collection<Annotation> unpackAnnotations(AccessibleObject object) {
+        Collection<Annotation> annotations = new HashSet<>();
+
+        for (Annotation annotation : object.getAnnotations()) {
+
+            // Unpack container annotations:
+            if(annotation.getClass().equals(MinCardinalities.class)) {
+                annotations.addAll(unpackAnnotations(object, MinCardinality.class));
+
+            } else if(annotation.getClass().equals(MaxCardinalities.class)) {
+                annotations.addAll(unpackAnnotations(object, MaxCardinality.class));
+
+            } else if(annotation.getClass().equals(Cardinalities.class)) {
+                annotations.addAll(unpackAnnotations(object, Cardinality.class));
+
+            } else { // Add any directly annotated (non-container) annotation:
+                annotations.add(annotation);
+            }
+        }
+        return annotations;
+    }
+
+    /**
+     * Returns all annotations of an accessible object by unpacking container annotations,
+     * i.e. an annotation is returned if its directly annotated at the given object
+     * or if it is contained in a appropriate container annotation (e.g. {@link MinCardinalities}).
+     * @param object The object from which annotations should be retrieved.
+     * @param annotation The type of the annotation that should be extracted.
+     * @return The annotations found at the object.
+     */
+    private <T extends Annotation> Collection<T> unpackAnnotations(AccessibleObject object, Class<T> annotation) {
+        Collection<T> annotations = new HashSet<>();
+
+        // Add direct (non-contained) annotation if any:
+        if(object.isAnnotationPresent(annotation)) {
+            annotations.add(object.getAnnotation(annotation));
+        }
+
+        // Check for each containable type whether its container is present:
+        if(annotation.equals(MinCardinality.class) && object.isAnnotationPresent(MinCardinalities.class)) {
+            for(Annotation current : object.getAnnotation(MinCardinalities.class).value()) {
+                annotations.add((T) current);
+            }
+        } else if(annotation.equals(MaxCardinality.class) && object.isAnnotationPresent(MaxCardinalities.class)) {
+            for(Annotation current : object.getAnnotation(MaxCardinalities.class).value()) {
+                annotations.add((T) current);
+            }
+        } else if(annotation.equals(Cardinality.class) && object.isAnnotationPresent(Cardinalities.class)) {
+            for(Annotation current : object.getAnnotation(Cardinalities.class).value()) {
+                annotations.add((T) current);
+            }
+        }
+
+        return annotations;
+    }
+
+    /**
      * Filters those object that are annotated with a certain annotation.
+     * An object is also contained in the result set if the given annotation is present in a container annotation,
+     * e.g. {@link MinCardinalities}.
      * @param objects The objects to filter.
      * @param annotation The annotation to search for.
      * @return Returns those objects from <code>objects</code> that have the given annotation.
@@ -407,6 +490,12 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         Collection<AccessibleObject> result = new HashSet<>();
         for(AccessibleObject object : objects) {
             if(object.isAnnotationPresent(annotation)) {
+                result.add(object);
+            } else if(annotation.equals(MinCardinality.class) && object.isAnnotationPresent(MinCardinalities.class)) {
+                result.add(object);
+            } else if(annotation.equals(MaxCardinality.class) && object.isAnnotationPresent(MaxCardinalities.class)) {
+                result.add(object);
+            } else if(annotation.equals(Cardinality.class) && object.isAnnotationPresent(Cardinalities.class)) {
                 result.add(object);
             }
         }
@@ -439,19 +528,6 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                 Iri iriAnnotation = object.getAnnotation(Iri.class);
                 iris.add(iriAnnotation.value());
             }
-        }
-        return iris;
-    }
-
-    /**
-     * Returns the set of IRIs of the given resource objects.
-     * @param resourceObjects The resource objects for which the IRIs should be retrieved.
-     * @return The IRIs of the given resource objects.
-     */
-    public Set<String> getIrisFromResourceObjects(Collection<? extends ResourceObject> resourceObjects) {
-        Set<String> iris = new HashSet<>();
-        for(ResourceObject object : resourceObjects) {
-            iris.add(object.toString());
         }
         return iris;
     }
@@ -544,6 +620,14 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         }
     }
 
+    /**
+     * Creates an resource object using the {@link ObjectConnection} provided.
+     * @param clazz The concept of the instance to create.
+     * @param id The ID/URI of the instance to create.
+     * @param <T> The type of the instances concept.
+     * @return The created object.
+     * @throws RepositoryException Thrown if an error occurs while instantiating.
+     */
     private  <T> T createObject(Class<T> clazz, Resource id) throws RepositoryException {
         ObjectConnection connection = getConnection();
         ObjectFactory objectFactory = connection.getObjectFactory();
@@ -880,17 +964,18 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         Collection<AccessibleObject> minCardinalityObjects = filterObjectsWithAnnotation(annotatedObjects, MinCardinality.class);
 
         for (AccessibleObject object : minCardinalityObjects) {
-            MinCardinality minCardinalityAnnotation = object.getAnnotation(MinCardinality.class);
-            int minCardinality = minCardinalityAnnotation.value();
+            for(MinCardinality minCardinalityAnnotation : unpackAnnotations(object, MinCardinality.class)) {
+                int minCardinality = minCardinalityAnnotation.value();
 
-            String onClazzIri = null;
-            if(minCardinalityAnnotation.onClass() != OWLClazz.class) {
-                onClazzIri = getIriFromObject(minCardinalityAnnotation.onClass());
+                String onClazzIri = null;
+                if(minCardinalityAnnotation.onClass() != OWLClazz.class) {
+                    onClazzIri = getIriFromObject(minCardinalityAnnotation.onClass());
+                }
+
+                // Add the cardinality to the restriction:
+                Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
+                restriction.setMinCardinality(Sets.<Integer>newHashSet(minCardinality));
             }
-
-            // Add the cardinality to the restriction:
-            Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
-            restriction.setMinCardinality(Sets.<Integer>newHashSet(minCardinality));
         }
     }
 
@@ -905,40 +990,46 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         Collection<AccessibleObject> maxCardinalityObjects = filterObjectsWithAnnotation(annotatedObjects, MaxCardinality.class);
 
         for (AccessibleObject object : maxCardinalityObjects) {
+            for(MaxCardinality maxCardinalityAnnotation : unpackAnnotations(object, MaxCardinality.class)) {
+                int maxCardinality = maxCardinalityAnnotation.value();
 
-            MaxCardinality maxCardinalityAnnotation = object.getAnnotation(MaxCardinality.class);
-            int minCardinality = maxCardinalityAnnotation.value();
+                String onClazzIri = null;
+                if(maxCardinalityAnnotation.onClass() != OWLClazz.class) {
+                    onClazzIri = getIriFromObject(maxCardinalityAnnotation.onClass());
+                }
 
-            String onClazzIri = null;
-            if(maxCardinalityAnnotation.onClass() != OWLClazz.class) {
-                onClazzIri = getIriFromObject(maxCardinalityAnnotation.onClass());
+                Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
+
+                // Add the cardinality to the restriction:
+                restriction.setMaxCardinality(Sets.<Integer>newHashSet(maxCardinality));
             }
-
-            Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
-
-            // Add the cardinality to the restriction:
-            restriction.setMaxCardinality(Sets.<Integer>newHashSet(minCardinality));
         }
     }
 
+    /**
+     * Persists the information that a property is restricted to have a certain number of values.
+     * All properties with {@link Cardinality} annotation are considered.
+     * @param annotatedObjects The {@link Iri} annotated objects that should be considered.
+     * @throws RepositoryException Thrown on error regarding the connected triplestore.
+     */
     private void persistCardinality(Collection<AccessibleObject> annotatedObjects) throws RepositoryException {
         // Get those methods and fields that have the @Cardinality annotation:
         Collection<AccessibleObject> cardinalityObjects = filterObjectsWithAnnotation(annotatedObjects, Cardinality.class);
 
         for (AccessibleObject object : cardinalityObjects) {
+            for(Cardinality cardinalityAnnotation : unpackAnnotations(object, Cardinality.class)) {
+                int cardinality = cardinalityAnnotation.value();
 
-            Cardinality cardinalityAnnotation = object.getAnnotation(Cardinality.class);
-            int cardinality = cardinalityAnnotation.value();
+                String onClazzIri = null;
+                if(cardinalityAnnotation.onClass() != OWLClazz.class) {
+                    onClazzIri = getIriFromObject(cardinalityAnnotation.onClass());
+                }
 
-            String onClazzIri = null;
-            if(cardinalityAnnotation.onClass() != OWLClazz.class) {
-                onClazzIri = getIriFromObject(cardinalityAnnotation.onClass());
+                Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
+                // Add the cardinality to the restriction:
+                restriction.setMaxCardinality(Sets.<Integer>newHashSet(cardinality));
+                restriction.setMinCardinality(Sets.<Integer>newHashSet(cardinality));
             }
-
-            Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
-            // Add the cardinality to the restriction:
-            restriction.setMaxCardinality(Sets.<Integer>newHashSet(cardinality));
-            restriction.setMinCardinality(Sets.<Integer>newHashSet(cardinality));
         }
     }
 

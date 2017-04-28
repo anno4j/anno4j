@@ -5,8 +5,6 @@ import com.github.anno4j.Transaction;
 import com.github.anno4j.annotations.*;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
-import com.github.anno4j.model.impl.agent.Person;
-import com.github.anno4j.model.namespaces.FOAF;
 import com.github.anno4j.model.namespaces.OWL;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.model.namespaces.XSD;
@@ -42,7 +40,7 @@ public class OWLSchemaPersistingManagerTest {
      * A person class with consistent schema annotations.
      */
     @Iri("http://example.de/#validly_annotated_person")
-    private interface ValidlyAnnotatedPerson extends ResourceObject {
+    private interface Person extends ResourceObject {
 
         @Bijective
         @MinCardinality(1) @MaxCardinality(1)
@@ -54,60 +52,73 @@ public class OWLSchemaPersistingManagerTest {
         @Iri("http://example.de/#id")
         public void setIds(Set<Integer> id);
 
-        public Set<ValidlyAnnotatedPerson> getPartners();
+        public Set<Person> getPartners();
 
-        public void setPartners(Set<ValidlyAnnotatedPerson> partners);
+        @MinCardinalities({@MinCardinality(2), @MinCardinality(value = 1, onClass = Job.class)})
+        @Iri("http://example.de/#has_activity")
+        public Set<Activity> getActivities();
+
+        public void setPartners(Set<Person> partners);
 
         @Transitive
         @InverseOf({"http://example.de/#has_subordinate"})
         @Iri("http://example.de/#has_boss")
-        @AllValuesFrom({ValidlyAnnotatedPerson.class, Person.class})
-        public Set<ValidlyAnnotatedPerson> getBosses();
+        @AllValuesFrom({Person.class, com.github.anno4j.model.impl.agent.Person.class})
+        public Set<Person> getBosses();
 
         @Iri("http://example.de/#has_boss")
-        public void setBosses(Set<ValidlyAnnotatedPerson> bosses);
+        public void setBosses(Set<Person> bosses);
 
         @Transitive
         @Iri("http://example.de/#has_subordinate")
-        public Set<ValidlyAnnotatedPerson> getSubordinates();
+        public Set<Person> getSubordinates();
 
         @Iri("http://example.de/#has_subordinate")
-        public void setSubordinates(Set<ValidlyAnnotatedPerson> subordinates);
+        public void setSubordinates(Set<Person> subordinates);
+
+        @Iri("http://example.de/#has_activity")
+        public void setActivities(Set<Activity> activities);
     }
 
     @Partial
-    public static abstract class ValidlyAnnotatedPersonSupport extends ResourceObjectSupport implements ValidlyAnnotatedPerson {
+    public static abstract class PersonSupport extends ResourceObjectSupport implements Person {
 
         @Symmetric
-        @MinCardinality(value = 0, onClass = ValidlyAnnotatedPerson.class) @MaxCardinality(1)
+        @MinCardinality(value = 0, onClass = Person.class) @MaxCardinality(1)
         @Iri("http://example.de/#partner")
-        private Set<ValidlyAnnotatedPerson> partners;
+        private Set<Person> partners;
 
         @Override
-        public Set<ValidlyAnnotatedPerson> getPartners() {
+        public Set<Person> getPartners() {
             return this.partners;
         }
 
         @Override
-        public void setPartners(Set<ValidlyAnnotatedPerson> partners) {
+        public void setPartners(Set<Person> partners) {
             this.partners.clear();
             this.partners.addAll(partners);
         }
     }
+
+    @Iri("http://example.de/#activity")
+    private interface Activity extends ResourceObject { }
+
+    @Iri("http://example.de/#job")
+    private interface Job extends Activity { }
 
     private static final String QUERY_PREFIX = "PREFIX owl: <" + OWL.NS + "> " +
                             "PREFIX rdfs: <" + RDFS.NS + "> " +
                             "PREFIX xsd: <" + XSD.NS + "> ";
 
     @Test
-    public void testConsistentAnnotations() throws Exception {
+    public void testAnnotationPersisting() throws Exception {
         Anno4j anno4j = new Anno4j();
 
         Reflections types = new Reflections(
                 new ConfigurationBuilder()
                 .setUrls(
-                        ClasspathHelper.forClass(ValidlyAnnotatedPerson.class, ClasspathHelper.staticClassLoader()),
-                        ClasspathHelper.forClass(ValidlyAnnotatedPersonSupport.class, ClasspathHelper.staticClassLoader())
+                        ClasspathHelper.forClass(Person.class, ClasspathHelper.staticClassLoader()),
+                        ClasspathHelper.forClass(PersonSupport.class, ClasspathHelper.staticClassLoader())
                 )
                 .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner())
         );
@@ -156,6 +167,19 @@ public class OWLSchemaPersistingManagerTest {
                 "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r4 . " +
                 "   ?r4 owl:onProperty <http://example.de/#has_boss> . " +
                 "   ?r4 owl:allValuesFrom <http://example.de/#validly_annotated_person> . " +
+
+                "   ?r5 a owl:Restriction . " +
+                "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r5 . " +
+                "   ?r5 owl:onProperty <http://example.de/#has_activity> . " +
+                "   ?r5 owl:minCardinality ?v5 . " +
+                "   FILTER( ?v5 = 2 )" +
+
+                "   ?r6 a owl:Restriction . " +
+                "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r6 . " +
+                "   ?r6 owl:onProperty <http://example.de/#has_activity> . " +
+                "   ?r6 owl:minCardinality ?v6 . " +
+                "   ?r6 owl:onClass <http://example.de/#job> . " +
+                "   FILTER( ?v6 = 1 )" +
                 "}";
 
         BooleanQuery restrictionQuery = transaction.getConnection().prepareBooleanQuery(QueryLanguage.SPARQL, q);
@@ -177,8 +201,8 @@ public class OWLSchemaPersistingManagerTest {
         Reflections types = new Reflections(
                 new ConfigurationBuilder()
                         .setUrls(
-                                ClasspathHelper.forClass(ValidlyAnnotatedPerson.class, ClasspathHelper.staticClassLoader()),
-                                ClasspathHelper.forClass(ValidlyAnnotatedPersonSupport.class, ClasspathHelper.staticClassLoader())
+                                ClasspathHelper.forClass(Person.class, ClasspathHelper.staticClassLoader()),
+                                ClasspathHelper.forClass(PersonSupport.class, ClasspathHelper.staticClassLoader())
                         )
                         .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner())
         );
@@ -217,8 +241,8 @@ public class OWLSchemaPersistingManagerTest {
         Reflections types = new Reflections(
                 new ConfigurationBuilder()
                         .setUrls(
-                                ClasspathHelper.forClass(ValidlyAnnotatedPerson.class, ClasspathHelper.staticClassLoader()),
-                                ClasspathHelper.forClass(ValidlyAnnotatedPersonSupport.class, ClasspathHelper.staticClassLoader())
+                                ClasspathHelper.forClass(Person.class, ClasspathHelper.staticClassLoader()),
+                                ClasspathHelper.forClass(PersonSupport.class, ClasspathHelper.staticClassLoader())
                         )
                         .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner())
         );
