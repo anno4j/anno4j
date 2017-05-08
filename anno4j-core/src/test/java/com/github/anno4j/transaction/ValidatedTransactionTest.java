@@ -12,6 +12,8 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.BooleanQuery;
+import org.openrdf.query.QueryLanguage;
 
 import java.util.Set;
 
@@ -130,6 +132,46 @@ public class ValidatedTransactionTest {
     @Iri("http://example.de/validated_transaction_test_resource_child")
     public interface ValidatedTransactionTestSpecialResource extends ValidatedTransactionTestResource { }
 
+
+
+    @Test
+    public void testPersistence() throws Exception {
+        Anno4j anno4j = new Anno4j();
+
+        // Add some initial objects:
+        ValidatedTransactionTestResource r = anno4j.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("http://example.de/res1"));
+        r.setCardinality(Sets.<Integer>newHashSet(1, 2, 3));
+        r.setSuperproperty1(Sets.<Integer>newHashSet(1, 2));
+
+        // Open the validated transaction:
+        Transaction transaction = anno4j.createValidatedTransaction();
+        r = transaction.findByID(ValidatedTransactionTestResource.class, "http://example.de/res1");
+        assertNotNull(r);
+        r.setCardinality(Sets.newHashSet(1, 2));
+
+        r = transaction.findByID(ValidatedTransactionTestResource.class, "http://example.de/res1");
+        assertEquals(Sets.newHashSet(1, 2), r.getCardinality());
+
+        // Test working context active:
+        BooleanQuery query = transaction.getConnection().prepareBooleanQuery(QueryLanguage.SPARQL, "ASK " +
+                "FROM NAMED <urn:anno4j:valtrans0_working> " +
+                "{" +
+                "   ?s ?p ?o . " +
+                "}");
+        assertTrue(query.evaluate());
+
+        // Commit the transaction:
+        transaction.commit();
+
+        // Test that working context is cleared:
+        transaction = anno4j.createTransaction();
+        query = transaction.getConnection().prepareBooleanQuery(QueryLanguage.SPARQL, "ASK " +
+                "FROM NAMED <urn:anno4j:valtrans0_working> " +
+                "{" +
+                "   ?s ?p ?o . " +
+                "}");
+        assertFalse(query.evaluate());
+    }
 
     @Test
     public void testIndirectModification() throws Exception {
@@ -348,10 +390,10 @@ public class ValidatedTransactionTest {
         ValidatedTransaction transaction = anno4j.createValidatedTransaction();
         transaction.begin();
 
-        ValidatedTransactionTestResource resource1 = transaction.createObject(ValidatedTransactionTestResource.class);
-        ValidatedTransactionTestResource resource2 = transaction.createObject(ValidatedTransactionTestResource.class);
-        ValidatedTransactionTestResource resource3 = transaction.createObject(ValidatedTransactionTestResource.class);
-        ValidatedTransactionTestResource resource4 = transaction.createObject(ValidatedTransactionTestResource.class);
+        ValidatedTransactionTestResource resource1 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n1"));
+        ValidatedTransactionTestResource resource2 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n2"));
+        ValidatedTransactionTestResource resource3 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n3"));
+        ValidatedTransactionTestResource resource4 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n4"));
         resource1.setTransitive(Sets.newHashSet(resource2, resource3, resource4));
         resource2.setTransitive(Sets.newHashSet(resource3));
 
@@ -371,10 +413,10 @@ public class ValidatedTransactionTest {
         ValidatedTransaction transaction = anno4j.createValidatedTransaction();
         transaction.begin();
 
-        ValidatedTransactionTestResource resource1 = transaction.createObject(ValidatedTransactionTestResource.class);
-        ValidatedTransactionTestResource resource2 = transaction.createObject(ValidatedTransactionTestResource.class);
-        ValidatedTransactionTestResource resource3 = transaction.createObject(ValidatedTransactionTestResource.class);
-        ValidatedTransactionTestResource resource4 = transaction.createObject(ValidatedTransactionTestResource.class);
+        ValidatedTransactionTestResource resource1 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n1"));
+        ValidatedTransactionTestResource resource2 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n2"));
+        ValidatedTransactionTestResource resource3 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n3"));
+        ValidatedTransactionTestResource resource4 = transaction.createObject(ValidatedTransactionTestResource.class, (Resource) new URIImpl("urn:test:n4"));
         resource1.setTransitive(Sets.newHashSet(resource2, resource4));
         resource2.setTransitive(Sets.newHashSet(resource3));
 

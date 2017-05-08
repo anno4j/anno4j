@@ -5,17 +5,22 @@ import com.github.anno4j.model.namespaces.OWL;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectQuery;
 import org.openrdf.repository.object.ObjectRepository;
 import org.openrdf.result.Result;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A transaction that supports the atomicity property and provides a validation of the datebases schema compliance
@@ -47,34 +52,59 @@ public class ValidatedTransaction extends Transaction {
     }
 
     /**
+     * The ID last assigned to a ValidatedTransaction.
+     */
+    private static int lastTransactionId = 0;
+
+    /**
      * Contains prefix definitions for SPARQL queries.
      */
     private static final String QUERY_PREFIX = "PREFIX owl: <" + OWL.NS + "> PREFIX rdfs: <" + RDFS.NS + "> ";
 
     /**
-     * The resource objects that were directly affected by the transaction.
+     * The ID assigned to this ValidatedTransaction.
      */
-    private Collection<ResourceObject> affectedObjects = new HashSet<>();
-
+    private int transactionId;
 
     /**
      * {@inheritDoc}
      */
     ValidatedTransaction(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration) throws RepositoryException {
         super(objectRepository, evaluatorConfiguration);
+
+        // Assign an ID to the transaction:
+        transactionId = nextTransactionId();
+
+        /*
+        In order to get modified statements work on transaction specific contexts.
+        All statements inserted into the default graph are inserted into the transactions
+        working context.
+        All statements removed are copied to the transactions archive context.
+         */
+        getConnection().setAddContexts(getWorkingContext());
+        getConnection().setArchiveContexts(getArchiveContext());
     }
 
     /**
      * Validates the schema compliance of the state resulting from the transaction.
      * The RDF data in the connected triplestore is validated against OWL schema information that is present in it.
-     * If validation failes a {@link ValidationFailedException} is thrown and the transaction is rolled back.
+     * If validation fails a {@link ValidationFailedException} is thrown and the transaction is rolled back.
      * @throws ValidationFailedException Thrown if the state the transaction resulted in is not compliant to the schema.
      * Call {@link ValidationFailedException#getMessage()} for information about the reason.
      * @throws RepositoryException Thrown if an errors occurs while querying the connected triplestore.
      */
     @Override
     public void commit() throws RepositoryException {
-        Collection<ResourceObject> anchors = getReachableInstances(affectedObjects);
+        Collection<ResourceObject> anchors = getAffectedResources();
+
+        // Copy statements from working context to default context:
+        ObjectConnection connection = getConnection();
+        RepositoryResult<Statement> statements = connection.getStatements(null, null, null, getWorkingContext());
+        while (statements.hasNext()) {
+            Statement statement = statements.next();
+            connection.remove(statement);
+            connection.add(statement.getSubject(), statement.getPredicate(), statement.getObject(), (Resource) null);
+        }
 
         // Valdiate the graph:
         try {
@@ -101,36 +131,83 @@ public class ValidatedTransaction extends Transaction {
     }
 
     /**
-     * Returns all resources that are reachable via a path of arbitrary length from any of the anchor instances
-     * provided.
-     * Thus the instances in <code>anchors</code> are also included in the result.
-     * @param anchors The resources from where to start scanning.
-     * @return The set of all resources that are reachable from the given anchor resources.
-     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     * @return An unique ID for a {@link ValidatedTransaction}.
      */
-    private Set<ResourceObject> getReachableInstances(Collection<ResourceObject> anchors) throws RepositoryException {
-        // Select all resources that are reachable via an arbirtary path from the anchors:
-        String q = QUERY_PREFIX + "SELECT ?o {" +
-                buildValuesClause(anchors, "i") +
-                "     ?i (<urn:anno4j:foo>|!<urn:anno4j:foo>)* ?o . " +
-                "     FILTER( isIRI(?o) )" +
-                "}";
+    private static int nextTransactionId() {
+        return lastTransactionId++;
+    }
 
-        // Evaluate the query:
-        Set<ResourceObject> reachable = new HashSet<>(anchors);
+    /**
+     * @return The context in which added are inserted.
+     */
+    private URI getWorkingContext() {
+        return new URIImpl("urn:anno4j:valtrans" + transactionId + "_working");
+    }
+
+    private URI getArchiveContext() {
+        return new URIImpl("urn:anno4j:valtrans" + transactionId + "_archive");
+    }
+
+    private Set<ResourceObject> getResourcesFromContext(URI context) throws RepositoryException {
         try {
-            ObjectQuery query = getConnection().prepareObjectQuery(q);
+            String q = QUERY_PREFIX + "SELECT ?o " +
+                    "FROM NAMED <" + context.toString() + "> " +
+                    "{" +
+                    "   GRAPH <" + context.toString() + "> {" +
+                    "       { ?o ?p ?x . } UNION { ?x ?p ?o . }" +
+                    "       FILTER ( isIRI(?o) )" +
+                    "   }" +
+                    "}";
 
-            for(Object item : query.evaluate().asSet()) {
-                if(item instanceof ResourceObject) {
-                    reachable.add((ResourceObject) item);
+            Set<ResourceObject> resources = new HashSet<>();
+            for (Object current : getConnection().prepareObjectQuery(q).evaluate().asSet()) {
+                if(current instanceof ResourceObject) {
+                    resources.add((ResourceObject) current);
                 }
             }
 
-        } catch (MalformedQueryException | QueryEvaluationException e) {
+            return resources;
+
+        } catch (QueryEvaluationException | MalformedQueryException e) {
             throw new RepositoryException(e);
         }
-        return reachable;
+    }
+
+    /**
+     * Returns all resources that were affected by this transaction, i.e.
+     * all resources in the transactions working context and the former neighbours of
+     * resources that were removed.
+     * @return The resources affected by the transaction.
+     * @throws RepositoryException Thrown if an error occurs while querying the connected triplestore.
+     */
+    private Set<ResourceObject> getAffectedResources() throws RepositoryException {
+        // All inserted resources are obviously affected:
+        Set<ResourceObject> affected = getResourcesFromContext(getWorkingContext());
+        // All deleted (archived) resources are also affected:
+        Set<ResourceObject> removedResources = getResourcesFromContext(getArchiveContext());
+        affected.addAll(removedResources);
+
+        // Add all neighbours (in the default contect) of deleted resources:
+        try {
+            String q = QUERY_PREFIX + "SELECT ?n {" +
+                    buildValuesClause(removedResources, "r") +
+                    "   {?n (<urn:anno4j:foo>|!<urn:anno4j:foo>) ?r . } " +
+                    "   UNION " +
+                    "   {?r (<urn:anno4j:foo>|!<urn:anno4j:foo>) ?n . } " +
+                    "   FILTER ( isIRI( ?n ) )" +
+                    "}";
+
+            for (Object current : getConnection().prepareObjectQuery(q).evaluate().asSet()) {
+                if(current instanceof ResourceObject) {
+                    affected.add((ResourceObject) current);
+                }
+            }
+
+        } catch (QueryEvaluationException | MalformedQueryException e) {
+            throw new RepositoryException(e);
+        }
+
+        return affected;
     }
 
     /**
@@ -166,7 +243,8 @@ public class ValidatedTransaction extends Transaction {
      */
     private void validateFunctional(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
         // Query for distinct values that are not in a owl:sameAs relation:
-        String q = QUERY_PREFIX + "SELECT ?prop ?v1 ?v2 ?i {" +
+        String q = QUERY_PREFIX + "SELECT ?prop ?v1 ?v2 ?i " +
+                " {" +
                 buildValuesClause(anchors, "i") +
                 "?i ?prop ?v1 . " +
                 "?i ?prop ?v2 . " +
@@ -285,63 +363,29 @@ public class ValidatedTransaction extends Transaction {
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateTransitive(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        for (ResourceObject object : anchors) {
-            String affectedObjectIri = object.getResourceAsString();
+        String q = QUERY_PREFIX + "SELECT ?s ?o ?p ?x {" +
+                buildValuesClause(anchors, "s") +
+                "   ?s ?p ?o . " +
+                "   ?p a owl:TransitiveProperty . " +
+                "   ?o ?p ?x . " +
+                "   MINUS {" +
+                "      ?s ?p ?x . " +
+                "   }" +
+                "} LIMIT 1";
 
-            // Build the query as a union of subqueries for the outgoing transitive properties of the current instance:
-            StringBuilder q = new StringBuilder(QUERY_PREFIX)
-                    .append("SELECT ?y ?z {");
-            try {
-                // All properties that are transitive and outgoing from the current object:
-                ObjectQuery query = getConnection().prepareObjectQuery(QUERY_PREFIX + "SELECT ?p { " +
-                        "  <" + affectedObjectIri + "> ?p ?o . " +
-                        "  ?p a owl:TransitiveProperty . " +
-                        "}");
+        try {
+            ObjectQuery query = getConnection().prepareObjectQuery(q);
+            Result<?> result = query.evaluate();
 
-                Result result = query.evaluate();
+            if(result.hasNext()) {
+                Object[] row = (Object[]) result.next();
 
-                while (result.hasNext()){
-                    String propertyIri = ((ResourceObject) result.next()).getResourceAsString();
-
-                    // Query for a path instance -> ?y -> ?z, without an edge object -> ?z:
-                    q.append("{ <" + affectedObjectIri + "> <" + propertyIri + ">+ ?y ." +
-                            "   ?y <" + propertyIri + ">+ ?z ." +
-
-                            "   MINUS {" +
-                            "      <" + affectedObjectIri + "> <" + propertyIri + "> ?z ." +
-                            "   } " +
-                            "}");
-
-                    // Append union operator for all but the last subquery:
-                    if(result.hasNext()) {
-                        q.append(" UNION ");
-                    }
-                }
-
-            } catch (MalformedQueryException | QueryEvaluationException e) {
-                throw new RepositoryException(e);
-            }
-            q.append("} LIMIT 1");
-
-            Set<?> result;
-            try {
-                ObjectQuery query = getConnection().prepareObjectQuery(q.toString());
-                result = query.evaluate().asSet();
-
-            } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
-                throw new RepositoryException(e);
+                throw new ValidationFailedException("Property " + row[2] + " is defined transitive, but mapping from "
+                        + row[0] + " to " + row[3] + " is missing (reachable via " + row[1] + ").");
             }
 
-            if(result.size() > 0) {
-                Object[] row = (Object[]) result.iterator().next();
-                if(row != null && row[0] != null && row[1] != null) {
-                    String intermediateIri = row[0].toString();
-                    String targetIri = row[1].toString();
-
-                    throw new ValidationFailedException("Transitive property violates transitivity. " +
-                            "No edge exists between " + affectedObjectIri + " and " + targetIri + ", but the latter is reachable via " + intermediateIri + ".");
-                }
-            }
+        } catch (MalformedQueryException | QueryEvaluationException e) {
+            throw new RepositoryException(e);
         }
     }
 
@@ -703,50 +747,5 @@ public class ValidatedTransaction extends Transaction {
                 }
             }
         }
-    }
-
-    @Override
-    public void persist(ResourceObject resource) throws RepositoryException {
-        super.persist(resource);
-        affectedObjects.add(resource);
-    }
-
-    @Override
-    public <T extends ResourceObject> T findByID(Class<T> type, String id) throws RepositoryException {
-        T result = super.findByID(type, id);
-
-        if(result != null) {
-            affectedObjects.add(result);
-        }
-
-        return result;
-    }
-
-    @Override
-    public <T extends ResourceObject> T findByID(Class<T> type, URI id) throws RepositoryException {
-        return findByID(type, id.toString());
-    }
-
-    @Override
-    public <T extends ResourceObject> List<T> findAll(Class<T> type) throws RepositoryException {
-        List<T> result = super.findAll(type);
-
-        if(result != null) {
-            affectedObjects.addAll(result);
-        }
-
-        return result;
-    }
-
-    @Override
-    public <T> T createObject(Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException {
-        return createObject(clazz, null);
-    }
-
-    @Override
-    public <T> T createObject(Class<T> clazz, Resource id) throws RepositoryException, IllegalAccessException, InstantiationException {
-        T object = super.createObject(clazz, id);
-        affectedObjects.add((ResourceObject) object);
-        return object;
     }
 }
