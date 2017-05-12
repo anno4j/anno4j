@@ -15,12 +15,11 @@ import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectQuery;
 import org.openrdf.repository.object.ObjectRepository;
+import org.openrdf.repository.object.RDFObject;
 import org.openrdf.result.Result;
 
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A transaction that supports the atomicity property and provides a validation of the datebases schema compliance
@@ -67,10 +66,39 @@ public class ValidatedTransaction extends Transaction {
     private int transactionId;
 
     /**
-     * {@inheritDoc}
+     * At commit time all statements in the working context (see {@link #getWorkingContext()}) are inserted into this
+     * context. If this parameter is null the default context will be used.
      */
-    ValidatedTransaction(ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration) throws RepositoryException {
+    private URI targetContext;
+
+    /**
+     * The contexts that will be validated at commit time.
+     * If this collection is empty or contains only {@code null} the whole repository will be validated.
+     * If the collection contains {@code null} all other contexts will be merged with the default graph.
+     */
+    private Collection<URI> validatedContexts = new ArrayList<>();
+
+    /**
+     * Initializes a transaction with schema validation at commit time and a certain target context.
+     * @param targetContext The context in which all statements created by the transaction will be inserted at commit time.
+     *                      This parameter can be null for the default context.
+     * @param validatedContexts The contexts that will be validated at commit time.
+     *                          If this collection is empty, null or contains only {@code null} the whole repository will be validated.
+     *                          If the collection contains {@code null} all other contexts will be merged with the default graph.
+     * @param objectRepository The repository on which to operate.
+     * @param evaluatorConfiguration Configuration for the LD path evaluator.
+     * @throws RepositoryException Thrown if an error occurs while initializing the transaction for the gien repository.
+     */
+    ValidatedTransaction(URI targetContext, Collection<URI> validatedContexts, ObjectRepository objectRepository, LDPathEvaluatorConfiguration evaluatorConfiguration) throws RepositoryException {
         super(objectRepository, evaluatorConfiguration);
+
+        // Set the target context:
+        this.targetContext = targetContext;
+
+        // Set the contexts that will be validated:
+        if(validatedContexts != null && !validatedContexts.isEmpty()) {
+            this.validatedContexts.addAll(validatedContexts);
+        }
 
         // Assign an ID to the transaction:
         transactionId = nextTransactionId();
@@ -89,6 +117,8 @@ public class ValidatedTransaction extends Transaction {
      * Validates the schema compliance of the state resulting from the transaction.
      * The RDF data in the connected triplestore is validated against OWL schema information that is present in it.
      * If validation fails a {@link ValidationFailedException} is thrown and the transaction is rolled back.
+     * If the validation succeeds all statements created by this transaction are inserted into the target context
+     * (see {@link #getTargetContext()}).
      * @throws ValidationFailedException Thrown if the state the transaction resulted in is not compliant to the schema.
      * Call {@link ValidationFailedException#getMessage()} for information about the reason.
      * @throws RepositoryException Thrown if an errors occurs while querying the connected triplestore.
@@ -103,10 +133,10 @@ public class ValidatedTransaction extends Transaction {
         while (statements.hasNext()) {
             Statement statement = statements.next();
             connection.remove(statement);
-            connection.add(statement.getSubject(), statement.getPredicate(), statement.getObject(), (Resource) null);
+            connection.add(statement.getSubject(), statement.getPredicate(), statement.getObject(), (Resource) getTargetContext());
         }
 
-        // Valdiate the graph:
+        // Validate the graph:
         try {
             validateFunctional(anchors);
             validateInverseFunctional(anchors);
@@ -138,16 +168,44 @@ public class ValidatedTransaction extends Transaction {
     }
 
     /**
-     * @return The context in which added are inserted.
+     * @return The context in which added statements are inserted.
      */
     private URI getWorkingContext() {
         return new URIImpl("urn:anno4j:valtrans" + transactionId + "_working");
     }
 
+    /**
+     * @return The context in which removed statements are copied to.
+     */
     private URI getArchiveContext() {
         return new URIImpl("urn:anno4j:valtrans" + transactionId + "_archive");
     }
 
+    /**
+     * @return The context in which all statements created by the transaction will be inserted at commit time
+     * on successful validation.
+     * Can be null if the statements are inserted into default context.
+     */
+    public URI getTargetContext() {
+        return targetContext;
+    }
+
+    /**
+     * @return The contexts that will be validated at commit time.
+     * If the returned collection is empty or does only contain {@code null} then the whole repository is validated.
+     * Otherwise only the specified contexts are considered which are merged with the default context if {@code null}
+     * is part of the collection.
+     */
+    public Collection<URI> getValidatedContexts() {
+        return Collections.unmodifiableCollection(validatedContexts);
+    }
+
+    /**
+     * Returns all resources that exist in a specific context.
+     * @param context The context from which to get resources.
+     * @return All resources (IRIs) that are present in {@code context}.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
     private Set<ResourceObject> getResourcesFromContext(URI context) throws RepositoryException {
         try {
             String q = QUERY_PREFIX + "SELECT ?o " +
@@ -177,6 +235,7 @@ public class ValidatedTransaction extends Transaction {
      * Returns all resources that were affected by this transaction, i.e.
      * all resources in the transactions working context and the former neighbours of
      * resources that were removed.
+     * Only resources from the validated contexts (see {@link #validatedContexts}) are considered.
      * @return The resources affected by the transaction.
      * @throws RepositoryException Thrown if an error occurs while querying the connected triplestore.
      */
@@ -186,11 +245,18 @@ public class ValidatedTransaction extends Transaction {
         // All deleted (archived) resources are also affected:
         Set<ResourceObject> removedResources = getResourcesFromContext(getArchiveContext());
         affected.addAll(removedResources);
+        // All resources cached and their neighbours:
+        Map<Resource, RDFObject> cachedObjectMap = getConnection().getCachedObjects();
+        for (Resource cachedResource : cachedObjectMap.keySet()) {
+            affected.add(findByID(ResourceObject.class, cachedResource.stringValue()));
+        }
 
         // Add all neighbours (in the default contect) of deleted resources:
         try {
-            String q = QUERY_PREFIX + "SELECT ?n {" +
-                    buildValuesClause(removedResources, "r") +
+            String q = QUERY_PREFIX + "SELECT ?n " +
+                    buildFromClause() +
+                    "{" +
+                    buildValuesClause(affected, "r") +
                     "   {?n (<urn:anno4j:foo>|!<urn:anno4j:foo>) ?r . } " +
                     "   UNION " +
                     "   {?r (<urn:anno4j:foo>|!<urn:anno4j:foo>) ?n . } " +
@@ -234,9 +300,46 @@ public class ValidatedTransaction extends Transaction {
     }
 
     /**
+     * Builds a SPARQL FROM clause depending on the contexts that should be validated (see {@link #validatedContexts}).
+     * If {@code null} (representing the default context) is part of the validated contexts then
+     * all other validated contexts will be merged with the default context.
+     * If no contexts or only the default context are specified for validation an empty clause will be generated resulting in a validation of the
+     * whole repository.
+     * @return Returns a SPARQL {@code FROM} or {@code FROM NAMED} clause depending on the contexts to validate.
+     */
+    private String buildFromClause() {
+        // Validation is only constrained if there are contexts explicitely specified and there is something else than null:
+        if(!validatedContexts.isEmpty() && validatedContexts.iterator().next() != null) {
+            // If the default graph (aka. null) should be validated, merge with it:
+            boolean mergeWithDefault = validatedContexts.contains(null);
+
+            StringBuilder clause = new StringBuilder();
+            for (URI context : validatedContexts) {
+                clause.append("FROM ");
+
+                // No merging with default context is done if we use FROM NAMED:
+                if (!mergeWithDefault) {
+                    clause.append("NAMED ");
+                }
+
+                clause.append("<")
+                        .append(context)
+                        .append("> ");
+            }
+
+            return clause.toString();
+        } else {
+            // Validate whole repository, i.e. empty clause:
+            return "";
+        }
+    }
+
+    /**
      * Checks that all functional properties that are probably affected by this transaction
      * have unique values.
      * Two values are said to be unique if there is no <code>owl:sameAs</code> path between them.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors The instances from which outgoing properties should be considered.
      * @throws RepositoryException Thrown if an error occurs while querying the connected triplestore.
      * @throws ValidationFailedException Thrown if the validation fails.
@@ -244,6 +347,7 @@ public class ValidatedTransaction extends Transaction {
     private void validateFunctional(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
         // Query for distinct values that are not in a owl:sameAs relation:
         String q = QUERY_PREFIX + "SELECT ?prop ?v1 ?v2 ?i " +
+                buildFromClause() +
                 " {" +
                 buildValuesClause(anchors, "i") +
                 "?i ?prop ?v1 . " +
@@ -277,13 +381,17 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks whether every <code>owl:InverseFunctionalProperty</code> which maps to a value from any of the given resources
      * in <code>anchors</code> is actually functional.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateInverseFunctional(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
         // Query for subjects that are not in a owl:sameAs relation:
-        String q = QUERY_PREFIX + "SELECT ?prop ?o ?v ?i { " +
+        String q = QUERY_PREFIX + "SELECT ?prop ?o ?v ?i " +
+                buildFromClause() +
+                "{ " +
                 buildValuesClause(anchors, "i") +
                 "?i ?prop ?v . " +
                 "?o ?prop ?v . " +
@@ -318,13 +426,17 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks whether every <code>owl:SymmetricProperty</code> which maps to a value from any of the given resources
      * in <code>anchors</code> is actually symmetric.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateSymmetric(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
         // Query for mappings where the inverse side is missing:
-        String q = QUERY_PREFIX + "SELECT ?p ?o ?i {" +
+        String q = QUERY_PREFIX + "SELECT ?p ?o ?i " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "i") +
                 "   ?i ?p ?o ." +
                 "   ?p a owl:SymmetricProperty ." +
@@ -358,12 +470,16 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks whether every <code>owl:TransitiveProperty</code> which maps to a value from any of the given resources
      * in <code>anchors</code> is actually transitive.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateTransitive(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        String q = QUERY_PREFIX + "SELECT ?s ?o ?p ?x {" +
+        String q = QUERY_PREFIX + "SELECT ?s ?o ?p ?x " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "s") +
                 "   ?s ?p ?o . " +
                 "   ?p a owl:TransitiveProperty . " +
@@ -392,12 +508,16 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks whether every property which has a <code>owl:inverseOf</code> has the inverse values appropriately set for every resoruce
      * in <code>anchors</code>.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateInverseOf(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        String q = QUERY_PREFIX + "SELECT ?p1 ?o ?i {" +
+        String q = QUERY_PREFIX + "SELECT ?p1 ?o ?i " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "i") +
                 "   ?i ?p1 ?o . " +
                 "   ?p1 owl:inverseOf ?p2 . " +
@@ -431,12 +551,16 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks for every properties that is in a <code>rdfs:subPropertyOf</code> relation, whether its value set is actually
      * a subset of all superproperties value sets.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateSubPropertyOf(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        String q = QUERY_PREFIX + "SELECT ?p1 ?p2 ?o ?i {" +
+        String q = QUERY_PREFIX + "SELECT ?p1 ?p2 ?o ?i " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "i") +
                 "          " +
                 "   ?i ?p1 ?o ." +
@@ -471,12 +595,16 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks whether every <code>owl:allValuesFrom</code> restriction imposed on any of the classes of the instances
      * <code>anchors</code> is fulfilled.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateAllValuesFrom(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        String q = QUERY_PREFIX + "SELECT ?p ?o ?c ?i {" +
+        String q = QUERY_PREFIX + "SELECT ?p ?o ?c ?i " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "i") +
                 "    ?i a ?t ." +
 
@@ -517,12 +645,16 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Checks whether every <code>owl:someValuesFrom</code> restriction imposed on any of the classes of the instances
      * <code>anchors</code> is fulfilled.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateSomeValuesFrom(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        String q = QUERY_PREFIX + "SELECT DISTINCT ?p ?c ?i (COUNT(?o) as ?total) (COUNT(?o2) as ?count) {  " +
+        String q = QUERY_PREFIX + "SELECT DISTINCT ?p ?c ?i (COUNT(?o) as ?total) (COUNT(?o2) as ?count) " +
+                buildFromClause() +
+                "{  " +
                 buildValuesClause(anchors, "i") +
                 "  ?i a ?t ." +
 
@@ -572,6 +704,8 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Returns how many values of the individuals <code>subjectURI</code> property <code>propertyURI</code>
      * are of a certain type.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param subjectURI The URI of the subject for which the property values will be checked.
      * @param propertyURI The URI of the property which values will be checked.
      * @param valueTypeURI The URI of the class that will be counted across the values.
@@ -582,7 +716,9 @@ public class ValidatedTransaction extends Transaction {
      * @throws QueryEvaluationException Thrown if the issued query could not be evaluated.
      */
     private int getValuesOfType(String subjectURI, String propertyURI, String valueTypeURI) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        ObjectQuery query = getConnection().prepareObjectQuery(QUERY_PREFIX + "SELECT (COUNT(?o) as ?count) {" +
+        ObjectQuery query = getConnection().prepareObjectQuery(QUERY_PREFIX + "SELECT (COUNT(?o) as ?count) " +
+                                                            buildFromClause() +
+                                                            "{" +
                                                             "   <" + subjectURI + "> <" + propertyURI + "> ?o . " +
                                                             "   { " +
                                                             "      ?o a ?t ." +
@@ -600,13 +736,17 @@ public class ValidatedTransaction extends Transaction {
      * Checks whether every <code>owl:minCardinality</code> restriction imposed on any of the classes of the instances
      * <code>anchors</code> is fulfilled.
      * Also checks the validity of <code>owl:onClass</code> constraints.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateMinCardinality(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
-        // Get the minimum and actual cardinality of properties. Also get the qualified class if there is any specified:
-        String q = QUERY_PREFIX + "SELECT ?p ?mc (COUNT(DISTINCT ?o) as ?c) ?oc ?i {" +
+        // Get the minimum and actual cardinality of properties with values. Also get the qualified class if there is any specified:
+        String q = QUERY_PREFIX + "SELECT ?p ?mc (COUNT(DISTINCT ?o) as ?c) ?oc ?i " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "i") +
                 "  ?i a ?t ." +
                 "  ?t rdfs:subClassOf+ ?r ." +
@@ -614,11 +754,13 @@ public class ValidatedTransaction extends Transaction {
                 "  ?r owl:onProperty ?p ." +
                 "  ?r owl:minCardinality ?mc ." +
 
-                "  ?i ?p ?o ." +
+                "  OPTIONAL {" +
+                "     ?i ?p ?o ." +
 
-                "  MINUS {" +
-                "     ?i ?p ?o2 ." +
-                "     ?o2 owl:sameAs+ ?o ." +
+                "     MINUS {" +
+                "         ?i ?p ?o2 ." +
+                "         ?o2 owl:sameAs+ ?o ." +
+                "     }" +
                 "  }" +
                 "  OPTIONAL {" +
                 "     ?r owl:onClass ?oc ." +
@@ -629,7 +771,6 @@ public class ValidatedTransaction extends Transaction {
         try {
             ObjectQuery query = getConnection().prepareObjectQuery(q);
             result = query.evaluate().asSet();
-
 
         } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             throw new RepositoryException(e);
@@ -677,13 +818,17 @@ public class ValidatedTransaction extends Transaction {
      * Checks whether every <code>owl:maxCardinality</code> restriction imposed on any of the classes of the instances
      * <code>anchors</code> is fulfilled.
      * Also checks the validity of <code>owl:onClass</code> constraints.
+     * If {@link #getValidatedContexts()} is not empty and does not only contain {@code null} then
+     * only these contexts are validated.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
      * @throws ValidationFailedException Thrown if any of the checked properties violates the above condition.
      */
     private void validateMaxCardinality(Collection<ResourceObject> anchors) throws RepositoryException, ValidationFailedException {
         // Get the maximum and actual cardinality of properties. Also get the qualified class if there is any specified:
-        String q = QUERY_PREFIX + "SELECT ?p ?mc (COUNT(DISTINCT ?o) as ?c) ?oc ?i {" +
+        String q = QUERY_PREFIX + "SELECT ?p ?mc (COUNT(DISTINCT ?o) as ?c) ?oc ?i " +
+                buildFromClause() +
+                "{" +
                 buildValuesClause(anchors, "i") +
                 "  ?i a ?t ." +
                 "  ?t rdfs:subClassOf+ ?r ." +
