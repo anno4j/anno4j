@@ -404,4 +404,10 @@ public class Anno4j implements TransactionCommands {
     public Transaction createTransaction() throws RepositoryException {
         return new Transaction(objectRepository, evaluatorConfiguration);
     }
+
+    public Transaction createTransaction(URI context) throws RepositoryException {
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context); // Let the transaction operate on the given context
+        return transaction;
+    }
 }
