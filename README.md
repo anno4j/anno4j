@@ -266,7 +266,53 @@ Annotation annotation = anno4j.createObject(Annotation.class);
 String annotationAsTurtle = annotation.getTriples(RDFFormat.TURTLE);
 ```
 
-## Generating annotated Java files from an existing ontology
+## Schema Annotations and Validation
+
+Anno4j features the annotation of schema information directly in the Java classes, which is translated into
+OWL DL and stored in the Anno4j connected triplestore.
+Currently the following annotations are available:
+
+| Annotation           | OWL equivalent                  | Description                                                                                                                  |
+|----------------------|---------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `@AllValuesFrom`     | `owl:allValuesFrom`             | All values of the property must have a certain type (intersection).                                                          |
+| `@Functional`        | `owl:FunctionalProperty`        | There can be only one distinct value of the property for each individual.                                                    |
+| `@InverseFunctional` | `owl:InverseFunctionalProperty` | There can be only one distinct individual for each value of the property.                                                    |
+| `@Bijective`         |                                 | Shorthand for `@Functional` and `@InverseFunctional`.                                                                        |
+| `@MinCardinality`    | `owl:minCardinality`            | Minimum number of values a property must have for each individual.                                                           |
+| `@MaxCardinality`    | `owl:maxCardinality`            | Maximum number of values a property must have for each individual.                                                           |
+| `@Cardinality`       | `owl:cardinality`               | Shorthand for `@MinCardinality` and `@MaxCardinality` with same value.                                                       |
+| `@InverseOf`         | `owl:inverseOf`                 | The property is the inverse of another.                                                                                      |
+| `@SomeValuesFrom`    | `owl:someValuesFrom`            | At least one value mapped by the annotated property must be of the given classes (intersection).                             |
+| `@SubPropertyOf`     | `rdfs:subPropertyOf`            | Denotes that the property is the subproperty of another, i.e. all superproperties have at least the values of this property. |
+| `@Symmetric`         | `owl:SymmetricProperty`         | If X is mapped by the property to Y, then also Y is mapped to X by it.                                                       |
+| `@Transitive`        | `owl:TransitiveProperty`        | If X is mapped by the property to Y and Y to Z, then also X is mapped to Z by it.
+
+Annotations can be added to `@Iri` annotated getter- and/or setter-methods.
+The following example states that each menu must at least contain one drink and one main dish.
+In order to add multiple annotations of the same type they must be enclosed in a container annotation, e.g. `@MinCardinalities`.
+Adding the `@InverseOf` annotation to the second property requires that the corresponding restaurant objects have the menu as value of their `http://example.de/serves_dish` property.
+
+```java
+
+@Iri("http://example.de/menu")
+public interface Menu extends ResourceObject {
+    
+    @MinCardinalities({
+        @MinCardinality( value = 1, onClass = Drink.class ),
+        @MinCardinality( value = 1, onClass = MainDish.class )
+    })
+    @Iri("http://example.de/has_dishes")
+    Set<Dish> getDishes();
+    
+    @InverseOf("http://example.de/serves_dish")
+    @Iri("http://example.de/served_at")
+    Set<Restaurant> getServedAt();
+}
+
+```
+
+
+### Generating annotated Java files from an existing ontology
 
 To make working with an existing RDFS ontology even easier, the Java classes required by Anno4j can be automatically generated.
 
