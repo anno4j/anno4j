@@ -44,7 +44,15 @@
         </developer>
         <developer>
             <name>Emanuel Berndl</name>
-            <email>emanuel.berndl@gmail.com</email>
+            <email>berndl.emanuel@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Thomas Weißgerber</name>
+            <email>weissger@posteo.de</email>
+        </developer>
+        <developer>
+            <name>Matthias Fisch</name>
+            <email>github@matthias-fisch.de</email>
         </developer>
     </developers>
 
