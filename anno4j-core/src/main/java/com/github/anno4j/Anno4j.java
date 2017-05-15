@@ -418,7 +418,11 @@ public class Anno4j implements TransactionCommands {
 
     /**
      * Creates a new transaction which provides schema validation services at commit time.
-     * @return The validated transaction.
+     * Note that the validation assumes that the state present is valid when {@link ValidatedTransaction#begin()}
+     * is called.
+     * Schema annotations made at {@link ResourceObject} classes will be scanned the first time a validated transaction
+     * is created.
+     * @return The validated transaction. {@link ValidatedTransaction#begin()} must be called afterwards.
      * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
      */
     public ValidatedTransaction createValidatedTransaction() throws RepositoryException, SchemaPersistingManager.ContradictorySchemaException, SchemaPersistingManager.InconsistentAnnotationException {
