@@ -82,13 +82,6 @@ public class Anno4j implements TransactionCommands {
     private Set<Class<?>> partialClasses;
 
 
-    /**
-     * Flag indicating whether a scan for schema annotations was already performed
-     * and the RDF schema information was persisted.
-     */
-    private boolean schemaPersisted = false;
-
-
     public Anno4j() throws RepositoryException, RepositoryConfigException {
         this(new SailRepository(new MemoryStore()));
     }
@@ -131,7 +124,7 @@ public class Anno4j implements TransactionCommands {
                 .setUrls(classpath)
                 .useParallelExecutor()
                 .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
-                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
+                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), new FieldAnnotationsScanner()));
 
         // Bugfix: Searching for Reflections creates a lot ot Threads, that are not closed at the end by themselves,
         // so we close them manually.
@@ -147,8 +140,37 @@ public class Anno4j implements TransactionCommands {
         }
 
         this.setRepository(repository);
+
+        // Persist schema information to repository:
+        persistSchemaAnnotations(annotatedClasses);
     }
-    
+
+    /**
+     * Persists the schema information implied by schema annotations to the default graph of the connected triplestore.
+     * Performs a validation that the schema annotations are consistent.
+     * @param types The types which methods and field should be scanned for schema information.
+     * @throws RepositoryException Thrown if an error occurs while persisting schema information.
+     * @throws SchemaPersistingManager.InconsistentAnnotationException Thrown if the schema annotations are inconsistent.
+     * @throws SchemaPersistingManager.ContradictorySchemaException Thrown if the schema information imposed by annotations contradicts with
+     * schema information that is already present in the connected triplestore.
+     */
+    private void persistSchemaAnnotations(Reflections types) throws RepositoryException {
+        Transaction transaction = createTransaction();
+        transaction.begin();
+
+        try {
+            SchemaPersistingManager persistingManager = new OWLSchemaPersistingManager(transaction.getConnection());
+            persistingManager.persistSchema(types);
+
+        } catch (SchemaPersistingManager.InconsistentAnnotationException | SchemaPersistingManager.ContradictorySchemaException e) {
+            // Rollback on error and rethrow exception:
+            transaction.rollback();
+            throw e;
+        }
+
+        transaction.commit();
+    }
+
     private void scanForEvaluators(Reflections annotatedClasses) {
         Set<Class<?>> defaultEvaluatorAnnotations = annotatedClasses.getTypesAnnotatedWith(Evaluator.class, true);
 
@@ -425,32 +447,23 @@ public class Anno4j implements TransactionCommands {
      * @return The validated transaction. {@link ValidatedTransaction#begin()} must be called afterwards.
      * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
      */
-    public ValidatedTransaction createValidatedTransaction() throws RepositoryException, SchemaPersistingManager.ContradictorySchemaException, SchemaPersistingManager.InconsistentAnnotationException {
-        // If this is the first time a validated transaction is created,
-        // scan and persist schema information:
-        if(!schemaPersisted) {
-            Set<URL> classpath = new HashSet<>();
-            classpath.addAll(ClasspathHelper.forClassLoader());
-            classpath.addAll(ClasspathHelper.forJavaClassPath());
-            classpath.addAll(ClasspathHelper.forManifest());
-            classpath.addAll(ClasspathHelper.forPackage(""));
+    public ValidatedTransaction createValidatedTransaction() throws RepositoryException {
+        return createValidatedTransaction(null);
+    }
 
-            Reflections types = new Reflections(new ConfigurationBuilder()
-                    .setUrls(classpath)
-                    .useParallelExecutor()
-                    .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
-                    .setScanners(new MethodAnnotationsScanner(), new FieldAnnotationsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner()));
-
-            Transaction transaction = createTransaction();
-            transaction.begin();
-
-            SchemaPersistingManager persistingManager = new OWLSchemaPersistingManager(transaction.getConnection());
-            persistingManager.persistSchema(types);
-
-            transaction.commit();
-            schemaPersisted = true;
-        }
-
-        return new ValidatedTransaction(objectRepository, evaluatorConfiguration);
+    /**
+     * Creates a new transaction which provides schema validation services at commit time.
+     * Note that the validation assumes that the state present is valid when {@link ValidatedTransaction#begin()}
+     * is called.
+     * Schema annotations made at {@link ResourceObject} classes will be scanned the first time a validated transaction
+     * is created.
+     * @param context The context on which the transaction will operate on.
+     * @return The validated transaction. {@link ValidatedTransaction#begin()} must be called afterwards.
+     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     */
+    public ValidatedTransaction createValidatedTransaction(URI context) throws RepositoryException {
+        ValidatedTransaction transaction = new ValidatedTransaction(objectRepository, evaluatorConfiguration);
+        transaction.setAllContexts(context);
+        return transaction;
     }
 }

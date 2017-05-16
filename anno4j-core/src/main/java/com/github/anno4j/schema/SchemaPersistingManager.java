@@ -13,7 +13,7 @@ public abstract class SchemaPersistingManager {
     /**
      * Signalizes that the schema annotations made are inconsistent.
      */
-    public static class InconsistentAnnotationException extends Exception {
+    public static class InconsistentAnnotationException extends RuntimeException {
         /**
          * {@inheritDoc}
          */
@@ -32,7 +32,7 @@ public abstract class SchemaPersistingManager {
      * Signalizes that the schema information imposed by schema annotations found
      * contradicts the schema information that is already present in the triplestore.
      */
-    public static class ContradictorySchemaException extends Exception {
+    public static class ContradictorySchemaException extends RepositoryException {
         /**
          * {@inheritDoc}
          */

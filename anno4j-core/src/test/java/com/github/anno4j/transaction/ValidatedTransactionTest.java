@@ -187,12 +187,7 @@ public class ValidatedTransactionTest {
         assertEquals(Sets.newHashSet(1, 2), resource.getSuperproperty1());
     }
 
-    /**
-     * This test is ignored, because it fails due to the bug in Issue #140.
-     * @throws Exception Thrown on error.
-     */
     @Test
-    @Ignore
     public void testContextPersistence() throws Exception {
         Anno4j anno4j = new Anno4j();
 
@@ -206,38 +201,21 @@ public class ValidatedTransactionTest {
         // Make resources valid:
         setValidCardinalities(resource1, resource2, resource3);
 
-        // Modify the resources using a validated transaction:
-        Transaction transaction = anno4j.createValidatedTransaction();
+        // Modify the resource using a validated transaction:
+        Transaction transaction = anno4j.createValidatedTransaction(context1);
         transaction.begin();
-        List<SpecialTestResource> resources = transaction.findAll(SpecialTestResource.class);
-        for(SpecialTestResource current :resources) {
-            current.setSuperproperty1(Sets.newHashSet(1, 2, 3));
-        }
+        SpecialTestResource found = transaction.findByID(SpecialTestResource.class, "urn:test:res1");
+        found.setSuperproperty1(Sets.newHashSet(1, 2, 3));
         transaction.commit();
 
-        // Refind the resources in their respective context:
-        resources = anno4j.createQueryService(context1)
+        // Refind the resource in their respective context:
+        resource1 = anno4j.createQueryService(context1)
                           .addCriteria(".", "urn:test:res1")
-                          .execute(SpecialTestResource.class);
-        assertFalse(resources.isEmpty());
-        resource1 = resources.get(0);
+                          .execute(SpecialTestResource.class).get(0);
 
-        resources = anno4j.createQueryService(context2)
-                .addCriteria(".", "urn:test:res2")
-                .execute(SpecialTestResource.class);
-        assertFalse(resources.isEmpty());
-        resource2 = resources.get(0);
-
-        resources = anno4j.createQueryService()
-                .addCriteria(".", "urn:test:res3")
-                .execute(SpecialTestResource.class);
-        assertFalse(resources.isEmpty());
-        resource3 = resources.get(0);
 
         // Check that the changes are present:
         assertEquals(Sets.newHashSet(1, 2, 3), resource1.getSuperproperty1());
-        assertEquals(Sets.newHashSet(1, 2, 3), resource2.getSuperproperty1());
-        assertEquals(Sets.newHashSet(1, 2, 3), resource3.getSuperproperty1());
     }
 
     @Test
@@ -265,10 +243,10 @@ public class ValidatedTransactionTest {
 
     @Test
     public void testContradictorySchema() throws Exception {
-        Anno4j anno4j = new Anno4j();
+        Anno4j anno4jInitital = new Anno4j();
 
         // Insert contradictory minCardinality:
-        Transaction setupTransaction = anno4j.createTransaction();
+        Transaction setupTransaction = anno4jInitital.createTransaction();
         setupTransaction.begin();
         setupTransaction.getConnection().prepareUpdate("INSERT DATA { " +
                 "     <http://example.de/validated_transaction_test_resource> rdfs:subClassOf _:restr . " +
@@ -280,14 +258,14 @@ public class ValidatedTransactionTest {
 
         boolean exceptionThrown = false;
         try {
-            anno4j.createValidatedTransaction();
+            new Anno4j(anno4jInitital.getRepository(), (URI) null);
         } catch (SchemaPersistingManager.ContradictorySchemaException e) {
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);
 
         // More tricky. Functional must not work with minCardinality of 2:
-        setupTransaction = anno4j.createTransaction();
+        setupTransaction = anno4jInitital.createTransaction();
         setupTransaction.begin();
         setupTransaction.getConnection().prepareUpdate("INSERT DATA { " +
                 "     <http://example.de/cardinality> a owl:FunctionalProperty . " +
@@ -296,7 +274,7 @@ public class ValidatedTransactionTest {
 
         exceptionThrown = false;
         try {
-            anno4j.createValidatedTransaction();
+            new Anno4j(anno4jInitital.getRepository(), (URI) null);
         } catch (SchemaPersistingManager.ContradictorySchemaException e) {
             exceptionThrown = true;
         }
