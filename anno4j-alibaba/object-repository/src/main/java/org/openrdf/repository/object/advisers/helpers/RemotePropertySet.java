@@ -197,11 +197,13 @@ public class RemotePropertySet implements PropertySet, Set<Object> {
 	}
 
 	/**
-	 * This method always returns <code>true</code>
+	 * Removes the specified element from this set if it is present.
 	 * 
-	 * @return <code>true</code>
+	 * @return <code>true</code> if this set contained the specified element.
 	 */
 	public boolean remove(Object o) {
+		boolean contained = contains(o);
+
 		ObjectConnection conn = getObjectConnection();
 		try {
 			Value value = getValue(o);
@@ -214,7 +216,7 @@ public class RemotePropertySet implements PropertySet, Set<Object> {
 		}
 		refresh(o);
 		refresh();
-		return true;
+		return contained;
 	}
 
 	public boolean removeAll(Collection<?> c) {

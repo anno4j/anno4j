@@ -7,8 +7,6 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
-import com.github.anno4j.schema.OWLSchemaPersistingManager;
-import com.github.anno4j.schema.SchemaPersistingManager;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -29,8 +27,6 @@ import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -124,7 +120,7 @@ public class Anno4j implements TransactionCommands {
                 .setUrls(classpath)
                 .useParallelExecutor()
                 .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
-                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), new FieldAnnotationsScanner()));
+                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
 
         // Bugfix: Searching for Reflections creates a lot ot Threads, that are not closed at the end by themselves,
         // so we close them manually.
@@ -140,37 +136,8 @@ public class Anno4j implements TransactionCommands {
         }
 
         this.setRepository(repository);
-
-        // Persist schema information to repository:
-        persistSchemaAnnotations(annotatedClasses);
     }
-
-    /**
-     * Persists the schema information implied by schema annotations to the default graph of the connected triplestore.
-     * Performs a validation that the schema annotations are consistent.
-     * @param types The types which methods and field should be scanned for schema information.
-     * @throws RepositoryException Thrown if an error occurs while persisting schema information.
-     * @throws SchemaPersistingManager.InconsistentAnnotationException Thrown if the schema annotations are inconsistent.
-     * @throws SchemaPersistingManager.ContradictorySchemaException Thrown if the schema information imposed by annotations contradicts with
-     * schema information that is already present in the connected triplestore.
-     */
-    private void persistSchemaAnnotations(Reflections types) throws RepositoryException {
-        Transaction transaction = createTransaction();
-        transaction.begin();
-
-        try {
-            SchemaPersistingManager persistingManager = new OWLSchemaPersistingManager(transaction.getConnection());
-            persistingManager.persistSchema(types);
-
-        } catch (SchemaPersistingManager.InconsistentAnnotationException | SchemaPersistingManager.ContradictorySchemaException e) {
-            // Rollback on error and rethrow exception:
-            transaction.rollback();
-            throw e;
-        }
-
-        transaction.commit();
-    }
-
+    
     private void scanForEvaluators(Reflections annotatedClasses) {
         Set<Class<?>> defaultEvaluatorAnnotations = annotatedClasses.getTypesAnnotatedWith(Evaluator.class, true);
 
@@ -436,6 +403,18 @@ public class Anno4j implements TransactionCommands {
 
     public Transaction createTransaction() throws RepositoryException {
         return new Transaction(objectRepository, evaluatorConfiguration);
+    }
+
+    /**
+     * Creates a transaction operating on the given context.
+     * @param context The context the transaction should operate on.
+     * @return Returns the transaction.
+     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     */
+    public Transaction createTransaction(URI context) throws RepositoryException {
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context); // Let the transaction operate on the given context
+        return transaction;
     }
 
     /**
