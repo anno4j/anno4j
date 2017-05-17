@@ -12,12 +12,15 @@ import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -31,7 +34,8 @@ public class ResourceObjectTest {
 
     @Before
     public void setUp() throws Exception {
-        this.anno4j = new Anno4j();
+        // Disable scanning for schema annotations:
+        this.anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false);
     }
 
     @Test

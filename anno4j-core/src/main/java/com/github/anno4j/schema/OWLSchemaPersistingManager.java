@@ -592,6 +592,10 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                     "?r a owl:Restriction . ";
             if(onClazz != null) {
                 q += "?r owl:onClass <" + onClazz + "> . ";
+            } else {
+                q += "MINUS {" +
+                     "  ?r owl:onClass ?oc ." +
+                     "}";
             }
             q += "?r owl:onProperty <" + iri + "> . " +
                  "?r <" + restrictionType + "> ?v . }";
@@ -614,7 +618,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
 
         // Validate that the result is empty (no restriction exists) or that it is a subset of the allowed values:
         if(!result.isEmpty() && !allowedValues.containsAll(result)) {
-            throw new ContradictorySchemaException("Restriction of " + iri + " at class " + clazz
+            throw new ContradictorySchemaException("Restriction of type " + restrictionType + " of " + iri + " at class " + clazz
                                     + " with values " + allowedValues.toString() +
                                     " is contradictory to already existing restriction to values " + result.toString());
         }

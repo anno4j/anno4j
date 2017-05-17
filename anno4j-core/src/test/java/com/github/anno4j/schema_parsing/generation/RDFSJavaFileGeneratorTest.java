@@ -68,7 +68,7 @@ public class RDFSJavaFileGeneratorTest {
         File dependencyJar = findDependencyJar();
         if(dependencyJar == null) {
             File anno4jRootPom = new File(System.getProperty("user.dir") + "/../pom.xml");
-            assertTrue(anno4jRootPom.exists());
+            assumeTrue(anno4jRootPom.exists());
             SystemCommand.runCommand("mvn -f " + anno4jRootPom.getAbsolutePath() + " -Dmaven.test.skip=true package assembly:single");
         }
 
