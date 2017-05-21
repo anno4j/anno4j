@@ -588,6 +588,7 @@ public class ValidatedTransaction extends Transaction {
                 "     MINUS {" +
                 "         ?i ?p ?o2 ." +
                 "         ?o2 owl:sameAs+ ?o ." +
+                "         FILTER(str(?o2) < str(?o))" +
                 "     }" +
                 "  }" +
                 "  OPTIONAL {" +
@@ -666,6 +667,7 @@ public class ValidatedTransaction extends Transaction {
                 "  MINUS {" +
                 "     ?i ?p ?o2 ." +
                 "     ?o2 owl:sameAs+ ?o ." +
+                "     FILTER(str(?o2) < str(?o))" +
                 "  }" +
                 "  OPTIONAL {" +
                 "     ?r owl:onClass ?oc ." +
