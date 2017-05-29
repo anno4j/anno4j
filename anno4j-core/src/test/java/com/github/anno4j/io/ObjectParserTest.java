@@ -15,6 +15,7 @@ import org.openrdf.rio.RDFFormat;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -72,9 +73,10 @@ public class ObjectParserTest {
 
             ObjectParser objectParser = new ObjectParser();
 
-            objectParser.parse(TURTLE, url, RDFFormat.TURTLE);
-            objectParser.parse(TURTLE2, url, RDFFormat.TURTLE);
-            List<Annotation> annotations = objectParser.parse(TURTLE3, url, RDFFormat.TURTLE);
+            List<Annotation> annotations = new LinkedList<>();
+            annotations.addAll(objectParser.parse(TURTLE, url, RDFFormat.TURTLE));
+            annotations.addAll(objectParser.parse(TURTLE2, url, RDFFormat.TURTLE));
+            annotations.addAll(objectParser.parse(TURTLE3, url, RDFFormat.TURTLE));
 
             assertEquals(3, annotations.size());
 

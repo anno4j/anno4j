@@ -13,7 +13,7 @@ import com.hp.hpl.jena.sparql.syntax.ElementGroup;
  */
 public class EvalComparison {
 
-    public static void evaluate(ElementGroup elementGroup, Criteria criteria, Var variable) {
+    public static void evaluate(ElementGroup elementGroup, Criteria criteria, Var variable, String resolvedConstraint) {
 
         if (criteria.isNaN()) {
 
@@ -21,13 +21,13 @@ public class EvalComparison {
 
             // Setting the boundaries (\b) to the RegExp, according to the comparison type
             if (Comparison.EQ.equals(criteria.getComparison())) {
-                constraint = "^" + criteria.getConstraint() + "$";
+                constraint = "^" + resolvedConstraint + "$";
             } else if (Comparison.CONTAINS.equals(criteria.getComparison())) {
-                constraint = criteria.getConstraint();
+                constraint = resolvedConstraint;
             } else if (Comparison.STARTS_WITH.equals(criteria.getComparison())) {
-                constraint = "^" + criteria.getConstraint();
+                constraint = "^" + resolvedConstraint;
             } else if (Comparison.ENDS_WITH.equals(criteria.getComparison())) {
-                constraint = criteria.getConstraint() + "$";
+                constraint = resolvedConstraint + "$";
             } else {
                 throw new IllegalStateException(criteria.getComparison() + " is only allowed on Numbers.");
             }
@@ -39,13 +39,13 @@ public class EvalComparison {
             Expr expr;
 
             if (criteria.getComparison().equals(Comparison.GT)) {
-                expr = new E_GreaterThan(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
+                expr = new E_GreaterThan(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(resolvedConstraint)));
             } else if (criteria.getComparison().equals(Comparison.GTE)) {
-                expr = new E_GreaterThanOrEqual(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
+                expr = new E_GreaterThanOrEqual(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(resolvedConstraint)));
             } else if (criteria.getComparison().equals(Comparison.LT)) {
-                expr = new E_LessThan(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
+                expr = new E_LessThan(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(resolvedConstraint)));
             } else if (criteria.getComparison().equals(Comparison.LTE)) {
-                expr = new E_LessThanOrEqual(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(criteria.getConstraint())));
+                expr = new E_LessThanOrEqual(new ExprVar(variable.asNode()), new NodeValueDouble(Double.parseDouble(resolvedConstraint)));
             } else if (criteria.getComparison().equals(Comparison.EQ)) {
                 expr = new E_Equals(new ExprVar(variable.asNode()), new ExprVar(criteria.getConstraint()));
             } else {

@@ -17,6 +17,7 @@ import org.apache.marmotta.ldpath.parser.ParseException;
 import org.openrdf.model.URI;
 
 import java.io.StringReader;
+import java.util.Map;
 
 public class EvalQuery {
 
@@ -41,7 +42,8 @@ public class EvalQuery {
             Var var = LDPathEvaluator.evaluate(parser.parseSelector(queryServiceDTO.getPrefixes()), elementGroup, objectVar, queryServiceDTO.getEvaluatorConfiguration());
 
             if (c.getConstraint() != null) {
-                EvalComparison.evaluate(elementGroup, c, var);
+                String resolvedConstraint = resolveConstraintPrefix(c.getConstraint(), queryServiceDTO, parser);
+                EvalComparison.evaluate(elementGroup, c, var, resolvedConstraint);
             }
         }
 
@@ -55,5 +57,16 @@ public class EvalQuery {
         query.getPrefixMapping().setNsPrefixes(queryServiceDTO.getPrefixes());
 
         return query;
+    }
+
+    private static String resolveConstraintPrefix(String constraint, QueryServiceConfiguration queryServiceDTO, LdPathParser parser) throws ParseException {
+
+        for (String namespace : queryServiceDTO.getPrefixes().keySet()) {
+            if (constraint.startsWith(namespace + ":")) {
+                return parser.resolveNamespace(namespace).toString() + constraint.substring(namespace.length() + 1);
+            }
+        }
+
+        return constraint;
     }
 }
