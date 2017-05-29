@@ -244,10 +244,10 @@ public class ValidatedTransactionTest {
 
     @Test
     public void testContradictorySchema() throws Exception {
-        Anno4j anno4j = new Anno4j();
+        Anno4j anno4j1 = new Anno4j();
 
         // Insert contradictory minCardinality:
-        Transaction setupTransaction = anno4j.createTransaction();
+        Transaction setupTransaction = anno4j1.createTransaction();
         setupTransaction.begin();
         setupTransaction.getConnection().prepareUpdate("INSERT DATA { " +
                 "     <http://example.de/validated_transaction_test_resource> rdfs:subClassOf _:restr . " +
@@ -259,23 +259,7 @@ public class ValidatedTransactionTest {
 
         boolean exceptionThrown = false;
         try {
-            anno4j.createValidatedTransaction();
-        } catch (SchemaPersistingManager.ContradictorySchemaException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(exceptionThrown);
-
-        // More tricky. Functional must not work with minCardinality of 2:
-        setupTransaction = anno4j.createTransaction();
-        setupTransaction.begin();
-        setupTransaction.getConnection().prepareUpdate("INSERT DATA { " +
-                "     <http://example.de/cardinality> a owl:FunctionalProperty . " +
-                "}").execute();
-        setupTransaction.commit();
-
-        exceptionThrown = false;
-        try {
-            anno4j.createValidatedTransaction();
+            new Anno4j(anno4j1.getRepository());
         } catch (SchemaPersistingManager.ContradictorySchemaException e) {
             exceptionThrown = true;
         }

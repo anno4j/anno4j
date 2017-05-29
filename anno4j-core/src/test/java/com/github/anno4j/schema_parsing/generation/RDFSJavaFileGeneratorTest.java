@@ -205,7 +205,7 @@ public class RDFSJavaFileGeneratorTest {
         boolean exceptionThrown = false;
         try {
             generator.generateJavaFiles(config, outputDir);
-        } catch (JavaFileGenerator.InvalidOntologyException e) {
+        } catch (JavaFileGenerator.JavaFileGenerationException e) {
             exceptionThrown = true;
         }
 

@@ -4,15 +4,24 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.namespaces.XSD;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazzSupport;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.memory.MemoryStore;
 
 import javax.lang.model.element.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -53,7 +62,9 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
         generationConfig.setIdentifierLanguagePreference(identifierLangPreference);
         generationConfig.setJavaDocLanguagePreference(javaDocLangPreference);
 
-        modelBuilder = new OWLJavaFileGenerator();
+        // Prevent persisting of schema information from other tests (would be rooted to ex:Vehicle):
+        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false);
+        modelBuilder = new OWLJavaFileGenerator(anno4j);
 
         // Create a RDFS model builder instance:
         VehicleOntologyLoader.addVehicleOntology(modelBuilder);
