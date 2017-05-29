@@ -1,8 +1,10 @@
 package com.github.anno4j.schema_parsing.building;
 
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.hp.hpl.jena.reasoner.ValidityReport;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -22,6 +24,13 @@ public interface OntologyModelBuilder {
          * {@inheritDoc}
          */
         public RDFSModelBuildingException() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public RDFSModelBuildingException(Throwable cause) {
+            super(cause);
         }
 
         /**
@@ -84,7 +93,7 @@ public interface OntologyModelBuilder {
      *
      * @return Returns the RDFS classes in the model built.
      */
-    Collection<ExtendedRDFSClazz> getClazzes();
+    Collection<BuildableRDFSClazz> getClazzes() throws RepositoryException;
 
     /**
      * Returns the extended resource objects of RDFS properties that were found during
@@ -92,7 +101,7 @@ public interface OntologyModelBuilder {
      *
      * @return Returns the RDFS properties in the model built.
      */
-    Collection<ExtendedRDFSProperty> getProperties();
+    Collection<BuildableRDFSProperty> getProperties() throws RepositoryException;
 
     /**
      * Returns a validity report for the model build during the last call of {@link #build()}.
@@ -102,6 +111,14 @@ public interface OntologyModelBuilder {
      * @throws IllegalStateException Thrown if the model was not previously built.
      */
     ValidityReport validate();
+
+    /**
+     * Returns a connection to the object repository that receives the ontology information during a call
+     * to {@link #build()}.
+     * @return Returns a object connection to the repository.
+     * @throws RepositoryException Thrown if no connection could be established.
+     */
+    ObjectConnection getConnection() throws RepositoryException;
 
     /**
      * Builds an ontology model for the RDF data added before using <code>addRDF</code> methods.

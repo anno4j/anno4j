@@ -39,14 +39,14 @@ public abstract class RDFSPropertySupport extends RDFSSchemaResourceSupport impl
      * {@inheritDoc}
      */
     @Override
-    public void addSubProperty(RDFSProperty subProperty) {
-        Set<RDFSProperty> subProperties = new HashSet<>();
+    public void addSuperproperty(RDFSProperty subProperty) {
+        Set<RDFSProperty> superProperties = new HashSet<>();
 
-        if(this.getSubProperties() != null) {
-            subProperties.addAll(this.getSubProperties());
+        if(this.getSuperproperties() != null) {
+            superProperties.addAll(this.getSuperproperties());
         }
 
-        subProperties.add(subProperty);
-        this.setSubProperties(subProperties);
+        superProperties.add(subProperty);
+        this.setSuperproperties(superProperties);
     }
 }

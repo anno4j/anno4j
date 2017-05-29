@@ -2,10 +2,14 @@ package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.namespaces.OWL;
 import com.github.anno4j.model.namespaces.RDFS;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSPropertySupport;
+import com.github.anno4j.schema.model.owl.OWLClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSPropertySupport;
+import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -13,31 +17,36 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
- * Test for the building capabilities of {@link ExtendedRDFSProperty}/{@link ExtendedRDFSPropertySupport}
+ * Test for the building capabilities of {@link BuildableRDFSProperty}/{@link BuildableRDFSPropertySupport}
  * for generating JavaPoet {@link MethodSpec}.
  */
-public class PropertySpecTest {
+public class RDFSPropertySpecTest {
 
-    private static RDFSModelBuilder modelBuilder;
+    private static OntologyModelBuilder modelBuilder;
 
     private static OntGenerationConfig generationConfig;
 
+    private OWLClazz declaringClass;
+
     /**
-     * Returns a {@link ExtendedRDFSProperty} instance from {@link #modelBuilder}
+     * Returns a {@link BuildableRDFSProperty} instance from {@link #modelBuilder}
      * with the specified URI.
      * @param uri The URI to get the property object for.
      * @return The property object or null if no property with the given URI is in the model.
      */
-    private static ExtendedRDFSProperty getPropertyFromModel(String uri) {
-        for(ExtendedRDFSProperty property : modelBuilder.getProperties()) {
+    private static BuildableRDFSProperty getPropertyFromModel(String uri) throws RepositoryException {
+        for(BuildableRDFSProperty property : modelBuilder.getProperties()) {
             if(property.getResourceAsString().equals(uri)) {
                 return property;
             }
@@ -47,43 +56,47 @@ public class PropertySpecTest {
 
     @Before
     public void setUp() throws Exception {
+        Anno4j anno4j = new Anno4j();
+
         generationConfig = new OntGenerationConfig();
         List<String> javaDocLangPreference = Arrays.asList("de", "en", OntGenerationConfig.UNTYPED_LITERAL);
         List<String> identifierLangPreference = Arrays.asList("en", "de", OntGenerationConfig.UNTYPED_LITERAL);
         generationConfig.setIdentifierLanguagePreference(identifierLangPreference);
         generationConfig.setJavaDocLanguagePreference(javaDocLangPreference);
 
-        // Create a RDFS model builder instance:
-        VehicleOntologyLoader ontologyLoader = new VehicleOntologyLoader();
-        modelBuilder = ontologyLoader.getVehicleOntologyModelBuilder();
+        // Create a model builder instance:
+        modelBuilder = new OWLJavaFileGenerator(anno4j);
+        VehicleOntologyLoader.addVehicleOntology(modelBuilder);
 
         // Build the ontology model:
         modelBuilder.build();
+
+        declaringClass = anno4j.createObject(OWLClazz.class, (Resource) new URIImpl("http://example.de/resource"));
     }
 
     @Test
     public void testGetter() throws Exception {
-        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        BuildableRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
         assertNotNull(loadCap);
 
-        MethodSpec loadCapSpec = loadCap.buildGetter(generationConfig);
+        MethodSpec loadCapSpec = loadCap.buildGetter(declaringClass, generationConfig);
+
+        // Test annotations empty:
+        assertEquals(0, loadCapSpec.annotations.size());
 
         // Test signature:
         assertEquals("getMaximumLoadCapacities", loadCapSpec.name);
         assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
         ClassName setClass = ClassName.get("java.util", "Set");
         assertEquals(ParameterizedTypeName.get(setClass, ClassName.get(Float.class)), loadCapSpec.returnType);
-
-        // Test annotation:
-        assertEquals(0, loadCapSpec.annotations.size()); // @Iri annotation was moved to private field. Setters must not have an annotation.
     }
 
     @Test
     public void testSetter() throws Exception {
-        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        BuildableRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
         assertNotNull(loadCap);
 
-        MethodSpec loadCapSpec = loadCap.buildSetter(generationConfig);
+        MethodSpec loadCapSpec = loadCap.buildSetter(declaringClass, generationConfig);
 
         // Test signature:
         assertEquals("setMaximumLoadCapacities", loadCapSpec.name);
@@ -102,10 +115,10 @@ public class PropertySpecTest {
 
     @Test
     public void testAdder() throws Exception {
-        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        BuildableRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
         assertNotNull(loadCap);
 
-        MethodSpec loadCapSpec = loadCap.buildAdder(generationConfig);
+        MethodSpec loadCapSpec = loadCap.buildAdder(declaringClass, generationConfig);
 
         // Test signature:
         assertEquals("addMaximumLoadCapacity", loadCapSpec.name);
@@ -123,10 +136,10 @@ public class PropertySpecTest {
 
     @Test
     public void testAdderAll() throws Exception {
-        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        BuildableRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
         assertNotNull(loadCap);
 
-        MethodSpec loadCapSpec = loadCap.buildAdderAll(generationConfig);
+        MethodSpec loadCapSpec = loadCap.buildAdderAll(declaringClass, generationConfig);
 
         // Test signature:
         assertEquals("addAllMaximumLoadCapacities", loadCapSpec.name);
@@ -145,10 +158,10 @@ public class PropertySpecTest {
 
     @Test
     public void testRemover() throws Exception {
-        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        BuildableRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
         assertNotNull(loadCap);
 
-        MethodSpec loadCapSpec = loadCap.buildRemover(generationConfig);
+        MethodSpec loadCapSpec = loadCap.buildRemover(declaringClass, generationConfig);
 
         // Test signature:
         assertEquals("removeMaximumLoadCapacity", loadCapSpec.name);
@@ -166,10 +179,10 @@ public class PropertySpecTest {
 
     @Test
     public void testRemoverAll() throws Exception {
-        ExtendedRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
+        BuildableRDFSProperty loadCap = getPropertyFromModel("http://example.de/ont#load_capacity");
         assertNotNull(loadCap);
 
-        MethodSpec loadCapSpec = loadCap.buildRemoverAll(generationConfig);
+        MethodSpec loadCapSpec = loadCap.buildRemoverAll(declaringClass, generationConfig);
 
         // Test signature:
         assertEquals("removeAllMaximumLoadCapacities", loadCapSpec.name);
@@ -189,12 +202,17 @@ public class PropertySpecTest {
     @Test
     public void testUnspecifiedDomain() throws Exception {
         Anno4j anno4j = new Anno4j();
-        ExtendedRDFSProperty property = anno4j.createObject(ExtendedRDFSProperty.class);
+        BuildableRDFSProperty property = anno4j.createObject(BuildableRDFSProperty.class);
 
-        ExtendedRDFSClazz rdfsClazz = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(RDFS.CLAZZ));
-        property.addRangeClazz(rdfsClazz);
+        BuildableRDFSClazz rdfsClazz = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(RDFS.CLAZZ));
+        BuildableRDFSClazz owlThing = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(OWL.THING));
+        property.setRanges(Sets.<RDFSClazz>newHashSet(rdfsClazz));
 
         ClassName range = property.getRangeJavaPoetClassName(generationConfig);
+        assertEquals(ClassName.get(ResourceObject.class), range);
+
+        property.setRanges(Sets.<RDFSClazz>newHashSet(owlThing));
+        range = property.getRangeJavaPoetClassName(generationConfig);
         assertEquals(ClassName.get(ResourceObject.class), range);
     }
 }

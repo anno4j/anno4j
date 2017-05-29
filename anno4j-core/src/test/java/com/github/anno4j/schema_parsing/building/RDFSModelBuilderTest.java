@@ -2,34 +2,37 @@ package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSProperty;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
 
 import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 
 /**
- * Test for the {@link RDFSModelBuilder} class.
- * See {@link RDFSModelBuilderValidationTest} for testing the
+ * Test for the {@link OWLJavaFileGenerator} class with regard to RDFS.
+ * See {@link ModelBuilderValidationTest} for testing the
  * model builders validation.
  */
 public class RDFSModelBuilderTest {
 
     private static Anno4j anno4j;
 
-    private static RDFSModelBuilder modelBuilder;
+    private static OntologyModelBuilder modelBuilder;
 
-    private static ExtendedRDFSClazz getClazzFromModel(String uri) {
-        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getClazzes();
-        for (ExtendedRDFSClazz clazz : clazzes) {
+    private static BuildableRDFSClazz getClazzFromModel(String uri) throws RepositoryException {
+        Collection<BuildableRDFSClazz> clazzes = modelBuilder.getClazzes();
+        for (BuildableRDFSClazz clazz : clazzes) {
             if(clazz.getResourceAsString().equals(uri)) {
                 return clazz;
             }
@@ -45,12 +48,22 @@ public class RDFSModelBuilderTest {
         return resourceStrings;
     }
 
+    private static <T extends ResourceObject> Collection<T> filterOwnNamespace(Collection<T> resources) {
+        Collection<T> filtered = new HashSet<>();
+        for (T resource : resources) {
+            if(resource.getResourceAsString().startsWith("http://example.de/ont#")) {
+                filtered.add(resource);
+            }
+        }
+        return filtered;
+    }
+
     @Before
     public void setUp() throws Exception {
         anno4j = new Anno4j();
 
-        VehicleOntologyLoader vehicleOntologyLoader = new VehicleOntologyLoader();
-        modelBuilder = vehicleOntologyLoader.getVehicleOntologyModelBuilder(anno4j);
+        modelBuilder = new OWLJavaFileGenerator(anno4j);
+        VehicleOntologyLoader.addVehicleOntology(modelBuilder);
 
         // Build the model:
         modelBuilder.build();
@@ -58,63 +71,71 @@ public class RDFSModelBuilderTest {
 
     @Test
     public void testClazzProperties() throws Exception {
-        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getClazzes();
+        Collection<BuildableRDFSClazz> clazzes = modelBuilder.getClazzes();
 
         // Model must contain the classes from the ontology plus RDFS build-in classes:
         assertTrue(clazzes.size() >= 5);
 
-        ExtendedRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
+        BuildableRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
         assertNotNull(vehicle);
-        assertEquals(3, vehicle.getOutgoingProperties().size());
-        Set<ExtendedRDFSProperty> vehicleOutProps = vehicle.getOutgoingProperties();
+
+        Collection<RDFSProperty> vehicleOutProps = filterOwnNamespace(vehicle.getOutgoingProperties());
+        assertEquals(3, vehicleOutProps.size());
         assertTrue(getResourcesAsStrings(vehicleOutProps).contains("http://example.de/ont#seat_num"));
 
-        ExtendedRDFSClazz car = getClazzFromModel("http://example.de/ont#Car");
+        BuildableRDFSClazz car = getClazzFromModel("http://example.de/ont#Car");
         assertNotNull(car);
-        assertEquals(1, car.getIncomingProperties().size());
-        Set<ExtendedRDFSProperty> carInProps = car.getIncomingProperties();
-        assertEquals("http://example.de/ont#parking_for", carInProps.iterator().next().getResourceAsString());
 
-        ExtendedRDFSClazz truck = getClazzFromModel("http://example.de/ont#Truck");
+        Collection<RDFSProperty> carInProps = filterOwnNamespace(car.getIncomingProperties());
+        assertEquals(1, carInProps.size());
+        assertTrue(getResourcesAsStrings(carInProps).contains("http://example.de/ont#parking_for"));
+
+        BuildableRDFSClazz truck = getClazzFromModel("http://example.de/ont#Truck");
         assertNotNull(truck);
-        Set<String> truckInProps = getResourcesAsStrings(truck.getIncomingProperties());
-        Set<String> truckOutProps = getResourcesAsStrings(truck.getOutgoingProperties());
+
+        Set<String> truckInProps = getResourcesAsStrings(filterOwnNamespace(truck.getIncomingProperties()));
+        Set<String> truckOutProps = getResourcesAsStrings(filterOwnNamespace(truck.getOutgoingProperties()));
         assertEquals(1, truckInProps.size());
         assertTrue(truckInProps.contains("http://example.de/ont#parking_for"));
         assertEquals(4, truckOutProps.size());
         assertTrue(truckOutProps.contains("http://example.de/ont#load_capacity"));
         assertTrue(truckOutProps.contains("http://example.de/ont#seat_num"));
 
-        ExtendedRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
+        BuildableRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
         assertNotNull(camper);
-        assertEquals(4, camper.getOutgoingProperties().size());
-        assertEquals(0, camper.getIncomingProperties().size());
+        assertEquals(4, filterOwnNamespace(camper.getOutgoingProperties()).size());
+        assertEquals(0, filterOwnNamespace(camper.getIncomingProperties()).size());
     }
 
     @Test
     public void testInheritance() throws Exception {
-        ExtendedRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
+        BuildableRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
         assertNotNull(vehicle);
-        assertEquals(1, vehicle.getSuperclazzes().size());
+        Collection<RDFSClazz> vehicleSuperClazzes = filterOwnNamespace(vehicle.getSuperclazzes());
+        vehicleSuperClazzes.remove(vehicle); // Remove (optional) reflexive relation
+        assertEquals(0, vehicleSuperClazzes.size());
 
-        ExtendedRDFSClazz car = getClazzFromModel("http://example.de/ont#Car");
+        BuildableRDFSClazz car = getClazzFromModel("http://example.de/ont#Car");
         assertNotNull(car);
-        assertEquals(1, car.getSuperclazzes().size());
-        ExtendedRDFSClazz carSuper = car.getSuperclazzes().iterator().next();
-        assertEquals(vehicle, carSuper);
+        Collection<RDFSClazz> carSuperClazzes = filterOwnNamespace(car.getSuperclazzes());
+        carSuperClazzes.remove(car);
+        assertEquals(1, carSuperClazzes.size());
+        assertTrue(filterOwnNamespace(car.getSuperclazzes()).contains(vehicle));
 
-        ExtendedRDFSClazz truck = getClazzFromModel("http://example.de/ont#Truck");
+        BuildableRDFSClazz truck = getClazzFromModel("http://example.de/ont#Truck");
         assertNotNull(truck);
-        assertEquals(1, truck.getSuperclazzes().size());
-        ExtendedRDFSClazz truckSuper = truck.getSuperclazzes().iterator().next();
-        assertEquals(vehicle, truckSuper);
+        Collection<RDFSClazz> truckSuperClazzes = filterOwnNamespace(truck.getSuperclazzes());
+        truckSuperClazzes.remove(truck);
+        assertEquals(1, truckSuperClazzes.size());
+        assertTrue(filterOwnNamespace(truck.getSuperclazzes()).contains(vehicle));
     }
 
     @Test
     public void testMultipleInheritance() throws Exception {
-        ExtendedRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
+        BuildableRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
         assertNotNull(camper);
-        Set<String> camperSuper = getResourcesAsStrings(camper.getSuperclazzes());
+        Set<String> camperSuper = getResourcesAsStrings(filterOwnNamespace(camper.getSuperclazzes()));
+        camperSuper.remove("http://example.de/ont#Camper"); // Remove (optional) reflexive relation
         assertEquals(2, camperSuper.size());
         assertTrue(camperSuper.contains("http://example.de/ont#Vehicle"));
         assertTrue(camperSuper.contains("http://example.de/ont#Home"));
@@ -122,11 +143,14 @@ public class RDFSModelBuilderTest {
 
     @Test
     public void testAnno4jPersistence() throws Exception {
-        List<ExtendedRDFSClazz> carClazzes = anno4j.createQueryService()
-                                        .addPrefix("ex", "http://example.de/ont#")
-                                        .addCriteria(".", "http://example.de/ont#Car")
-                                        .execute(ExtendedRDFSClazz.class);
-        assertEquals(1, carClazzes.size());
+        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
+        assertTrue(connection.prepareBooleanQuery(QueryLanguage.SPARQL,
+                "PREFIX ex: <http://example.de/ont#> " +
+                        "ASK {" +
+                        "  ex:Car rdfs:subClassOf ex:Vehicle . " +
+                        "  ex:parking_for rdfs:domain ex:Home . " +
+                        "}"
+        ).evaluate());
     }
 
     @Test
@@ -134,8 +158,8 @@ public class RDFSModelBuilderTest {
         // The ex:name property has no domain explicitly specified.
         // So its domain is inferred as rdfs:Class, but this should be shifted
         // to the root classes.
-        ExtendedRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
-        ExtendedRDFSClazz home = getClazzFromModel("http://example.de/ont#Home");
+        BuildableRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
+        BuildableRDFSClazz home = getClazzFromModel("http://example.de/ont#Home");
         assertNotNull(vehicle);
         assertNotNull(home);
 
@@ -150,7 +174,7 @@ public class RDFSModelBuilderTest {
         ClassLoader classLoader = getClass().getClassLoader();
         URL cyclicOntUrl = classLoader.getResource("cyclic_equivalence.ttl");
 
-        RDFSModelBuilder modelBuilder = new RDFSModelBuilder();
+        OntologyModelBuilder modelBuilder = new OWLJavaFileGenerator();
         modelBuilder.addRDF(new FileInputStream(cyclicOntUrl.getFile()), "http://example.de/ont#", "TURTLE");
 
         modelBuilder.build();
@@ -164,17 +188,17 @@ public class RDFSModelBuilderTest {
         assertEquals(3, ontClazzes.size());
 
         // Find the class that was picked as a representative of the equivalent classes:
-        ExtendedRDFSClazz equivalentClass = null;
-        for (ExtendedRDFSClazz clazz : modelBuilder.getClazzes()) {
+        BuildableRDFSClazz equivalentClass = null;
+        for (BuildableRDFSClazz clazz : modelBuilder.getClazzes()) {
             if(clazz.getResourceAsString().equals("http://example.de/ont#B") || clazz.getResourceAsString().equals("http://example.de/ont#C")) {
                 equivalentClass = clazz;
             }
         }
         assertNotNull(equivalentClass);
-        assertEquals(1, equivalentClass.getOutgoingProperties().size());
-        ExtendedRDFSProperty property = equivalentClass.getOutgoingProperties().iterator().next();
+        assertEquals(1, filterOwnNamespace(equivalentClass.getOutgoingProperties()).size());
+        RDFSProperty property = filterOwnNamespace(equivalentClass.getOutgoingProperties()).iterator().next();
         assertEquals("http://example.de/ont#foo", property.getResourceAsString());
-        assertEquals(1, property.getRanges().size());
-        assertEquals(equivalentClass.getResourceAsString(), property.getRanges().iterator().next().getResourceAsString());
+        assertEquals(1, filterOwnNamespace(property.getRanges()).size());
+        assertEquals(equivalentClass.getResourceAsString(), filterOwnNamespace(property.getRanges()).iterator().next().getResourceAsString());
     }
 }

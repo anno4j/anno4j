@@ -1,23 +1,26 @@
 package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.validation.Validator;
 import com.squareup.javapoet.*;
+import org.openrdf.repository.RepositoryException;
 
 /**
- * Support class (of {@link ExtendedRDFSProperty}) for generating
+ * Support class (of {@link BuildableRDFSProperty}) for generating
  * addAll* methods of support classes.
  */
 @Partial
-public abstract class AdderAllImplementationSupport extends AdderAllSupport implements ExtendedRDFSProperty {
+public abstract class AdderAllImplementationSupport extends AdderAllSupport implements BuildableRDFSProperty {
 
     @Override
-    public MethodSpec buildAdderAllImplementation(OntGenerationConfig config) {
+    public MethodSpec buildAdderAllImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
         // Get the signature of a adder for this property:
-        MethodSpec signature = buildSignature(config);
+        MethodSpec signature = buildSignature(domainClazz, config);
 
         if(signature != null) {
             // Override annotation of the method:
@@ -25,7 +28,7 @@ public abstract class AdderAllImplementationSupport extends AdderAllSupport impl
 
             MethodSpec.Builder adderBuilder = signature.toBuilder();
 
-            ExtendedRDFSClazz range = findSingleRangeClazz();
+            BuildableRDFSClazz range = findSingleRangeClazz();
             ClassName rangeClassName = range.getJavaPoetClassName(config);
             ParameterSpec param = signature.parameters.get(0);
             ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
@@ -42,14 +45,17 @@ public abstract class AdderAllImplementationSupport extends AdderAllSupport impl
             // Generate code for adding also to superproperties:
             adderBuilder.addComment("Add values also to superproperties:")
                         .beginControlFlow("if(!$N.isEmpty())", param);
-            for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                String superAdderAllName = superProperty.buildAdderAll(config).name;
-                adderBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderAllName, param);
+            for (RDFSProperty superProperty : getSuperproperties()) {
+                // Ignore superproperties from special vocabulary and the reflexive relation:
+                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
+                    String superAdderAllName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
+                    adderBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderAllName, param);
+                }
             }
             adderBuilder.endControlFlow(); // End if(!param.isEmpty())
 
             // Get the annotated field for this property:
-            FieldSpec field = buildAnnotatedField(config);
+            FieldSpec field = buildAnnotatedField(domainClazz, config);
 
             return adderBuilder.addAnnotation(overrideAnnotation)
                     .addStatement("this.$N.addAll(values)", field)

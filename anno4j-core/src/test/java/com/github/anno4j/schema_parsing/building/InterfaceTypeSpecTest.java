@@ -2,8 +2,8 @@ package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.namespaces.XSD;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazzSupport;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazzSupport;
 import com.squareup.javapoet.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 /**
- * Test for the building capabilities of {@link ExtendedRDFSClazz}/{@link ExtendedRDFSClazzSupport}
+ * Test for the building capabilities of {@link BuildableRDFSClazz}/{@link BuildableRDFSClazzSupport}
  * for generating JavaPoet {@link TypeSpec}.
  */
 public class InterfaceTypeSpecTest extends TypeSpecTest {
@@ -27,17 +27,17 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
      */
     private static OntGenerationConfig generationConfig;
 
-    private static RDFSModelBuilder modelBuilder;
+    private static OWLJavaFileGenerator modelBuilder;
 
     /**
-     * Returns a {@link ExtendedRDFSClazz} instance from {@link #modelBuilder}
+     * Returns a {@link BuildableRDFSClazz} instance from {@link #modelBuilder}
      * with the specified URI.
      * @param uri The URI to get the class object for.
      * @return The class object or null if no class with the given URI is in the model.
      */
-    private static ExtendedRDFSClazz getClazzFromModel(String uri) {
-        Collection<ExtendedRDFSClazz> clazzes = modelBuilder.getClazzes();
-        for (ExtendedRDFSClazz clazz : clazzes) {
+    private static BuildableRDFSClazz getClazzFromModel(String uri) throws RepositoryException {
+        Collection<BuildableRDFSClazz> clazzes = modelBuilder.getClazzes();
+        for (BuildableRDFSClazz clazz : clazzes) {
             if(clazz.getResourceAsString().equals(uri)) {
                 return clazz;
             }
@@ -53,9 +53,10 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
         generationConfig.setIdentifierLanguagePreference(identifierLangPreference);
         generationConfig.setJavaDocLanguagePreference(javaDocLangPreference);
 
+        modelBuilder = new OWLJavaFileGenerator();
+
         // Create a RDFS model builder instance:
-        VehicleOntologyLoader ontologyLoader = new VehicleOntologyLoader();
-        modelBuilder = ontologyLoader.getVehicleOntologyModelBuilder();
+        VehicleOntologyLoader.addVehicleOntology(modelBuilder);
 
         // Build the ontology model:
         modelBuilder.build();
@@ -63,7 +64,7 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
 
     @Test
     public void testBaseClass() throws Exception {
-        ExtendedRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
+        BuildableRDFSClazz vehicle = getClazzFromModel("http://example.de/ont#Vehicle");
         assertNotNull(vehicle);
 
         TypeSpec vehicleSpec = vehicle.buildTypeSpec(generationConfig);
@@ -87,8 +88,8 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
         assertTrue(vehicleSpec.javadoc.toString().startsWith("A mobile machine that"));
 
         // Vehicles have the seat_num, name and official_name properties
-        // and thus a getter, setter, adder, addAll, remover and removerAll for it:
-        assertEquals(18, vehicleSpec.methodSpecs.size());
+        // and thus a getter, setter, setter with vararg, adder, addAll, remover and removerAll for it:
+        assertEquals(3*7, vehicleSpec.methodSpecs.size());
         Set<String> methodNames = getMethodNames(vehicleSpec);
         assertTrue(methodNames.contains("getNumberOfSeats"));
         assertTrue(methodNames.contains("setNumberOfSeats"));
@@ -106,7 +107,7 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
 
     @Test
     public void testSubClass() throws Exception {
-        ExtendedRDFSClazz truck = getClazzFromModel("http://example.de/ont#Truck");
+        BuildableRDFSClazz truck = getClazzFromModel("http://example.de/ont#Truck");
         assertNotNull(truck);
 
         TypeSpec truckSpec = truck.buildTypeSpec(generationConfig);
@@ -129,8 +130,8 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
         assertNotNull(truckSpec.javadoc);
         assertTrue(truckSpec.javadoc.toString().startsWith("Ein LKW ist ein"));
 
-        // Trucks have the load_capacity property and thus a getter, setter, adder, addAll, remover, removerAll for it:
-        assertEquals(6, truckSpec.methodSpecs.size());
+        // Trucks have the load_capacity property and thus a getter, setter, setter with vararg, adder, addAll, remover, removerAll for it:
+        assertEquals(7, truckSpec.methodSpecs.size());
         Set<String> methodNames = getMethodNames(truckSpec);
         assertTrue(methodNames.contains("getMaximumLoadCapacities"));
         assertTrue(methodNames.contains("setMaximumLoadCapacities"));
@@ -144,7 +145,7 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
 
     @Test
     public void testMultipleInheritance() throws Exception {
-        ExtendedRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
+        BuildableRDFSClazz camper = getClazzFromModel("http://example.de/ont#Camper");
         assertNotNull(camper);
 
         TypeSpec camperSpec = camper.buildTypeSpec(generationConfig);
@@ -179,7 +180,7 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
 
     /**
      * Returns the JavaPoet class name for a RDFS class using
-     * {@link ExtendedRDFSClazz#getJavaPoetClassName(OntGenerationConfig)}.
+     * {@link BuildableRDFSClazz#getJavaPoetClassName(OntGenerationConfig)}.
      * @param anno4j The Anno4j instance used for creating the resource object.
      * @param clazzUri The URI of the class for which a JavaPoet class name should be created.
      * @param config The configuration object to be used for generating the class name.
@@ -189,7 +190,7 @@ public class InterfaceTypeSpecTest extends TypeSpecTest {
      * @throws InstantiationException Thrown on error during instantiating the resource object with Anno4j.
      */
     private static ClassName getJavaPoetClassName(Anno4j anno4j, String clazzUri, OntGenerationConfig config) throws RepositoryException, IllegalAccessException, InstantiationException {
-        ExtendedRDFSClazz clazz = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(clazzUri));
+        BuildableRDFSClazz clazz = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(clazzUri));
         return clazz.getJavaPoetClassName(config);
     }
 

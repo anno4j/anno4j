@@ -2,7 +2,7 @@ package com.github.anno4j.schema_parsing.validation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.namespaces.XSD;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -45,7 +45,7 @@ public class XSDValueSpaceValidatorTest {
 
     @Test
     public void testNonPositive() throws Exception {
-        ExtendedRDFSClazz xsdNonPositiveInt = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(XSD.NON_POSITIVE_INTEGER));
+        BuildableRDFSClazz xsdNonPositiveInt = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(XSD.NON_POSITIVE_INTEGER));
 
         MethodSpec.Builder methodBuilder = method.toBuilder();
         validator.addValueSpaceCheck(methodBuilder, param, xsdNonPositiveInt);
@@ -57,7 +57,7 @@ public class XSDValueSpaceValidatorTest {
 
     @Test
     public void testNegative() throws Exception {
-        ExtendedRDFSClazz xsdNegativeInt = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(XSD.NEGATIVE_INTEGER));
+        BuildableRDFSClazz xsdNegativeInt = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(XSD.NEGATIVE_INTEGER));
 
         MethodSpec.Builder methodBuilder = method.toBuilder();
         validator.addValueSpaceCheck(methodBuilder, param, xsdNegativeInt);
@@ -69,7 +69,7 @@ public class XSDValueSpaceValidatorTest {
 
     @Test
     public void testNonNegative() throws Exception {
-        ExtendedRDFSClazz xsdNonNegativeInt = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(XSD.NON_NEGATIVE_INTEGER));
+        BuildableRDFSClazz xsdNonNegativeInt = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(XSD.NON_NEGATIVE_INTEGER));
 
         MethodSpec.Builder methodBuilder = method.toBuilder();
         validator.addValueSpaceCheck(methodBuilder, param, xsdNonNegativeInt);
@@ -81,7 +81,7 @@ public class XSDValueSpaceValidatorTest {
 
     @Test
     public void testUnsigned() throws Exception {
-        ExtendedRDFSClazz xsdUnsignedInt = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(XSD.UNSIGNED_INT));
+        BuildableRDFSClazz xsdUnsignedInt = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(XSD.UNSIGNED_INT));
 
         MethodSpec.Builder methodBuilder = method.toBuilder();
         validator.addValueSpaceCheck(methodBuilder, param, xsdUnsignedInt);
@@ -93,7 +93,7 @@ public class XSDValueSpaceValidatorTest {
 
     @Test
     public void testPositive() throws Exception {
-        ExtendedRDFSClazz xsdPositiveInt = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(XSD.POSITIVE_INTEGER));
+        BuildableRDFSClazz xsdPositiveInt = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(XSD.POSITIVE_INTEGER));
 
         MethodSpec.Builder methodBuilder = method.toBuilder();
         validator.addValueSpaceCheck(methodBuilder, param, xsdPositiveInt);

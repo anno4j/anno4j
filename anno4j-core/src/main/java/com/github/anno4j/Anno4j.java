@@ -453,4 +453,6 @@ public class Anno4j implements TransactionCommands {
 
         return new ValidatedTransaction(objectRepository, evaluatorConfiguration);
     }
+
+
 }

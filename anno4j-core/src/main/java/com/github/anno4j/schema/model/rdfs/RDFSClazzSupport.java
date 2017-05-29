@@ -15,14 +15,14 @@ public abstract class RDFSClazzSupport extends RDFSSchemaResourceSupport impleme
      * {@inheritDoc}
      */
     @Override
-    public void addSubClazz(RDFSClazz subClazz) {
-        Set<RDFSClazz> subClazzes = new HashSet<>();
+    public void addSuperclazz(RDFSClazz subClazz) {
+        Set<RDFSClazz> superClazzes = new HashSet<>();
 
-        if(this.getSubClazzes() != null ) {
-            subClazzes.addAll(this.getSubClazzes());
+        if(this.getSuperclazzes() != null ) {
+            superClazzes.addAll(this.getSuperclazzes());
         }
 
-        subClazzes.add(subClazz);
-        this.setSubClazzes(subClazzes);
+        superClazzes.add(subClazz);
+        this.setSuperclazzes(superClazzes);
     }
 }

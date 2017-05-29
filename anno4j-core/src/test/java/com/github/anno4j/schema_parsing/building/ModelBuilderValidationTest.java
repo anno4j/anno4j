@@ -15,18 +15,15 @@ import static org.junit.Assert.*;
  * The model builder should recognize invalid ontologies and
  * in this case not persist information to the underlying Anno4j object.
  */
-public class RDFSModelBuilderValidationTest {
+public class ModelBuilderValidationTest {
 
     @Test
     public void testCorrectOntology() throws Exception {
         Anno4j anno4j = new Anno4j();
 
         // Get a model builder with correct ontology:
-        VehicleOntologyLoader ontologyLoader = new VehicleOntologyLoader();
-        RDFSModelBuilder modelBuilder = ontologyLoader.getVehicleOntologyModelBuilder(anno4j);
-        if(modelBuilder == null) {
-            fail();
-        }
+        OntologyModelBuilder modelBuilder = new OWLJavaFileGenerator(anno4j);
+        VehicleOntologyLoader.addVehicleOntology(modelBuilder);
 
         // Build the model:
         modelBuilder.build();
@@ -49,11 +46,8 @@ public class RDFSModelBuilderValidationTest {
         Anno4j anno4j = new Anno4j();
 
         // Get a model builder with correct ontology:
-        VehicleOntologyLoader ontologyLoader = new VehicleOntologyLoader();
-        RDFSModelBuilder modelBuilder = ontologyLoader.getVehicleOntologyModelBuilder(anno4j);
-        if(modelBuilder == null) {
-            fail();
-        }
+        OntologyModelBuilder modelBuilder = new OWLJavaFileGenerator(anno4j);
+        VehicleOntologyLoader.addVehicleOntology(modelBuilder);
 
         // Set range of ex:seat_num to something not numeric (violates range constraint):
         modelBuilder.addRDF(IOUtils.toInputStream("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
@@ -66,7 +60,13 @@ public class RDFSModelBuilderValidationTest {
                 "</rdf:RDF>"), "http://example.de/ont#");
 
         // Build the model:
-        modelBuilder.build();
+        boolean exceptionThrown = false;
+        try {
+            modelBuilder.build();
+        } catch (OntologyModelBuilder.RDFSModelBuildingException e) {
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
 
         // The model should be valid:
         ValidityReport report = modelBuilder.validate();

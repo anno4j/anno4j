@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
  * i.e. the property is functional and inverse functional (see {@link Functional}, {@link InverseFunctional}).
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Bijective {
 }

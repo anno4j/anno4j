@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * This annotation corresponds to <a href="https://www.w3.org/TR/owl-guide/#owl_someValuesFrom">owl:someValuesFrom</a>.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface SomeValuesFrom {
 
     /**

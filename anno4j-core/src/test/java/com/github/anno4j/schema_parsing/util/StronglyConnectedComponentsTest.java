@@ -1,14 +1,20 @@
 package com.github.anno4j.schema_parsing.util;
 
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.google.common.collect.Sets;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
+import org.openrdf.rio.RDFFormat;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,9 +26,9 @@ import static junit.framework.TestCase.assertEquals;
  */
 public class StronglyConnectedComponentsTest {
 
-    private static OntModel model;
+    private Anno4j anno4j;
 
-    private static Collection<Collection<OntClass>> sccs;
+    private static Collection<Collection<RDFSClazz>> sccs;
 
     @Before
     public void setUp() throws Exception {
@@ -33,10 +39,8 @@ public class StronglyConnectedComponentsTest {
             throw new FileNotFoundException("scc_test.ttl was not found.");
         }
 
-        // Create a Jena ontology model from the RDF file:
-        model = ModelFactory.createOntologyModel();
-        model.read(new FileInputStream(ontUrl.getFile()), "http://example.de/ont#", "TURTLE");
-
+        anno4j = new Anno4j();
+        anno4j.getRepository().getConnection().add(new File(ontUrl.getFile()), "http://example.de/ont#", RDFFormat.TURTLE, (Resource) null);
 
         // The strongly connected components in the ontology:
         // See https://en.wikipedia.org/wiki/Strongly_connected_component#/media/File:Graph_Condensation.svg
@@ -44,66 +48,57 @@ public class StronglyConnectedComponentsTest {
         sccs = new HashSet<>();
 
         sccs.add(Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#A"),
-                model.getOntClass("http://example.de/ont#B"),
-                model.getOntClass("http://example.de/ont#C"),
-                model.getOntClass("http://example.de/ont#D"),
-                model.getOntClass("http://example.de/ont#E")));
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#A"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#B"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#C"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#D"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#E")));
 
         sccs.add(Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#F")
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#F")
         ));
 
         sccs.add(Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#G"),
-                model.getOntClass("http://example.de/ont#H"),
-                model.getOntClass("http://example.de/ont#I")));
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#G"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#H"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#I")));
 
         sccs.add(Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#J")
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#J")
         ));
 
         sccs.add(Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#K"),
-                model.getOntClass("http://example.de/ont#L")
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#K"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#L")
         ));
 
         sccs.add(Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#M"),
-                model.getOntClass("http://example.de/ont#N"),
-                model.getOntClass("http://example.de/ont#O"),
-                model.getOntClass("http://example.de/ont#P")
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#M"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#N"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#O"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#P")
         ));
     }
 
     @Test
     public void findSCCs() throws Exception {
-        Collection<OntClass> seeds = Sets.newHashSet(
-                model.getOntClass("http://example.de/ont#A"),
-                model.getOntClass("http://example.de/ont#B"),
-                model.getOntClass("http://example.de/ont#C"),
-                model.getOntClass("http://example.de/ont#D"),
-                model.getOntClass("http://example.de/ont#E"),
-                model.getOntClass("http://example.de/ont#F"),
-                model.getOntClass("http://example.de/ont#G"),
-                model.getOntClass("http://example.de/ont#H"),
-                model.getOntClass("http://example.de/ont#I"),
-                model.getOntClass("http://example.de/ont#J"),
-                model.getOntClass("http://example.de/ont#K"),
-                model.getOntClass("http://example.de/ont#L"),
-                model.getOntClass("http://example.de/ont#M"),
-                model.getOntClass("http://example.de/ont#N"),
-                model.getOntClass("http://example.de/ont#O"),
-                model.getOntClass("http://example.de/ont#P")
-        );
-        assertEquals(sccs, StronglyConnectedComponents.findSCCs(seeds));
-    }
-
-    @Test
-    public void findSCCsSingleSource() throws Exception {
-        // All classes are subclasses of ex:J:
-        Collection<OntClass> seeds = Sets.newHashSet(
-            model.getOntClass("http://example.de/ont#J")
+        Collection<RDFSClazz> seeds = Sets.newHashSet(
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#A"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#B"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#C"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#D"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#E"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#F"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#G"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#H"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#I"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#J"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#K"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#L"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#M"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#N"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#O"),
+                anno4j.findByID(RDFSClazz.class, "http://example.de/ont#P")
         );
         assertEquals(sccs, StronglyConnectedComponents.findSCCs(seeds));
     }

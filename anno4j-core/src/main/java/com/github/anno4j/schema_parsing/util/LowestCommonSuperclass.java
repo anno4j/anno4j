@@ -1,11 +1,20 @@
 package com.github.anno4j.schema_parsing.util;
 
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.google.common.collect.Sets;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectQuery;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
- * Utility class for finding the lowest common superclass of {@link ExtendedRDFSClazz} objects.
+ * Utility class for finding the lowest common superclass of {@link BuildableRDFSClazz} objects.
  */
 public class LowestCommonSuperclass {
 
@@ -15,16 +24,22 @@ public class LowestCommonSuperclass {
      * @param clazz The class for which to find superclasses.
      * @return The transitive closure of superclasses of the given class including <code>clazz</code>.
      */
-    private static Set<ExtendedRDFSClazz> getSuperclassClosure(ExtendedRDFSClazz clazz) {
-        Set<ExtendedRDFSClazz> superClazzes = new HashSet<>();
-        superClazzes.add(clazz); // Add the class itself
+    private static Set<BuildableRDFSClazz> getSuperclassClosure(BuildableRDFSClazz clazz) throws RepositoryException {
+        Set<BuildableRDFSClazz> closure = Sets.newHashSet(clazz);
+        ObjectConnection connection = clazz.getObjectConnection();
 
-        // Recursively find transitive superclasses for each parent of the current class:
-        for (ExtendedRDFSClazz superClazz : clazz.getSuperclazzes()) {
-            superClazzes.addAll(getSuperclassClosure(superClazz));
+        try {
+            ObjectQuery query = connection.prepareObjectQuery(
+                    "SELECT ?super {" +
+                    "   <" + clazz.getResourceAsString() + "> rdfs:subClassOf+ ?super . " +
+                    "}"
+            );
+            closure.addAll(query.evaluate(BuildableRDFSClazz.class).asSet());
+        } catch (QueryEvaluationException | MalformedQueryException e) {
+            throw new RepositoryException(e);
         }
 
-        return superClazzes;
+        return closure;
     }
 
     /**
@@ -34,21 +49,35 @@ public class LowestCommonSuperclass {
      * @param clazz The class for which the distance to the root should be calculated.
      * @return Returns the length of the shortest path to the root.
      */
-    private static int minimumDistanceFromRoot(ExtendedRDFSClazz clazz) {
+    private static int minimumDistanceFromRoot(BuildableRDFSClazz clazz) throws RepositoryException {
         // The root (rdfs:Class) has no parents.
         // The distance to itself is 0:
-        if(clazz.getSuperclazzes().isEmpty()) {
+        Set<RDFSClazz> superClazzes = clazz.getSuperclazzes();
+        boolean isRoot = superClazzes.isEmpty();
+        isRoot |= superClazzes.size() == 1 && superClazzes.contains(clazz);
+        if(isRoot) {
             return 0;
         }
 
         int parentMinDistance = Integer.MAX_VALUE; // Current minimum distance seen
 
         // Iterate parents, calculate distances and select minimum one:
-        for (ExtendedRDFSClazz parent : clazz.getSuperclazzes()) {
-            int distance = minimumDistanceFromRoot(parent);
+        for (RDFSClazz parent : clazz.getSuperclazzes()) {
+            // Omit reflexive subclass relation:
+            if(!parent.equals(clazz)) {
+                // Get the resource of buildable object type:
+                BuildableRDFSClazz buildableParent;
+                try {
+                    buildableParent = parent.getObjectConnection().findObject(BuildableRDFSClazz.class, parent.getResource());
+                } catch (QueryEvaluationException e) {
+                    throw new RepositoryException(e);
+                }
 
-            if(distance < parentMinDistance) {
-                parentMinDistance = distance;
+                int distance = minimumDistanceFromRoot(buildableParent);
+
+                if(distance < parentMinDistance) {
+                    parentMinDistance = distance;
+                }
             }
         }
 
@@ -65,17 +94,17 @@ public class LowestCommonSuperclass {
      * @param clazzes The classes to find a lowest common superclass.
      * @return A lowest common superclass of all given classes.
      */
-    public static ExtendedRDFSClazz getLowestCommonSuperclass(Collection<ExtendedRDFSClazz> clazzes) {
+    public static BuildableRDFSClazz getLowestCommonSuperclass(Collection<BuildableRDFSClazz> clazzes) throws RepositoryException {
         // If only one class is given, immediately return it for performance reasons:
         if(clazzes.size() == 1) {
             return clazzes.iterator().next();
         }
 
-        Iterator<ExtendedRDFSClazz> clazzIter = clazzes.iterator();
+        Iterator<BuildableRDFSClazz> clazzIter = clazzes.iterator();
 
         // The set of common superclasses. Initialize with all superclasses of the first class.
         // Includes the first class itself in case it is a superclass of all others:
-        Collection<ExtendedRDFSClazz> common = getSuperclassClosure(clazzIter.next());
+        Collection<BuildableRDFSClazz> common = getSuperclassClosure(clazzIter.next());
 
         // For each other class find superclasses and intersect with intersection of all previous classes:
         while(clazzIter.hasNext()) {
@@ -85,8 +114,8 @@ public class LowestCommonSuperclass {
         // common now contains all common superclasses.
         // Find one with maximum distance to root:
         int maximumDistance = -1;
-        ExtendedRDFSClazz lowestCommonSuper = null;
-        for (ExtendedRDFSClazz commonSuper : common) {
+        BuildableRDFSClazz lowestCommonSuper = null;
+        for (BuildableRDFSClazz commonSuper : common) {
             int distance = minimumDistanceFromRoot(commonSuper);
 
             if (distance > maximumDistance) {

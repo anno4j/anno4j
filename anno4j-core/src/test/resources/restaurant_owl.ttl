@@ -1,0 +1,124 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.de/ont#> .
+
+ex:Dish a owl:Class ;
+        rdfs:label "Gericht"@de ;
+		rdfs:label "Dish"@en .
+
+ex:Main_Dish rdfs:subClassOf ex:Dish ;
+		rdfs:label "Hauptgericht"@de ;
+		rdfs:label "Main dish"@en .
+		
+ex:ItalianDish rdfs:subClassOf ex:Dish ;
+		rdfs:label "Italienisches Gericht"@de ;
+		rdfs:label "Italian dish"@en .
+
+ex:Menu a owl:Class ;
+		rdfs:label "Menü"@de;
+		rdfs:label "Menu"@en .
+		
+ex:Restaurant a owl:Class ;
+		rdfs:label "Restaurant"@de ;
+		rdfs:label "Restaurant"@en .
+
+ex:Drink rdfs:subClassOf ex:Dish ;
+		rdfs:label "Getränk"@de ;
+		rdfs:label "Drink"@en .
+
+# OWL equivalence relation:
+ex:Beverage owl:equivalentClass ex:Drink .
+
+# For the ex:serves property there is an inverse property ex:served_at:
+ex:serves a owl:ObjectProperty ;
+          rdfs:domain ex:Restaurant ;
+		  rdfs:range ex:Dish ;
+		  rdfs:label "bietet an"@de ;
+		  rdfs:label "serves"@en ;
+		  owl:inverseOf ex:served_at .
+
+# The ex:fits_with property is symmetric and transitive:
+ex:fits_with a owl:ObjectProperty ;
+		  rdfs:domain ex:Dish ;
+		  rdfs:range ex:Dish ;
+		  rdfs:label "passt zu"@de ;
+		  rdfs:label "fits with"@en ;
+		  rdfs:comment "Beschreibt zu welchen Gerichten ein Gericht passt."@de ;
+		  rdfs:comment "Describes with which other dishes a certain dish matches."@en ;
+		  a owl:SymmetricProperty ;
+		  a owl:TransitiveProperty .
+
+ex:contains a owl:ObjectProperty ;
+          rdfs:domain ex:Menu ;
+		  rdfs:range ex:Dish ;
+		  rdfs:label "enthält"@de ;
+		  rdfs:label "contains"@en ;
+		  owl:inverseOf ex:isContainedIn .
+		
+ex:has_main_dish a owl:FunctionalProperty ;
+		  rdfs:subPropertyOf ex:contains ;
+		  rdfs:label "hat Hauptgang"@de;
+		  rdfs:label "has main dish"@en .
+		  
+ex:isMainDishOf a owl:InverseFunctionalProperty ;
+		 rdfs:subPropertyOf ex:isContainedIn ;
+		 rdfs:label "ist Hauptgang von"@de ;
+		 rdfs:label "is main dish of"@en .
+
+# Names
+ex:name  a owl:DatatypeProperty ;
+         rdfs:range xsd:string ;
+         rdfs:label "hat Name"@de ;
+         rdfs:label "has name"@en ;
+         a owl:FunctionalProperty ;
+         a owl:InverseFunctionalProperty .
+		 
+# A menu contains between 2 and 5 dishes, at least one main dish
+ex:Menu rdfs:subClassOf _:r2 ;
+		rdfs:subClassOf _:r22 .
+		
+_:r2      a owl:Restriction ;
+          owl:onProperty ex:contains ;
+		  owl:minCardinality "2"^^xsd:unsignedInt ;
+		  owl:maxCardinality "5"^^xsd:unsignedInt .
+		  
+_:r22	  a owl:Restriction ;
+		  owl:onProperty ex:contains ;
+		  owl:onClass ex:Main_Dish ;
+		  owl:minCardinality "1"^^xsd:unsignedInt .
+		  
+# Every menu must at least contain one drink
+ex:Menu rdfs:subClassOf _:r3 .
+_:r3      a owl:Restriction ;
+          owl:onProperty ex:contains ;
+		  owl:onClass ex:Drink ;
+		  owl:minCardinality "1"^^xsd:unsignedInt .
+
+# A restaurant has exactly one name:
+ex:Restaurant rdfs:subClassOf _:r4 .
+_:r4    a owl:Restriction ;
+	    owl:onProperty ex:name ;
+		owl:cardinality "1"^^xsd:unsignedInt .
+
+# Dishes may have different names, but at least one:
+ex:Dish rdfs:subClassOf _:r5 . 
+_:r5 	a owl:Restriction ;
+		owl:onProperty ex:name ;
+		owl:minCardinality "1"^^xsd:unsignedInt .
+		
+# A italian menu is a menu that contains only italian dishes:
+ex:ItalianMenu rdfs:subClassOf _:r6 ;
+		rdfs:label "Rein italienisches Menü"@de ;
+		rdfs:label "Only italian menu"@en .
+_:r6    a owl:Restriction ;
+	    owl:onProperty ex:contains ;
+		owl:allValuesFrom ex:ItalianDish .
+		
+ex:PartialItalianMenu rdfs:subClassOf _:r7 ;
+		rdfs:label "Teilweise italienisches Menü"@de ;
+		rdfs:label "Partially italian menu"@en .
+_:r7 	a owl:Restriction ;
+		owl:onProperty ex:contains ;
+		owl:someValuesFrom ex:ItalianDish .

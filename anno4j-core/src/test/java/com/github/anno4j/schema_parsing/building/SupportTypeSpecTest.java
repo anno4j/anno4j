@@ -3,9 +3,11 @@ package com.github.anno4j.schema_parsing.building;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.support.SupportTypeSpecSupport;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
+import com.google.common.collect.Sets;
 import com.squareup.javapoet.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,8 +15,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class SupportTypeSpecTest extends TypeSpecTest {
 
-    private static ExtendedRDFSClazz clazz;
+    private static BuildableRDFSClazz clazz;
 
     private OntGenerationConfig generationConfig;
 
@@ -34,20 +35,17 @@ public class SupportTypeSpecTest extends TypeSpecTest {
     public void setUp() throws Exception {
         Anno4j anno4j = new Anno4j();
 
-        clazz = anno4j.createObject(ExtendedRDFSClazz.class);
+        clazz = anno4j.createObject(BuildableRDFSClazz.class);
         clazz.addLabel("MyClazz");
 
-        Set<ExtendedRDFSProperty> props = new HashSet<>();
-        ExtendedRDFSProperty foo = anno4j.createObject(ExtendedRDFSProperty.class, (Resource) new URIImpl("http://example.org/#foo"));
-        foo.addLabel("foo");
-        foo.addRangeClazz(clazz);
-        props.add(foo);
-
-        clazz.setOutgoingProperties(props);
+        BuildableRDFSProperty foo = anno4j.createObject(BuildableRDFSProperty.class, (Resource) new URIImpl("http://example.org/#foo"));
+        foo.setLabels(Sets.<CharSequence>newHashSet("foo"));
+        foo.setDomains(Sets.<RDFSClazz>newHashSet(clazz));
+        foo.setRanges(Sets.<RDFSClazz>newHashSet(clazz));
 
         generationConfig = new OntGenerationConfig();
-        List<String> identifierLangPreference = Arrays.asList(OntGenerationConfig.UNTYPED_LITERAL);
-        List<String> javaDocLangPreference = Arrays.asList(OntGenerationConfig.UNTYPED_LITERAL);
+        List<String> identifierLangPreference = Collections.singletonList(OntGenerationConfig.UNTYPED_LITERAL);
+        List<String> javaDocLangPreference = Collections.singletonList(OntGenerationConfig.UNTYPED_LITERAL);
         generationConfig.setIdentifierLanguagePreference(identifierLangPreference);
         generationConfig.setJavaDocLanguagePreference(javaDocLangPreference);
     }

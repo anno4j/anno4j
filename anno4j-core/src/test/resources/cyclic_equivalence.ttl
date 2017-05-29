@@ -1,6 +1,14 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix ex: <http://example.de/ont#> .
 
+#      A
+#      |
+# ----------
+# |         |
+# B<------->C
+#           |
+#           D
+
 ex:B rdfs:subClassOf ex:A .
 ex:C rdfs:subClassOf ex:A .
 ex:B rdfs:subClassOf ex:C .

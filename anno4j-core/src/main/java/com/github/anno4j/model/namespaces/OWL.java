@@ -16,6 +16,18 @@ public class OWL {
     public final static String CLAZZ = NS + "Class";
 
     /**
+     * Refers to http://www.w3.org/2002/07/owl#Thing
+     * The class extension of owl:Thing is the set of all individuals.
+     */
+    public final static String THING = NS + "Thing";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#Nothing
+     * The class extension of owl:Nothing is the empty set.
+     */
+    public final static String NOTHING = NS + "Nothing";
+
+    /**
      * Refers to http://www.w3.org/2002/07/owl#Restriction
      * A restriction can support limitations and boundaries for properties.
      */
@@ -130,4 +142,24 @@ public class OWL {
      * the hasValue resource.
      */
     public final static String HAS_VALUE = NS + "hasValue";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#equivalentClass
+     * owl:equivalentClass is a built-in property that links a class description to another class description.
+     */
+    public final static String EQUIVALENT_CLASS = NS + "equivalentClass";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#disjointWith
+     * Each owl:disjointWith statement asserts that the class extensions of the two class descriptions involved have
+     * no individuals in common.
+     */
+    public final static String DISJOINT_WITH = NS + "disjointWith";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#complementOf
+     * owl:complementOf is analogous to logical negation: the class extension consists of those individuals that are
+     * NOT members of the class extension of the complement class.
+     */
+    public final static String COMPLEMENT_OF = NS + "complementOf";
 }

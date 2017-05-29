@@ -17,18 +17,18 @@ public interface RDFSClazz extends RDFSSchemaResource {
      * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
      */
     @Iri(RDFS.SUB_CLASS_OF)
-    void setSubClazzes(Set<RDFSClazz> subClazzes);
+    void setSuperclazzes(Set<RDFSClazz> subClazzes);
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subclassof
      * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
      */
     @Iri(RDFS.SUB_CLASS_OF)
-    Set<RDFSClazz> getSubClazzes();
+    Set<RDFSClazz> getSuperclazzes();
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subclassof
      * The property rdfs:subClassOf is an instance of rdf:Property that is used to state that all the instances of one class are instances of another.
      */
-    void addSubClazz(RDFSClazz subClazz);
+    void addSuperclazz(RDFSClazz subClazz);
 }

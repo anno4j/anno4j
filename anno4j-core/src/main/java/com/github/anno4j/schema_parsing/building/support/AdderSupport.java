@@ -1,25 +1,27 @@
 package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.naming.MethodNameBuilder;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
+import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
 
 /**
- * Support class (of {@link ExtendedRDFSProperty}) for generating resource class add-methods
+ * Support class (of {@link BuildableRDFSProperty}) for generating resource class add-methods
  * for this property.
  */
 @Partial
-public abstract class AdderSupport extends PropertyBuildingSupport implements ExtendedRDFSProperty {
+public abstract class AdderSupport extends PropertyBuildingSupport implements BuildableRDFSProperty {
 
     @Override
-    MethodSpec buildSignature(OntGenerationConfig config) {
+    MethodSpec buildSignature(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
         if(getRanges() != null) {
             // Get the most specific class describing all of the properties range classes:
             ClassName paramType = getRangeJavaPoetClassName(config);
@@ -33,7 +35,7 @@ public abstract class AdderSupport extends PropertyBuildingSupport implements Ex
             javaDoc.add("\n@param value The element to be added.");
 
             // Add a throws declaration if the value space is constrained:
-            ExtendedRDFSClazz range = findSingleRangeClazz();
+            BuildableRDFSClazz range = findSingleRangeClazz();
             addJavaDocExceptionInfo(javaDoc, range, config);
 
             // Create name builder with the preferred RDFS label if available:
@@ -58,9 +60,9 @@ public abstract class AdderSupport extends PropertyBuildingSupport implements Ex
     }
 
     @Override
-    public MethodSpec buildAdder(OntGenerationConfig config) {
+    public MethodSpec buildAdder(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
         // Add the abstract modifier to the signature, because there is no implementation in the interface:
-        return buildSignature(config)
+        return buildSignature(domainClazz, config)
                 .toBuilder()
                 .addModifiers(Modifier.ABSTRACT)
                 .build();

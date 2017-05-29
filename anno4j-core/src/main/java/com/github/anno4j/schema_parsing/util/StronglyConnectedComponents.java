@@ -1,7 +1,11 @@
 package com.github.anno4j.schema_parsing.util;
 
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.RepositoryException;
 
 import java.util.*;
 
@@ -26,7 +30,7 @@ public class StronglyConnectedComponents {
         /**
          * The wrapped class.
          */
-        private OntClass clazz;
+        private RDFSClazz clazz;
 
         /**
          * The unique index the algorithm assigned to this class.
@@ -51,7 +55,7 @@ public class StronglyConnectedComponents {
          * @param clazz The clazz to store in this node.
          * @param index The index of the stored class.
          */
-        public Node(OntClass clazz, int index) {
+        public Node(RDFSClazz clazz, int index) {
             this.clazz = clazz;
             this.index = index;
             this.lowLink = index;
@@ -61,14 +65,14 @@ public class StronglyConnectedComponents {
         /**
          * @return The class stored in this node.
          */
-        public OntClass getClazz() {
+        public RDFSClazz getClazz() {
             return clazz;
         }
 
         /**
          * @param clazz The class stored in this node.
          */
-        public void setClazz(OntClass clazz) {
+        public void setClazz(RDFSClazz clazz) {
             this.clazz = clazz;
         }
 
@@ -133,18 +137,25 @@ public class StronglyConnectedComponents {
      * @param stack The stack maintained by the algorithm.
      * @param indexGenerator Generator for creating unique indices for classes.
      */
-    private static void strongConnect(OntClass clazz, Collection<Collection<OntClass>> sccs,
-                               Map<OntClass, Node> visitedNodes, Stack<Node> stack, IndexGenerator indexGenerator) {
+    private static void strongConnect(RDFSClazz clazz, Collection<Collection<RDFSClazz>> sccs,
+                                      Map<RDFSClazz, Node> visitedNodes, Stack<Node> stack, IndexGenerator indexGenerator) throws RepositoryException {
         // Assign an index to the clazz and put it on the stack:
         Node node = new Node(clazz, indexGenerator.nextIndex());
         visitedNodes.put(clazz, node);
         stack.push(node);
         node.setOnStack(true);
 
+        BuildableRDFSClazz buildable;
+        try {
+            buildable = clazz.getObjectConnection().findObject(BuildableRDFSClazz.class, clazz.getResource());
+        } catch (RepositoryException | QueryEvaluationException e) {
+            throw new RepositoryException();
+        }
+
         // DFS on the subclasses:
-        ExtendedIterator<OntClass> subClazzIter = clazz.listSubClasses();
+        Iterator<RDFSClazz> subClazzIter = buildable.getSuperclazzes().iterator();
         while (subClazzIter.hasNext()) {
-            OntClass subClazz = subClazzIter.next();
+            RDFSClazz subClazz = subClazzIter.next();
             // Subclass not yet visited?
             if(!visitedNodes.containsKey(subClazz)) {
                 // Recursively continue DFS on the subclass:
@@ -162,7 +173,7 @@ public class StronglyConnectedComponents {
         // Output a SCC if this node is the root of one:
         // The root of a SCC is defined as the node with the lowest index (the lowlink):
         if(node.getIndex() == node.getLowLink()) {
-            Collection<OntClass> scc = new HashSet<>();
+            Collection<RDFSClazz> scc = new HashSet<>();
             Node sccParticipant = null;
 
 
@@ -182,11 +193,11 @@ public class StronglyConnectedComponents {
      * @return The strongly connected components found in the subtrees. Each subcollection
      * contains a subgraph which is a SCC.
      */
-    public static Collection<Collection<OntClass>> findSCCs(Collection<? extends OntClass> seeds) {
-        Collection<Collection<OntClass>> cycles = new HashSet<>();
+    public static Collection<Collection<RDFSClazz>> findSCCs(Collection<? extends RDFSClazz> seeds) throws RepositoryException {
+        Collection<Collection<RDFSClazz>> cycles = new HashSet<>();
 
-        for (OntClass clazz : seeds) {
-            strongConnect(clazz, cycles, new HashMap<OntClass, Node>(), new Stack<Node>(), new IndexGenerator());
+        for (RDFSClazz clazz : seeds) {
+            strongConnect(clazz, cycles, new HashMap<RDFSClazz, Node>(), new Stack<Node>(), new IndexGenerator());
         }
 
         return cycles;

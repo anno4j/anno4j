@@ -1,6 +1,7 @@
 package com.github.anno4j.schema_parsing.generation;
 
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
+import org.openrdf.repository.RepositoryException;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,13 @@ public interface JavaFileGenerator {
          * {@inheritDoc}
          */
         public JavaFileGenerationException() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public JavaFileGenerationException(Throwable cause) {
+            super(cause);
         }
 
         /**
@@ -112,6 +120,7 @@ public interface JavaFileGenerator {
      *                        then existing files may be overwritten.
      * @throws JavaFileGenerationException Thrown if an error occured during file generation.
      * @throws IOException Thrown if an error occurs while writing the generated files.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    void generateJavaFiles(OntGenerationConfig config, File outputDirectory) throws JavaFileGenerationException, IOException;
+    void generateJavaFiles(OntGenerationConfig config, File outputDirectory) throws JavaFileGenerationException, IOException, RepositoryException;
 }

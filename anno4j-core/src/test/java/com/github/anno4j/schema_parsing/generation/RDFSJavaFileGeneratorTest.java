@@ -1,5 +1,6 @@
 package com.github.anno4j.schema_parsing.generation;
 
+import com.github.anno4j.schema_parsing.building.OWLJavaFileGenerator;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.validation.ValidatorChain;
 import org.apache.commons.io.IOUtils;
@@ -68,7 +69,7 @@ public class RDFSJavaFileGeneratorTest {
         File dependencyJar = findDependencyJar();
         if(dependencyJar == null) {
             File anno4jRootPom = new File(System.getProperty("user.dir") + "/../pom.xml");
-            assertTrue(anno4jRootPom.exists());
+            assumeTrue(anno4jRootPom.exists());
             SystemCommand.runCommand("mvn -f " + anno4jRootPom.getAbsolutePath() + " -Dmaven.test.skip=true package assembly:single");
         }
 
@@ -143,7 +144,7 @@ public class RDFSJavaFileGeneratorTest {
         config.setValidators(ValidatorChain.getRDFSDefault());
 
         // Generate Java files from the ontology and store them in the output directory:
-        JavaFileGenerator generator = new RDFSJavaFileGenerator();
+        JavaFileGenerator generator = new OWLJavaFileGenerator();
         generator.addRDF(vehicleOntStream, "http://example.de/ont#");
         generator.generateJavaFiles(config, outputDir);
 
@@ -178,7 +179,7 @@ public class RDFSJavaFileGeneratorTest {
 
     @Test
     public void testInvalidOntology() throws Exception {
-        JavaFileGenerator generator = new RDFSJavaFileGenerator();
+        JavaFileGenerator generator = new OWLJavaFileGenerator();
 
         // Get the vehicle ontology from test resources:
         URL vehicleOntUrl = getClass().getClassLoader().getResource("vehicle.rdf.xml");

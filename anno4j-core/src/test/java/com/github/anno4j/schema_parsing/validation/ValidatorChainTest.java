@@ -2,7 +2,7 @@ package com.github.anno4j.schema_parsing.validation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.namespaces.XSD;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -25,15 +25,15 @@ public class ValidatorChainTest {
 
     private static Anno4j anno4j;
 
-    private static ExtendedRDFSClazz xsdPositiveInt;
+    private static BuildableRDFSClazz xsdPositiveInt;
 
-    private static ExtendedRDFSClazz myCustomType;
+    private static BuildableRDFSClazz myCustomType;
 
     @Before
     public void setUp() throws Exception {
         anno4j = new Anno4j();
-        xsdPositiveInt = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(XSD.POSITIVE_INTEGER));
-        myCustomType = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl("http://example.de/mct"));
+        xsdPositiveInt = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(XSD.POSITIVE_INTEGER));
+        myCustomType = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl("http://example.de/mct"));
     }
 
     @Test

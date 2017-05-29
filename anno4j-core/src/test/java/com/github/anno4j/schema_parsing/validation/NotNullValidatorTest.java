@@ -2,7 +2,7 @@ package com.github.anno4j.schema_parsing.validation;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.namespaces.RDFS;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -24,12 +24,12 @@ public class NotNullValidatorTest {
 
     private static Anno4j anno4j;
 
-    private static ExtendedRDFSClazz rdfsClazz;
+    private static BuildableRDFSClazz rdfsClazz;
 
     @Before
     public void setUp() throws Exception {
         anno4j = new Anno4j();
-        rdfsClazz = anno4j.createObject(ExtendedRDFSClazz.class, (Resource) new URIImpl(RDFS.CLAZZ));
+        rdfsClazz = anno4j.createObject(BuildableRDFSClazz.class, (Resource) new URIImpl(RDFS.CLAZZ));
     }
 
     @Test

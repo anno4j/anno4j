@@ -1,6 +1,9 @@
 package com.github.anno4j.schema_parsing.building;
 
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.schema.model.owl.OWLClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.validation.NotNullValidator;
 import com.github.anno4j.schema_parsing.validation.ValidatorChain;
 import com.squareup.javapoet.AnnotationSpec;
@@ -9,6 +12,9 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
 import java.util.Arrays;
@@ -24,18 +30,20 @@ import static org.junit.Assert.*;
  */
 public class PropertySupportSpecTest {
 
-    private static RDFSModelBuilder modelBuilder;
+    private static OntologyModelBuilder modelBuilder;
 
     private static OntGenerationConfig generationConfig;
 
+    private RDFSClazz declaringClass;
+
     /**
-     * Returns a {@link ExtendedRDFSProperty} instance from {@link #modelBuilder}
+     * Returns a {@link BuildableRDFSProperty} instance from {@link #modelBuilder}
      * with the specified URI.
      * @param uri The URI to get the property object for.
      * @return The property object or null if no property with the given URI is in the model.
      */
-    private static ExtendedRDFSProperty getPropertyFromModel(String uri) {
-        for(ExtendedRDFSProperty property : modelBuilder.getProperties()) {
+    private static BuildableRDFSProperty getPropertyFromModel(String uri) throws RepositoryException {
+        for(BuildableRDFSProperty property : modelBuilder.getProperties()) {
             if(property.getResourceAsString().equals(uri)) {
                 return property;
             }
@@ -45,6 +53,8 @@ public class PropertySupportSpecTest {
 
     @Before
     public void setUp() throws Exception {
+        Anno4j anno4j = new Anno4j();
+
         generationConfig = new OntGenerationConfig();
         // Language preference:
         List<String> javaDocLangPreference = Arrays.asList("en", OntGenerationConfig.UNTYPED_LITERAL);
@@ -58,19 +68,21 @@ public class PropertySupportSpecTest {
         generationConfig.setValidators(chain);
 
         // Create a RDFS model builder instance:
-        VehicleOntologyLoader ontologyLoader = new VehicleOntologyLoader();
-        modelBuilder = ontologyLoader.getVehicleOntologyModelBuilder();
+        modelBuilder = new OWLJavaFileGenerator(anno4j);
+        VehicleOntologyLoader.addVehicleOntology(modelBuilder);
 
         // Build the ontology model:
         modelBuilder.build();
+
+        declaringClass = anno4j.createObject(OWLClazz.class, (Resource) new URIImpl("http://example.de/resource"));
     }
 
     @Test
     public void testSetterImplementation() throws Exception {
-        ExtendedRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
+        BuildableRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
         assertNotNull(seatNumProp);
 
-        MethodSpec setter = seatNumProp.buildSetterImplementation(generationConfig);
+        MethodSpec setter = seatNumProp.buildSetterImplementation(declaringClass, generationConfig);
 
         // Override annotation:
         AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
@@ -98,10 +110,10 @@ public class PropertySupportSpecTest {
 
     @Test
     public void testAdderImplementation() throws Exception {
-        ExtendedRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
+        BuildableRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
         assertNotNull(seatNumProp);
 
-        MethodSpec adder = seatNumProp.buildAdderImplementation(generationConfig);
+        MethodSpec adder = seatNumProp.buildAdderImplementation(declaringClass, generationConfig);
 
         // Override annotation:
         AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
@@ -127,10 +139,10 @@ public class PropertySupportSpecTest {
 
     @Test
     public void testAdderAllImplementation() throws Exception {
-        ExtendedRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
+        BuildableRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
         assertNotNull(seatNumProp);
 
-        MethodSpec adderAll = seatNumProp.buildAdderAllImplementation(generationConfig);
+        MethodSpec adderAll = seatNumProp.buildAdderAllImplementation(declaringClass, generationConfig);
 
         // Override annotation:
         AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
@@ -158,10 +170,10 @@ public class PropertySupportSpecTest {
 
     @Test
     public void testRemoverImplementation() throws Exception {
-        ExtendedRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
+        BuildableRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
         assertNotNull(seatNumProp);
 
-        MethodSpec remover = seatNumProp.buildRemoverImplementation(generationConfig);
+        MethodSpec remover = seatNumProp.buildRemoverImplementation(declaringClass, generationConfig);
 
         // Override annotation:
         AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
@@ -187,10 +199,10 @@ public class PropertySupportSpecTest {
 
     @Test
     public void testRemoverAllImplementation() throws Exception {
-        ExtendedRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
+        BuildableRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
         assertNotNull(seatNumProp);
 
-        MethodSpec adderAll = seatNumProp.buildRemoverAllImplementation(generationConfig);
+        MethodSpec adderAll = seatNumProp.buildRemoverAllImplementation(declaringClass, generationConfig);
 
         // Override annotation:
         AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();

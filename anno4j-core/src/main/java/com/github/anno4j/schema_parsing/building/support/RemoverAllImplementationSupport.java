@@ -1,23 +1,25 @@
 package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
+import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.squareup.javapoet.*;
+import org.openrdf.repository.RepositoryException;
 
 /**
- * Support class (of {@link ExtendedRDFSProperty}) for generating
+ * Support class (of {@link BuildableRDFSProperty}) for generating
  * removeAll* methods of support classes.
  */
 @Partial
-public abstract class RemoverAllImplementationSupport extends RemoverAllSupport implements ExtendedRDFSProperty {
+public abstract class RemoverAllImplementationSupport extends RemoverAllSupport implements BuildableRDFSProperty {
 
     @Override
-    public MethodSpec buildRemoverAllImplementation(OntGenerationConfig config) {
+    public MethodSpec buildRemoverAllImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
         // Get the signature of a remover for this property:
-        MethodSpec signature = buildSignature(config);
+        MethodSpec signature = buildSignature(domainClazz, config);
 
         if(signature != null) {
             // We will extend the signature by its implementation:
@@ -27,7 +29,7 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
 
             // Get the Java class name of the properties range:
-            ExtendedRDFSClazz range = findSingleRangeClazz();
+            BuildableRDFSClazz range = findSingleRangeClazz();
             ClassName rangeClassName = range.getJavaPoetClassName(config);
 
             // Get a JavaPoet name for the methods single parameter:
@@ -37,14 +39,14 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             // Prepare iterating the values of the parameter set:
             ParameterSpec param = ParameterSpec.builder(paramType, paramName).build();
             ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
-            MethodSpec remover = buildRemover(config);
+            MethodSpec remover = buildRemover(domainClazz, config);
 
             // Prepare Set and HashSet types:
             TypeName set = ParameterizedTypeName.get(ClassName.get("java.util", "Set"), rangeClassName);
             TypeName hashSet = ParameterizedTypeName.get(ClassName.get("java.util", "HashSet"), rangeClassName);
 
             // Get the annotated field for this property:
-            FieldSpec field = buildAnnotatedField(config);
+            FieldSpec field = buildAnnotatedField(domainClazz, config);
 
             // Iterate the input values and check if the value was actually removed from this property:
             removerAllBuilder.addStatement("boolean changed = false")
@@ -64,18 +66,23 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             // The values can be safely removed also from superproperties
             // if they were actually removed from this one (see above generated if-clause):
             removerAllBuilder.addComment("Remove from superproperties:");
-            for (ExtendedRDFSProperty superProperty : getSuperproperties()) {
-                String superRemoverAllName = superProperty.buildRemoverAll(config).name;
-                removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", superRemoverAllName);
+            for (RDFSProperty superProperty : getSuperproperties()) {
+                // Ignore superproperties from special vocabulary and the reflexive relation:
+                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
+                    String superRemoverAllName = asBuildableProperty(superProperty).buildRemoverAll(domainClazz, config).name;
+                    removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", superRemoverAllName);
+                }
             }
 
             // The value can be safely removed from subproperties
             // if it was actually removed from this one (see above generated if-clause):
             removerAllBuilder.addComment("Remove values from subproperties:");
             for(RDFSProperty subProperty : getSubProperties()) {
-                String subPropertyRemoverAllName = ((ExtendedRDFSProperty) subProperty).buildRemoverAll(config).name;
-
-                removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", subPropertyRemoverAllName);
+                // Ignore subproperties from special vocabulary and the reflexive relation:
+                if(!isFromSpecialVocabulary(subProperty) && !subProperty.equals(this)) {
+                    String subPropertyRemoverAllName = ((BuildableRDFSProperty) subProperty).buildRemoverAll(domainClazz, config).name;
+                    removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", subPropertyRemoverAllName);
+                }
             }
 
             removerAllBuilder.endControlFlow(); // End if(!_containedValues.isEmpty())

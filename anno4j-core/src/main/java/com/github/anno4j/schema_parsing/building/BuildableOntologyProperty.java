@@ -1,9 +1,11 @@
 package com.github.anno4j.schema_parsing.building;
 
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
+import org.openrdf.repository.RepositoryException;
 
 /**
  * Provides support for building Java methods for RDF properties.
@@ -17,7 +19,7 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * @return The class name of the properties domains common superclass based on <code>config</code>
      * or null if no such class can be determined.
      */
-    ClassName getDomainJavaPoetClassName(OntGenerationConfig config);
+    ClassName getDomainJavaPoetClassName(OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Returns the JavaPoet class name of the most specific common superclass of all
@@ -26,7 +28,7 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * @return The class name of the properties ranges common superclass based on <code>config</code>
      * or null if no such class can be determined.
      */
-    ClassName getRangeJavaPoetClassName(OntGenerationConfig config);
+    ClassName getRangeJavaPoetClassName(OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Returns an {@link IdentifierBuilder} instance for generating identifiers for this
@@ -58,97 +60,141 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
     /**
      * Generates a JavaPoet specification of an <code>@Iri</code>-annotated field for this property,
      * which can be used in Anno4j support classes.
+     * @param domainClazz The class in which context the field should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet field specification for this property or null
      * if no range was provided for this property.
      */
-    FieldSpec buildAnnotatedField(OntGenerationConfig config);
+    FieldSpec buildAnnotatedField(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object getter
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildGetter(OntGenerationConfig config);
+    MethodSpec buildGetter(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Support class getter
      * for this property.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildGetterImplementation(OntGenerationConfig config);
+    MethodSpec buildGetterImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object setter
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildSetter(OntGenerationConfig config);
+    MethodSpec buildSetter(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
+
 
     /**
      * Generates a JavaPoet method specification for a Support class setter
      * for this property.
      * Checks whether the provided values are in range are added to the methods
      * definition.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildSetterImplementation(OntGenerationConfig config);
+    MethodSpec buildSetterImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
+
+    /**
+     * Generates a JavaPoet method specification for a Anno4j resource object variable argument setter
+     * for this property.
+     * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
+     * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
+     * @param config The configuration for building the method specification.
+     * @return The JavaPoet method specification for this property or null
+     * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    MethodSpec buildVarArgSetter(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
+
+    /**
+     * Generates a JavaPoet method specification for a Support class variable argument setter
+     * for this property.
+     * Checks whether the provided values are in range are added to the methods
+     * definition.
+     * @param domainClazz The class in which context the method should be generated.
+     * @param config The configuration for building the method specification.
+     * @return The JavaPoet method specification for this property or null
+     * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    MethodSpec buildVarArgSetterImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object add-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildAdder(OntGenerationConfig config);
+    MethodSpec buildAdder(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Support class add-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property or an error occurs.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildAdderImplementation(OntGenerationConfig config);
+    MethodSpec buildAdderImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object add-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildAdderAll(OntGenerationConfig config);
+    MethodSpec buildAdderAll(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Support class add-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property or an error occurs.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildAdderAllImplementation(OntGenerationConfig config);
+    MethodSpec buildAdderAllImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object remove-method
@@ -158,39 +204,46 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildRemover(OntGenerationConfig config);
+    MethodSpec buildRemover(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Support class remove-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property or an error occurs.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildRemoverImplementation(OntGenerationConfig config);
+    MethodSpec buildRemoverImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object removeAll-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildRemoverAll(OntGenerationConfig config);
+    MethodSpec buildRemoverAll(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Support class removeAll-method
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
      * configuration provided.
+     * @param domainClazz The class in which context the method should be generated.
      * @param config The configuration for building the method specification.
      * @return The JavaPoet method specification for this property or null
      * if no range was provided for this property or an error occurs.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    MethodSpec buildRemoverAllImplementation(OntGenerationConfig config);
+    MethodSpec buildRemoverAllImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 }

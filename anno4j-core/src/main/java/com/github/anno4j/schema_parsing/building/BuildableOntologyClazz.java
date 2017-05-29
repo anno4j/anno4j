@@ -4,6 +4,7 @@ import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.openrdf.annotations.Iri;
+import org.openrdf.repository.RepositoryException;
 
 import java.util.List;
 import java.util.Set;
@@ -36,7 +37,7 @@ public interface BuildableOntologyClazz extends BuildableOntologyResource {
      * {@link com.github.anno4j.schema_parsing.mapping.DatatypeMapper} returns a Java type
      * that is not supported by Anno4j.
      */
-    ClassName getJavaPoetClassName(OntGenerationConfig config);
+    ClassName getJavaPoetClassName(OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet {@link TypeSpec} of a resource object interface for this RDFS class.
@@ -44,8 +45,9 @@ public interface BuildableOntologyClazz extends BuildableOntologyResource {
      * and all methods representing properties which this class is domain of.
      * @param config Configuration for the generation. E.g. specifies which language to use for JavaDoc.
      * @return The type specification for a resource object interface for this RDFS class.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    TypeSpec buildTypeSpec(OntGenerationConfig config);
+    TypeSpec buildTypeSpec(OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet {@link TypeSpec} of a support class for this RDFS class.
@@ -53,6 +55,7 @@ public interface BuildableOntologyClazz extends BuildableOntologyResource {
      * imposed by e.g. a XSD datatype.
      * @param config Configuration for the generation. E.g. specifies which language to use for JavaDoc.
      * @return The type specification for a support class for this RDFS class.
+     *
      */
-    TypeSpec buildSupportTypeSpec(OntGenerationConfig config);
+    TypeSpec buildSupportTypeSpec(OntGenerationConfig config) throws RepositoryException;
 }

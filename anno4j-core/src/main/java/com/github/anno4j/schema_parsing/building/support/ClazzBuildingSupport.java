@@ -2,17 +2,26 @@ package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.namespaces.OWL;
+import com.github.anno4j.model.namespaces.RDF;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.model.namespaces.XSD;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema.model.rdfs.RDFSClazzSupport;
+import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.mapping.DatatypeMapper;
 import com.github.anno4j.schema_parsing.mapping.IllegalMappingException;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSClazz;
-import com.github.anno4j.schema_parsing.model.ExtendedRDFSProperty;
-import com.github.anno4j.schema.model.rdfs.RDFSClazzSupport;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
+import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.naming.ClassNameBuilder;
 import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.squareup.javapoet.ClassName;
+import org.openrdf.query.BooleanQuery;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.LangString;
 
 import java.net.URISyntaxException;
@@ -20,11 +29,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Support class for {@link ExtendedRDFSClazz} implementing basic methods
+ * Support class for {@link BuildableRDFSClazz} implementing basic methods
  * for JavaPoet class generation for this class.
  */
 @Partial
-public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements ExtendedRDFSClazz {
+public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements BuildableRDFSClazz {
 
     @Override
     public String getJavaPackageName() {
@@ -62,8 +71,9 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
     }
 
     @Override
-    public ClassName getJavaPoetClassName(OntGenerationConfig config) {
-        if (getResourceAsString().equals(RDFS.CLAZZ) || getResourceAsString().equals(RDFS.RESOURCE)) {
+    public ClassName getJavaPoetClassName(OntGenerationConfig config) throws RepositoryException {
+        if (getResourceAsString().equals(RDFS.CLAZZ) || getResourceAsString().equals(RDFS.RESOURCE)
+                || getResourceAsString().equals(OWL.THING)) {
             return ClassName.get(ResourceObject.class);
 
         }
@@ -159,10 +169,10 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
             }
 
             // Add information about incoming and outgoing properties:
-            for (ExtendedRDFSProperty incomingProp : getIncomingProperties()) {
+            for (RDFSProperty incomingProp : getIncomingProperties()) {
                 nameBuilder = nameBuilder.withIncomingProperty(incomingProp);
             }
-            for (ExtendedRDFSProperty outgoingProp : getOutgoingProperties()) {
+            for (RDFSProperty outgoingProp : getOutgoingProperties()) {
                 nameBuilder = nameBuilder.withOutgoingProperty(outgoingProp);
             }
 
@@ -220,20 +230,72 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements E
     }
 
     @Override
-    public boolean hasPropertyTransitive(ExtendedRDFSProperty property) {
-        // If the class has the property, immediately return:
-        if (getOutgoingProperties().contains(property)) {
-            return true;
-        }
+    public boolean hasPropertyTransitive(RDFSProperty property) throws RepositoryException {
+        try {
+            BooleanQuery query = getObjectConnection().prepareBooleanQuery(QueryLanguage.SPARQL,
+                    "ASK {" +
+                            "   {" +
+                            "       <" + property.getResourceAsString() + "> rdfs:domain <" + getResourceAsString() + "> . " +
+                            "   }" +
+                            "   UNION" +
+                            "   {" +
+                            "       <" + getResourceAsString() + "> rdfs:subClassOf+ ?s ." +
+                            "       <" + property.getResourceAsString() + "> rdfs:domain ?s ." +
+                            "   }" +
+                            "}"
+            );
 
-        // Recursively search in superclasses:
-        for (ExtendedRDFSClazz superClazz : getSuperclazzes()) {
-            if (superClazz.hasPropertyTransitive(property)) {
-                return true;
-            }
+            return query.evaluate();
+        } catch (QueryEvaluationException | MalformedQueryException e) {
+            throw new RepositoryException(e);
         }
+    }
 
-        // The property was neither found in this class or any superclass:
-        return false;
+    /**
+     * Returns the given resource in {@link BuildableRDFSProperty} type.
+     * @param property The property resource which should be converted.
+     * @return The property in the {@link BuildableRDFSProperty} type or null if there is no such property
+     * in the repository.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    BuildableRDFSProperty asBuildableProperty(RDFSProperty property) throws RepositoryException {
+        try {
+            return getObjectConnection().findObject(BuildableRDFSProperty.class, property.getResource());
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    /**
+     * Returns the given resource in {@link BuildableRDFSClazz} type.
+     * @param clazz The class resource which should be converted.
+     * @return The class in the {@link BuildableRDFSClazz} type or null if there is no such class
+     * in the repository.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+     BuildableRDFSClazz asBuildableClazz(RDFSClazz clazz) throws RepositoryException {
+        try {
+            return getObjectConnection().findObject(BuildableRDFSClazz.class, clazz.getResource());
+        } catch (QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    /**
+     * Returns whether the given resource is from one of the following vocabularies:
+     * <ul>
+     *     <li>{@link RDF}</li>
+     *     <li>{@link RDFS}</li>
+     *     <li>{@link OWL}</li>
+     *     <li>{@link XSD}</li>
+     * </ul>
+     * @param resource The resource to check.
+     * @return Returns true iff the resource is from one of the above vocabularies.
+     */
+     static boolean isFromSpecialVocabulary(ResourceObject resource) {
+         return resource.getResourceAsString().startsWith(RDF.NS)
+                 || resource.getResourceAsString().startsWith(RDFS.NS)
+                 || resource.getResourceAsString().startsWith(OWL.NS)
+                 || resource.getResourceAsString().startsWith(XSD.NS);
     }
 }

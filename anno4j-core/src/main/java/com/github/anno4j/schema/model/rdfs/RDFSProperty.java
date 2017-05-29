@@ -62,18 +62,18 @@ public interface RDFSProperty extends RDFSSchemaResource {
      * The property rdfs:subPropertyOf is an instance of rdf:Property that is used to state that all resources related by one property are also related by another.
      */
     @Iri(RDFS.SUB_PROPERTY_OF)
-    void setSubProperties(Set<RDFSProperty> subProperties);
+    void setSuperproperties(Set<RDFSProperty> subProperties);
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subpropertyof
      * The property rdfs:subPropertyOf is an instance of rdf:Property that is used to state that all resources related by one property are also related by another.
      */
     @Iri(RDFS.SUB_PROPERTY_OF)
-    Set<RDFSProperty> getSubProperties();
+    Set<RDFSProperty> getSuperproperties();
 
     /**
      * Refers to https://www.w3.org/TR/rdf-schema/#ch_subpropertyof
      * The property rdfs:subPropertyOf is an instance of rdf:Property that is used to state that all resources related by one property are also related by another.
      */
-    void addSubProperty(RDFSProperty subProperty);
+    void addSuperproperty(RDFSProperty superProperty);
 }

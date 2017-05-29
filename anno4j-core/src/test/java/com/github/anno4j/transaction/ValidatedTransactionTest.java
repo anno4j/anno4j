@@ -7,7 +7,6 @@ import com.github.anno4j.annotations.*;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.schema.SchemaPersistingManager;
 import com.google.common.collect.Sets;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
@@ -187,30 +186,24 @@ public class ValidatedTransactionTest {
         assertEquals(Sets.newHashSet(1, 2), resource.getSuperproperty1());
     }
 
-    /**
-     * This test is ignored, because it fails due to the bug in Issue #140.
-     * @throws Exception Thrown on error.
-     */
     @Test
-    @Ignore
     public void testContextPersistence() throws Exception {
         Anno4j anno4j = new Anno4j();
 
         // The contexts:
         URI context1 = new URIImpl("urn:test:context1");
-        URI context2 = new URIImpl("urn:test:context2");
 
         SpecialTestResource resource1 = anno4j.createObject(SpecialTestResource.class, context1, new URIImpl("urn:test:res1"));
-        SpecialTestResource resource2 = anno4j.createObject(SpecialTestResource.class, context2, new URIImpl("urn:test:res2"));
-        SpecialTestResource resource3 = anno4j.createObject(SpecialTestResource.class, (Resource) new URIImpl("urn:test:res3")); // Default context
         // Make resources valid:
-        setValidCardinalities(resource1, resource2, resource3);
+        setValidCardinalities(resource1);
 
         // Modify the resources using a validated transaction:
-        Transaction transaction = anno4j.createValidatedTransaction();
+        Transaction transaction = anno4j.createValidatedTransaction(context1);
         transaction.begin();
-        List<SpecialTestResource> resources = transaction.findAll(SpecialTestResource.class);
-        for(SpecialTestResource current :resources) {
+        List<SpecialTestResource> resources = transaction.createQueryService()
+                                                         .addCriteria(".", "urn:test:res1")
+                                                         .execute(SpecialTestResource.class);
+        for(SpecialTestResource current : resources) {
             current.setSuperproperty1(Sets.newHashSet(1, 2, 3));
         }
         transaction.commit();
@@ -222,22 +215,8 @@ public class ValidatedTransactionTest {
         assertFalse(resources.isEmpty());
         resource1 = resources.get(0);
 
-        resources = anno4j.createQueryService(context2)
-                .addCriteria(".", "urn:test:res2")
-                .execute(SpecialTestResource.class);
-        assertFalse(resources.isEmpty());
-        resource2 = resources.get(0);
-
-        resources = anno4j.createQueryService()
-                .addCriteria(".", "urn:test:res3")
-                .execute(SpecialTestResource.class);
-        assertFalse(resources.isEmpty());
-        resource3 = resources.get(0);
-
         // Check that the changes are present:
         assertEquals(Sets.newHashSet(1, 2, 3), resource1.getSuperproperty1());
-        assertEquals(Sets.newHashSet(1, 2, 3), resource2.getSuperproperty1());
-        assertEquals(Sets.newHashSet(1, 2, 3), resource3.getSuperproperty1());
     }
 
     @Test

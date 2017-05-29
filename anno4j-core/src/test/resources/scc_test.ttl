@@ -32,3 +32,20 @@ ex:N rdfs:subClassOf ex:O .
 ex:P rdfs:subClassOf ex:O .
 ex:O rdfs:subClassOf ex:M .
 ex:P rdfs:subClassOf ex:K .
+
+ex:A a rdfs:Class .
+ex:B a rdfs:Class .
+ex:C a rdfs:Class .
+ex:D a rdfs:Class .
+ex:E a rdfs:Class .
+ex:F a rdfs:Class .
+ex:G a rdfs:Class .
+ex:H a rdfs:Class .
+ex:I a rdfs:Class .
+ex:J a rdfs:Class .
+ex:K a rdfs:Class .
+ex:L a rdfs:Class .
+ex:M a rdfs:Class .
+ex:N a rdfs:Class .
+ex:O a rdfs:Class .
+ex:P a rdfs:Class .
