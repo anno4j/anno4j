@@ -6,10 +6,7 @@ import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.validation.NotNullValidator;
 import com.github.anno4j.schema_parsing.validation.ValidatorChain;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Resource;
@@ -158,7 +155,7 @@ public class PropertySupportSpecTest {
 
         // Parameter:
         ClassName set = ClassName.get(Set.class);
-        ParameterizedTypeName paramType = ParameterizedTypeName.get(set, ClassName.get(Integer.class));
+        ParameterizedTypeName paramType = ParameterizedTypeName.get(set, WildcardTypeName.subtypeOf(ClassName.get(Integer.class)));
         assertEquals(1, adderAll.parameters.size());
         assertEquals(paramType, adderAll.parameters.get(0).type);
 
@@ -218,7 +215,7 @@ public class PropertySupportSpecTest {
 
         // Parameter:
         ClassName set = ClassName.get(Set.class);
-        ParameterizedTypeName paramType = ParameterizedTypeName.get(set, ClassName.get(Integer.class));
+        ParameterizedTypeName paramType = ParameterizedTypeName.get(set, WildcardTypeName.subtypeOf(ClassName.get(Integer.class)));
         assertEquals(1, adderAll.parameters.size());
         assertEquals(paramType, adderAll.parameters.get(0).type);
 

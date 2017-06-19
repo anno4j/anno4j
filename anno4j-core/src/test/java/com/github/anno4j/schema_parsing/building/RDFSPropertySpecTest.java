@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.WildcardTypeName;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Resource;
@@ -146,7 +147,7 @@ public class RDFSPropertySpecTest {
         assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
         assertEquals(1, loadCapSpec.parameters.size());
         ClassName setClass = ClassName.get("java.util", "Set");
-        assertEquals(ParameterizedTypeName.get(setClass, ClassName.get(Float.class)), loadCapSpec.parameters.get(0).type);
+        assertEquals(ParameterizedTypeName.get(setClass, WildcardTypeName.subtypeOf(ClassName.get(Float.class))), loadCapSpec.parameters.get(0).type);
 
         // Test JavaDoc:
         assertNotNull(loadCapSpec.javadoc);
@@ -189,7 +190,7 @@ public class RDFSPropertySpecTest {
         assertTrue(loadCapSpec.modifiers.contains(Modifier.PUBLIC));
         assertEquals(1, loadCapSpec.parameters.size());
         ClassName setClass = ClassName.get("java.util", "Set");
-        assertEquals(ParameterizedTypeName.get(setClass, ClassName.get(Float.class)), loadCapSpec.parameters.get(0).type);
+        assertEquals(ParameterizedTypeName.get(setClass, WildcardTypeName.subtypeOf(ClassName.get(Float.class))), loadCapSpec.parameters.get(0).type);
 
         // Test JavaDoc:
         assertNotNull(loadCapSpec.javadoc);
