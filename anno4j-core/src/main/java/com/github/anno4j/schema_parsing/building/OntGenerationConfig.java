@@ -68,6 +68,11 @@ public class OntGenerationConfig {
     private boolean checkFileOrFragmentAmbiguity = false;
 
     /**
+     * Defines the base package to which the generated package structure should be output to.
+     */
+    private String basePackage = "";
+
+    /**
      * Initializes the configuration with preference for untyped literals
      * for identifiers and JavaDoc.
      * Uses the default validator chain for RDFS (see {@link ValidatorChain#getRDFSDefault()}).
@@ -374,5 +379,37 @@ public class OntGenerationConfig {
      */
     public void setFileOrFragmentAmbiguityChecking(boolean checkFileOrFragmentAmbiguity) {
         this.checkFileOrFragmentAmbiguity = checkFileOrFragmentAmbiguity;
+    }
+
+    /**
+     * Returns the package into which all generated Java files (within their respective packages) are
+     * written to.
+     * <br><br>
+     * Example:<br>
+     * If the files should be put in your existing projects package {@code com.yourproject.model}
+     * specify the base package that way and {@link com.github.anno4j.schema_parsing.generation.JavaFileGenerator}
+     * will write Java files into subpackages (determined by the class URIs) and adopt the package declaration within
+     * the source files, e.g. {@code package com.yourproject.model.org.dbpedia}.
+     *
+     * @return Returns the base package.
+     */
+    public String getBasePackage() {
+        return basePackage;
+    }
+
+    /**
+     * Sets the package into which all generated Java files (within their respective packages) are
+     * written to.
+     * <br><br>
+     * Example:<br>
+     * If the files should be put in your existing projects package {@code com.yourproject.model}
+     * specify the base package that way and {@link com.github.anno4j.schema_parsing.generation.JavaFileGenerator}
+     * will write Java files into subpackages (determined by the class URIs) and adopt the package declaration within
+     * the source files, e.g. {@code package com.yourproject.model.org.dbpedia}.
+     *
+     * @param basePackage The base package.
+     */
+    public void setBasePackage(String basePackage) {
+        this.basePackage = basePackage;
     }
 }

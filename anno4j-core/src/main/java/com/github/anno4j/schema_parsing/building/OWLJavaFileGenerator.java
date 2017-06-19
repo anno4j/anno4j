@@ -340,6 +340,34 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
                 || resource.getResourceAsString().startsWith(OWL.NS);
     }
 
+    private File getAbsoluteOutputDirectory(File directory, OntGenerationConfig config) {
+        if(!config.getBasePackage().isEmpty()) {
+            // Work on the input directory with trailing slash:
+            String hook = directory.getAbsolutePath();
+            if(!hook.endsWith(File.separator)) {
+                hook += File.separator;
+            }
+
+            // Check for maximum length match of base package at the end of the input directory:
+            String[] basePackage = config.getBasePackage().split("\\.");
+            for (int i = basePackage.length - 1; i >= 0; i--) {
+                // Transform the current base package portion to a filesystem path part:
+                StringBuilder portion = new StringBuilder();
+                for (int j = 0; j <= i; j++) {
+                    portion.append(basePackage[j]).append(File.separator);
+                }
+
+                // Check if the input directory ends with this specific portion:
+                if(hook.endsWith(portion.toString())) {
+                    return new File(hook.substring(0, hook.lastIndexOf(portion.toString())));
+                }
+            }
+        }
+
+        // If the base package doesn't overlap:
+        return directory;
+    }
+
     @Override
     public ObjectConnection getConnection() throws RepositoryException {
         return anno4j.getObjectRepository().getConnection();
@@ -370,11 +398,22 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
             throw new JavaFileGenerationException("The built model is invalid!");
         }
 
+        // Get the actual output directory depending on the base package set:
+        outputDirectory = getAbsoluteOutputDirectory(outputDirectory, config);
+
         for (BuildableRDFSClazz clazz : getDistinctClasses()) {
             // Don't output files for classes that are from RDF/RDFS/... vocab and not for literal types:
             if (!isFromSpecialVocabulary(clazz) && !clazz.isLiteral()) {
 
+                // Determine the package to write to:
                 String clazzPackage = clazz.getJavaPackageName();
+                if(!config.getBasePackage().isEmpty()) {
+                    if(clazzPackage.isEmpty()) {
+                        clazzPackage = config.getBasePackage();
+                    } else {
+                        clazzPackage = config.getBasePackage() + "." + clazzPackage;
+                    }
+                }
 
                 JavaFile resourceObjectFile = JavaFile.builder(clazzPackage, clazz.buildTypeSpec(config))
                         .build();
