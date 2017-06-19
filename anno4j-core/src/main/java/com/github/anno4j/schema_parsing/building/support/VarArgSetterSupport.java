@@ -3,16 +3,13 @@ package com.github.anno4j.schema_parsing.building.support;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
-import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
-import com.github.anno4j.schema_parsing.naming.ClassNameBuilder;
-import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
-import com.github.anno4j.schema_parsing.naming.MethodNameBuilder;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ArrayTypeName;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
-import java.net.URISyntaxException;
 
 /**
  * Support class belonging to {@link BuildableRDFSProperty} that adds functionality
@@ -30,7 +27,7 @@ public abstract class VarArgSetterSupport extends SetterBuildingSupport implemen
             TypeName paramType = ArrayTypeName.of(getParameterType(config, false));
 
 
-            return setter.addParameter(paramType, getParameterName())
+            return setter.addParameter(paramType, "values")
                          .varargs()
                          .build();
         } else {

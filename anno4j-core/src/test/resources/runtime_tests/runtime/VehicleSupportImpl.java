@@ -16,9 +16,9 @@ public class VehicleSupportImpl extends VehicleSupport {
 
     public VehicleSupportImpl() {
         // Initialize the property fields:
-        seatNums = new HashSet<>();
-        names = new HashSet<>();
-        officialNames = new HashSet<>();
+        numberOfSeats = new HashSet<>();
+        hasNames = new HashSet<>();
+        hasOfficialNames = new HashSet<>();
     }
 
     @Override
@@ -28,22 +28,22 @@ public class VehicleSupportImpl extends VehicleSupport {
 
     @Override
     public Set<? extends CharSequence> getHasOfficialNames() {
-        return officialNames;
+        return hasOfficialNames;
     }
 
     @Override
     public Set<? extends CharSequence> getHasNames() {
-        return names;
+        return hasNames;
     }
 
     @Override
     public Set<Integer> getNumberOfSeats() {
-        return seatNums;
+        return numberOfSeats;
     }
 
     @Override
-    public void setHasNames(Set<? extends CharSequence> names) {
-        super.setHasNames(names);
+    public void setHasNames(Set<? extends CharSequence> hasNames) {
+        super.setHasNames(hasNames);
     }
 
     @Override

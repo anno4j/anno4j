@@ -38,7 +38,6 @@ public class OntGenerationConfig {
      */
     private List<String> javadocLangPreference = new ArrayList<>();
 
-
     /**
      * The validators used to validate setter and adder arguments.
      */

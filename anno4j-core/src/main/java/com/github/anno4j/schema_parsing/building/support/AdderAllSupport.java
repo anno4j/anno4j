@@ -46,15 +46,8 @@ public abstract class AdderAllSupport extends PropertyBuildingSupport implements
             // Add a throws declaration if the value space is constrained:
             addJavaDocExceptionInfo(javaDoc, range, config);
 
-            // Create name builder with the preferred RDFS label if available:
-            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
-            CharSequence preferredLabel = getPreferredRDFSLabel(config);
-            if (preferredLabel != null) {
-                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
-            }
-
-            return methodNameBuilder
-                    .getJavaPoetMethodSpec("addAll", true)
+            return MethodNameBuilder.forObjectRepository(getObjectConnection())
+                    .getJavaPoetMethodSpec("addAll", this, config, true)
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(paramType, "values")

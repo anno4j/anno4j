@@ -1,12 +1,18 @@
 package com.github.anno4j.schema_parsing.naming;
 
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.schema.model.rdfs.RDFSSchemaResource;
+import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectRepository;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.regex.Matcher;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -24,19 +30,6 @@ public class IdentifierBuilder {
          * {@inheritDoc}
          */
         public NameBuildingException(String message) {
-            super(message);
-        }
-    }
-
-    /**
-     * Thrown if a name should be extracted from URI while this is a blank node.
-     */
-    public class BlankNodeException extends NameBuildingException {
-
-        /**
-         * {@inheritDoc}
-         */
-        public BlankNodeException(String message) {
             super(message);
         }
     }
@@ -62,70 +55,35 @@ public class IdentifierBuilder {
     private static final Pattern URI_VALIDATION_REGEX = Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
     /**
-     * The resource to build a name for.
+     * Connection to use for building names, e.g. to disambiguate the identifiers.
      */
-    private String resource;
+    private ObjectConnection connection;
 
     /**
-     * The rdfs:label assigned to the resource.
-     * Used for constructing more meaningful names.
+     * Initializes the builder with a connection to a repository.
+     * @param connection The connection to use later.
      */
-    private String rdfsLabel;
-
-    /**
-     * @param resource The resource to build a name for.
-     */
-    protected IdentifierBuilder(String resource) {
-        this.resource = resource;
+    IdentifierBuilder(ObjectConnection connection) {
+        this.connection = connection;
     }
 
     /**
-     * Creates a new builder object.
-     * @param resource The resource to build a name for.
-     * @return A builder instance.
+     * Returns a builder object that operates on the given repository.
+     * @param repository The repository to use, e.g. for name disambiguation.
+     * @return An instance of the builder.
+     * @throws RepositoryException Thrown if an error occurs while opening a connection to the repository.
      */
-    public static IdentifierBuilder builder(String resource) {
-        return new IdentifierBuilder(resource);
+    public static IdentifierBuilder forObjectRepository(ObjectRepository repository) throws RepositoryException {
+        return forObjectRepository(repository.getConnection());
     }
 
     /**
-     * Supplies a rdfs:label for the resource to the builder,
-     * which is used for constructing more meaningful names.
-     * @param label A rdfs:label literal assigned to the resource.
-     * @return Reference to the builder in order to enable method chaining.
+     * Returns a builder object that operates on the connected repository.
+     * @param connection A connection to the repository to use, e.g. for name disambiguation.
+     * @return An instance of the builder.
      */
-    public IdentifierBuilder withRDFSLabel(String label) {
-        rdfsLabel = label;
-        return this;
-    }
-
-    /**
-     * @return The resource ID or URI that this builder constructs a name for.
-     */
-    public String getResource() {
-        return resource;
-    }
-
-    /**
-     * @return The rdfs:label assigned to the resource.
-     * Used for constructing more meaningful names.
-     */
-    public String getRdfsLabel() {
-        return rdfsLabel;
-    }
-
-    /**
-     * @return Returns true iff the resource is a blank node.
-     */
-    protected boolean isBlankNode() {
-        // IDs of blank nodes do not conform to URI specification:
-        Matcher matcher = URI_VALIDATION_REGEX.matcher(resource);
-
-        // Require that the URI has at least a scheme and authority part:
-        return !(matcher.matches()
-                && matcher.groupCount() >= 4
-                && matcher.group(2) != null
-                && matcher.group(4) != null);
+    public static IdentifierBuilder forObjectRepository(ObjectConnection connection) {
+        return new IdentifierBuilder(connection);
     }
 
     /**
@@ -172,28 +130,36 @@ public class IdentifierBuilder {
 
     /**
      * Returns the filename or fragment of a given URI.
-     * @return The fragment or filename.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If no fragment or filename can be found in the URI.
-     * @throws BlankNodeException If the URI represents a blank node.
+     * @param resource The resource for which to extract the fragment or filename.
+     * @return The fragment or filename or an deterministically chosen, unique name for the resource.
      */
-    private String getFileOrFragmentName() throws URISyntaxException, NameBuildingException {
-        // We cannot get a filename or fragment for a blank node:
-        if(isBlankNode()) {
-            throw new BlankNodeException("Cannot get a filename or fragment for a blank node");
-        }
+    private String getFileOrFragmentName(ResourceObject resource) {
 
-        URI u = new URI(resource);
+        URI u = null;
+        try {
+            u = new URI(resource.getResourceAsString());
+        } catch (URISyntaxException e) {
+            return "Unnamed" + resource.getResourceAsString().hashCode();
+        }
+        // Handle fragments, i.e. trailing components preceeded by "#":
         if(u.getFragment() != null) {
             return u.getFragment();
         }
+        // Handle URLs with paths. Pick the name of the last folder/file:
         if(u.getPath() != null) {
             String[] splits = u.getPath().split("/");
             if(!splits[splits.length - 1].isEmpty()) {
                 return splits[splits.length - 1];
             }
         }
-        throw new NameBuildingException("No fragment or filename can be found in " + resource + ".");
+        // Handle URNs:
+        if(u.toString().startsWith("urn:")) {
+            String[] splits = u.toString().split(":");
+            if(!splits[splits.length - 1].isEmpty()) {
+                return splits[splits.length - 1];
+            }
+        }
+        return "Unnamed" + resource.getResourceAsString().hashCode();
     }
 
     /**
@@ -205,53 +171,136 @@ public class IdentifierBuilder {
      * If a portion of the hostname contains a special character that is not a hyphen then this character is left out
      * in the package name.
      *
-     * @return Returns the package name for the given URI. If the hostname is a IP address or the resource is a blank node
+     * @param object The resource for which to get the package name for.
+     * @return Returns the package name for the given resource. If the hostname is a IP address or the resource is a blank node
      * then the default package "" is returned.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}
-     * and the requirement for a hostname component.
      */
-    public String packageName() throws URISyntaxException {
-        if(isBlankNode()) {
+    public String packageName(ResourceObject object) {
+        URI u;
+        try {
+            u = new URI(object.getResourceAsString());
+        } catch (URISyntaxException e) {
             return "";
-        } else {
-            URI u = new URI(resource);
-            if(u.getHost() != null) {
+        }
 
-                String[] splits = u.getHost().toLowerCase().split("\\.");
+        if(u.getHost() != null) {
 
-                // Iterate the components in reverse order to generate a package style name:
-                List<String> packageNamePortions = new LinkedList<>();
-                for (int i = splits.length - 1; i >= 0; i--) {
-                    // Package names can't be empty, only numbers (IPv4 addresses) or contain colons (IPv6):
-                    if(!splits[i].isEmpty() && !splits[i].matches("[0-9]+") && !splits[i].contains(":")) {
+            String[] splits = u.getHost().toLowerCase().split("\\.");
 
-                        String portion;
-                        try {
-                            portion = toJavaName(splits[i]); // Make Java compliant
-                            packageNamePortions.add(portion);
+            // Iterate the components in reverse order to generate a package style name:
+            List<String> packageNamePortions = new LinkedList<>();
+            for (int i = splits.length - 1; i >= 0; i--) {
+                // Package names can't be empty, only numbers (IPv4 addresses) or contain colons (IPv6):
+                if(!splits[i].isEmpty() && !splits[i].matches("[0-9]+") && !splits[i].contains(":")) {
 
-                        } catch (IllegalArgumentException ignored) { }
-                    }
+                    String portion;
+                    try {
+                        portion = toJavaName(splits[i]); // Make Java compliant
+                        packageNamePortions.add(portion);
+
+                    } catch (IllegalArgumentException ignored) { }
                 }
-
-                if(packageNamePortions.size() > 0) {
-                    StringBuilder packageName = new StringBuilder();
-
-                    // Join the portions of the package name found to a package name separated by '.':
-                    ListIterator<String> portionIter = packageNamePortions.listIterator();
-                    while(portionIter.hasNext()) {
-                        packageName.append(portionIter.next());
-                        if(portionIter.hasNext()) {
-                            packageName.append(".");
-                        }
-                    }
-                    return packageName.toString();
-                } else {
-                    return "";
-                }
-            } else {
-                throw new URISyntaxException(resource, "The URI does not contain a host component.");
             }
+
+            if(packageNamePortions.size() > 0) {
+                StringBuilder packageName = new StringBuilder();
+
+                // Join the portions of the package name found to a package name separated by '.':
+                ListIterator<String> portionIter = packageNamePortions.listIterator();
+                while(portionIter.hasNext()) {
+                    packageName.append(portionIter.next());
+                    if(portionIter.hasNext()) {
+                        packageName.append(".");
+                    }
+                }
+                return packageName.toString();
+            } else {
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Returns the RDFS label preferred by the given configuration.
+     * @param resource The resource for which to get a label.
+     * @param config The configuration object specifying the language preference.
+     * @return Returns the RDFS label preferred or null if no label could be found.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    private String getPreferredRDFSLabel(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
+        try {
+            RDFSSchemaResource schemaResource = connection.findObject(RDFSSchemaResource.class, resource.getResource());
+            if(schemaResource != null) {
+                CharSequence bestLabel = null;
+                for (CharSequence label : schemaResource.getLabels()) {
+                    if (config.isPreferredForIdentifiers(label, bestLabel)) {
+                        bestLabel = label;
+                    }
+                }
+                if (bestLabel != null) {
+                    return bestLabel.toString();
+                } else {
+                    return null;
+                }
+
+            } else { // Something that is not a RDFS resource has no RDFS label:
+                return null;
+            }
+
+        } catch (QueryEvaluationException | RepositoryException e) {
+            throw new RepositoryException();
+        }
+    }
+
+    private boolean isRDFSLabelUnique(ResourceObject resource, String label) throws RepositoryException {
+        // A conflicting label may be lead by some non-alphanumeric characters:
+        StringBuilder regex = new StringBuilder("([^a-zA-Z0-9])*");
+        for(int i = 0; i < label.length(); i++) {
+            char c = label.charAt(i);
+            if(Character.isJavaIdentifierPart(c)) {
+                regex.append(c);
+            }
+            // Between each char (and at the end) there may be non-alphanumeric chars (would be pruned out by name generation):
+            regex.append("([^0-9a-zA-Z])*");
+        }
+
+        try {
+            return !connection.prepareBooleanQuery(QueryLanguage.SPARQL,
+                    "ASK {" +
+                            "   ?s rdfs:label ?l . " +
+                            "   FILTER( ?s != <" + resource.getResourceAsString() + "> && REGEX(LCASE(str(?l)), \"" + regex + "\") )" +
+                            "}"
+            ).evaluate();
+        } catch (MalformedQueryException | QueryEvaluationException | RepositoryException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    private boolean isFileOrFragmentNameUnique(ResourceObject resource) throws RepositoryException {
+        String fragment = getFileOrFragmentName(resource);
+        // A conflicting label may be lead by a sperator and some non-alphanumeric characters:
+        StringBuilder regex = new StringBuilder("(.*)(:|/|#)([^a-zA-Z0-9])*");
+        for(int i = 0; i < fragment.length(); i++) {
+            char c = fragment.charAt(i);
+            if(Character.isJavaIdentifierPart(c)) {
+                regex.append(c);
+            }
+            // Between each char (and at the end) there may be non-alphanumeric chars (would be pruned out by name generation):
+            regex.append("([^a-zA-Z0-9])*");
+        }
+        regex.append("$");
+
+        try {
+            return !connection.prepareBooleanQuery(QueryLanguage.SPARQL,
+                    "ASK {" +
+                            "   ?s ?p ?o . " +
+                            "   FILTER( ?s != <" + resource.getResourceAsString() + "> && REGEX(LCASE(str(?s)), \"" + regex + "\") )" +
+                            "}"
+            ).evaluate();
+        } catch (MalformedQueryException | QueryEvaluationException | RepositoryException e) {
+            throw new RepositoryException(e);
         }
     }
 
@@ -260,22 +309,21 @@ public class IdentifierBuilder {
      * Removes all characters that are not allowed in identifier names and transforms separations by underscore,
      * hyphen or whitespace to CamelCase.
      * The name is preferably generated from the rdfs:label if it was set.
+     * @param resource The resource for which to find a name.
+     * @param config The configuration object specifying how names are built.
      * @return The identifier name that was determined.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public String lowercaseIdentifier() throws URISyntaxException, NameBuildingException {
+    public String lowercaseIdentifier(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
         // Prefer the rdfs:label as a basis for the name. If not supplied, try to extract from URI:
         StringBuilder rawName;
-        if(rdfsLabel != null) {
+        String rdfsLabel = getPreferredRDFSLabel(resource, config);
+        if(rdfsLabel != null && isRDFSLabelUnique(resource, rdfsLabel)) {
             rawName = new StringBuilder(rdfsLabel);
+        } else if(isFileOrFragmentNameUnique(resource)){
+            rawName = new StringBuilder(getFileOrFragmentName(resource));
         } else {
-            try {
-                rawName = new StringBuilder(getFileOrFragmentName());
-
-            } catch (BlankNodeException e) {
-                rawName = new StringBuilder(resource);
-            }
+            rawName = new StringBuilder(getFileOrFragmentName(resource)).append(resource.getResourceAsString().hashCode());
         }
 
         // Replace separation with underscore and/or whitespace to camel case:
@@ -312,11 +360,7 @@ public class IdentifierBuilder {
             rawName.setCharAt(0, Character.toLowerCase(rawName.charAt(0)));
         }
 
-        try {
-            return toJavaName(rawName.toString());
-        } catch (IllegalArgumentException e) {
-            throw new NameBuildingException("No name could be determined.");
-        }
+        return toJavaName(rawName.toString());
     }
 
     /**
@@ -324,14 +368,15 @@ public class IdentifierBuilder {
      * Removes all characters that are not allowed in identifier names and transforms separations by underscore,
      * hyphen or whitespace to CamelCase.
      * The name is preferably generated from the rdfs:label if it was set.
+     * @param resource The resource for which to find a name.
+     * @param config The configuration object specifying how names are built.
      * @return The identifier name that was determined.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public String capitalizedIdentifier() throws URISyntaxException, NameBuildingException {
+    public String capitalizedIdentifier(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
 
         // Prune non allowed characters from the raw name:
-        StringBuilder identifier = new StringBuilder(lowercaseIdentifier());
+        StringBuilder identifier = new StringBuilder(lowercaseIdentifier(resource, config));
 
         // Capitalize first character as defined by the coding conventions:
         identifier.setCharAt(0, Character.toUpperCase(identifier.charAt(0)));
@@ -342,13 +387,14 @@ public class IdentifierBuilder {
     /**
      * Extracts a plural form for this resource.
      * A trailing "s" is added and some simple grammatical rules (for english) are applied.
-     * @return Same as {@link #lowercaseIdentifier()}, but in a plural form.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * @param resource The resource for which to find a name.
+     * @param config The configuration object specifying how names are built.
+     * @return Same as {@link #lowercaseIdentifier(ResourceObject, OntGenerationConfig)}, but in a plural form.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public String lowercasePluralIdentifier() throws URISyntaxException, NameBuildingException {
+    public String lowercasePluralIdentifier(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
         StringBuilder identifier = new StringBuilder();
-        identifier.append(lowercaseIdentifier());
+        identifier.append(lowercaseIdentifier(resource, config));
 
         // Replace trailing "y" with "ie". E.g. "capacity" will be transformed to "capacities":
         if(identifier.charAt(identifier.length() - 1) == 'y') {
@@ -367,12 +413,13 @@ public class IdentifierBuilder {
     /**
      * Extracts a capitalized plural form for this resource.
      * A trailing "s" is added and some simple grammatical rules (for english) are applied.
-     * @return Same as {@link #capitalizedIdentifier()}, but in a plural form.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in {@link java.net.URI}.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * @param resource The resource for which to find a name.
+     * @param config The configuration object specifying how names are built.
+     * @return Same as {@link #capitalizedIdentifier(ResourceObject, OntGenerationConfig)}, but in a plural form.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public String capitalizedPluralIdentifier() throws URISyntaxException, NameBuildingException {
-        StringBuilder identifier = new StringBuilder(lowercasePluralIdentifier());
+    public String capitalizedPluralIdentifier(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
+        StringBuilder identifier = new StringBuilder(lowercasePluralIdentifier(resource, config));
         if(identifier.length() > 0) {
             identifier.setCharAt(0, Character.toUpperCase(identifier.charAt(0)));
         }

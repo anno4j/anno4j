@@ -21,7 +21,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -74,42 +73,23 @@ public abstract class PropertyBuildingSupport extends PropertySchemaAnnotationSu
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public IdentifierBuilder getIdentifierBuilder(OntGenerationConfig config) {
-        return IdentifierBuilder.builder(getResourceAsString())
-                .withRDFSLabel(getPreferredRDFSLabel(config).toString());
-    }
-
-    @Override
-    public String getLowercaseIdentifier(OntGenerationConfig config, boolean plural) {
-        try {
-            IdentifierBuilder builder = IdentifierBuilder.builder(getResourceAsString());
-            if (plural) {
-                return builder.lowercasePluralIdentifier();
-            } else {
-                return builder.lowercaseIdentifier();
-            }
-
-        } catch (IdentifierBuilder.NameBuildingException | URISyntaxException e) {
-            return "unnamedProperty" + hashCode();
+    public String getLowercaseIdentifier(OntGenerationConfig config, boolean plural) throws RepositoryException {
+        IdentifierBuilder builder = IdentifierBuilder.forObjectRepository(getObjectConnection());
+        if (plural) {
+            return builder.lowercasePluralIdentifier(this, config);
+        } else {
+            return builder.lowercaseIdentifier(this, config);
         }
     }
 
     @Override
-    public String getCapitalizedIdentifier(OntGenerationConfig config, boolean plural) {
-        try {
-            IdentifierBuilder builder = IdentifierBuilder.builder(getResourceAsString());
-            if (plural) {
-                return builder.capitalizedPluralIdentifier();
-            } else {
-                return builder.capitalizedIdentifier();
-            }
-
-        } catch (IdentifierBuilder.NameBuildingException | URISyntaxException e) {
-            return "UnnamedProperty" + hashCode();
+    public String getCapitalizedIdentifier(OntGenerationConfig config, boolean plural) throws RepositoryException {
+        IdentifierBuilder builder = IdentifierBuilder.forObjectRepository(getObjectConnection());
+        if (plural) {
+            return builder.capitalizedPluralIdentifier(this, config);
+        } else {
+            return builder.capitalizedIdentifier(this, config);
         }
     }
 

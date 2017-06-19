@@ -1,8 +1,11 @@
 package com.github.anno4j.schema_parsing.naming;
 
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.squareup.javapoet.MethodSpec;
-
-import java.net.URISyntaxException;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectRepository;
 
 /**
  * Generates Java compliant method names for resources.
@@ -10,19 +13,30 @@ import java.net.URISyntaxException;
 public class MethodNameBuilder extends IdentifierBuilder {
 
     /**
-     * @param resource The resource to build a name for.
+     * Initializes the builder with a connection to a repository.
+     * @param connection The connection to use later.
      */
-    private MethodNameBuilder(String resource) {
-        super(resource);
+    private MethodNameBuilder(ObjectConnection connection) {
+        super(connection);
     }
 
     /**
-     * Creates a new MethodNameBuilder object for the given resource.
-     * @param resource The resource to build a name for.
-     * @return A builder instance.
+     * Returns a builder object that operates on the given repository.
+     * @param repository The repository to use, e.g. for name disambiguation.
+     * @return An instance of the builder.
+     * @throws RepositoryException Thrown if an error occurs while opening a connection to the repository.
      */
-    public static MethodNameBuilder builder(String resource) {
-        return new MethodNameBuilder(resource);
+    public static MethodNameBuilder forObjectRepository(ObjectRepository repository) throws RepositoryException {
+        return forObjectRepository(repository.getConnection());
+    }
+
+    /**
+     * Returns a builder object that operates on the connected repository.
+     * @param connection A connection to the repository to use, e.g. for name disambiguation.
+     * @return An instance of the builder.
+     */
+    public static MethodNameBuilder forObjectRepository(ObjectConnection connection) {
+        return new MethodNameBuilder(connection);
     }
 
     /**
@@ -33,36 +47,21 @@ public class MethodNameBuilder extends IdentifierBuilder {
      * The generation of the methods name if preferably done on basis of the RDFS label set.
      * If it is not possible to derive a meaningful name, then an unambiguous name is picked.
      * @param prefix The part preceding the properties name in the method name, e.g. "set", "addAll", ...
+     * @param resource The property resource for which to generate a (name-only) method specification.
+     * @param config The configuration according to which to chose the name.
      * @param pluralName Whether a plural form should be picked for the methods name.
      * @return A {@link MethodSpec} object for a method for the resource.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public MethodSpec getJavaPoetMethodSpec(String prefix, boolean pluralName) {
+    public MethodSpec getJavaPoetMethodSpec(String prefix, ResourceObject resource, OntGenerationConfig config, boolean pluralName) throws RepositoryException {
         StringBuilder methodName = new StringBuilder(prefix);
 
-        try {
-            if(pluralName) {
-                methodName.append(capitalizedPluralIdentifier());
-            } else {
-                methodName.append(capitalizedIdentifier());
-            }
-        } catch (NameBuildingException | URISyntaxException e) {
-            // Find some unambiguous name for the property by using hashCode():
-            int hashCode = getResource().hashCode();
-            methodName.append("UnnamedProperty");
-            if(hashCode < 0) {
-                methodName.append(-hashCode)
-                          .append("_");
-            } else {
-                methodName.append(hashCode);
-            }
+        if(pluralName) {
+            methodName.append(capitalizedPluralIdentifier(resource, config));
+        } else {
+            methodName.append(capitalizedIdentifier(resource, config));
         }
 
         return MethodSpec.methodBuilder(methodName.toString()).build();
-    }
-
-    @Override
-    public MethodNameBuilder withRDFSLabel(String label) {
-        super.withRDFSLabel(label);
-        return this;
     }
 }

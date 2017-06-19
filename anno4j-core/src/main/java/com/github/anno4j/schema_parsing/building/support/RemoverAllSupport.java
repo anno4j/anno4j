@@ -44,15 +44,8 @@ public abstract class RemoverAllSupport extends PropertyBuildingSupport implemen
             javaDoc.add("\n@param values The elements to be removed.");
             javaDoc.add("\n@return Returns true if any value was removed.");
 
-            // Create name builder with the preferred RDFS label if available:
-            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
-            CharSequence preferredLabel = getPreferredRDFSLabel(config);
-            if (preferredLabel != null) {
-                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
-            }
-
-            return methodNameBuilder
-                    .getJavaPoetMethodSpec("removeAll", true)
+            return MethodNameBuilder.forObjectRepository(getObjectConnection())
+                    .getJavaPoetMethodSpec("removeAll", this, config, true)
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(paramType, "values")

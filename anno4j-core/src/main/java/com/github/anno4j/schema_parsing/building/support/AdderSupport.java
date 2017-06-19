@@ -38,15 +38,8 @@ public abstract class AdderSupport extends PropertyBuildingSupport implements Bu
             BuildableRDFSClazz range = findSingleRangeClazz();
             addJavaDocExceptionInfo(javaDoc, range, config);
 
-            // Create name builder with the preferred RDFS label if available:
-            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
-            CharSequence preferredLabel = getPreferredRDFSLabel(config);
-            if (preferredLabel != null) {
-                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
-            }
-
-            return methodNameBuilder
-                    .getJavaPoetMethodSpec("add", false)
+            return MethodNameBuilder.forObjectRepository(getObjectConnection())
+                    .getJavaPoetMethodSpec("add", this, config, false)
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(paramType, "value")

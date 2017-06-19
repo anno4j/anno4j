@@ -6,15 +6,12 @@ import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
-import com.github.anno4j.schema_parsing.naming.ClassNameBuilder;
-import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.github.anno4j.schema_parsing.naming.MethodNameBuilder;
 import com.github.anno4j.schema_parsing.validation.Validator;
 import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -24,20 +21,6 @@ import java.util.HashSet;
  */
 @Partial
 public abstract class SetterBuildingSupport extends PropertyBuildingSupport implements BuildableRDFSProperty {
-
-    /**
-     * Returns a name for the parameter of the setter based on its RDFS labels and/or other information about
-     * the property mapped.
-     * @return Tries to find a meaningful name for a setter parameter. Returns {@code "values"} on failure.
-     */
-    String getParameterName() {
-        try {
-            return ClassNameBuilder.builder(getResourceAsString())
-                    .lowercaseIdentifier() + "s";
-        } catch (IdentifierBuilder.NameBuildingException | URISyntaxException e) {
-            return  "values";
-        }
-    }
 
     /**
      * Returns the JavaPoet representation of the parameters type.
@@ -72,7 +55,6 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
             // Find most specific common superclass:
             BuildableRDFSClazz rangeClazz = findSingleRangeClazz();
             // Find a name for the parameter:
-            String paramName = getParameterName();
 
             // JavaDoc of the method:
             CodeBlock.Builder javaDoc = CodeBlock.builder();
@@ -80,20 +62,13 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
             if (preferredComment != null) {
                 javaDoc.add(preferredComment.toString());
             }
-            javaDoc.add("\n@param " + paramName + " The elements to set.");
+            javaDoc.add("\n@param values The elements to set.");
 
             // Add a throws declaration if the value space is constrained:
             addJavaDocExceptionInfo(javaDoc, rangeClazz, config);
 
-            // Create name builder with the preferred RDFS label if available:
-            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
-            CharSequence preferredLabel = getPreferredRDFSLabel(config);
-            if (preferredLabel != null) {
-                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
-            }
-
-            return methodNameBuilder
-                    .getJavaPoetMethodSpec("set", true)
+            return MethodNameBuilder.forObjectRepository(getObjectConnection())
+                    .getJavaPoetMethodSpec("set", this, config, true)
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)

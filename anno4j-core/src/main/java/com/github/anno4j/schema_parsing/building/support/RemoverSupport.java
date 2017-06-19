@@ -36,15 +36,9 @@ public abstract class RemoverSupport extends PropertyBuildingSupport implements 
             BuildableRDFSClazz range = findSingleRangeClazz();
             ClassName paramType = range.getJavaPoetClassName(config);
 
-            // Create name builder with the preferred RDFS label if available:
-            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
-            CharSequence preferredLabel = getPreferredRDFSLabel(config);
-            if (preferredLabel != null) {
-                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
-            }
 
-            return methodNameBuilder
-                    .getJavaPoetMethodSpec("remove", false)
+            return MethodNameBuilder.forObjectRepository(getObjectConnection())
+                    .getJavaPoetMethodSpec("remove", this, config, false)
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(paramType, "value")

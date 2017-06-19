@@ -1,7 +1,6 @@
 package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
-import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -30,13 +29,6 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      */
     ClassName getRangeJavaPoetClassName(OntGenerationConfig config) throws RepositoryException;
 
-    /**
-     * Returns an {@link IdentifierBuilder} instance for generating identifiers for this
-     * property based on the natural language preferences set in <code>config</code>.
-     * @param config The configuration object on which generation of identifiers will be based on.
-     * @return An identifier builder for this property suiting the preferences made in <code>config</code>.
-     */
-    IdentifierBuilder getIdentifierBuilder(OntGenerationConfig config);
 
     /**
      * Generates a lowercase identifier for this property based on the natural language preferences
@@ -45,7 +37,7 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * @param plural Whether the identifier should be in plural form.
      * @return A lowercase identifier for this property suiting the preferences made in <code>config</code>.
      */
-    String getLowercaseIdentifier(OntGenerationConfig config, boolean plural);
+    String getLowercaseIdentifier(OntGenerationConfig config, boolean plural) throws RepositoryException;
 
 
     /**
@@ -55,7 +47,7 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * @param plural Whether the identifier should be in plural form.
      * @return A uppercase identifier for this property suiting the preferences made in <code>config</code>.
      */
-    String getCapitalizedIdentifier(OntGenerationConfig config, boolean plural);
+    String getCapitalizedIdentifier(OntGenerationConfig config, boolean plural) throws RepositoryException;
 
     /**
      * Generates a JavaPoet specification of an <code>@Iri</code>-annotated field for this property,

@@ -1,12 +1,12 @@
 package com.github.anno4j.schema_parsing.naming;
 
-import com.github.anno4j.schema.model.rdfs.RDFSProperty;
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
-
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashSet;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectRepository;
 
 /**
  * Generates Java compliant class or interface names for resources.
@@ -15,134 +15,52 @@ import java.util.HashSet;
 public class ClassNameBuilder extends IdentifierBuilder {
 
     /**
-     * Properties that have the class to build a name for as part of
-     * their range.
-     * Used for generating names for blank nodes.
+     * Initializes the builder with a connection to a repository.
+     * @param connection The connection to use later.
      */
-    private Collection<String> incomingProperties = new HashSet<>();
-
-    /**
-     * Properties that have the class to build a name for as part of
-     * their domain.
-     * Used for generating names for blank nodes.
-     */
-    private Collection<String> outgoingProperties = new HashSet<>();
-
-    /**
-     * @param resource The resource to build a name for.
-     */
-    private ClassNameBuilder(String resource) {
-        super(resource);
+    private ClassNameBuilder(ObjectConnection connection) {
+        super(connection);
     }
 
     /**
-     * Creates a new ClassNameBuilder object.
-     * @param resource The resource to build a name for.
-     * @return A builder instance.
+     * Returns a builder object that operates on the given repository.
+     * @param repository The repository to use, e.g. for name disambiguation.
+     * @return An instance of the builder.
+     * @throws RepositoryException Thrown if an error occurs while opening a connection to the repository.
      */
-    public static ClassNameBuilder builder(String resource) {
-        return new ClassNameBuilder(resource);
+    public static ClassNameBuilder forObjectRepository(ObjectRepository repository) throws RepositoryException {
+        return forObjectRepository(repository.getConnection());
+    }
+
+    /**
+     * Returns a builder object that operates on the connected repository.
+     * @param connection A connection to the repository to use, e.g. for name disambiguation.
+     * @return An instance of the builder.
+     */
+    public static ClassNameBuilder forObjectRepository(ObjectConnection connection) {
+        return new ClassNameBuilder(connection);
     }
 
     /**
      * Returns the JavaPoet class name object for the resource.
+     * @param config The configuration object specifying the language preference.
+     * @param resource The class resource to get a class name for.
      * @return The JavaPoet class name.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
-     * requirement for a hostname component.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public ClassName className() throws URISyntaxException, NameBuildingException {
-        if(isBlankNode() && getRdfsLabel() == null) {
-            if(!outgoingProperties.isEmpty()) {
-                StringBuilder name = new StringBuilder();
-                for (String property : outgoingProperties) {
-                    String part = IdentifierBuilder.builder(property)
-                            .capitalizedIdentifier();
-                    name.append(part);
-                }
-
-                name.append("Node");
-
-                return ClassName.get(packageName(), name.toString());
-
-            } else if (!incomingProperties.isEmpty()) {
-                StringBuilder name = new StringBuilder();
-                for (String property : incomingProperties) {
-                    String part = IdentifierBuilder.builder(property)
-                            .capitalizedIdentifier();
-                    name.append(part);
-                }
-
-                name.append("Target");
-
-                return ClassName.get(packageName(), name.toString());
-
-            } else {
-                return ClassName.get(packageName(), capitalizedIdentifier());
-            }
-
-        } else {
-            return ClassName.get(packageName(), capitalizedIdentifier());
-        }
+    public ClassName className(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
+        return ClassName.get(packageName(resource), capitalizedIdentifier(resource, config));
     }
 
     /**
      * Generates a JavaPoet type spec for an empty interface representing the resource.
+     * @param config The configuration object specifying the language preference.
+     * @param resource The class resource to get a class name for.
      * @return JavaPoet object representing an interface for the resource. Can be modified by calling
      * {@link TypeSpec#toBuilder()} on it.
-     * @throws URISyntaxException If the URI violates RFC 2396 augmented by the rules defined in URI and the
-     * requirement for a hostname component.
-     * @throws NameBuildingException If the required information for building the name is not contained in the URI.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public TypeSpec interfaceSpec() throws URISyntaxException, NameBuildingException {
-        return TypeSpec.interfaceBuilder(className()).build();
-    }
-
-    @Override
-    public ClassNameBuilder withRDFSLabel(String label) {
-        super.withRDFSLabel(label);
-        return this;
-    }
-
-    /**
-     * Adds that the class is range of a property <code>prop</code>
-     * as additional information for name building.
-     * @param prop The property this class is part of the range.
-     * @return Reference to the builder in order to enable method chaining.
-     */
-    public ClassNameBuilder withIncomingProperty(String prop) {
-        incomingProperties.add(prop);
-        return this;
-    }
-
-    /**
-     * Adds that the class is range of a property <code>prop</code>
-     * as additional information for name building.
-     * @param prop The property this class is part of the range.
-     * @return Reference to the builder in order to enable method chaining.
-     */
-    public ClassNameBuilder withIncomingProperty(RDFSProperty prop) {
-        return withIncomingProperty(prop.getResourceAsString());
-    }
-
-    /**
-     * Adds that the class is domain of a property <code>prop</code>
-     * as additional information for name building.
-     * @param prop The property this class is part of the domain.
-     * @return Reference to the builder in order to enable method chaining.
-     */
-    public ClassNameBuilder withOutgoingProperty(String prop) {
-        outgoingProperties.add(prop);
-        return this;
-    }
-
-    /**
-     * Adds that the class is domain of a property <code>prop</code>
-     * as additional information for name building.
-     * @param prop The property this class is part of the domain.
-     * @return Reference to the builder in order to enable method chaining.
-     */
-    public ClassNameBuilder withOutgoingProperty(RDFSProperty prop) {
-        return withOutgoingProperty(prop.getResourceAsString());
+    public TypeSpec interfaceSpec(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
+        return TypeSpec.interfaceBuilder(className(resource, config)).build();
     }
 }

@@ -54,15 +54,8 @@ public abstract class GetterSupport extends PropertyBuildingSupport implements B
                 returnType = ParameterizedTypeName.get(set, valueType);
             }
 
-            // Create name builder with the preferred RDFS label if available:
-            MethodNameBuilder methodNameBuilder = MethodNameBuilder.builder(getResourceAsString());
-            CharSequence preferredLabel = getPreferredRDFSLabel(config);
-            if (preferredLabel != null) {
-                methodNameBuilder.withRDFSLabel(getPreferredRDFSLabel(config).toString());
-            }
-
-            return methodNameBuilder
-                    .getJavaPoetMethodSpec("get", !hasSingleValueReturn)
+            return MethodNameBuilder.forObjectRepository(getObjectConnection())
+                    .getJavaPoetMethodSpec("get", this, config, !hasSingleValueReturn)
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .returns(returnType)

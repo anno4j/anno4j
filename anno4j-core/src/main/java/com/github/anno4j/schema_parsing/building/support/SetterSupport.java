@@ -45,7 +45,7 @@ public abstract class SetterSupport extends SetterBuildingSupport implements Bui
             paramType = ParameterizedTypeName.get(set, paramType);
         }
 
-        return setter.addParameter(paramType, getParameterName())
+        return setter.addParameter(paramType, "values")
                      .build();
     }
 

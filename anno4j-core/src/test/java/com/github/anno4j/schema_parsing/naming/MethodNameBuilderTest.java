@@ -1,6 +1,15 @@
 package com.github.anno4j.schema_parsing.naming;
 
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.schema.model.rdfs.RDFSProperty;
+import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
+import com.google.common.collect.Sets;
+import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.object.LangString;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -9,27 +18,42 @@ import static org.junit.Assert.assertTrue;
  */
 public class MethodNameBuilderTest {
 
+    private Anno4j anno4j;
+
+    private OntGenerationConfig config;
+
+    @Before
+    public void setUp() throws Exception {
+        anno4j = new Anno4j();
+        config = new OntGenerationConfig();
+        config.setIdentifierLanguagePreference(new String[]{"de", OntGenerationConfig.UNTYPED_LITERAL});
+    }
+
     @Test
     public void testJavaPoetMethodSpec() throws Exception {
+        MethodNameBuilder builder = MethodNameBuilder.forObjectRepository(anno4j.getObjectRepository());
+
+        RDFSProperty age = anno4j.createObject(RDFSProperty.class, (Resource) new URIImpl("http://example.org/#age"));
+
         // Test singular:
-        assertEquals("getAge", MethodNameBuilder.builder("http://example.org/#age")
-                                                            .getJavaPoetMethodSpec("get", false)
-                                                            .name);
+        assertEquals("getAge", builder.getJavaPoetMethodSpec("get", age, config, false).name);
 
         // Test plural:
-        assertEquals("getAges", MethodNameBuilder.builder("http://example.org/#age")
-                                                        .getJavaPoetMethodSpec("get", true)
-                                                        .name);
+        assertEquals("getAges", builder.getJavaPoetMethodSpec("get", age, config, true).name);
 
         // Test building with RDFS label:
-        assertEquals("getAlter", MethodNameBuilder.builder("http://example.org/#age")
-                                                            .withRDFSLabel("Alter")
-                                                            .getJavaPoetMethodSpec("get", false)
-                                                            .name);
+        age.setLabels(Sets.<CharSequence>newHashSet(new LangString("Alter", "de")));
+        assertEquals("getAlter", builder.getJavaPoetMethodSpec("get", age, config, false).name);
 
         // Test resource for which no name can be extracted:
-        assertTrue(MethodNameBuilder.builder("http://example.org/#")
-                .getJavaPoetMethodSpec("foo", false)
-                .name.startsWith("fooUnnamed"));
+        boolean exceptionThrown = false;
+        try {
+            RDFSProperty noName = anno4j.createObject(RDFSProperty.class, (Resource) new URIImpl("http://example.org/#"));
+            MethodNameBuilder.forObjectRepository(anno4j.getObjectRepository())
+                    .getJavaPoetMethodSpec("foo", noName, config, false);
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
     }
 }

@@ -1,55 +1,48 @@
 package com.github.anno4j.schema_parsing.naming;
 
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
+import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
+import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test for {@link ClassNameBuilder}.
  */
 public class ClassNameBuilderTest {
+
+    private Anno4j anno4j;
+
+    private OntGenerationConfig config;
+
+    private RDFSClazz person;
+
+    @Before
+    public void setUp() throws Exception {
+        anno4j = new Anno4j();
+        config = new OntGenerationConfig();
+
+        person = anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://example.com/my_person"));
+    }
+
     @Test
     public void className() throws Exception {
-        ClassName cn = ClassNameBuilder.builder("http://example.com/ont#Person")
-                .className();
+        ClassName cn = ClassNameBuilder.forObjectRepository(anno4j.getObjectRepository())
+                .className(person, config);
         assertEquals("com.example", cn.packageName());
-        assertEquals("Person", cn.simpleName());
-
-        cn = ClassNameBuilder.builder("http://example.com/person")
-                .className();
-        assertEquals("com.example", cn.packageName());
-        assertEquals("Person", cn.simpleName());
+        assertEquals("MyPerson", cn.simpleName());
     }
 
     @Test
     public void interfaceSpec() throws Exception {
-        TypeSpec typeSpec = ClassNameBuilder.builder("http://example.com/ont#Person")
-                .interfaceSpec();
-        assertEquals("Person", typeSpec.name);
-
-        typeSpec = ClassNameBuilder.builder("http://example.com/person")
-                .interfaceSpec();
-        assertEquals("Person", typeSpec.name);
-    }
-
-    @Test
-    public void testBlankNode() throws Exception {
-        ClassNameBuilder builder = ClassNameBuilder.builder("someblanknode");
-
-        assertEquals("Someblanknode", builder.className().simpleName());
-
-        ClassName cn = builder.withIncomingProperty("http://example.com/has_ingredient")
-                              .className();
-        assertEquals("HasIngredientTarget", cn.simpleName());
-
-        cn = builder.withOutgoingProperty("http://example.com/ingredient")
-                      .withOutgoingProperty("http://example.com/amount")
-                      .className();
-
-        assertTrue(cn.simpleName().equals("IngredientAmountNode")
-                || cn.simpleName().equals("AmountIngredientNode"));
+        TypeSpec typeSpec = ClassNameBuilder.forObjectRepository(anno4j.getObjectRepository())
+                .interfaceSpec(person, config);
+        assertEquals("MyPerson", typeSpec.name);
     }
 }

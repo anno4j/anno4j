@@ -15,7 +15,6 @@ import com.github.anno4j.schema_parsing.mapping.IllegalMappingException;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.naming.ClassNameBuilder;
-import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.squareup.javapoet.ClassName;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.MalformedQueryException;
@@ -24,7 +23,6 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.LangString;
 
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -37,11 +35,8 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements B
 
     @Override
     public String getJavaPackageName() {
-        try {
-            return ClassNameBuilder.builder(getResourceAsString()).packageName();
-        } catch (URISyntaxException e) {
-            return "";
-        }
+        return ClassNameBuilder.forObjectRepository(getObjectConnection())
+                               .packageName(this);
     }
 
     /**
@@ -156,40 +151,7 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements B
             return ClassName.get(CharSequence.class);
         }
 
-        // First try to find a name for this class:
-        try {
-            ClassNameBuilder nameBuilder = ClassNameBuilder.builder(getResourceAsString());
-
-            // Identifier building is enhanced by rdfs:label literals:
-            if (getLabels() != null && !getLabels().isEmpty()) {
-                CharSequence preferredLabel = getPreferredRDFSLabel(config);
-                if (preferredLabel != null) {
-                    nameBuilder = nameBuilder.withRDFSLabel(preferredLabel.toString());
-                }
-            }
-
-            // Add information about incoming and outgoing properties:
-            for (RDFSProperty incomingProp : getIncomingProperties()) {
-                nameBuilder = nameBuilder.withIncomingProperty(incomingProp);
-            }
-            for (RDFSProperty outgoingProp : getOutgoingProperties()) {
-                nameBuilder = nameBuilder.withOutgoingProperty(outgoingProp);
-            }
-
-            return nameBuilder.className();
-
-        } catch (IdentifierBuilder.NameBuildingException | URISyntaxException e1) {
-            // On error, try to derive at least a package name from the resource:
-            String packageName;
-            try {
-                packageName = ClassNameBuilder.builder(getResourceAsString())
-                        .packageName();
-            } catch (URISyntaxException e2) {
-                packageName = ""; // Fall back to default package
-            }
-            // Generate a unique identifier from the resources id:
-            return ClassName.get(packageName, "UnnamedClass" + getResourceAsString().hashCode());
-        }
+        return ClassNameBuilder.forObjectRepository(getObjectConnection()).className(this, config);
     }
 
     /**
