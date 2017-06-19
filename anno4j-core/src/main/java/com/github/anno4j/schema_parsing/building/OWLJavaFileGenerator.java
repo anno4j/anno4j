@@ -246,6 +246,8 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
                             "  ?p a rdf:Property . " +
                             "} WHERE {" +
                             "   { ?p a owl:DatatypeProperty . } UNION { ?p a owl:ObjectProperty . } " +
+                            "   UNION { ?inv owl:inverseOf ?p . } UNION { ?p owl:inverseOf ?inv . } " +
+                            "   UNION { ?p rdfs:subPropertyOf ?super . } UNION { ?sub rdfs:subPropertyOf ?p . }" +
                             "}"
             ).execute();
             // Set owl:Thing as the domain of all properties which have none specified:
