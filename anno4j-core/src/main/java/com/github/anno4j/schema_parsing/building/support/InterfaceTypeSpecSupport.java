@@ -3,6 +3,7 @@ package com.github.anno4j.schema_parsing.building.support;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.namespaces.OWL;
 import com.github.anno4j.model.namespaces.RDFS;
+import com.github.anno4j.schema.model.owl.Restriction;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
@@ -34,8 +35,8 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
         for (RDFSClazz superClazz : getSuperclazzes()) {
             // Only take owl:Thing (corresponds to ResourceObject) if there is no other superclass:
             if(!superClazz.getResourceAsString().equals(OWL.THING)) {
-                // Ignore the subclass relation of the class to itself:
-                if(!superClazz.equals(this)) {
+                // Ignore the subclass relation of the class to itself and OWL restrictions (handled by annotations):
+                if(!superClazz.equals(this) && !(superClazz instanceof Restriction)) {
                     superClazzNames.add(asBuildableClazz(superClazz).getJavaPoetClassName(config));
                 }
             }

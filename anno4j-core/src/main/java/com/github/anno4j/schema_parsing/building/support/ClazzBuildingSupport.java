@@ -129,7 +129,7 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements B
             }
         }
 
-        /**
+        /*
          * If this class is an unknown literal, return char sequence:
          */
         if(isLiteral()) {

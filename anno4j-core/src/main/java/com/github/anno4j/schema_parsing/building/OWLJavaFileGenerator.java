@@ -219,6 +219,8 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
             anno4j.createObject(RDFSProperty.class, (Resource) new URIImpl(OWL.DISJOINT_WITH));
             anno4j.createObject(RDFSProperty.class, (Resource) new URIImpl(OWL.COMPLEMENT_OF));
             anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(OWL.THING));
+            anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(RDFS.LITERAL));
+            anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(RDFS.DATATYPE));
             anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(OWL.NOTHING));
             anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(OWL.CLAZZ));
 
@@ -255,6 +257,16 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
                             "   FILTER NOT EXISTS {" +
                             "      ?p rdfs:domain ?c . " +
                             "   }" +
+                            "}"
+            ).execute();
+            // Set rdfs:Literal as a superclass of datatype property ranges:
+            anno4j.getObjectRepository().getConnection().prepareUpdate(
+                    "INSERT {" +
+                            "   ?o rdfs:subClassOf rdfs:Literal . " +
+                            "   ?o a rdfs:Class . " +
+                            "} WHERE {" +
+                            "   ?p a owl:DatatypeProperty . " +
+                            "   ?p rdfs:range ?o . " +
                             "}"
             ).execute();
 

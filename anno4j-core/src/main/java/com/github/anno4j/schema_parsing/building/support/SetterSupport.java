@@ -34,12 +34,11 @@ public abstract class SetterSupport extends SetterBuildingSupport implements Bui
         MethodSpec.Builder setter = buildParameterlessSetterSignature(domainClazz, config);
 
         // Different parameter types are generated for cardinality one and for higher cardinality:
-        Integer cardinality = getCardinality(domainClazz);
-        boolean higherCardinality = cardinality == null || cardinality > 1;
+        boolean singleValueParameter = hasSingleValueParameter(domainClazz);
 
-        TypeName paramType = getParameterType(config, higherCardinality);
+        TypeName paramType = getParameterType(config, !singleValueParameter);
 
-        if(higherCardinality) {
+        if(!singleValueParameter) {
             // Use Set type parameter for higher cardinalities:
             ClassName set = ClassName.get("java.util", "Set");
             paramType = ParameterizedTypeName.get(set, paramType);

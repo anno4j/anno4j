@@ -54,9 +54,9 @@ public abstract class BuildableRDFSPropertySupport extends RDFSPropertySupport i
                             "}"
             );
 
-            List<Integer> result = query.evaluate(Integer.class).asList();
+            List<Number> result = query.evaluate(Number.class).asList();
             if(result != null && !result.isEmpty()) {
-                return result.get(0);
+                return result.get(0).intValue();
             } else {
                 return null;
             }

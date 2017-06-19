@@ -320,8 +320,8 @@ public class IdentifierBuilder {
         String rdfsLabel = getPreferredRDFSLabel(resource, config);
         if(rdfsLabel != null && isRDFSLabelUnique(resource, rdfsLabel)) {
             rawName = new StringBuilder(rdfsLabel);
-        } else if(isFileOrFragmentNameUnique(resource)){
-            rawName = new StringBuilder(getFileOrFragmentName(resource));
+        //} else if(isFileOrFragmentNameUnique(resource)){ TODO Check for this? Issue #145
+        //    rawName = new StringBuilder(getFileOrFragmentName(resource));
         } else {
             rawName = new StringBuilder(getFileOrFragmentName(resource)).append(resource.getResourceAsString().hashCode());
         }

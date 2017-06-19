@@ -14,6 +14,7 @@ import org.openrdf.repository.RepositoryException;
 import javax.lang.model.element.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This partial class belonging to {@link com.github.anno4j.schema_parsing.model.BuildableRDFSProperty}
@@ -21,6 +22,18 @@ import java.util.HashSet;
  */
 @Partial
 public abstract class SetterBuildingSupport extends PropertyBuildingSupport implements BuildableRDFSProperty {
+
+    /**
+     * Returns whether the setter should have a single value parameter type.
+     * This is the case if the property has a cardinality of one.
+     * @param domainClazz The class for which to generate the setter.
+     * @return Returns true iff the setter should have a single value parameter.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    boolean hasSingleValueParameter(RDFSClazz domainClazz) throws RepositoryException {
+        Integer cardinality = getCardinality(domainClazz);
+        return cardinality != null && cardinality == 1;
+    }
 
     /**
      * Returns the JavaPoet representation of the parameters type.
@@ -54,7 +67,6 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
         if (getRanges() != null) {
             // Find most specific common superclass:
             BuildableRDFSClazz rangeClazz = findSingleRangeClazz();
-            // Find a name for the parameter:
 
             // JavaDoc of the method:
             CodeBlock.Builder javaDoc = CodeBlock.builder();
@@ -100,7 +112,7 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
         boolean isVarArg = stub.build().varargs;
 
         Integer cardinality = getCardinality(domainClazz);
-        boolean isParameterSingleValue = allowSingleValueParam && cardinality != null && cardinality == 1;
+        boolean isParameterSingleValue = allowSingleValueParam && hasSingleValueParameter(domainClazz);
 
         // Add validation code:
         for (Validator validator : config.getValidators()) {
@@ -132,25 +144,34 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
 
         // Add new values to superproperties:
         stub.addComment("Add new values to superproperties:");
-        if(isVarArg) { // Emptiness check must be performed different for Set<> and array (vararg):
-            stub.beginControlFlow("if($N.length == 0)", paramName);
-        } else {
-            stub.beginControlFlow("if(!$N.isEmpty())", paramName);
-        }
-        for (RDFSProperty superProperty : getSuperproperties()) {
-            if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                // Use add* for single values and addAll* for Set<> parameter:
-                String superAdderName;
-                if(isParameterSingleValue) {
-                    superAdderName = asBuildableProperty(superProperty).buildAdder(domainClazz, config).name;
-                } else {
-                    superAdderName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
-                }
+        if(isParameterSingleValue) {
+            stub.addStatement("$T tmp = new $T()", ParameterizedTypeName.get(ClassName.get(Set.class), param.type), ParameterizedTypeName.get(ClassName.get(HashSet.class), param.type))
+                .addStatement("tmp.add($N)", param);
 
-                stub.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderName, paramName);
+            for (RDFSProperty superProperty : getSuperproperties()) {
+                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
+                    // Use add* for single values and addAll* for Set<> parameter:
+                    String superAdderName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
+                    stub.addStatement("this._invokeResourceObjectMethodIfExists($S, tmp)", superAdderName);
+                }
             }
+
+        } else {
+            if(isVarArg) { // Emptiness check must be performed different for Set<> and array (vararg):
+                stub.beginControlFlow("if($N.length == 0)", paramName);
+            } else  {
+                stub.beginControlFlow("if(!$N.isEmpty())", paramName);
+            }
+
+            for (RDFSProperty superProperty : getSuperproperties()) {
+                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
+                    // Use add* for single values and addAll* for Set<> parameter:
+                    String superAdderName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
+                    stub.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderName, param);
+                }
+            }
+            stub.endControlFlow();
         }
-        stub.endControlFlow();
 
         // Generate code for clearing subproperties:
         stub.addComment("All subproperties loose their values:");

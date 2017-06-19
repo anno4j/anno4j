@@ -612,7 +612,7 @@ public class ValidatedTransaction extends Transaction {
                 String propertyIri = row[0].toString();
                 String objectIri = row[4].toString();
 
-                int minCardinality = (int) row[1];
+                int minCardinality = ((BigInteger) row[1]).intValue();
                 int cardinality = ((BigInteger) row[2]).intValue();
 
                 // We can directly decide whether there are too few values of any type:
@@ -691,7 +691,7 @@ public class ValidatedTransaction extends Transaction {
                 String propertyIri = row[0].toString();
                 String objectIri = row[4].toString();
 
-                int maxCardinality = (int) row[1];
+                int maxCardinality = ((BigInteger) row[1]).intValue();
                 int cardinality = ((BigInteger) row[2]).intValue();
 
                 // We can directly decide from the above query result whether there are too many values of any type:

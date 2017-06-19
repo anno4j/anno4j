@@ -30,14 +30,25 @@ public abstract class GetterImplementationSupport extends GetterSupport implemen
             // The annotated field from which we will retrieve values:
             FieldSpec field = buildAnnotatedField(domainClazz, config);
 
-            // Prepare types:
-            ClassName set = ClassName.get(Set.class);
+            // Prepare returned type:
             ClassName rangeType = getRangeJavaPoetClassName(config);
-            TypeName hashSet = ParameterizedTypeName.get(ClassName.get(HashSet.class), rangeType);
 
-            getterBuilder.addStatement("$T values = new $T();", set, hashSet)
-                         .addStatement("values.addAll($N)", field)
-                         .addStatement("return values");
+            if(hasSingleValueReturnType(domainClazz)) {
+                getterBuilder.beginControlFlow("if(!$N.isEmpty())", field)
+                            .addStatement("return $N.iterator().next()", field)
+                            .endControlFlow()
+                            .beginControlFlow("else")
+                            .addStatement("return null")
+                            .endControlFlow();
+
+            } else {
+                ClassName set = ClassName.get(Set.class);
+                TypeName hashSet = ParameterizedTypeName.get(ClassName.get(HashSet.class), rangeType);
+
+                getterBuilder.addStatement("$T values = new $T();", set, hashSet)
+                            .addStatement("values.addAll($N)", field)
+                            .addStatement("return values");
+            }
 
             return getterBuilder.addAnnotation(overrideAnnotation)
                                 .build();

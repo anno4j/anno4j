@@ -26,12 +26,7 @@ public abstract class RemoverAllSupport extends PropertyBuildingSupport implemen
             ClassName set = ClassName.get("java.util", "Set");
 
             // Get the type of parameter type elements:
-            TypeName setType = range.getJavaPoetClassName(config);
-
-            // For convenience the parameter type for strings should be a wildcard, i.e. Set<? extends CharSequence>:
-            if(setType.equals(ClassName.get(CharSequence.class))) {
-                setType = WildcardTypeName.subtypeOf(setType);
-            }
+            TypeName setType = WildcardTypeName.subtypeOf(range.getJavaPoetClassName(config));
 
             TypeName paramType = ParameterizedTypeName.get(set, setType);
 

@@ -126,15 +126,15 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
                 annotations.add(buildTypeArrayAnnotation(SomeValuesFrom.class, restriction.getSomeValuesFrom(), config));
             }
             if(!restriction.getMinCardinality().isEmpty()) {
-                int minCardinality = restriction.getMinCardinality().iterator().next();
+                int minCardinality = restriction.getMinCardinality().iterator().next().intValue();
                 annotations.add(buildQualifiedAnnotation(MinCardinality.class, restriction, minCardinality, config));
             }
             if(!restriction.getMaxCardinality().isEmpty()) {
-                int maxCardinality = restriction.getMaxCardinality().iterator().next();
+                int maxCardinality = restriction.getMaxCardinality().iterator().next().intValue();
                 annotations.add(buildQualifiedAnnotation(MaxCardinality.class, restriction, maxCardinality, config));
             }
             if(!restriction.getCardinality().isEmpty()) {
-                int cardinality = restriction.getCardinality().iterator().next();
+                int cardinality = restriction.getCardinality().iterator().next().intValue();
                 annotations.add(buildQualifiedAnnotation(Cardinality.class, restriction, cardinality, config));
             }
         }

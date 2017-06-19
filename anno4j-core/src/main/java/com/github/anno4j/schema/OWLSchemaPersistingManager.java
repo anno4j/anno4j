@@ -27,6 +27,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -978,7 +979,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
 
                 // Add the cardinality to the restriction:
                 Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
-                restriction.setMinCardinality(Sets.<Integer>newHashSet(minCardinality));
+                restriction.setMinCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(minCardinality)));
             }
         }
     }
@@ -1005,7 +1006,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                 Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
 
                 // Add the cardinality to the restriction:
-                restriction.setMaxCardinality(Sets.<Integer>newHashSet(maxCardinality));
+                restriction.setMaxCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(maxCardinality)));
             }
         }
     }
@@ -1031,8 +1032,8 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
 
                 Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
                 // Add the cardinality to the restriction:
-                restriction.setMaxCardinality(Sets.<Integer>newHashSet(cardinality));
-                restriction.setMinCardinality(Sets.<Integer>newHashSet(cardinality));
+                restriction.setMaxCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
+                restriction.setMinCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
             }
         }
     }
@@ -1048,7 +1049,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
     }
 
     /**
-     * Checks wether the given annotation imposes a property characteristic, i.e. is one of
+     * Checks whether the given annotation imposes a property characteristic, i.e. is one of
      * <ul>
      *     <li>{@link Functional}</li>
      *     <li>{@link InverseFunctional}</li>

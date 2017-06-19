@@ -30,36 +30,36 @@ public abstract class RestrictionSupport extends ResourceObjectSupport implement
     }
 
     @Override
-    public void setMinCardinality(Set<Integer> minCardinality) {
+    public void setMinCardinality(Set<Number> minCardinality) {
         // There can only be one constraint for the minimum cardinality:
         if(minCardinality == null || minCardinality.size() != 1) {
             throw new IllegalArgumentException("There can be at most one owl:minCardinality constraint per restriction.");
         }
         // Also the cardinality must be non-negative:
-        if(minCardinality.iterator().next() < 0) {
+        if(minCardinality.iterator().next().intValue() < 0) {
             throw new IllegalArgumentException("The minimum cardinality of a property must be non-negative.");
         }
     }
 
     @Override
-    public void setMaxCardinality(Set<Integer> maxCardinality) {
+    public void setMaxCardinality(Set<Number> maxCardinality) {
         // There can only be one constraint for the maximum cardinality:
         if(maxCardinality == null || maxCardinality.size() != 1) {
             throw new IllegalArgumentException("There can be at most one owl:maxCardinality constraint per restriction.");
         }
         // Also the cardinality must be non-negative:
-        if(maxCardinality.iterator().next() < 0) {
+        if(maxCardinality.iterator().next().intValue() < 0) {
             throw new IllegalArgumentException("The maximum cardinality of a property must be non-negative.");
         }
     }
 
     @Override
-    public void setCardinality(Set<Integer> cardinality) {
+    public void setCardinality(Set<Number> cardinality) {
         // There can only be one constraint for the cardinality:
         if(cardinality == null || cardinality.size() != 1) {
             throw new IllegalArgumentException("There can be at most one owl:cardinality constraint per restriction.");
         }
-        if(cardinality.iterator().next() < 0) {
+        if(cardinality.iterator().next().intValue() < 0) {
             throw new IllegalArgumentException("The cardinality of a property must be non-negative.");
         }
     }

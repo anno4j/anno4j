@@ -26,22 +26,22 @@ public interface Restriction extends ResourceObject {
     void setOnClazz(Set<OWLClazz> clazzes);
 
     @Iri(OWL.MIN_CARDINALITY)
-    Set<Integer> getMinCardinality();
+    Set<Number> getMinCardinality();
 
     @Iri(OWL.MIN_CARDINALITY)
-    void setMinCardinality(Set<Integer> minCardinality);
+    void setMinCardinality(Set<Number> minCardinality);
 
     @Iri(OWL.MAX_CARDINALITY)
-    Set<Integer> getMaxCardinality();
+    Set<Number> getMaxCardinality();
 
     @Iri(OWL.MAX_CARDINALITY)
-    void setMaxCardinality(Set<Integer> maxCardinality);
+    void setMaxCardinality(Set<Number> maxCardinality);
 
     @Iri(OWL.CARDINALITY)
-    Set<Integer> getCardinality();
+    Set<Number> getCardinality();
 
     @Iri(OWL.CARDINALITY)
-    void setCardinality(Set<Integer> cardinality);
+    void setCardinality(Set<Number> cardinality);
 
     @Iri(OWL.ALL_VALUES_FROM)
     Set<OWLClazz> getAllValuesFrom();
