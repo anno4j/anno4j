@@ -49,6 +49,25 @@ public class OntGenerationConfig {
     private Collection<DatatypeMapper> datatypeMappers = new ArrayList<>();
 
     /**
+     * Identifier names are generated preferably from RDFS labels.
+     * If this flag is set the repository will be scanned for possibly conflicting
+     * RDFS labels of other resources, i.e. one that may result is the same identifier name.
+     * In case of a conflict the identifier builder will try to derive a name from the resources URI.
+     * Also see {@link com.github.anno4j.schema_parsing.naming.IdentifierBuilder}.
+     */
+    private boolean checkRDFSLabelAmbiguity = true;
+
+    /**
+     * Identifier names are derived from the resources URI if no RDFS label is applicable.
+     * If this flag is set all other resources in the repository are scanned whether their
+     * URI could be derived to the same identifier name.
+     * In case of such a conflict the identifier will be generated in a unique but less readable
+     * way.
+     * Also see {@link com.github.anno4j.schema_parsing.naming.IdentifierBuilder}.
+     */
+    private boolean checkFileOrFragmentAmbiguity = false;
+
+    /**
      * Initializes the configuration with preference for untyped literals
      * for identifiers and JavaDoc.
      * Uses the default validator chain for RDFS (see {@link ValidatorChain#getRDFSDefault()}).
@@ -293,5 +312,67 @@ public class OntGenerationConfig {
      */
     public void setDatatypeMappers(DatatypeMapper[] datatypeMappers) {
         this.datatypeMappers = Arrays.asList(datatypeMappers);
+    }
+
+    /**
+     * Identifier names for a resource are preferably chosen from its RDFS label ({@code rdfs:label}).
+     * If the ambiguity check is enabled all other labels will be checked for being possibly in conflict
+     * when a identifier name is generated, i.e. would result in the same identifier name.
+     * In case of a conflict the identifier is picked from the resources URI (also see
+     * {@link #isFileOrFragmentAmbiguityChecked()}) for this.
+     * @return Returns true if ambiguity checks will be performed.
+     */
+    public boolean isRDFSLabelAmbiguityChecked() {
+        return checkRDFSLabelAmbiguity;
+    }
+
+    /**
+     * Identifier names for a resource are preferably chosen from its RDFS label ({@code rdfs:label}).
+     * If the ambiguity check is enabled all other labels will be checked for being possibly in conflict
+     * when a identifier name is generated, i.e. would result in the same identifier name.
+     * In case of a conflict the identifier is picked from the resources URI (also see
+     * {@link #isFileOrFragmentAmbiguityChecked()}) for this.
+     * @param checkRDFSLabelAmbiguity Whether to perform the above check and fallback mechanism.
+     */
+    public void setRDFSLabelAmbiguityChecking(boolean checkRDFSLabelAmbiguity) {
+        this.checkRDFSLabelAmbiguity = checkRDFSLabelAmbiguity;
+    }
+
+    /**
+     * Identifier names for a resources are chosen from the suffix of its URI in absence of a RDFS label.
+     * If the ambiguity check is enabled all other resources will be checked for their URIs being possibly in
+     * conflict with the suffix of the URI of the resource to generate an identifier for.
+     * In case of a conflict the identifier is still picked in an unique way, but it may be less readable.
+     * Also see {@link com.github.anno4j.schema_parsing.naming.IdentifierBuilder} for this.
+     * <br>
+     * Example:<br>
+     * Consider the class resources {@code http://example.de/ont#Main_Dish} and {@code http://example.de/ont#MainDish}.
+     * If the ambiguity check is turned off, the generated classes will both be named {@code MainDish} which
+     * will lead to Java compile errors.
+     * If the check is enabled the class names will receive an unique number so they can be distinguished.
+     *
+     * @return Returns whether the above check is turned on.
+     */
+    public boolean isFileOrFragmentAmbiguityChecked() {
+        return checkFileOrFragmentAmbiguity;
+    }
+
+    /**
+     * Identifier names for a resources are chosen from the suffix of its URI in absence of a RDFS label.
+     * If the ambiguity check is enabled all other resources will be checked for their URIs being possibly in
+     * conflict with the suffix of the URI of the resource to generate an identifier for.
+     * In case of a conflict the identifier is still picked in an unique way, but it may be less readable.
+     * Also see {@link com.github.anno4j.schema_parsing.naming.IdentifierBuilder} for this.
+     * <br>
+     * Example:<br>
+     * Consider the class resources {@code http://example.de/ont#Main_Dish} and {@code http://example.de/ont#MainDish}.
+     * If the ambiguity check is turned off, the generated classes will both be named {@code MainDish} which
+     * will lead to Java compile errors.
+     * If the check is enabled the class names will receive an unique number so they can be distinguished.
+     *
+     * @param checkFileOrFragmentAmbiguity Whether the above check should be turned on.
+     */
+    public void setFileOrFragmentAmbiguityChecking(boolean checkFileOrFragmentAmbiguity) {
+        this.checkFileOrFragmentAmbiguity = checkFileOrFragmentAmbiguity;
     }
 }

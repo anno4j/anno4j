@@ -12,7 +12,10 @@ import org.openrdf.repository.object.ObjectRepository;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Pattern;
 
 /**
@@ -318,10 +321,10 @@ public class IdentifierBuilder {
         // Prefer the rdfs:label as a basis for the name. If not supplied, try to extract from URI:
         StringBuilder rawName;
         String rdfsLabel = getPreferredRDFSLabel(resource, config);
-        if(rdfsLabel != null && isRDFSLabelUnique(resource, rdfsLabel)) {
+        if(rdfsLabel != null && (!config.isRDFSLabelAmbiguityChecked() || isRDFSLabelUnique(resource, rdfsLabel))) {
             rawName = new StringBuilder(rdfsLabel);
-        //} else if(isFileOrFragmentNameUnique(resource)){ TODO Check for this? Issue #145
-        //    rawName = new StringBuilder(getFileOrFragmentName(resource));
+        } else if(!config.isFileOrFragmentAmbiguityChecked() || isFileOrFragmentNameUnique(resource)){
+            rawName = new StringBuilder(getFileOrFragmentName(resource));
         } else {
             rawName = new StringBuilder(getFileOrFragmentName(resource)).append(resource.getResourceAsString().hashCode());
         }
