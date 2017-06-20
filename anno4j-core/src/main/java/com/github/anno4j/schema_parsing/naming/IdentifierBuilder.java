@@ -60,7 +60,7 @@ public class IdentifierBuilder {
     /**
      * Connection to use for building names, e.g. to disambiguate the identifiers.
      */
-    private ObjectConnection connection;
+    private final ObjectConnection connection;
 
     /**
      * Initializes the builder with a connection to a repository.
@@ -138,7 +138,7 @@ public class IdentifierBuilder {
      */
     private String getFileOrFragmentName(ResourceObject resource) {
 
-        URI u = null;
+        URI u;
         try {
             u = new URI(resource.getResourceAsString());
         } catch (URISyntaxException e) {
@@ -283,7 +283,7 @@ public class IdentifierBuilder {
 
     private boolean isFileOrFragmentNameUnique(ResourceObject resource) throws RepositoryException {
         String fragment = getFileOrFragmentName(resource);
-        // A conflicting label may be lead by a sperator and some non-alphanumeric characters:
+        // A conflicting label may be lead by a separator and some non-alphanumeric characters:
         StringBuilder regex = new StringBuilder("(.*)(:|/|#)([^a-zA-Z0-9])*");
         for(int i = 0; i < fragment.length(); i++) {
             char c = fragment.charAt(i);

@@ -155,25 +155,6 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements B
     }
 
     /**
-     * Returns the rdfs:label which is preferred for identifier names
-     * according to the configuration object provided.
-     *
-     * @param config The configuration object.
-     * @return The preferred rdfs:label literal.
-     */
-    private CharSequence getPreferredRDFSLabel(OntGenerationConfig config) {
-        // Get the label in the preferred language:
-        CharSequence preferredLabel = null;
-        for (CharSequence label : getLabels()) {
-            if (config.isPreferredForIdentifiers(label, preferredLabel)) {
-                preferredLabel = label;
-            }
-        }
-
-        return preferredLabel;
-    }
-
-    /**
      * Returns the rdfs:comment which is preferred for JavaDoc
      * according to the configuration object provided.
      *

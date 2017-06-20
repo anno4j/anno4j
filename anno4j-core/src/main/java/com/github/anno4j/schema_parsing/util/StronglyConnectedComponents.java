@@ -3,7 +3,6 @@ package com.github.anno4j.schema_parsing.util;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 
@@ -35,7 +34,7 @@ public class StronglyConnectedComponents {
         /**
          * The unique index the algorithm assigned to this class.
          */
-        private int index;
+        private final int index;
 
         /**
          * The lowest {@link #index} of nodes reachable from this node.

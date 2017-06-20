@@ -229,7 +229,7 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
         }
     }
 
-    private AnnotationSpec buildIriArrayAnnotation(Class<?> annotationType, Collection<? extends ResourceObject> resources) throws RepositoryException {
+    private AnnotationSpec buildIriArrayAnnotation(Class<?> annotationType, Collection<? extends ResourceObject> resources) {
         CodeBlock.Builder inner = CodeBlock.builder().add("{");
         Iterator<? extends ResourceObject> resourceIter = resources.iterator();
         while (resourceIter.hasNext()) {
@@ -338,7 +338,7 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
      * Returns the Java class name for the given class according to the passed configuration.
      * @param clazz The class for which a Java class name should be found.
      * @param config The configuration specifying how the class name is determined.
-     * @return Returns the JavaPoet specifiation of the classes class name.
+     * @return Returns the JavaPoet specification of the classes class name.
      * @throws RepositoryException Thrown if an error occurs while querying necessary information about the class
      * from the repository.
      */

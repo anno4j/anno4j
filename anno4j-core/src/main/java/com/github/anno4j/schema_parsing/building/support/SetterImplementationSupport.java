@@ -2,15 +2,10 @@ package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
-import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
-import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
-import com.github.anno4j.schema_parsing.validation.Validator;
 import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
-
-import java.util.HashSet;
 
 /**
  * Support class (of {@link BuildableRDFSProperty}) for generating

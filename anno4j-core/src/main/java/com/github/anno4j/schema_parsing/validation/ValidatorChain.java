@@ -47,7 +47,7 @@ public class ValidatorChain extends ArrayList<Validator> {
     }
 
     /**
-     * Checks whether this validator chain constraines the value of a datatype.
+     * Checks whether this validator chain constrains the value of a datatype.
      * @param range The datatype to check for.
      * @return Returns true if and only if any of the validators in the chain
      * imposes a constraint on the datatypes value space, i.e. generates code

@@ -118,7 +118,7 @@ public interface JavaFileGenerator {
      *                        (or their package directories respectively) are stored.
      *                        Will be created if it does not exist. If the directory is not empty
      *                        then existing files may be overwritten.
-     * @throws JavaFileGenerationException Thrown if an error occured during file generation.
+     * @throws JavaFileGenerationException Thrown if an error occurred during file generation.
      * @throws IOException Thrown if an error occurs while writing the generated files.
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
