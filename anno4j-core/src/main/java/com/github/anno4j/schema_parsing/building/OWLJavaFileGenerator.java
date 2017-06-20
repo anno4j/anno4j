@@ -445,14 +445,7 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
             if (!isFromSpecialVocabulary(clazz) && !clazz.isLiteral()) {
 
                 // Determine the package to write to:
-                String clazzPackage = clazz.getJavaPackageName();
-                if(!config.getBasePackage().isEmpty()) {
-                    if(clazzPackage.isEmpty()) {
-                        clazzPackage = config.getBasePackage();
-                    } else {
-                        clazzPackage = config.getBasePackage() + "." + clazzPackage;
-                    }
-                }
+                String clazzPackage = clazz.getJavaPackageName(config);
 
                 JavaFile resourceObjectFile = JavaFile.builder(clazzPackage, clazz.buildTypeSpec(config))
                         .build();

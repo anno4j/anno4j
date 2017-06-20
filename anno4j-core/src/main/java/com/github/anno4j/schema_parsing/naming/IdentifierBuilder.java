@@ -173,17 +173,19 @@ public class IdentifierBuilder {
      * <a href="https://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html">Naming a Package</a>).
      * If a portion of the hostname contains a special character that is not a hyphen then this character is left out
      * in the package name.
+     * The package structure extracted is appended to the base package defined in {@code config}
      *
      * @param object The resource for which to get the package name for.
+     * @param config Configuration for Java class generation.
      * @return Returns the package name for the given resource. If the hostname is a IP address or the resource is a blank node
-     * then the default package "" is returned.
+     * then the default package {@link OntGenerationConfig#getBasePackage()} of {@code config} is returned.
      */
-    public String packageName(ResourceObject object) {
+    public String packageName(ResourceObject object, OntGenerationConfig config) {
         URI u;
         try {
             u = new URI(object.getResourceAsString());
         } catch (URISyntaxException e) {
-            return "";
+            return config.getBasePackage();
         }
 
         if(u.getHost() != null) {
@@ -216,12 +218,19 @@ public class IdentifierBuilder {
                         packageName.append(".");
                     }
                 }
-                return packageName.toString();
+
+                // Append to base package if there is any:
+                if(!config.getBasePackage().isEmpty()) {
+                    return config.getBasePackage() + "." + packageName.toString();
+                } else {
+                    return packageName.toString();
+                }
+
             } else {
-                return "";
+                return config.getBasePackage();
             }
         } else {
-            return "";
+            return config.getBasePackage();
         }
     }
 

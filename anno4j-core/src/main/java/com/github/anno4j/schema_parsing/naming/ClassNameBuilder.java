@@ -49,7 +49,7 @@ public class ClassNameBuilder extends IdentifierBuilder {
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
     public ClassName className(ResourceObject resource, OntGenerationConfig config) throws RepositoryException {
-        return ClassName.get(packageName(resource), capitalizedIdentifier(resource, config));
+        return ClassName.get(packageName(resource, config), capitalizedIdentifier(resource, config));
     }
 
     /**

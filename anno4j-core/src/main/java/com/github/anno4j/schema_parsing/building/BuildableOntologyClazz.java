@@ -18,10 +18,12 @@ public interface BuildableOntologyClazz extends BuildableOntologyResource {
     /**
      * Resolves a package name for a Java class representing this RDFS class.
      * The package name will be extraced from the hostname portion of the resources URI.
-     * @return The package name for this class or the default package (empty string) if
+     * @param config Configuration for the generation of Java classes.
+     * @return The package name for this class or the default package
+     * ({@link OntGenerationConfig#getBasePackage()} of {@code config}) if
      * no package name can be extracted from the resources URI (e.g. because it is a blank node).
      */
-    String getJavaPackageName();
+    String getJavaPackageName(OntGenerationConfig config);
 
     /**
      * Returns a JavaPoet {@link ClassName} object of a Java class for this RDFS class.

@@ -33,15 +33,15 @@ public class IdentifierBuilderTest {
     @Test
     public void testPackageName() throws Exception {
         IdentifierBuilder builder = IdentifierBuilder.forObjectRepository(anno4j.getObjectRepository());
-        assertEquals("com.xmlns", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(FOAF.HOMEPAGE))));
+        assertEquals("com.xmlns", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(FOAF.HOMEPAGE)), config));
 
-        assertEquals("de.uni_passau.fim", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://fim.uni-passau.de/uri"))));
+        assertEquals("de.uni_passau.fim", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://fim.uni-passau.de/uri")), config));
 
-        assertEquals("over.its.finally_", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://finally.its.over/uri"))));
+        assertEquals("over.its.finally_", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://finally.its.over/uri")), config));
 
-        assertEquals("", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://127.0.0.1/uri"))));
+        assertEquals("", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("http://127.0.0.1/uri")), config));
 
-        assertEquals("", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("urn:isbn:3827370191"))));
+        assertEquals("", builder.packageName(anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl("urn:isbn:3827370191")), config));
     }
 
     @Test
