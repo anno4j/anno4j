@@ -34,9 +34,9 @@ import java.util.Collection;
 public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements BuildableRDFSClazz {
 
     @Override
-    public String getJavaPackageName() {
+    public String getJavaPackageName(OntGenerationConfig config) {
         return ClassNameBuilder.forObjectRepository(getObjectConnection())
-                               .packageName(this);
+                               .packageName(this, config);
     }
 
     /**
