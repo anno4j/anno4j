@@ -66,10 +66,22 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
      */
     private Anno4j anno4j;
 
+    /**
+     * Initializes the generator without a connection to an external repository,
+     * i.e. no ontology information is persisted.
+     * @throws RepositoryConfigException Thrown if the internal repository is not correctly configured.
+     * @throws RepositoryException Thrown if an error occurs regarding the setup of the internal repository.
+     */
     public OWLJavaFileGenerator() throws RepositoryConfigException, RepositoryException {
         this(new Anno4j());
     }
 
+    /**
+     * Initializes the generator with an Anno4j instance which connected repository
+     * will receive the ontology information (including inferred statements) after a call
+     * to {@link #build()} or {@link #generateJavaFiles(OntGenerationConfig, File)}.
+     * @param anno4j The Anno4j instance that will receive ontology information.
+     */
     public OWLJavaFileGenerator(Anno4j anno4j) {
         this.anno4j = anno4j;
 

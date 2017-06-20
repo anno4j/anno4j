@@ -257,6 +257,14 @@ public class IdentifierBuilder {
         }
     }
 
+    /**
+     * Checks whether there is any other resource than the given one which has an {@code rdfs:label}
+     * which would possibly result in the same identifier name by {@link #toJavaName(String)}.
+     * @param resource The resource that has the label.
+     * @param label The label to check for.
+     * @return Returns true iff there is no possibly conflicting label within the repository.
+     * @throws RepositoryException Thrown if an error occurrs while querying the repository.
+     */
     private boolean isRDFSLabelUnique(ResourceObject resource, String label) throws RepositoryException {
         // A conflicting label may be lead by some non-alphanumeric characters:
         StringBuilder regex = new StringBuilder("([^a-zA-Z0-9])*");
@@ -281,6 +289,13 @@ public class IdentifierBuilder {
         }
     }
 
+    /**
+     * Returns true if there is no suffix found in any other resource than the given one
+     * that would possibly result into the same identifier name when processed by {@link #toJavaName(String)}.
+     * @param resource The resource which suffix should be checked.
+     * @return Returns true iff the no other possibly conflicting IRI is found in the repository.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
     private boolean isFileOrFragmentNameUnique(ResourceObject resource) throws RepositoryException {
         String fragment = getFileOrFragmentName(resource);
         // A conflicting label may be lead by a separator and some non-alphanumeric characters:

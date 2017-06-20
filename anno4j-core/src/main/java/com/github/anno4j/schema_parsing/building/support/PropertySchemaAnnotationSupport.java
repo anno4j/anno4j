@@ -215,6 +215,12 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
         return embedded;
     }
 
+    /**
+     * Returns whether the resource is of a certain type given by its IRI.
+     * @param typeIri The IRI of the type to check for.
+     * @return Returns true iff the resource is of the above type.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
     private boolean hasType(String typeIri) throws RepositoryException {
         try {
             ObjectConnection connection = getObjectConnection();
@@ -229,6 +235,12 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
         }
     }
 
+    /**
+     * Builds an annotation which {@code value} is an array of the IRIs (as strings) of the given resources.
+     * @param annotationType The type of the annotation to generate.
+     * @param resources The resources which IRIs should be part of the array.
+     * @return The JavaPoet annotation specification of the above annotation.
+     */
     private AnnotationSpec buildIriArrayAnnotation(Class<?> annotationType, Collection<? extends ResourceObject> resources) {
         CodeBlock.Builder inner = CodeBlock.builder().add("{");
         Iterator<? extends ResourceObject> resourceIter = resources.iterator();
@@ -286,6 +298,15 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
                             .build();
     }
 
+    /**
+     * Generates an annotation which {@code value} is an array of the Java classes ({@link Class}) generated for
+     * the given RDFS classes, e.g. {@code MyAnnotation({MyClazz1.class, MyClazz2.class, ...})}.
+     * @param annotationType The type of the annotation to generate.
+     * @param types The RDFS classes which corresponding Java classes should be part of the array.
+     * @param config The configuration used for generating Java classes.
+     * @return Returns the JavaPoet specification of the above annotation.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
     private AnnotationSpec buildTypeArrayAnnotation(Class<?> annotationType, Collection<? extends RDFSClazz> types, OntGenerationConfig config) throws RepositoryException {
         // Build inner content of the annotation:
         CodeBlock.Builder inner = CodeBlock.builder();
