@@ -72,7 +72,7 @@ public class DatatypeMappingTest {
 
         // Build the generation configuration:
         OntGenerationConfig config = new OntGenerationConfig();
-        config.setDatatypeMappers(new DatatypeMapper[]{new ValidOddIntegerMapper()});
+        config.setDatatypeMappers(new ValidOddIntegerMapper());
 
         // Build an adder for ex:foo and check the type of its parameter:
         MethodSpec adder = foo.buildAdder(declaringClass, config);
@@ -93,7 +93,7 @@ public class DatatypeMappingTest {
 
         // Build the generation configuration:
         OntGenerationConfig config = new OntGenerationConfig();
-        config.setDatatypeMappers(new DatatypeMapper[]{new InvalidOddIntegerMapper()});
+        config.setDatatypeMappers(new InvalidOddIntegerMapper());
 
         // Exception should be thrown:
         boolean exceptionThrown = false;

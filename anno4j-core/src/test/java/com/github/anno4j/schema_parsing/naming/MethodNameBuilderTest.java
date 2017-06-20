@@ -26,7 +26,7 @@ public class MethodNameBuilderTest {
     public void setUp() throws Exception {
         anno4j = new Anno4j();
         config = new OntGenerationConfig();
-        config.setIdentifierLanguagePreference(new String[]{"de", OntGenerationConfig.UNTYPED_LITERAL});
+        config.setIdentifierLanguagePreference("de", OntGenerationConfig.UNTYPED_LITERAL);
     }
 
     @Test

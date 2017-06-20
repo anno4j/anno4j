@@ -139,8 +139,8 @@ public class RDFSJavaFileGeneratorTest {
 
         // Setup the configuration:
         OntGenerationConfig config = new OntGenerationConfig();
-        config.setIdentifierLanguagePreference(new String[] {"en"});
-        config.setJavaDocLanguagePreference(new String[] {"en"});
+        config.setIdentifierLanguagePreference("en");
+        config.setJavaDocLanguagePreference("en");
         config.setValidators(ValidatorChain.getRDFSDefault());
 
         // Generate Java files from the ontology and store them in the output directory:
@@ -198,8 +198,8 @@ public class RDFSJavaFileGeneratorTest {
 
         // Setup the configuration:
         OntGenerationConfig config = new OntGenerationConfig();
-        config.setIdentifierLanguagePreference(new String[] {"en"});
-        config.setJavaDocLanguagePreference(new String[] {"en"});
+        config.setIdentifierLanguagePreference("en");
+        config.setJavaDocLanguagePreference("en");
         config.setValidators(ValidatorChain.getRDFSDefault());
 
         boolean exceptionThrown = false;

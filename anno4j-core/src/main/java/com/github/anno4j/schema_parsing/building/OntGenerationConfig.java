@@ -108,7 +108,7 @@ public class OntGenerationConfig {
      * an untyped literal, i.e. a literal without language information.
      * @param preference The preference sequence to use for identifier names.
      */
-    public void setIdentifierLanguagePreference(String[] preference) {
+    public void setIdentifierLanguagePreference(String... preference) {
         identifierLangPreference.clear();
         identifierLangPreference.addAll(Arrays.asList(preference));
     }
@@ -138,7 +138,7 @@ public class OntGenerationConfig {
      * an untyped literal, i.e. a literal without language information.
      * @param preference The preference sequence to use for identifier names.
      */
-    public void setJavaDocLanguagePreference(String[] preference) {
+    public void setJavaDocLanguagePreference(String... preference) {
         javadocLangPreference.clear();
         javadocLangPreference.addAll(Arrays.asList(preference));
     }
@@ -315,7 +315,7 @@ public class OntGenerationConfig {
      * (subclasses of <code>rdfs:Datatype</code>) to Java types.
      * @param datatypeMappers The mappers to be used during Java file generation.
      */
-    public void setDatatypeMappers(DatatypeMapper[] datatypeMappers) {
+    public void setDatatypeMappers(DatatypeMapper... datatypeMappers) {
         this.datatypeMappers = Arrays.asList(datatypeMappers);
     }
 
