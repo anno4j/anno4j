@@ -2,16 +2,19 @@ package com.github.anno4j.schema;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
+
 /**
  * Provides functionality to its inheriting support classes to make the repository
  * compliant to the schema that is defined in the repository using RDFS/OWL.
- * When the {@link #sanitizeSchema()} method is called the resources values
+ * When the {@link #sanitizeSchema(Resource)} method is called the resources values
  * are made compliant to the schema, e.g. the inverse relation is inserted for a property
  * that is declared symmetric.
  * Currently the following schema features are handled by this support class:
@@ -51,10 +54,12 @@ public abstract class SchemaSanitizingSupport extends ResourceObjectSupport impl
 
     /**
      * Removes orphan values of subproperties, i.e. those values that are set by a subproperty
-     * but not for any superproperty.
+     * but not for the given superproperty.
+     * The values of properties that do not participate in the {@code rdfs:subPropertyOf} relationship
+     * of the given property {@code superPropertyIri} are not affected.
      * @throws RepositoryException Thrown if an error occurs while updating the repository.
      */
-    private void sanitizeSubProperties() throws RepositoryException {
+    private void sanitizeSubProperties(String superPropertyIri) throws RepositoryException {
         ObjectConnection connection = getObjectConnection();
         try {
             connection.prepareUpdate(QueryLanguage.SPARQL,
@@ -62,9 +67,9 @@ public abstract class SchemaSanitizingSupport extends ResourceObjectSupport impl
                             "   <" + getResourceAsString() + "> ?sub ?o . " +
                             "} WHERE {" + // Select those values that are linked by a subproperty:
                             "   <" + getResourceAsString() + "> ?sub ?o . " +
-                            "   ?sub rdfs:subPropertyOf+ ?super . " +
+                            "   ?sub rdfs:subPropertyOf+ <" + superPropertyIri + "> . " +
                             "   MINUS {" + // Don't remove those values that are also linked by superproperties:
-                            "       <" + getResourceAsString() + "> ?super ?o . " +
+                            "       <" + getResourceAsString() + "> <" + superPropertyIri + "> ?o . " +
                             "   }" +
                             "}"
             ).execute();
@@ -140,9 +145,17 @@ public abstract class SchemaSanitizingSupport extends ResourceObjectSupport impl
         }
     }
 
+    /**
+     * Updates the repository in order to comply to the schema information present in it.
+     * Note that updates are always performed locally, i.e. only for this resource.
+     * @param propertyUri The IRI of the  property which values have changed. This must be the only property that
+     *                    changed so that sub-/superproperties receive correct values.
+     * @return Returns false on error. true is returned if sanitizing was performed successfully.
+     */
     @Override
-    public boolean sanitizeSchema() {
+    public boolean sanitizeSchema(Resource propertyUri) {
         try {
+            sanitizeSubProperties(propertyUri.toString());
             sanitizeSuperProperties();
             sanitizeSymmetry();
             sanitizeTransitivity();
@@ -151,5 +164,18 @@ public abstract class SchemaSanitizingSupport extends ResourceObjectSupport impl
             return false;
         }
         return true;
+    }
+
+    /**
+     * Updates the repository in order to comply to the schema information present in it.
+     * Note that updates are always performed locally, i.e. only for this resource.
+     *
+     * @param propertyUri The URI of the  property which values have changed. This must be the only property that
+     *                    changed so that sub-/superproperties receive correct values.
+     * @return Returns false on error. true is returned if sanitizing was performed successfully.
+     */
+    @Override
+    public boolean sanitizeSchema(String propertyUri) {
+        return sanitizeSchema(new URIImpl(propertyUri));
     }
 }

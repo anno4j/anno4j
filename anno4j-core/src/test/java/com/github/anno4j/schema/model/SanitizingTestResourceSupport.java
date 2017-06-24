@@ -13,31 +13,31 @@ public abstract class SanitizingTestResourceSupport extends SchemaSanitizingSupp
 
     @Override
     public void setSuperproperty(Set<Integer> values) {
-        sanitizeSchema();
+        sanitizeSchema("urn:anno4j_test:sanitizing_superprop");
     }
 
     @Override
     public void setSubproperty(Set<Integer> values) {
-        sanitizeSchema();
+        sanitizeSchema("urn:anno4j_test:sanitizing_subprop");
     }
 
     @Override
     public void setSymmetric(Set<SanitizingTestResource> values) {
-        sanitizeSchema();
+        sanitizeSchema("urn:anno4j_test:sanitizing_symmetric");
     }
 
     @Override
     public void setTransitive(Set<SanitizingTestResource> values) {
-        sanitizeSchema();
+        sanitizeSchema("urn:anno4j_test:sanitizing_transitive");
     }
 
     @Override
     public void setInverse1(Set<SanitizingTestResource> values) {
-        sanitizeSchema();
+        sanitizeSchema("urn:anno4j_test:sanitizing_inverse1");
     }
 
     @Override
     public void setInverse2(Set<SanitizingTestResource> values) {
-        sanitizeSchema();
+        sanitizeSchema("urn:anno4j_test:sanitizing_inverse2");
     }
 }

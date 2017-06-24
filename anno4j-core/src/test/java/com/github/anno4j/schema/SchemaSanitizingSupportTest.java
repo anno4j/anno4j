@@ -25,14 +25,26 @@ public class SchemaSanitizingSupportTest {
     public void testSuperpropertySanitizing() throws Exception {
         SanitizingTestResource resource = anno4j.createObject(SanitizingTestResource.class);
 
-        resource.setSuperproperty(Sets.newHashSet(3));
-        assertEquals(Sets.newHashSet(3), resource.getSuperproperty());
-        assertEquals(Sets.<Integer>newHashSet(), resource.getSubproperty());
+        resource.setSuperproperty(Sets.newHashSet(1));
+        resource.setSubproperty(Sets.newHashSet(2));
 
-        resource.setSubproperty(Sets.newHashSet(1, 2));
-        resource.sanitizeSchema();
-        assertEquals(Sets.newHashSet(1, 2, 3), resource.getSuperproperty());
-        assertEquals(Sets.newHashSet(1, 2), resource.getSubproperty());
+        // Check that the values for the subproperty are also set for the superproperty:
+        assertEquals(Sets.newHashSet(1, 2), resource.getSuperproperty());
+
+        resource.setSuperproperty(Sets.newHashSet(3));
+
+        // Now the superproperty should have only the new value and the subproperty should be cleared:
+        assertEquals(Sets.newHashSet(3), resource.getSuperproperty());
+        assertEquals(Sets.newHashSet(), resource.getSubproperty());
+
+        // Check that subproperty keeps values that are also present in updated superproperty:
+        resource.setSubproperty(Sets.newHashSet(4));
+        assertEquals(Sets.newHashSet(3, 4), resource.getSuperproperty());
+        assertEquals(Sets.newHashSet(4), resource.getSubproperty());
+
+        resource.setSuperproperty(Sets.newHashSet(4, 5));
+        assertEquals(Sets.newHashSet(4, 5), resource.getSuperproperty());
+        assertEquals(Sets.newHashSet(4), resource.getSubproperty());
     }
 
     @Test
@@ -41,7 +53,7 @@ public class SchemaSanitizingSupportTest {
         SanitizingTestResource resource2 = anno4j.createObject(SanitizingTestResource.class);
 
         resource1.setSymmetric(Sets.newHashSet(resource2));
-        resource1.sanitizeSchema();
+        resource1.sanitizeSchema("urn:anno4j_test:sanitizing_transitive");
 
         assertEquals(Sets.newHashSet(resource2), resource1.getSymmetric());
         assertEquals(Sets.newHashSet(resource1), resource2.getSymmetric());
@@ -56,7 +68,7 @@ public class SchemaSanitizingSupportTest {
         // Important: Must be in this order because sanitizing is local by specification:
         resource2.setTransitive(Sets.newHashSet(resource3));
         resource1.setTransitive(Sets.newHashSet(resource2));
-        resource1.sanitizeSchema();
+        resource1.sanitizeSchema("urn:anno4j_test:sanitizing_transitive");
 
         assertEquals(Sets.newHashSet(resource2, resource3), resource1.getTransitive());
     }
