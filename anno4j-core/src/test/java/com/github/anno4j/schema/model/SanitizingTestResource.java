@@ -4,7 +4,7 @@ import com.github.anno4j.annotations.InverseOf;
 import com.github.anno4j.annotations.SubPropertyOf;
 import com.github.anno4j.annotations.Symmetric;
 import com.github.anno4j.annotations.Transitive;
-import com.github.anno4j.schema.SchemaSanitizingResourceObject;
+import com.github.anno4j.schema.SchemaSanitizingObject;
 import org.openrdf.annotations.Iri;
 
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.Set;
  * Created by fischmat on 20.06.17.
  */
 @Iri("urn:anno4j_test:sanitizing_resource")
-public interface SanitizingTestResource extends SchemaSanitizingResourceObject {
+public interface SanitizingTestResource extends SchemaSanitizingObject {
 
     @Iri("urn:anno4j_test:sanitizing_superprop")
     Set<Integer> getSuperproperty();

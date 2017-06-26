@@ -8,7 +8,7 @@ import org.openrdf.model.Resource;
 /**
  * Extends the Anno4j base interface {@link com.github.anno4j.model.impl.ResourceObject}
  * providing functionality for sanitizing the repository according to schema information
- * (see {@link SchemaSanitizingSupport}).
+ * (see {@link SchemaSanitizingObjectSupport}).
  *
  * When the {@link #sanitizeSchema(Resource)} method is called the resources values
  * are made compliant to the schema, e.g. the inverse relation is inserted for a property
@@ -25,7 +25,7 @@ import org.openrdf.model.Resource;
  * </ul>
  */
 @Iri(Anno4jNS.RESOURCE)
-public interface SchemaSanitizingResourceObject extends ResourceObject {
+public interface SchemaSanitizingObject extends ResourceObject {
 
     /**
      * Updates the repository in order to comply to the schema information present in it.

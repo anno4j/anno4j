@@ -29,7 +29,7 @@ import org.openrdf.repository.object.ObjectConnection;
  * </ul>
  */
 @Partial
-public abstract class SchemaSanitizingSupport extends ResourceObjectSupport implements SchemaSanitizingResourceObject {
+public abstract class SchemaSanitizingObjectSupport extends ResourceObjectSupport implements SchemaSanitizingObject {
 
     /**
      * Complements values of superproperties according to values set for subproperties.

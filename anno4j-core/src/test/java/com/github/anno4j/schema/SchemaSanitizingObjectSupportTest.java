@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test for {@link SchemaSanitizingSupport}.
+ * Test for {@link SchemaSanitizingObjectSupport}.
  */
-public class SchemaSanitizingSupportTest {
+public class SchemaSanitizingObjectSupportTest {
 
     private Anno4j anno4j;
 

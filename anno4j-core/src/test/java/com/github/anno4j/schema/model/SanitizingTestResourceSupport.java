@@ -1,7 +1,7 @@
 package com.github.anno4j.schema.model;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.schema.SchemaSanitizingSupport;
+import com.github.anno4j.schema.SchemaSanitizingObjectSupport;
 
 import java.util.Set;
 
@@ -9,7 +9,7 @@ import java.util.Set;
  * Created by fischmat on 20.06.17.
  */
 @Partial
-public abstract class SanitizingTestResourceSupport extends SchemaSanitizingSupport implements SanitizingTestResource {
+public abstract class SanitizingTestResourceSupport extends SchemaSanitizingObjectSupport implements SanitizingTestResource {
 
     @Override
     public void setSuperproperty(Set<Integer> values) {
