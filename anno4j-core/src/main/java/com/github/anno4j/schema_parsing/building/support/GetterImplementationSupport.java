@@ -42,7 +42,7 @@ public abstract class GetterImplementationSupport extends GetterSupport implemen
                             .endControlFlow();
 
             } else {
-                ClassName set = ClassName.get(Set.class);
+                TypeName set = ParameterizedTypeName.get(ClassName.get(Set.class), rangeType);
                 TypeName hashSet = ParameterizedTypeName.get(ClassName.get(HashSet.class), rangeType);
 
                 getterBuilder.addStatement("$T values = new $T();", set, hashSet)
