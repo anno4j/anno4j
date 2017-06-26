@@ -40,21 +40,13 @@ public abstract class AdderImplementationSupport extends AdderSupport implements
                 }
             }
 
-            // Generate code for adding also to superproperties:
-            for (RDFSProperty superProperty : getSuperproperties()) {
-                // Ignore superproperties from special vocabulary and the reflexive relation:
-                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                    String superAdderName = asBuildableProperty(superProperty).buildAdder(domainClazz, config).name;
-                    adderBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderName, param);
-                }
-            }
-
             // Get the annotated field for this property:
             FieldSpec field = buildAnnotatedField(domainClazz, config);
 
             // Build the adders method specification:
             return adderBuilder.addAnnotation(overrideAnnotation)
                                 .addStatement("this.$N.add($N)", field, param) // Actual adding code
+                                .addStatement("sanitizeSchema($S)", getResourceAsString()) // Handles adding to superproperties
                                 .build();
 
         } else {

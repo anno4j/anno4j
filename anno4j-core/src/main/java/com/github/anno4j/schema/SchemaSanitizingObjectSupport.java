@@ -1,6 +1,7 @@
 package com.github.anno4j.schema;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
@@ -149,6 +150,74 @@ public abstract class SchemaSanitizingObjectSupport extends ResourceObjectSuppor
 
         } catch (MalformedQueryException | UpdateExecutionException e) {
             throw new RepositoryException(e);
+        }
+    }
+
+    /**
+     * Removes a value from the property given and all its subproperties.
+     * If the schema sanitizing capabilities of this support class are used
+     * this method must be used in order to prevent that the removal is undone by {@link #sanitizeSchema(String)} later.
+     * @param propertyIri The IRI of the property from which the value should be removed.
+     * @param value The value that should be removed.
+     * @return Returns false iff an error occurred.
+     */
+    protected boolean removeValue(String propertyIri, Object value) {
+        ObjectConnection connection = getObjectConnection();
+        try {
+            // For non-literal values:
+            if(value instanceof ResourceObject) {
+                // Remove the value from subproperties:
+                connection.prepareUpdate(QueryLanguage.SPARQL,
+                        "DELETE {" +
+                                "   <" + getResourceAsString() + "> ?p <" + ((ResourceObject) value).getResourceAsString() + "> . " +
+                                "} WHERE {" +
+                                "   ?p rdfs:subPropertyOf+ <" + propertyIri + "> . " +
+                                "}"
+                ).execute();
+
+                // Remove the value from the given property itself:
+                connection.prepareUpdate(QueryLanguage.SPARQL,
+                        "DELETE {" +
+                                "   <" + getResourceAsString() + "> <" + propertyIri + "> <" + ((ResourceObject) value).getResourceAsString() + "> . " +
+                                "}"
+                ).execute();
+
+            } else { // if the value is a literal:
+
+                // Get a SPARQL filter suitable representation of the value:
+                String valueString;
+                if(value instanceof Number) {
+                    valueString = value.toString();
+                } else {
+                    valueString = "'" + value.toString() + "'";
+                }
+
+                // Remove the value from subproperties:
+                connection.prepareUpdate(QueryLanguage.SPARQL,
+                        "DELETE {" +
+                                "   <" + getResourceAsString() + "> ?p ?v . " +
+                                "} WHERE {" +
+                                "   <" + getResourceAsString() + "> ?p ?v . " +
+                                "   ?p rdfs:subPropertyOf+ <" + propertyIri + "> . " +
+                                "   FILTER(?v = " + valueString + ")" +
+                                "}"
+                ).execute();
+
+                // Remove the value from the given property itself:
+                connection.prepareUpdate(QueryLanguage.SPARQL,
+                        "DELETE {" +
+                                "   <" + getResourceAsString() + "> <" + propertyIri + "> ?v . " +
+                                "} WHERE {" +
+                                "   <" + getResourceAsString() + "> <" + propertyIri + "> ?v ." +
+                                "   FILTER(?v = " + valueString + ")" +
+                                "}"
+                ).execute();
+            }
+
+            return true;
+
+        } catch (MalformedQueryException | UpdateExecutionException | RepositoryException e) {
+            return false;
         }
     }
 

@@ -42,23 +42,12 @@ public abstract class AdderAllImplementationSupport extends AdderAllSupport impl
                 }
             }
 
-            // Generate code for adding also to superproperties:
-            adderBuilder.addComment("Add values also to superproperties:")
-                        .beginControlFlow("if(!$N.isEmpty())", param);
-            for (RDFSProperty superProperty : getSuperproperties()) {
-                // Ignore superproperties from special vocabulary and the reflexive relation:
-                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                    String superAdderAllName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
-                    adderBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderAllName, param);
-                }
-            }
-            adderBuilder.endControlFlow(); // End if(!param.isEmpty())
-
             // Get the annotated field for this property:
             FieldSpec field = buildAnnotatedField(domainClazz, config);
 
             return adderBuilder.addAnnotation(overrideAnnotation)
                     .addStatement("this.$N.addAll(values)", field)
+                    .addStatement("sanitizeSchema($S)", getResourceAsString()) // Handles adding to superproperties
                     .build();
 
         } else {

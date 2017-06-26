@@ -130,63 +130,7 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
         // Get the annotated field for this property:
         FieldSpec field = buildAnnotatedField(domainClazz, config);
 
-        // Remove all old values from superproperties:
-        stub.addComment("Remove old values from superproperties:")
-                .beginControlFlow("if(!this.$N.isEmpty())", field);
-        for (RDFSProperty superProperty : getSuperproperties()) {
-            // Ignore superproperties from special vocabulary and the reflexive relation:
-            if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                MethodSpec superPropertyRemoverAll = asBuildableProperty(superProperty).buildRemoverAll(domainClazz, config);
-                stub.addStatement("$N(this.$N)", superPropertyRemoverAll, field);
-            }
-        }
-        stub.endControlFlow(); // End if(!field.isEmpty())
-
-        // Add new values to superproperties:
-        stub.addComment("Add new values to superproperties:");
-        if(isParameterSingleValue) {
-            stub.addStatement("$T tmp = new $T()", ParameterizedTypeName.get(ClassName.get(Set.class), param.type), ParameterizedTypeName.get(ClassName.get(HashSet.class), param.type))
-                .addStatement("tmp.add($N)", param);
-
-            for (RDFSProperty superProperty : getSuperproperties()) {
-                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                    // Use add* for single values and addAll* for Set<> parameter:
-                    String superAdderName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
-                    stub.addStatement("this._invokeResourceObjectMethodIfExists($S, tmp)", superAdderName);
-                }
-            }
-
-        } else {
-            if(isVarArg) { // Emptiness check must be performed different for Set<> and array (vararg):
-                stub.beginControlFlow("if($N.length == 0)", paramName);
-            } else  {
-                stub.beginControlFlow("if(!$N.isEmpty())", paramName);
-            }
-
-            for (RDFSProperty superProperty : getSuperproperties()) {
-                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                    // Use add* for single values and addAll* for Set<> parameter:
-                    String superAdderName = asBuildableProperty(superProperty).buildAdderAll(domainClazz, config).name;
-                    stub.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superAdderName, param);
-                }
-            }
-            stub.endControlFlow();
-        }
-
-        // Generate code for clearing subproperties:
-        stub.addComment("All subproperties loose their values:");
-        for(RDFSProperty subProperty : getSubProperties()) {
-            if(!isFromSpecialVocabulary(subProperty) && !subProperty.equals(this)) {
-                String subPropertySetterName = ((BuildableRDFSProperty) subProperty).buildSetter(domainClazz, config).name;
-                stub.addStatement("this._invokeResourceObjectMethodIfExists($S, new $T())", subPropertySetterName, ClassName.get(HashSet.class));
-            }
-        }
-
-        // Override annotation of the method:
-        AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
-
-        stub.addAnnotation(overrideAnnotation)
-                .addStatement("this.$N.clear()", field);
+        stub.addStatement("this.$N.clear()", field);
 
         if(isParameterSingleValue) {
             stub.addStatement("this.$N.add($N)", field, paramName);
@@ -196,6 +140,12 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
             stub.addStatement("this.$N.addAll($N)", field, paramName);
         }
 
-        return stub;
+        // Sanitize the schema using SchemaSanitizingObjectSupport:
+        stub.addStatement("sanitizeSchema($S)", getResourceAsString());
+
+        // Override annotation of the method:
+        AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
+
+        return stub.addAnnotation(overrideAnnotation);
     }
 }

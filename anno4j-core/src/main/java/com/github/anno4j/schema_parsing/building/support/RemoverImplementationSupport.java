@@ -46,36 +46,13 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
             // Get the annotated field for this property:
             FieldSpec field = buildAnnotatedField(domainClazz, config);
 
-            // Add the actual removal code:
-            removerBuilder.addStatement("boolean contained = this.$N.contains($N)", field, param)
-                    .addStatement("this.$N.remove($N)", field, param)
-                    .addComment("Cascade changes if value was actually set for this property:")
-                    .beginControlFlow("if(contained)");
-
-            // The value can be safely removed also from superproperties
-            // if it was actually removed from this one (see above generated if-clause):
-            removerBuilder.addComment("Remove from superproperties:");
-            for (RDFSProperty superProperty : getSuperproperties()) {
-                // Ignore superproperties from special vocabulary and the reflexive relation:
-                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                    String superRemoverName = asBuildableProperty(superProperty).buildRemover(domainClazz, config).name;
-                    removerBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", superRemoverName, param);
-                }
-            }
-
-            // Same for subproperties. The value can be safely removed from subproperties
-            // if it was actually removed from this one (see above generated if-clause):
-            removerBuilder.addComment("Remove from subproperties:");
-            for(RDFSProperty subProperty : getSubProperties()) {
-                // Ignore subproperties from special vocabulary and the reflexive relation:
-                if(!isFromSpecialVocabulary(subProperty) && !subProperty.equals(this)) {
-                    String subPropertyRemoverName = ((BuildableRDFSProperty) subProperty).buildRemover(domainClazz, config).name;
-                    removerBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, $N)", subPropertyRemoverName, param);
-                }
-            }
-
-            removerBuilder.endControlFlow() // End if(removed)
-                          .addStatement("return contained");
+            // Add the actual removal code and sanitize schema afterwards:
+            removerBuilder.beginControlFlow("if(this.$N.contains($N))", field, param)
+                          .addStatement("removeValue($S, $N)", getResourceAsString(), param)
+                          .addStatement("sanitizeSchema($S)", getResourceAsString())
+                          .addStatement("return true")
+                          .endControlFlow()
+                          .addStatement("return false");
 
             // Build the removers method specification:
             return removerBuilder.addAnnotation(overrideAnnotation)

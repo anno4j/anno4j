@@ -61,29 +61,11 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             // Only propagate removal if there is actually something to be removed:
             removerAllBuilder.beginControlFlow("if(!_containedValues.isEmpty())");
 
-            removerAllBuilder.addStatement("this.$N.removeAll(_containedValues)", field);
-
-            // The values can be safely removed also from superproperties
-            // if they were actually removed from this one (see above generated if-clause):
-            removerAllBuilder.addComment("Remove from superproperties:");
-            for (RDFSProperty superProperty : getSuperproperties()) {
-                // Ignore superproperties from special vocabulary and the reflexive relation:
-                if(!isFromSpecialVocabulary(superProperty) && !superProperty.equals(this)) {
-                    String superRemoverAllName = asBuildableProperty(superProperty).buildRemoverAll(domainClazz, config).name;
-                    removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", superRemoverAllName);
-                }
-            }
-
-            // The value can be safely removed from subproperties
-            // if it was actually removed from this one (see above generated if-clause):
-            removerAllBuilder.addComment("Remove values from subproperties:");
-            for(RDFSProperty subProperty : getSubProperties()) {
-                // Ignore subproperties from special vocabulary and the reflexive relation:
-                if(!isFromSpecialVocabulary(subProperty) && !subProperty.equals(this)) {
-                    String subPropertyRemoverAllName = ((BuildableRDFSProperty) subProperty).buildRemoverAll(domainClazz, config).name;
-                    removerAllBuilder.addStatement("this._invokeResourceObjectMethodIfExists($S, _containedValues)", subPropertyRemoverAllName);
-                }
-            }
+            // Remove all values and sanitize schema afterwards using SchemaSanitizingObjectSupport:
+            removerAllBuilder.beginControlFlow("for($T _current : _containedValues)", rangeClassName)
+                             .addStatement("removeValue($S, _current)", getResourceAsString())
+                             .endControlFlow()
+                             .addStatement("sanitizeSchema($S)", getResourceAsString());
 
             removerAllBuilder.endControlFlow(); // End if(!_containedValues.isEmpty())
 

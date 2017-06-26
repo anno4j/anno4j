@@ -3,6 +3,7 @@ package com.github.anno4j.schema_parsing.building;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.schema.SchemaSanitizingObjectSupport;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.support.SupportTypeSpecSupport;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
@@ -60,8 +61,8 @@ public class SupportTypeSpecTest extends TypeSpecTest {
         assertEquals(partialAnnotation, typeSpec.annotations.get(0));
 
         // Test superclass:
-        TypeName resourceObjectSupport = ClassName.get(ResourceObjectSupport.class);
-        assertEquals(resourceObjectSupport, typeSpec.superclass);
+        TypeName sanitizingObjectSupport = ClassName.get(SchemaSanitizingObjectSupport.class);
+        assertEquals(sanitizingObjectSupport, typeSpec.superclass);
 
         // Test superinterface:
         ClassName superInterface = clazz.getJavaPoetClassName(generationConfig);
