@@ -45,6 +45,16 @@ public abstract class SchemaSanitizingObjectSupport extends ResourceObjectSuppor
                             "} WHERE {" +
                             "   <" + getResourceAsString() + "> ?p ?o . " +
                             "   ?p rdfs:subPropertyOf+ ?super . " +
+                            "   MINUS {" +
+                            "       <" + getResourceAsString() + "> ?super ?o2 ." +
+                            "       {" +
+                            "          ?o2 owl:sameAs+ ?o . " +
+                            "       }" +
+                            "       UNION " +
+                            "       {" +
+                            "          ?o owl:sameAs+ ?o2 . " +
+                            "       }" +
+                            "   }" +
                             "}"
             ).execute();
 
