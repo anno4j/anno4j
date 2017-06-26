@@ -68,8 +68,15 @@ public abstract class SchemaSanitizingSupport extends ResourceObjectSupport impl
                             "} WHERE {" + // Select those values that are linked by a subproperty:
                             "   <" + getResourceAsString() + "> ?sub ?o . " +
                             "   ?sub rdfs:subPropertyOf+ <" + superPropertyIri + "> . " +
-                            "   MINUS {" + // Don't remove those values that are also linked by superproperties:
-                            "       <" + getResourceAsString() + "> <" + superPropertyIri + "> ?o . " +
+                            "   MINUS {" +
+                            "       {" + // Don't remove those values that are also linked by superproperties...
+                            "           <" + getResourceAsString() + "> <" + superPropertyIri + "> ?o ." +
+                            "       } " +
+                            "       UNION " +
+                            "       {" + // or that are equivalent to such a value:
+                            "          <" + getResourceAsString() + "> <" + superPropertyIri + "> ?v . " +
+                            "          { ?v owl:sameAs+ ?o . } UNION { ?o owl:sameAs+ ?v . }" +
+                            "       }" +
                             "   }" +
                             "}"
             ).execute();
