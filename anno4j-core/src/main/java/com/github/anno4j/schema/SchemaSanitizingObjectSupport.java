@@ -187,7 +187,7 @@ public abstract class SchemaSanitizingObjectSupport extends ResourceObjectSuppor
 
                 // Remove the value from the given property itself:
                 connection.prepareUpdate(QueryLanguage.SPARQL,
-                        "DELETE {" +
+                        "DELETE DATA {" +
                                 "   <" + getResourceAsString() + "> <" + propertyIri + "> <" + ((ResourceObject) value).getResourceAsString() + "> . " +
                                 "}"
                 ).execute();

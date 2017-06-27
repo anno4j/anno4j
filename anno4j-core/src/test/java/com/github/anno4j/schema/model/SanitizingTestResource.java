@@ -5,6 +5,7 @@ import com.github.anno4j.annotations.SubPropertyOf;
 import com.github.anno4j.annotations.Symmetric;
 import com.github.anno4j.annotations.Transitive;
 import com.github.anno4j.schema.SchemaSanitizingObject;
+import com.github.anno4j.schema.SchemaSanitizingObjectSupportTest;
 import org.openrdf.annotations.Iri;
 
 import java.util.Set;
@@ -27,6 +28,19 @@ public interface SanitizingTestResource extends SchemaSanitizingObject {
 
     @Iri("urn:anno4j_test:sanitizing_subprop")
     void setSubproperty(Set<Integer> values);
+
+    @Iri("urn:anno4j_test:sanitizing_obj_superprop")
+    Set<SanitizingTestResource> getObjectSuperproperty();
+
+    @Iri("urn:anno4j_test:sanitizing_obj_superprop")
+    void setObjectSuperproperty(Set<SanitizingTestResource> values);
+
+    @Iri("urn:anno4j_test:sanitizing_obj_subprop")
+    @SubPropertyOf({"urn:anno4j_test:sanitizing_obj_superprop"})
+    Set<SanitizingTestResource> getObjectSubproperty();
+
+    @Iri("urn:anno4j_test:sanitizing_obj_subprop")
+    void setObjectSubproperty(Set<SanitizingTestResource> values);
 
     @Iri("urn:anno4j_test:sanitizing_symmetric")
     @Symmetric
@@ -55,4 +69,10 @@ public interface SanitizingTestResource extends SchemaSanitizingObject {
 
     @Iri("urn:anno4j_test:sanitizing_inverse2")
     void setInverse2(Set<SanitizingTestResource> values);
+
+    /**
+     * This method tests value removal and belongs to
+     * {@link SchemaSanitizingObjectSupportTest#testRemoveValue()}.
+     */
+    void testRemoveValue(SanitizingTestResource superObject);
 }
