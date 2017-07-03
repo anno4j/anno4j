@@ -38,6 +38,15 @@ public interface BuildableRDFSClazz extends RDFSClazz, BuildableOntologyClazz {
     Set<RDFSClazz> getSubclazzes() throws RepositoryException;
 
     /**
+     * Returns all direct superclasses of this class, i.e. every {@code rdfs:Class} instance X
+     * which is in a {@code rdfs:subClassOf} relationship and for which no class X' does exist with
+     * {@code this rdfs:subClassOf+ X' . X' rdfs:subClassOf+ X . }
+     * @return Returns the set of direct superclasses.
+     * @throws RepositoryException Thrown of an error occurs while querying the repository.
+     */
+    Set<RDFSClazz> getDirectSuperclazzes() throws RepositoryException;
+
+    /**
      * Checks whether the given resource is a superclass of this class, i.e. there is a statement
      * with predicate rdfs:subClassOf, the resource as object and this class as subject.
      * Also searches transitively for a subclass relationship.

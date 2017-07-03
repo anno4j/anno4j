@@ -10,6 +10,7 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectQuery;
 
 import java.util.Set;
@@ -82,6 +83,27 @@ public abstract class BuildableRDFSClazzSupport extends RDFSClazzSupport impleme
                             "}"
             );
             return query.evaluate(RDFSClazz.class).asSet();
+        } catch (MalformedQueryException | QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public Set<RDFSClazz> getDirectSuperclazzes() throws RepositoryException {
+        ObjectConnection connection = getObjectConnection();
+        try {
+            ObjectQuery query = connection.prepareObjectQuery(
+                    "SELECT ?c {" +
+                    "  <" + getResourceAsString() + "> rdfs:subClassOf ?c . " +
+                    "  MINUS {" +
+                    "     <"+ getResourceAsString() + "> rdfs:subClassOf+ ?c2 . " +
+                    "     ?c2 rdfs:subClassOf+ ?c . " +
+                    "     FILTER(?c != ?c2 && <" + getResourceAsString() + "> != ?c2)" +
+                    "  }" +
+                    "}"
+            );
+            return query.evaluate(RDFSClazz.class).asSet();
+
         } catch (MalformedQueryException | QueryEvaluationException e) {
             throw new RepositoryException(e);
         }

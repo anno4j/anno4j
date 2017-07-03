@@ -32,8 +32,8 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
         ClassName clazzName = getJavaPoetClassName(config);
 
         Collection<TypeName> superClazzNames = new HashSet<>();
-        for (RDFSClazz superClazz : getSuperclazzes()) {
-            // Only take owl:Thing (corresponds to ResourceObject) if there is no other superclass:
+        for (RDFSClazz superClazz : getDirectSuperclazzes()) {
+            // Ignore owl:Thing. This is handled below:
             if(!superClazz.getResourceAsString().equals(OWL.THING)) {
                 // Ignore the subclass relation of the class to itself and OWL restrictions (handled by annotations):
                 if(!superClazz.equals(this) && !(superClazz instanceof Restriction)) {
