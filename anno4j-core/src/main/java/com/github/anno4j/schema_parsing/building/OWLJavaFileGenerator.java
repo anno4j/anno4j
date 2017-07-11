@@ -29,6 +29,8 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.ObjectQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +67,11 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
      * The Anno4j instance where RDFS information is persisted to.
      */
     private Anno4j anno4j;
+
+    /**
+     * The logger used for printing progress.
+     */
+    private Logger logger = LoggerFactory.getLogger(OWLJavaFileGenerator.class);
 
     /**
      * Initializes the generator without a connection to an external repository,
@@ -255,13 +262,17 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
             anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(OWL.CLAZZ));
 
 
+            logger.debug("Inferring statements using " + model.getReasoner().getClass().getName() + ". This may take a while...");
+            int statementTransferCount = 0;
             StmtIterator statementIter = model.listStatements();
             while (statementIter.hasNext()) {
                 Statement jenaStatement = statementIter.nextStatement();
                 anno4j.getObjectRepository()
                         .getConnection()
                         .add(JenaSesameUtils.asSesameStatement(jenaStatement));
+                statementTransferCount++;
             }
+            logger.debug(statementTransferCount + " statements inferred");
 
             anno4j.getObjectRepository().getConnection().prepareUpdate(
                     "INSERT {" +
@@ -310,6 +321,7 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
     }
 
     private void normalizeRDFSEquivalence() throws RepositoryException {
+        int normalizationCount = 0; // Number of SCCs found
         for(Collection<RDFSClazz> scc : StronglyConnectedComponents.findSCCs(anno4j.findAll(RDFSClazz.class))) {
             if(scc.size() > 1) {
                 Iterator<RDFSClazz> sccIterator = scc.iterator();
@@ -353,8 +365,11 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
                         throw new RepositoryException(e);
                     }
                 }
+
+                normalizationCount++;
             }
         }
+        logger.debug("Found and reduced " + normalizationCount + " rdfs:subClassOf SCCs...");
     }
 
     /**
@@ -426,6 +441,7 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
         }
 
         // Process the model:
+        logger.debug("Building ontology model...");
         try {
             build();
         } catch (RDFSModelBuildingException e) {
@@ -439,8 +455,11 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
 
         // Get the actual output directory depending on the base package set:
         outputDirectory = getAbsoluteOutputDirectory(outputDirectory, config);
+        logger.debug("Generated files will be written to " + outputDirectory.getAbsolutePath() + " and base package " + config.getBasePackage());
 
-        for (BuildableRDFSClazz clazz : getDistinctClasses()) {
+        int clazzesGenerated = 0; // Number of classes generated for logging purposes
+        Collection<BuildableRDFSClazz> clazzes = getDistinctClasses();
+        for (BuildableRDFSClazz clazz : clazzes) {
             // Don't output files for classes that are from RDF/RDFS/... vocab and not for literal types:
             if (!isFromSpecialVocabulary(clazz) && !clazz.isLiteral()) {
 
@@ -455,6 +474,11 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
 
                 resourceObjectFile.writeTo(outputDirectory);
                 supportFile.writeTo(outputDirectory);
+
+                clazzesGenerated++;
+                logger.debug("Generated Java class " + clazz.getJavaPoetClassName(config).simpleName()
+                        + " for RDF class " + clazz.getResourceAsString()
+                        + " (" + clazzesGenerated + " of " + clazzes.size() + ")");
             }
         }
     }
