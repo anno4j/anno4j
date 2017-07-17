@@ -75,15 +75,25 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
             if(!definedInSuper && !isFromSpecialVocabulary(property)) {
                 getters.add(buildable.buildGetter(this, config));
                 setters.add(buildable.buildSetter(this, config));
-                adders.add(buildable.buildAdder(this, config));
-                removers.add(buildable.buildRemover(this, config));
+                if(config.areAdderMethodsGenerated()) {
+                    adders.add(buildable.buildAdder(this, config));
+                }
+                if(config.areRemoverMethodsGenerated()) {
+                    removers.add(buildable.buildRemover(this, config));
+                }
 
                 // Generate *All() methods only if cardinality is greater than one:
                 Integer cardinality = buildable.getCardinality(this);
                 if(cardinality == null || cardinality > 1) {
-                    setters.add(buildable.buildVarArgSetter(this, config));
-                    adderAll.add(buildable.buildAdderAll(this, config));
-                    removerAll.add(buildable.buildRemoverAll(this, config));
+                    if(config.areVarArgSetterMethodsGenerated()) {
+                        setters.add(buildable.buildVarArgSetter(this, config));
+                    }
+                    if(config.areAdderAllMethodsGenerated()) {
+                        adderAll.add(buildable.buildAdderAll(this, config));
+                    }
+                    if(config.areRemoverAllMethodsGenerated()) {
+                        removerAll.add(buildable.buildRemoverAll(this, config));
+                    }
                 }
             }
         }

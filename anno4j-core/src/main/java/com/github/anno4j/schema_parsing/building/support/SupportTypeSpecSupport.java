@@ -1,8 +1,6 @@
 package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.impl.ResourceObject;
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.OWL;
 import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.schema.SchemaSanitizingObjectSupport;
@@ -15,8 +13,6 @@ import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -78,15 +74,25 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
 
                 getters.add(buildable.buildGetterImplementation(this, config));
                 setters.add(buildable.buildSetterImplementation(this, config));
-                adders.add(buildable.buildAdderImplementation(this, config));
-                removers.add(buildable.buildRemoverImplementation(this, config));
+                if(config.areAdderMethodsGenerated()) {
+                    adders.add(buildable.buildAdderImplementation(this, config));
+                }
+                if(config.areRemoverMethodsGenerated()) {
+                    removers.add(buildable.buildRemoverImplementation(this, config));
+                }
 
                 // Generate *All() methods only if cardinality is greater than one:
                 Integer cardinality = buildable.getCardinality(this);
                 if(cardinality == null || cardinality > 1) {
-                    setters.add(buildable.buildVarArgSetterImplementation(this, config));
-                    addersAll.add(buildable.buildAdderAllImplementation(this, config));
-                    removersAll.add(buildable.buildRemoverAllImplementation(this, config));
+                    if(config.areVarArgSetterMethodsGenerated()) {
+                        setters.add(buildable.buildVarArgSetterImplementation(this, config));
+                    }
+                    if(config.areAdderAllMethodsGenerated()) {
+                        addersAll.add(buildable.buildAdderAllImplementation(this, config));
+                    }
+                    if(config.areRemoverAllMethodsGenerated()) {
+                        removersAll.add(buildable.buildRemoverAllImplementation(this, config));
+                    }
                 }
             }
         }

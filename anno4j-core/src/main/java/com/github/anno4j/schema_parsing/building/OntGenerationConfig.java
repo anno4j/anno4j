@@ -73,6 +73,32 @@ public class OntGenerationConfig {
     private String basePackage = "";
 
     /**
+     * Whether methods for adding a single value to the value set of an objects property should be generated.
+     */
+    private boolean doGenerateAdder = true;
+
+    /**
+     * Whether methods for adding a multiple values to the value set of an objects property should be generated.
+     */
+    private boolean doGenerateAdderAll = true;
+
+    /**
+     * Whether methods for removing a single value from the value set of an objects property should be generated.
+     */
+    private boolean doGenerateRemover = true;
+
+    /**
+     * Whether methods for removing a multiple values from the value set of an objects property should be generated.
+     */
+    private boolean doGenerateRemoverAll = true;
+
+    /**
+     * Whether methods for setting the value set of an objects property using variable arguments should be generated.
+     */
+    private boolean doGenerateVarArgSetter = true;
+
+
+    /**
      * Initializes the configuration with preference for untyped literals
      * for identifiers and JavaDoc.
      * Uses the default validator chain for RDFS (see {@link ValidatorChain#getRDFSDefault()}).
@@ -411,5 +437,75 @@ public class OntGenerationConfig {
      */
     public void setBasePackage(String basePackage) {
         this.basePackage = basePackage;
+    }
+
+    /**
+     * @return Whether methods for adding a single value to the value set of an objects property should be generated.
+     */
+    public boolean areAdderMethodsGenerated() {
+        return doGenerateAdder;
+    }
+
+    /**
+     * @param doGenerateAdder Whether methods for adding a single value to the value set of an objects property should be generated.
+     */
+    public void useAdderMethodGeneration(boolean doGenerateAdder) {
+        this.doGenerateAdder = doGenerateAdder;
+    }
+
+    /**
+     * @return Whether methods for adding a multiple values to the value set of an objects property should be generated.
+     */
+    public boolean areAdderAllMethodsGenerated() {
+        return doGenerateAdderAll;
+    }
+
+    /**
+     * @param doGenerateAdderAll Whether methods for adding a multiple values to the value set of an objects property should be generated.
+     */
+    public void useAdderAllMethodGeneration(boolean doGenerateAdderAll) {
+        this.doGenerateAdderAll = doGenerateAdderAll;
+    }
+
+    /**
+     * @return Whether methods for removing a single value from the value set of an objects property should be generated.
+     */
+    public boolean areRemoverMethodsGenerated() {
+        return doGenerateRemover;
+    }
+
+    /**
+     * @param doGenerateRemover Whether methods for removing a single value from the value set of an objects property should be generated.
+     */
+    public void useRemoverMethodGeneration(boolean doGenerateRemover) {
+        this.doGenerateRemover = doGenerateRemover;
+    }
+
+    /**
+     * @return Whether methods for removing a multiple values from the value set of an objects property should be generated.
+     */
+    public boolean areRemoverAllMethodsGenerated() {
+        return doGenerateRemoverAll;
+    }
+
+    /**
+     * @param doGenerateRemoverAll Whether methods for removing a multiple values from the value set of an objects property should be generated.
+     */
+    public void useRemoverAllMethodGeneration(boolean doGenerateRemoverAll) {
+        this.doGenerateRemoverAll = doGenerateRemoverAll;
+    }
+
+    /**
+     * @return Whether methods for setting the value set of an objects property using variable arguments should be generated.
+     */
+    public boolean areVarArgSetterMethodsGenerated() {
+        return doGenerateVarArgSetter;
+    }
+
+    /**
+     * @param doGenerateVarArgSetter Whether methods for setting the value set of an objects property using variable arguments should be generated.
+     */
+    public void useVarArgSetterGeneration(boolean doGenerateVarArgSetter) {
+        this.doGenerateVarArgSetter = doGenerateVarArgSetter;
     }
 }
