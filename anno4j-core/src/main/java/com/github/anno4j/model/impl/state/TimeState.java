@@ -23,7 +23,6 @@ public interface TimeState extends State {
      *
      * @param sourceDateStart   The value to set for the http://www.w3.org/ns/oa#sourceDateStart relationship.
      */
-    @Iri(OADM.SOURCE_DATE_START)
     void setSourceDateStart(String sourceDateStart);
 
     /**
@@ -34,7 +33,6 @@ public interface TimeState extends State {
      *
      * @return  The value currently set for the http://www.w3.org/ns/oa#sourceDateStart relationship.
      */
-    @Iri(OADM.SOURCE_DATE_START)
     String getSourceDateStart();
 
     /**
@@ -45,7 +43,6 @@ public interface TimeState extends State {
      *
      * @param sourceDateEnd The value to set for the http://www.w3.org/ns/oa#sourceDateEnd relationship.
      */
-    @Iri(OADM.SOURCE_DATE_END)
     void setSourceDateEnd(String sourceDateEnd);
 
     /**
@@ -56,7 +53,6 @@ public interface TimeState extends State {
      *
      * @return  The value currently defined for the http://www.w3.org/ns/oa#sourceDateEnd relationship.
      */
-    @Iri(OADM.SOURCE_DATE_END)
     String getSourceDateEnd();
 
     /**

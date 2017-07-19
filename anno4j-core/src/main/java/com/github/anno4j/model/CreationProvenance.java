@@ -35,7 +35,6 @@ public interface CreationProvenance extends ResourceObject {
      *
      * @return  The timestamp value of the dcterms:created property.
      */
-    @Iri(DCTERMS.CREATED)
     String getCreated();
 
     /**
@@ -43,7 +42,6 @@ public interface CreationProvenance extends ResourceObject {
      *
      * @param created   The timestamp to set for the dcterms:created property.
      */
-    @Iri(DCTERMS.CREATED)
     void setCreated(String created);
 
     /**
@@ -64,7 +62,6 @@ public interface CreationProvenance extends ResourceObject {
      *
      * @return  The timestamp value of the dcterms:modified property.
      */
-    @Iri(DCTERMS.MODIFIED)
     String getModified();
 
     /**
@@ -72,7 +69,6 @@ public interface CreationProvenance extends ResourceObject {
      *
      * @param modification  The timestamp value to set for the dcterms:modified property.
      */
-    @Iri(DCTERMS.MODIFIED)
     void setModified(String modification);
 
     /**

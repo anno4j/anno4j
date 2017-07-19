@@ -127,7 +127,6 @@ public interface Annotation extends CreationProvenance {
      *
      * @return  The timestamp value of the dcterms:issued property.
      */
-    @Iri(DCTERMS.ISSUED)
     String getGenerated();
 
     /**
@@ -135,7 +134,6 @@ public interface Annotation extends CreationProvenance {
      *
      * @param generated The timestamp value to set for the dcterms:issued property.
      */
-    @Iri(DCTERMS.ISSUED)
     void setGenerated(String generated);
 
     /**
@@ -193,7 +191,6 @@ public interface Annotation extends CreationProvenance {
      * @return Value of http:www.w3.org/ns/oa#serializedAt.
      */
     @Deprecated
-    @Iri(OADM.SERIALIZED_AT)
     String getSerializedAt();
 
     /**
@@ -202,7 +199,6 @@ public interface Annotation extends CreationProvenance {
      * @param serializedAt New value of http:www.w3.org/ns/oa#serializedAt.
      */
     @Deprecated
-    @Iri(OADM.SERIALIZED_AT)
     void setSerializedAt(String serializedAt);
 
     /**
@@ -225,7 +221,6 @@ public interface Annotation extends CreationProvenance {
      * @return Value of http:www.w3.org/ns/oa#annotatedAt.
      */
     @Deprecated
-    @Iri(OADM.ANNOTATED_AT)
     String getAnnotatedAt();
 
     /**
@@ -234,7 +229,6 @@ public interface Annotation extends CreationProvenance {
      * @param annotatedAt New value of http:www.w3.org/ns/oa#annotatedAt.
      */
     @Deprecated
-    @Iri(OADM.ANNOTATED_AT)
     void setAnnotatedAt(String annotatedAt);
 
     /**
