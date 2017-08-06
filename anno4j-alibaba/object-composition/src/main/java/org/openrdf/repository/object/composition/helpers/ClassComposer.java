@@ -663,6 +663,7 @@ public class ClassComposer {
 		for(int i = 0; i < behaviour.getMethods().length; i++) {
 			methodHashes[i] = behaviour.getMethods()[i].hashCode();
 		}
+		Arrays.sort(methodHashes);
 		int methodsHash = Arrays.hashCode(methodHashes);
 
 		String simpleName = factory.getName().replaceAll("\\W", "_");
