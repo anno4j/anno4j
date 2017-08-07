@@ -291,6 +291,58 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
                             "   UNION { ?p rdfs:subPropertyOf ?super . } UNION { ?sub rdfs:subPropertyOf ?p . }" +
                             "}"
             ).execute();
+            // Infer the domain/range of properties that have an inverse property:
+            anno4j.getObjectRepository().getConnection().prepareUpdate(
+                    "INSERT {" +
+                            "   ?p rdfs:domain ?v . " +
+                            "} WHERE {" +
+                            "   ?p a rdf:Property . " + // ?p is a Property without domain:
+                            "   MINUS {" +
+                            "      ?p rdfs:domain ?v2 . " +
+                            "   }" +
+                            "   {" + // There exists an inverse ?i:
+                            "      ?p owl:inverseOf ?i . " +
+                            "   } UNION {" +
+                            "      ?i owl:inverseOf ?p . " +
+                            "   }" +
+                            "   ?i rdfs:range ?v . " + // ?i has a range, i.e. the domain of ?p
+                            "}"
+            ).execute();
+            anno4j.getObjectRepository().getConnection().prepareUpdate(
+                    "INSERT {" +
+                            "   ?p rdfs:range ?v . " +
+                            "} WHERE {" +
+                            "   ?p a rdf:Property . " + // ?p is a Property without range:
+                            "   MINUS {" +
+                            "      ?p rdfs:range ?v2 . " +
+                            "   }" +
+                            "   {" + // There exists an inverse ?i:
+                            "      ?p owl:inverseOf ?i . " +
+                            "   } UNION {" +
+                            "      ?i owl:inverseOf ?p . " +
+                            "   }" +
+                            "   ?i rdfs:domain ?v . " + // ?i has a domain, i.e. the range of ?p
+                            "}"
+            ).execute();
+            // Properties without asserted domain/range inherit it from their superproperties:
+            anno4j.getObjectRepository().getConnection().prepareUpdate(
+                    "INSERT {" +
+                            "  ?p ?t ?v . " +
+                            "} WHERE { " +
+                            "   VALUES ?t { rdfs:domain rdfs:range } " +
+                            "   ?p a rdf:Property . " + // Look for properties without ?t value.
+                            "   MINUS {" +
+                            "       ?p ?t ?vp . " +
+                            "   }" +
+                            "   ?p rdfs:subPropertyOf+ ?m . " + // Select the value of superproperties.
+                            "   ?m ?t ?v . " +
+                            "   MINUS {" + // Remove properties that have a subproperty with a ?t value. (Ensures most specific superprop is taken)
+                            "       ?m2 rdfs:subPropertyOf+ ?m . " +
+                            "       ?m2 ?t ?v2 . " +
+                            "       FILTER( ?m2 != ?p && ?m2 != ?m )" +
+                            "   }" +
+                            "}"
+            ).execute();
             // Set owl:Thing as the domain of all properties which have none specified:
             anno4j.getObjectRepository().getConnection().prepareUpdate(
                     "INSERT {" +
