@@ -1,10 +1,7 @@
 package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.namespaces.OWL;
-import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.schema.SchemaSanitizingObjectSupport;
-import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
@@ -23,24 +20,6 @@ import java.util.HashSet;
 @Partial
 public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implements BuildableRDFSClazz {
 
-    /**
-     * Checks if <code>property</code> is an outgoing property of any (transitive) superclass
-     * of this class, which is not part of the RDFS specification (i.e. has the {@link RDFS#NS namespace}).
-     * @param property The property to check for.
-     * @return Returns true if and only if <code>property</code> is not an outgoing property of any transitive non-RDFS
-     * superclass.
-     */
-    private boolean isDefinedInSuperclass(RDFSProperty property) throws RepositoryException {
-        // Check if the property is present in any (non RDFS) superclass:
-        boolean definedInSuper = false;
-        for (RDFSClazz superClazz : getSuperclazzes()) {
-            definedInSuper |= asBuildableClazz(superClazz).hasPropertyTransitive(property)
-                    && !superClazz.getResourceAsString().startsWith(RDFS.NS) && !superClazz.getResourceAsString().startsWith(OWL.NS)
-                    && !superClazz.equals(this);
-        }
-        return definedInSuper;
-    }
-
     @Override
     public TypeSpec buildSupportTypeSpec(OntGenerationConfig config) throws RepositoryException {
         // First try to find a name for this class:
@@ -58,7 +37,7 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
         Collection<MethodSpec> removers = new HashSet<>();
         Collection<MethodSpec> removersAll = new HashSet<>();
         for (RDFSProperty property : getOutgoingProperties()) {
-            // Only add the method to the type spec if it was not already defined in a superclass:
+            // Only add the method to the type spec if it was not already defined in a superclass (unless it requires redefinition):
             if(!isDefinedInSuperclass(property) && !isFromSpecialVocabulary(property)) {
                 BuildableRDFSProperty buildable = asBuildableProperty(property);
                 setters.add(buildable.buildVarArgSetterImplementation(this, config));

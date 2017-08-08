@@ -195,6 +195,50 @@ public abstract class ClazzBuildingSupport extends RDFSClazzSupport implements B
     }
 
     /**
+     * Checks if <code>property</code> is an outgoing property of any (transitive) superclass
+     * of this class, which is not part of the RDFS specification (i.e. has the {@link RDFS#NS namespace}).
+     * @param property The property to check for.
+     * @return Returns true if and only if <code>property</code> is not an outgoing property of any transitive non-RDFS
+     * superclass.
+     */
+     boolean isDefinedInSuperclass(RDFSProperty property) throws RepositoryException {
+        // Check if the property is present in any (non RDFS) superclass:
+        boolean definedInSuper = false;
+        for (RDFSClazz superClazz : getSuperclazzes()) {
+            definedInSuper |= asBuildableClazz(superClazz).hasPropertyTransitive(property)
+                    && !superClazz.getResourceAsString().startsWith(RDFS.NS) && !superClazz.getResourceAsString().startsWith(OWL.NS)
+                    && !superClazz.equals(this);
+        }
+        return definedInSuper;
+    }
+
+    /**
+     * Whether the mapping for the given property needs to be redefined in this class.
+     * This is the case if the class has a (direct) {@code owl:Restriction} on the property
+     * for this class.
+     * @param property The property to check for.
+     * @return Returns true if the property mapping needs a redefinition in the Java class generated
+     * for this class.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+     boolean needsRedefinition(RDFSProperty property) throws RepositoryException {
+        try {
+            BooleanQuery query = getObjectConnection().prepareBooleanQuery(QueryLanguage.SPARQL,
+                    "ASK {" +
+                            "   ?r a owl:Restriction . " +
+                            "   <" + getResourceAsString() + "> rdfs:subClassOf ?r . " +
+                            "   ?r owl:onProperty <" + property.getResourceAsString() + "> . " +
+                            "}"
+            );
+
+            return query.evaluate();
+
+        } catch (MalformedQueryException | QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    /**
      * Returns the given resource in {@link BuildableRDFSProperty} type.
      * @param property The property resource which should be converted.
      * @return The property in the {@link BuildableRDFSProperty} type or null if there is no such property

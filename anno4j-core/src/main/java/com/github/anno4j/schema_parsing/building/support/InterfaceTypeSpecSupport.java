@@ -2,7 +2,6 @@ package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.namespaces.OWL;
-import com.github.anno4j.model.namespaces.RDFS;
 import com.github.anno4j.schema.model.owl.Restriction;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
@@ -61,38 +60,35 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
             // Get as buildable object:
             BuildableRDFSProperty buildable = asBuildableProperty(property);
 
-            // Check if the property is present in any superclass:
-            boolean definedInSuper = false;
-            for (RDFSClazz superClazz : getSuperclazzes()) {
-                // Ignore RDFS classes, because this property may be shifted from rdfs:Class or owl:Thing
-                // to a root class that is actually generated:
-                definedInSuper |= asBuildableClazz(superClazz).hasPropertyTransitive(property)
-                                && !superClazz.getResourceAsString().startsWith(RDFS.NS) && !superClazz.getResourceAsString().startsWith(OWL.NS)
-                                && !superClazz.equals(this);
-            }
+            // Don't generate methods for properties from OWL, RDFS...:
+            if(!isFromSpecialVocabulary(property)) {
+                // Only add the method to the type spec if it was not already defined in a superclass:
+                if(!isDefinedInSuperclass(property)) {
+                    getters.add(buildable.buildGetter(this, config));
+                    setters.add(buildable.buildSetter(this, config));
+                    setters.add(buildable.buildVarArgSetter(this, config));
 
-            // Only add the method to the type spec if it was not already defined in a superclass and it is not from special vocab:
-            if(!definedInSuper && !isFromSpecialVocabulary(property)) {
-                getters.add(buildable.buildGetter(this, config));
-                setters.add(buildable.buildSetter(this, config));
-                setters.add(buildable.buildVarArgSetter(this, config));
-
-                if(config.areAdderMethodsGenerated()) {
-                    adders.add(buildable.buildAdder(this, config));
-                }
-                if(config.areRemoverMethodsGenerated()) {
-                    removers.add(buildable.buildRemover(this, config));
-                }
-
-                // Generate *All() methods only if cardinality is greater than one:
-                Integer cardinality = buildable.getCardinality(this);
-                if(cardinality == null || cardinality > 1) {
-                    if(config.areAdderAllMethodsGenerated()) {
-                        adderAll.add(buildable.buildAdderAll(this, config));
+                    if(config.areAdderMethodsGenerated()) {
+                        adders.add(buildable.buildAdder(this, config));
                     }
-                    if(config.areRemoverAllMethodsGenerated()) {
-                        removerAll.add(buildable.buildRemoverAll(this, config));
+                    if(config.areRemoverMethodsGenerated()) {
+                        removers.add(buildable.buildRemover(this, config));
                     }
+
+                    // Generate *All() methods only if cardinality is greater than one:
+                    Integer cardinality = buildable.getCardinality(this);
+                    if(cardinality == null || cardinality > 1) {
+                        if(config.areAdderAllMethodsGenerated()) {
+                            adderAll.add(buildable.buildAdderAll(this, config));
+                        }
+                        if(config.areRemoverAllMethodsGenerated()) {
+                            removerAll.add(buildable.buildRemoverAll(this, config));
+                        }
+                    }
+
+                // Generate a new (annotated) getter if the property is restricted in this class:
+                } else if (needsRedefinition(property)) {
+                    getters.add(buildable.buildGetter(this, config));
                 }
             }
         }
