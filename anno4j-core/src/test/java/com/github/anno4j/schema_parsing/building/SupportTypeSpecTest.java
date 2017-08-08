@@ -8,10 +8,12 @@ import com.github.anno4j.schema_parsing.building.support.SupportTypeSpecSupport;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.google.common.collect.Sets;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 
@@ -71,23 +73,11 @@ public class SupportTypeSpecTest extends TypeSpecTest {
         // Test methods:
         Set<String> methodNames = getMethodNames(typeSpec);
         assertEquals(5, methodNames.size());
-        assertTrue(methodNames.contains("getFoos"));
         assertTrue(methodNames.contains("setFoos"));
         assertTrue(methodNames.contains("addFoo"));
         assertTrue(methodNames.contains("addAllFoos"));
         assertTrue(methodNames.contains("removeFoo"));
         assertTrue(methodNames.contains("removeAllFoos"));
-
-        // Test fields:
-        Set<String> fieldNames = getFieldNames(typeSpec);
-        assertEquals(1, fieldNames.size());
-        assertTrue(fieldNames.contains("foos"));
-
-        AnnotationSpec iriAnnotation = AnnotationSpec.builder(Iri.class)
-                                                    .addMember("value", "$S", "http://example.org/#foo")
-                                                    .build();
-        FieldSpec fooField = typeSpec.fieldSpecs.get(0);
-        assertTrue(fooField.annotations.contains(iriAnnotation));
     }
 
 }
