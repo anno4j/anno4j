@@ -65,9 +65,10 @@ public interface JavaFileGenerator {
      * {@link #generateJavaFiles(OntGenerationConfig, File)}.
      *
      * @param rdfInput An input stream to RDF/XML data.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * @param format  The format of the RDF data. One of "RDF/XML", "N-TRIPLE", "TURTLE" (or "TTL") and "N3"
+     *                 or <code>null</code> for the default format.
      */
-    void addRDF(InputStream rdfInput, String base);
+    void addRDF(InputStream rdfInput, String format);
 
     /**
      * Adds RDF statements containing ontology information.
@@ -76,9 +77,10 @@ public interface JavaFileGenerator {
      * {@link #generateJavaFiles(OntGenerationConfig, File)}.
      *
      * @param url      An URL to RDF data in RDF/XML format.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * @param format  The format of the RDF data. One of "RDF/XML", "N-TRIPLE", "TURTLE" (or "TTL") and "N3"
+     *                 or <code>null</code> for the default format.
      */
-    void addRDF(String url, String base);
+    void addRDF(String url, String format);
 
     /**
      * Adds RDF statements containing ontology information.
