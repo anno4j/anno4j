@@ -333,6 +333,7 @@ public class ValidatedTransaction extends Transaction {
                 "   MINUS {" +
                 "      ?s ?p ?x . " +
                 "   }" +
+                "   FILTER(?s != ?x)" +
                 "} LIMIT 1";
 
         try {
