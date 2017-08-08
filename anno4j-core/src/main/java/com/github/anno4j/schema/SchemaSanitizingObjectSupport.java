@@ -10,6 +10,7 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.traits.Refreshable;
 
 
 /**
@@ -167,6 +168,11 @@ public abstract class SchemaSanitizingObjectSupport extends ResourceObjectSuppor
      * Removes a value from the property given and all its subproperties.
      * If the schema sanitizing capabilities of this support class are used
      * this method must be used in order to prevent that the removal is undone by {@link #sanitizeSchema(String)} later.
+     * <b>Important:</b> It may be necessary to refresh cached values for this property afterwards with
+     * {@link Refreshable#refresh()}. Otherwise getter-methods may return old values.<br>
+     * Example:<br>
+     * <code>removeValue("http://example.org/foo", myValue);</code><br>
+     * <code>((PropertySet) getFoo()).refresh();</code>
      * @param propertyIri The IRI of the property from which the value should be removed.
      * @param value The value that should be removed.
      * @return Returns false iff an error occurred.

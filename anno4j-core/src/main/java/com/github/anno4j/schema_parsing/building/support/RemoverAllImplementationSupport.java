@@ -7,6 +7,7 @@ import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.advisers.helpers.PropertySet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -76,7 +77,12 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
                              .endControlFlow()
                              .addStatement("sanitizeSchema($S)", getResourceAsString());
 
-            removerAllBuilder.endControlFlow(); // End if(!_containedValues.isEmpty())
+            TypeName propertySet = ClassName.get(PropertySet.class);
+            removerAllBuilder.endControlFlow() // End if(!_containedValues.isEmpty())
+                             .addComment("Refresh values:")
+                             .beginControlFlow("if($N() instanceof $T)", getter, propertySet)
+                             .addStatement("(($T) $N()).refresh()", propertySet, getter)
+                            .endControlFlow();
 
             removerAllBuilder.addStatement("return changed");
 

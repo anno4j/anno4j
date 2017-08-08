@@ -7,6 +7,7 @@ import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.object.advisers.helpers.PropertySet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,9 +49,14 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
             }
 
             // Add the actual removal code and sanitize schema afterwards:
+            TypeName propertySet = ClassName.get(PropertySet.class);
             removerBuilder.beginControlFlow("if(_oldValues.contains($N))", param)
                           .addStatement("removeValue($S, $N)", getResourceAsString(), param)
                           .addStatement("sanitizeSchema($S)", getResourceAsString())
+                          .addComment("Refresh values:")
+                          .beginControlFlow("if($N() instanceof $T)", getter, propertySet)
+                          .addStatement("(($T) $N()).refresh()", propertySet, getter)
+                          .endControlFlow()
                           .addStatement("return true")
                           .endControlFlow()
                           .addStatement("return false");
