@@ -5,6 +5,7 @@ import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.squareup.javapoet.*;
+import org.openrdf.annotations.Iri;
 import org.openrdf.repository.RepositoryException;
 
 import javax.lang.model.element.Modifier;
@@ -34,7 +35,7 @@ public abstract class SetterSupport extends SetterBuildingSupport implements Bui
         MethodSpec.Builder setter = buildParameterlessSetterSignature(domainClazz, config);
 
         // Different parameter types are generated for cardinality one and for higher cardinality:
-        boolean singleValueParameter = hasSingleValueParameter(domainClazz);
+        boolean singleValueParameter = isSingleValueProperty(domainClazz);
 
         TypeName paramType = getParameterType(config, !singleValueParameter);
 
@@ -50,6 +51,11 @@ public abstract class SetterSupport extends SetterBuildingSupport implements Bui
 
     @Override
     public MethodSpec buildSetter(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
+        // @Iri annotation of the property:
+        AnnotationSpec iriAnnotation = AnnotationSpec.builder(Iri.class)
+                .addMember("value", "$S", getResourceAsString())
+                .build();
+
         // Get the signature of a setter for this property:
         MethodSpec signature = buildSignature(domainClazz, config);
 
@@ -57,6 +63,7 @@ public abstract class SetterSupport extends SetterBuildingSupport implements Bui
             // Add an abstract modifier to the signature:
             return signature.toBuilder()
                     .addModifiers(Modifier.ABSTRACT)
+                    .addAnnotation(iriAnnotation)
                     .build();
 
         } else {

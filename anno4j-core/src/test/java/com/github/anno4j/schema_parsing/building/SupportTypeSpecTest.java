@@ -2,7 +2,6 @@ package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.schema.SchemaSanitizingObjectSupport;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema_parsing.building.support.SupportTypeSpecSupport;
@@ -71,7 +70,7 @@ public class SupportTypeSpecTest extends TypeSpecTest {
 
         // Test methods:
         Set<String> methodNames = getMethodNames(typeSpec);
-        assertEquals(6, methodNames.size());
+        assertEquals(5, methodNames.size());
         assertTrue(methodNames.contains("getFoos"));
         assertTrue(methodNames.contains("setFoos"));
         assertTrue(methodNames.contains("addFoo"));

@@ -2,13 +2,13 @@ package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
-import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -33,21 +33,22 @@ public abstract class RemoverImplementationSupport extends RemoverSupport implem
             BuildableRDFSClazz range = findSingleRangeClazz();
             TypeName rangeType = range.getJavaPoetClassName(config);
 
-            // For string types the return type of getters is a wildcard type:
-            if(rangeType.equals(ClassName.get(CharSequence.class))) {
-                rangeType = WildcardTypeName.subtypeOf(rangeType);
-            }
-
             // Prepare class names of used types:
-            ClassName set = ClassName.get(Set.class);
-            TypeName rangeSet = ParameterizedTypeName.get(set, rangeType);
+            TypeName set = ParameterizedTypeName.get(ClassName.get(Set.class), rangeType);
+            TypeName hashSet = ParameterizedTypeName.get(ClassName.get(HashSet.class), rangeType);
             ParameterSpec param = signature.parameters.get(0);
 
-            // Get the annotated field for this property:
-            FieldSpec field = buildAnnotatedField(domainClazz, config);
+            // Get the value(s) returned by getter:
+            MethodSpec getter = buildGetter(domainClazz, config);
+            if (isSingleValueProperty(domainClazz)) {
+                removerBuilder.addStatement("$T _oldValues = new $T()", set, hashSet)
+                            .addStatement("_oldValues.add($N())", getter);
+            } else {
+                removerBuilder.addStatement("$T _oldValues = $N()", set, getter);
+            }
 
             // Add the actual removal code and sanitize schema afterwards:
-            removerBuilder.beginControlFlow("if(this.$N.contains($N))", field, param)
+            removerBuilder.beginControlFlow("if(_oldValues.contains($N))", param)
                           .addStatement("removeValue($S, $N)", getResourceAsString(), param)
                           .addStatement("sanitizeSchema($S)", getResourceAsString())
                           .addStatement("return true")

@@ -83,7 +83,7 @@ public class RDFSPropertySpecTest {
         MethodSpec loadCapSpec = loadCap.buildGetter(declaringClass, generationConfig);
 
         // Test annotations empty:
-        assertEquals(0, loadCapSpec.annotations.size());
+        assertEquals(1, loadCapSpec.annotations.size());
 
         // Test signature:
         assertEquals("getMaximumLoadCapacities", loadCapSpec.name);
@@ -111,7 +111,7 @@ public class RDFSPropertySpecTest {
         assertTrue(loadCapSpec.javadoc.toString().startsWith("Ladung in Tonnen"));
 
         // Test annotation:
-        assertEquals(0, loadCapSpec.annotations.size()); // @Iri annotation was moved to private field. Setters must not have an annotation.
+        assertEquals(1, loadCapSpec.annotations.size()); // @Iri annotation was moved to private field. Setters must not have an annotation.
     }
 
     @Test

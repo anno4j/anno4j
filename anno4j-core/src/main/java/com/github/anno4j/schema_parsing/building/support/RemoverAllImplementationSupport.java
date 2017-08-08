@@ -2,12 +2,14 @@ package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
-import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.squareup.javapoet.*;
 import org.openrdf.repository.RepositoryException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Support class (of {@link BuildableRDFSProperty}) for generating
@@ -41,22 +43,29 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
             MethodSpec remover = buildRemover(domainClazz, config);
 
-            // Prepare Set and HashSet types:
-            TypeName set = ParameterizedTypeName.get(ClassName.get("java.util", "Set"), rangeClassName);
-            TypeName hashSet = ParameterizedTypeName.get(ClassName.get("java.util", "HashSet"), rangeClassName);
-
-            // Get the annotated field for this property:
-            FieldSpec field = buildAnnotatedField(domainClazz, config);
+            // Prepare types:
+            TypeName set = ParameterizedTypeName.get(ClassName.get(Set.class), rangeClassName);
+            TypeName hashSet = ParameterizedTypeName.get(ClassName.get(HashSet.class), rangeClassName);
 
             // Iterate the input values and check if the value was actually removed from this property:
-            removerAllBuilder.addStatement("boolean changed = false")
-                    .addStatement("$T _containedValues = new $T()", set, hashSet)
-                    .beginControlFlow("for($T $N : $N)", rangeClassName, current, param)
-                    .beginControlFlow("if(this.$N.contains($N))", field, current) // If the value is actual a value of this property
-                    .addStatement("changed |= true") // Set changed flag
-                    .addStatement("_containedValues.add($N)", current) // Add to collection of removed values
-                    .endControlFlow() // End if
-                    .endControlFlow(); // End for
+            removerAllBuilder.addStatement("boolean changed = false");
+
+            // Get the value(s) returned by getter:
+            MethodSpec getter = buildGetter(domainClazz, config);
+            if (isSingleValueProperty(domainClazz)) {
+                removerAllBuilder.addStatement("$T _oldValues = new $T()", set, hashSet)
+                            .addStatement("_oldValues.add($N())", getter);
+            } else {
+                removerAllBuilder.addStatement("$T _oldValues = $N()", set, getter);
+            }
+
+            removerAllBuilder.addStatement("$T _containedValues = new $T()", set, hashSet)
+                            .beginControlFlow("for($T $N : $N)", rangeClassName, current, param)
+                            .beginControlFlow("if(_oldValues.contains($N))", current) // If the value is actual a value of this property
+                            .addStatement("changed |= true") // Set changed flag
+                            .addStatement("_containedValues.add($N)", current) // Add to collection of removed values
+                            .endControlFlow() // End if
+                            .endControlFlow(); // End for
 
             // Only propagate removal if there is actually something to be removed:
             removerAllBuilder.beginControlFlow("if(!_containedValues.isEmpty())");

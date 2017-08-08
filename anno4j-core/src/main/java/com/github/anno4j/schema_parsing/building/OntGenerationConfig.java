@@ -92,11 +92,6 @@ public class OntGenerationConfig {
      */
     private boolean doGenerateRemoverAll = true;
 
-    /**
-     * Whether methods for setting the value set of an objects property using variable arguments should be generated.
-     */
-    private boolean doGenerateVarArgSetter = true;
-
 
     /**
      * Initializes the configuration with preference for untyped literals
@@ -493,19 +488,5 @@ public class OntGenerationConfig {
      */
     public void useRemoverAllMethodGeneration(boolean doGenerateRemoverAll) {
         this.doGenerateRemoverAll = doGenerateRemoverAll;
-    }
-
-    /**
-     * @return Whether methods for setting the value set of an objects property using variable arguments should be generated.
-     */
-    public boolean areVarArgSetterMethodsGenerated() {
-        return doGenerateVarArgSetter;
-    }
-
-    /**
-     * @param doGenerateVarArgSetter Whether methods for setting the value set of an objects property using variable arguments should be generated.
-     */
-    public void useVarArgSetterGeneration(boolean doGenerateVarArgSetter) {
-        this.doGenerateVarArgSetter = doGenerateVarArgSetter;
     }
 }

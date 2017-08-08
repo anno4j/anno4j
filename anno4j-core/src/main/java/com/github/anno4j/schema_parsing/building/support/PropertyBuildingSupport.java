@@ -14,16 +14,15 @@ import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
 import com.github.anno4j.schema_parsing.naming.IdentifierBuilder;
 import com.github.anno4j.schema_parsing.util.LowestCommonSuperclass;
 import com.github.anno4j.schema_parsing.validation.Validator;
-import com.squareup.javapoet.*;
-import org.openrdf.annotations.Iri;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.MethodSpec;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 
-import javax.lang.model.element.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Support class providing utility functionality for generating
@@ -91,25 +90,6 @@ public abstract class PropertyBuildingSupport extends PropertySchemaAnnotationSu
         } else {
             return builder.capitalizedIdentifier(this, config);
         }
-    }
-
-    @Override
-    public FieldSpec buildAnnotatedField(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
-        // Get the type and the name of the field:
-        ClassName set = ClassName.get(Set.class);
-        TypeName rangeType = ParameterizedTypeName.get(set, getRangeJavaPoetClassName(config));
-        String name = getLowercaseIdentifier(config, true);
-
-        // IRI annotation of the field:
-        AnnotationSpec iriAnnotation = AnnotationSpec.builder(Iri.class)
-                .addMember("value", "$S", getResourceAsString())
-                .build();
-
-        // Build the field specification:
-        return FieldSpec.builder(rangeType, name, Modifier.PROTECTED)
-                .addAnnotation(iriAnnotation)
-                .addAnnotations(buildSchemaAnnotations(domainClazz, config))
-                .build();
     }
 
 
@@ -235,6 +215,18 @@ public abstract class PropertyBuildingSupport extends PropertySchemaAnnotationSu
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
         }
+    }
+
+    /**
+     * Returns whether the property has a single value in the given context.
+     * This is the case if the property has a cardinality of one.
+     * @param domainClazz The class defining the context.
+     * @return Returns true iff the setter should have a single value parameter.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    boolean isSingleValueProperty(RDFSClazz domainClazz) throws RepositoryException {
+        Integer cardinality = getCardinality(domainClazz);
+        return cardinality != null && cardinality == 1;
     }
 
     /**

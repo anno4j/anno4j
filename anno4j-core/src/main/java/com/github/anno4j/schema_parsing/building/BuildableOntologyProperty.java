@@ -2,7 +2,6 @@ package com.github.anno4j.schema_parsing.building;
 
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import org.openrdf.repository.RepositoryException;
 
@@ -50,16 +49,6 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
     String getCapitalizedIdentifier(OntGenerationConfig config, boolean plural) throws RepositoryException;
 
     /**
-     * Generates a JavaPoet specification of an <code>@Iri</code>-annotated field for this property,
-     * which can be used in Anno4j support classes.
-     * @param domainClazz The class in which context the field should be generated.
-     * @param config The configuration for building the method specification.
-     * @return The JavaPoet field specification for this property or null
-     * if no range was provided for this property.
-     */
-    FieldSpec buildAnnotatedField(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
-
-    /**
      * Generates a JavaPoet method specification for a Anno4j resource object getter
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
@@ -73,17 +62,6 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
     MethodSpec buildGetter(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
-     * Generates a JavaPoet method specification for a Support class getter
-     * for this property.
-     * @param domainClazz The class in which context the method should be generated.
-     * @param config The configuration for building the method specification.
-     * @return The JavaPoet method specification for this property or null
-     * if no range was provided for this property.
-     * @throws RepositoryException Thrown if an error occurs while querying the repository.
-     */
-    MethodSpec buildGetterImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
-
-    /**
      * Generates a JavaPoet method specification for a Anno4j resource object setter
      * for this property.
      * JavaDoc and method name are picked from rdfs:comment/rdfs:label according to the
@@ -95,20 +73,6 @@ public interface BuildableOntologyProperty extends BuildableOntologyResource {
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
     MethodSpec buildSetter(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
-
-
-    /**
-     * Generates a JavaPoet method specification for a Support class setter
-     * for this property.
-     * Checks whether the provided values are in range are added to the methods
-     * definition.
-     * @param domainClazz The class in which context the method should be generated.
-     * @param config The configuration for building the method specification.
-     * @return The JavaPoet method specification for this property or null
-     * if no range was provided for this property.
-     * @throws RepositoryException Thrown if an error occurs while querying the repository.
-     */
-    MethodSpec buildSetterImplementation(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException;
 
     /**
      * Generates a JavaPoet method specification for a Anno4j resource object variable argument setter

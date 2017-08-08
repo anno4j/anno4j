@@ -2,7 +2,6 @@ package com.github.anno4j.schema_parsing.building.support;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
-import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema_parsing.building.OntGenerationConfig;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
@@ -22,18 +21,6 @@ import java.util.Set;
  */
 @Partial
 public abstract class SetterBuildingSupport extends PropertyBuildingSupport implements BuildableRDFSProperty {
-
-    /**
-     * Returns whether the setter should have a single value parameter type.
-     * This is the case if the property has a cardinality of one.
-     * @param domainClazz The class for which to generate the setter.
-     * @return Returns true iff the setter should have a single value parameter.
-     * @throws RepositoryException Thrown if an error occurs while querying the repository.
-     */
-    boolean hasSingleValueParameter(RDFSClazz domainClazz) throws RepositoryException {
-        Integer cardinality = getCardinality(domainClazz);
-        return cardinality != null && cardinality == 1;
-    }
 
     /**
      * Returns the JavaPoet representation of the parameters type.
@@ -80,7 +67,7 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
             addJavaDocExceptionInfo(javaDoc, rangeClazz, config);
 
             return MethodNameBuilder.forObjectRepository(getObjectConnection())
-                    .getJavaPoetMethodSpec("set", this, config, true)
+                    .getJavaPoetMethodSpec("set", this, config, !isSingleValueProperty(domainClazz))
                     .toBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
@@ -92,8 +79,7 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
 
     /**
      * Adds code to the method stub which performs validation of the first parameter of the method according to
-     * the {@link Validator}s in {@code config} and afterwards sets the values to the support classes field
-     * (see {@link #buildAnnotatedField(RDFSClazz, OntGenerationConfig)}).
+     * the {@link Validator}s in {@code config} and afterwards sets the values.
      * Changes are propagated to all super- and subproperties of the property mapped.
      * @param stub The JavaPoet method specification to which the generated code will be added.
      * @param domainClazz The class for which the method is defined.
@@ -110,15 +96,13 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
         String paramName = param.name;
         ParameterSpec current = ParameterSpec.builder(rangeClassName, "current").build();
         boolean isVarArg = stub.build().varargs;
-
-        Integer cardinality = getCardinality(domainClazz);
-        boolean isParameterSingleValue = allowSingleValueParam && hasSingleValueParameter(domainClazz);
+        boolean isParameterSingleValue = allowSingleValueParam && isSingleValueProperty(domainClazz);
 
         // Add validation code:
         for (Validator validator : config.getValidators()) {
             if(validator.isValueSpaceConstrained(range)) {
                 if(isParameterSingleValue) {
-                    validator.addValueSpaceCheck(stub, stub.build().parameters.get(0), range);
+                    validator.addValueSpaceCheck(stub, param, range);
                 } else {
                     stub.beginControlFlow("for($T $N : $N)", rangeClassName, current, paramName);
                     validator.addValueSpaceCheck(stub, current, range);
@@ -126,18 +110,33 @@ public abstract class SetterBuildingSupport extends PropertyBuildingSupport impl
                 }
             }
         }
+        // If the setter is single valued and this is a vararg setter then allow max. one value:
+        if(isVarArg && isSingleValueProperty(domainClazz)) {
+            stub.beginControlFlow("if($N.length > 1)", param)
+                    .addStatement("throw new $T($S)", ClassName.get(IllegalArgumentException.class), "Too many values.")
+                    .endControlFlow();
+        }
 
-        // Get the annotated field for this property:
-        FieldSpec field = buildAnnotatedField(domainClazz, config);
-
-        stub.addStatement("this.$N.clear()", field);
+        TypeName newValuesType = ParameterizedTypeName.get(ClassName.get(Set.class), rangeClassName);
+        TypeName hashSet = ParameterizedTypeName.get(ClassName.get(HashSet.class), rangeClassName);
+        stub.addStatement("$T _newValues = new $T()", newValuesType, hashSet);
 
         if(isParameterSingleValue) {
-            stub.addStatement("this.$N.add($N)", field, paramName);
+            stub.addStatement("_newValues.add($N)", paramName);
         } else if(isVarArg) {
-            stub.addStatement("this.$N.addAll($T.asList($N))", field, ClassName.get(Arrays.class), paramName);
+            stub.addStatement("_newValues.addAll($T.asList($N))", ClassName.get(Arrays.class), paramName);
+        }
+
+        // Get the properties setter-method:
+        MethodSpec setter = buildSetter(domainClazz, config);
+
+        // Set the values. Set single value if single valued setter:
+        if(isSingleValueProperty(domainClazz)) {
+            stub.beginControlFlow("if(!_newValues.isEmpty())")
+                    .addStatement("$N(_newValues.iterator().next())", setter)
+                    .endControlFlow();
         } else {
-            stub.addStatement("this.$N.addAll($N)", field, paramName);
+            stub.addStatement("$N(_newValues)", setter);
         }
 
         // Sanitize the schema using SchemaSanitizingObjectSupport:

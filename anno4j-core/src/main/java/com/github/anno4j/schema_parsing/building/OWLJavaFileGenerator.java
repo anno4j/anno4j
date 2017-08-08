@@ -100,11 +100,11 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
      * A subsequent call to {@link #build()} is required for committing the data to the model.
      *
      * @param rdfInput An input stream to RDF/XML data.
-     * @param base     The base uri to be used when converting relative URI's to absolute URI's.
+     * @param format     The base uri to be used when converting relative URI's to absolute URI's.
      */
     @Override
-    public void addRDF(InputStream rdfInput, String base) {
-        model.read(rdfInput, base);
+    public void addRDF(InputStream rdfInput, String format) {
+        model.read(rdfInput, format);
     }
 
     /**
@@ -112,11 +112,11 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
      * A subsequent call to {@link #build()} is required for committing the data to the model.
      *
      * @param url  An URL to RDF data in RDF/XML format.
-     * @param base The base uri to be used when converting relative URI's to absolute URI's.
+     * @param format The base uri to be used when converting relative URI's to absolute URI's.
      */
     @Override
-    public void addRDF(String url, String base) {
-        model.read(url, base);
+    public void addRDF(String url, String format) {
+        model.read(url, format);
     }
 
     /**

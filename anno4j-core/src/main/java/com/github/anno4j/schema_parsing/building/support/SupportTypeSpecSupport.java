@@ -51,17 +51,7 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
         AnnotationSpec partialAnnotation = AnnotationSpec.builder(Partial.class)
                                                         .build();
 
-        // Generate @Iri annotated fields:
-        Collection<FieldSpec> fields = new HashSet<>();
-        for (RDFSProperty property : getOutgoingProperties()) {
-            // Only generate a field for this property if its not defined in a non-RDFS superclass:
-            if(!isDefinedInSuperclass(property) && !isFromSpecialVocabulary(property)) {
-                fields.add(asBuildableProperty(property).buildAnnotatedField(this, config));
-            }
-        }
-
         // Generate methods:
-        Collection<MethodSpec> getters = new HashSet<>();
         Collection<MethodSpec> setters = new HashSet<>();
         Collection<MethodSpec> adders  = new HashSet<>();
         Collection<MethodSpec> addersAll  = new HashSet<>();
@@ -71,9 +61,8 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
             // Only add the method to the type spec if it was not already defined in a superclass:
             if(!isDefinedInSuperclass(property) && !isFromSpecialVocabulary(property)) {
                 BuildableRDFSProperty buildable = asBuildableProperty(property);
+                setters.add(buildable.buildVarArgSetterImplementation(this, config));
 
-                getters.add(buildable.buildGetterImplementation(this, config));
-                setters.add(buildable.buildSetterImplementation(this, config));
                 if(config.areAdderMethodsGenerated()) {
                     adders.add(buildable.buildAdderImplementation(this, config));
                 }
@@ -84,9 +73,6 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
                 // Generate *All() methods only if cardinality is greater than one:
                 Integer cardinality = buildable.getCardinality(this);
                 if(cardinality == null || cardinality > 1) {
-                    if(config.areVarArgSetterMethodsGenerated()) {
-                        setters.add(buildable.buildVarArgSetterImplementation(this, config));
-                    }
                     if(config.areAdderAllMethodsGenerated()) {
                         addersAll.add(buildable.buildAdderAllImplementation(this, config));
                     }
@@ -110,8 +96,6 @@ public abstract class SupportTypeSpecSupport extends ClazzBuildingSupport implem
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .superclass(resourceObjectSupport)
                 .addSuperinterface(interfaceName)
-                .addFields(fields)
-                .addMethods(getters)
                 .addMethods(setters)
                 .addMethods(adders)
                 .addMethods(addersAll)

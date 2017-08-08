@@ -75,6 +75,8 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
             if(!definedInSuper && !isFromSpecialVocabulary(property)) {
                 getters.add(buildable.buildGetter(this, config));
                 setters.add(buildable.buildSetter(this, config));
+                setters.add(buildable.buildVarArgSetter(this, config));
+
                 if(config.areAdderMethodsGenerated()) {
                     adders.add(buildable.buildAdder(this, config));
                 }
@@ -85,9 +87,6 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
                 // Generate *All() methods only if cardinality is greater than one:
                 Integer cardinality = buildable.getCardinality(this);
                 if(cardinality == null || cardinality > 1) {
-                    if(config.areVarArgSetterMethodsGenerated()) {
-                        setters.add(buildable.buildVarArgSetter(this, config));
-                    }
                     if(config.areAdderAllMethodsGenerated()) {
                         adderAll.add(buildable.buildAdderAll(this, config));
                     }

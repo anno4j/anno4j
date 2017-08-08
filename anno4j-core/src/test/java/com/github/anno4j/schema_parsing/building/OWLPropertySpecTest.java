@@ -66,7 +66,7 @@ public class OWLPropertySpecTest {
         // Build the getter method signature:
         MethodSpec nameGetter = nameProperty.buildGetter(restaurant, generationConfig);
 
-        assertEquals(0, nameGetter.annotations.size());
+        assertEquals(3, nameGetter.annotations.size());
         assertEquals(0, nameGetter.parameters.size());
         assertEquals("getHasName", nameGetter.name);
 
@@ -76,7 +76,7 @@ public class OWLPropertySpecTest {
         // The same for the ex:serves property:
         MethodSpec servesGetter = servesProperty.buildGetter(restaurant, generationConfig);
 
-        assertEquals(0, servesGetter.annotations.size());
+        assertEquals(2, servesGetter.annotations.size());
         assertEquals(0, servesGetter.parameters.size());
         assertEquals("getServes", servesGetter.name);
         ClassName setType = ClassName.get(Set.class);
@@ -87,15 +87,16 @@ public class OWLPropertySpecTest {
     public void testSetter() throws Exception {
         // Get the properties as a buildable and the class for which to build:
         BuildableRDFSClazz restaurant = anno4j.findByID(BuildableRDFSClazz.class, "http://example.de/ont#Restaurant");
+        BuildableRDFSClazz dish = anno4j.findByID(BuildableRDFSClazz.class, "http://example.de/ont#Dish");
         BuildableRDFSProperty nameProperty = anno4j.findByID(BuildableRDFSProperty.class, "http://example.de/ont#name");
 
         // Test normal setter:
         MethodSpec nameSetter = nameProperty.buildSetter(restaurant, generationConfig);
-        assertEquals(0, nameSetter.annotations.size());
+        assertEquals(1, nameSetter.annotations.size());
         assertEquals(1, nameSetter.parameters.size());
-        assertEquals(ClassName.get(CharSequence.class), nameSetter.parameters.get(0).type);
+        assertEquals(ClassName.get(CharSequence.class), nameSetter.parameters.get(0).type); // Cardinality is one, so single value parameter
         assertFalse(nameSetter.varargs);
-        assertEquals("setHasNames", nameSetter.name);
+        assertEquals("setHasName", nameSetter.name); // Cardinality is one, so name is singular
 
         // Test vararg setter:
         MethodSpec nameSetterVarArg = nameProperty.buildVarArgSetter(restaurant, generationConfig);
@@ -103,6 +104,24 @@ public class OWLPropertySpecTest {
         assertEquals(1, nameSetterVarArg.parameters.size());
         assertEquals(ArrayTypeName.get(CharSequence[].class), nameSetterVarArg.parameters.get(0).type);
         assertTrue(nameSetterVarArg.varargs);
-        assertEquals("setHasNames", nameSetterVarArg.name);
+        assertEquals("setHasName", nameSetterVarArg.name); // Cardinality is one, so name is singular
+
+        BuildableRDFSProperty servesProperty = anno4j.findByID(BuildableRDFSProperty.class, "http://example.de/ont#serves");
+
+        // Test normal setter:
+        MethodSpec servesSetter = servesProperty.buildSetter(restaurant, generationConfig);
+        assertEquals(1, servesSetter.annotations.size());
+        assertEquals(1, servesSetter.parameters.size());
+        assertEquals(ParameterizedTypeName.get(ClassName.get(Set.class),dish.getJavaPoetClassName(generationConfig)), servesSetter.parameters.get(0).type);
+        assertFalse(servesSetter.varargs);
+        assertEquals("setServes", servesSetter.name);
+
+        // Test vararg setter:
+        MethodSpec servesSetterVarArg = servesProperty.buildVarArgSetter(restaurant, generationConfig);
+        assertEquals(0, servesSetterVarArg.annotations.size());
+        assertEquals(1, servesSetterVarArg.parameters.size());
+        assertEquals(ArrayTypeName.of(dish.getJavaPoetClassName(generationConfig)), servesSetterVarArg.parameters.get(0).type);
+        assertTrue(servesSetterVarArg.varargs);
+        assertEquals("setServes", servesSetterVarArg.name);
     }
 }

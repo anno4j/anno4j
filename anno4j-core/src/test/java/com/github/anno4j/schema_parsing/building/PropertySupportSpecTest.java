@@ -74,36 +74,6 @@ public class PropertySupportSpecTest {
         declaringClass = anno4j.createObject(OWLClazz.class, (Resource) new URIImpl("http://example.de/resource"));
     }
 
-    @Test
-    public void testSetterImplementation() throws Exception {
-        BuildableRDFSProperty seatNumProp = getPropertyFromModel("http://example.de/ont#seat_num");
-        assertNotNull(seatNumProp);
-
-        MethodSpec setter = seatNumProp.buildSetterImplementation(declaringClass, generationConfig);
-
-        // Override annotation:
-        AnnotationSpec overrideAnnotation = AnnotationSpec.builder(Override.class).build();
-        assertEquals(1, setter.annotations.size());
-        assertEquals(overrideAnnotation, setter.annotations.get(0));
-
-        // Modifiers:
-        assertEquals(1, setter.modifiers.size());
-        assertTrue(setter.modifiers.contains(Modifier.PUBLIC));
-
-        // Name:
-        assertEquals("setNumberOfSeats", setter.name);
-
-        // Parameter:
-        ClassName set = ClassName.get(Set.class);
-        ParameterizedTypeName paramType = ParameterizedTypeName.get(set, ClassName.get(Integer.class));
-        assertEquals(1, setter.parameters.size());
-        assertEquals(paramType, setter.parameters.get(0).type);
-
-        // Test validation code:
-        String code = setter.code.toString();
-        Matcher matcher = Pattern.compile("if\\s*\\(((.+)\\s*==\\s*null|null\\s*==\\s*(.+))\\)").matcher(code);
-        assertTrue(matcher.find());
-    }
 
     @Test
     public void testAdderImplementation() throws Exception {

@@ -4,10 +4,7 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.annotations.*;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSClazz;
 import com.github.anno4j.schema_parsing.model.BuildableRDFSProperty;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.impl.URIImpl;
@@ -88,7 +85,7 @@ public class SchemaAnnotationGenerationTest {
             throw new RepositoryException(e);
         }
 
-        FieldSpec field = property.buildAnnotatedField(clazz, generationConfig);
+        MethodSpec field = property.buildGetter(clazz, generationConfig);
         for (AnnotationSpec currentAnnotation : field.annotations) {
             if(currentAnnotation.type.equals(AnnotationSpec.builder(annotationType).build().type)) {
                 return currentAnnotation;
