@@ -54,7 +54,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      * @throws ContradictorySchemaException Thrown if the schema information imposed by annotations contradicts with
      * schema information that is already present in the connected triplestore.
      */
-    public void persistSchema(Reflections types) throws RepositoryException, InconsistentAnnotationException, ContradictorySchemaException {
+    public void persistSchema(Reflections types) throws InconsistentAnnotationException, RepositoryException {
         Collection<AccessibleObject> iriAnnotatedObjects = new HashSet<>();
         // Add methods with @Iri annotation:
         iriAnnotatedObjects.addAll(types.getMethodsAnnotatedWith(Iri.class));
@@ -184,7 +184,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      * the schema information that is already present in the connected triplestore.
      * @throws RepositoryException Thrown if an error occurs while querying the connected triplestore.
      */
-    private void validateAgainstExistingSchema(Collection<AccessibleObject> annotatedObjects) throws ContradictorySchemaException, RepositoryException {
+    private void validateAgainstExistingSchema(Collection<AccessibleObject> annotatedObjects) throws RepositoryException {
 
         // Check that any functional property has no (min) cardinality greater than 1 in the schema:
         Collection<AccessibleObject> functionalObjects = filterObjectsWithAnnotation(annotatedObjects, Functional.class);
@@ -579,7 +579,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      * @throws RepositoryException Thrown if an error occurs while querying the connected triplestore.
      * @throws ContradictorySchemaException Thrown if the validation fails.
      */
-    private <T> void validateRestriction(AccessibleObject propertyObject, String restrictionType, Set<String> allowedValues, String onClazz) throws RepositoryException, ContradictorySchemaException {
+    private <T> void validateRestriction(AccessibleObject propertyObject, String restrictionType, Set<String> allowedValues, String onClazz) throws RepositoryException {
         // Get IRIs of the property and its declaring class:
         String iri = getIriFromObject(propertyObject);
         String clazz = getIriFromObject(getDeclaringJavaClazz(propertyObject));
@@ -685,7 +685,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         StringBuilder query = new StringBuilder(QUERY_PREFIX)
                                     .append("INSERT DATA {");
         for(String instance : instances) {
-            query.append(" <" + instance + "> a <" + clazz + "> .");
+            query.append(" <").append(instance).append("> a <").append(clazz).append("> .");
         }
         query.append("}");
 
@@ -729,7 +729,7 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         }
 
         Restriction restriction = createObject(Restriction.class, null);
-        restriction.setOnProperty(Sets.<RDFSProperty>newHashSet(property));
+        restriction.setOnProperty(Sets.newHashSet(property));
 
         // Set the class against which the restriction is stated, if it is provided:
         if(onClazzIri != null) {
@@ -1039,16 +1039,6 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
     }
 
     /**
-     * Checks whether a given annotation is a schema annotation.
-     * @param annotation The annotation to check.
-     * @return Returns true iff the given annotation is a schema annotation.
-     */
-    private boolean isSchemaAnnotation(Annotation annotation) {
-        return isPropertyCharacteristicAnnotation(annotation)
-                || isPropertyRestrictionAnnotation(annotation);
-    }
-
-    /**
      * Checks whether the given annotation imposes a property characteristic, i.e. is one of
      * <ul>
      *     <li>{@link Functional}</li>
@@ -1079,8 +1069,8 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      *     <li>{@link MinCardinality}</li>
      *     <li>{@link MaxCardinality}</li>
      * </ul>
-     * @param annotation
-     * @return
+     * @param annotation The annotation to check.
+     * @return Returns true iff the annotation imposes a restriction on a property for a certain class.
      */
     private boolean isPropertyRestrictionAnnotation(Annotation annotation) {
         return annotation instanceof AllValuesFrom

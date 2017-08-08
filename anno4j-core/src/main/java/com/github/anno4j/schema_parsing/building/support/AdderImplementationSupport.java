@@ -60,7 +60,7 @@ public abstract class AdderImplementationSupport extends AdderSupport implements
 
             // Set the new values:
             if(isSingleValueProperty(domainClazz)) {
-                // If this is a single value property check wether the there is only one value:
+                // If this is a single value property check whether the there is only one value:
                 adderBuilder.beginControlFlow("if(_acc.size() > 1)")
                         .addStatement("throw new $T($S)", ClassName.get(IllegalArgumentException.class), "Too many values")
                         .endControlFlow()

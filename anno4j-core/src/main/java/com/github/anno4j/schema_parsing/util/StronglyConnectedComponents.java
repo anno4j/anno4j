@@ -152,11 +152,9 @@ public class StronglyConnectedComponents {
         }
 
         // DFS on the subclasses:
-        Iterator<RDFSClazz> subClazzIter = buildable.getSuperclazzes().iterator();
-        while (subClazzIter.hasNext()) {
-            RDFSClazz subClazz = subClazzIter.next();
+        for (RDFSClazz subClazz : buildable.getSuperclazzes()) {
             // Subclass not yet visited?
-            if(!visitedNodes.containsKey(subClazz)) {
+            if (!visitedNodes.containsKey(subClazz)) {
                 // Recursively continue DFS on the subclass:
                 strongConnect(subClazz, sccs, visitedNodes, stack, indexGenerator);
                 // Check if a node with a lower index is part of the SCC.

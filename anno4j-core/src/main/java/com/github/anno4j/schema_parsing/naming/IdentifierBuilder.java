@@ -26,18 +26,6 @@ import java.util.regex.Pattern;
 public class IdentifierBuilder {
 
     /**
-     * Signalizes that an error occurred while extracting a Java type name from a URI.
-     */
-    public class NameBuildingException extends Exception {
-        /**
-         * {@inheritDoc}
-         */
-        public NameBuildingException(String message) {
-            super(message);
-        }
-    }
-
-    /**
      * List of reserved keywords in the Java programming language.
      * Those can not be used as identifiers.
      */
@@ -144,7 +132,7 @@ public class IdentifierBuilder {
         } catch (URISyntaxException e) {
             return "Unnamed" + resource.getResourceAsString().hashCode();
         }
-        // Handle fragments, i.e. trailing components preceeded by "#":
+        // Handle fragments, i.e. trailing components preceded by "#":
         if(u.getFragment() != null) {
             return u.getFragment();
         }
@@ -272,7 +260,7 @@ public class IdentifierBuilder {
      * @param resource The resource that has the label.
      * @param label The label to check for.
      * @return Returns true iff there is no possibly conflicting label within the repository.
-     * @throws RepositoryException Thrown if an error occurrs while querying the repository.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
     private boolean isRDFSLabelUnique(ResourceObject resource, String label) throws RepositoryException {
         // A conflicting label may be lead by some non-alphanumeric characters:

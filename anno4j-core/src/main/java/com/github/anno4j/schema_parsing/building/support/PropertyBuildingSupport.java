@@ -136,7 +136,7 @@ public abstract class PropertyBuildingSupport extends PropertySchemaAnnotationSu
      *
      * @return The most specific common superclass.
      */
-    protected BuildableRDFSClazz findSingleRangeClazz() throws RepositoryException {
+    BuildableRDFSClazz findSingleRangeClazz() throws RepositoryException {
         // Get the current property of RDF property type:
         RDFSProperty property;
         try {
@@ -209,7 +209,7 @@ public abstract class PropertyBuildingSupport extends PropertySchemaAnnotationSu
      * in the repository.
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    BuildableRDFSClazz asBuildableClazz(RDFSClazz clazz) throws RepositoryException {
+    private BuildableRDFSClazz asBuildableClazz(RDFSClazz clazz) throws RepositoryException {
         try {
             return getObjectConnection().findObject(BuildableRDFSClazz.class, clazz.getResource());
         } catch (QueryEvaluationException e) {

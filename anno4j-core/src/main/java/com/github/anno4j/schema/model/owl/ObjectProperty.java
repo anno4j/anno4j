@@ -17,11 +17,11 @@ public interface ObjectProperty extends RDFSProperty {
      * @return Returns those properties that are inverse to this one.
      */
     @Iri(OWL.INVERSE_OF)
-    public Set<ObjectProperty> getInverseOf();
+    Set<ObjectProperty> getInverseOf();
 
     /**
      * Refers to http://www.w3.org/2002/07/owl#inverseOf
      * @param inverseProperties Those properties that are inverse to this one.
      */
-    public void setInverseOf(Set<ObjectProperty> inverseProperties);
+    void setInverseOf(Set<ObjectProperty> inverseProperties);
 }

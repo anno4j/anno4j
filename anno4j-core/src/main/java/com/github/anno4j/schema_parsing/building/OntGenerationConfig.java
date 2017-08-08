@@ -28,7 +28,7 @@ public class OntGenerationConfig {
      * A value of {@link #UNTYPED_LITERAL} stands for a literal without language information,
      * i.e. a untyped literal.
      */
-    private List<String> identifierLangPreference = new ArrayList<>();
+    private final List<String> identifierLangPreference = new ArrayList<>();
 
     /**
      * The preference order for the language of rdfs:comment literals to
@@ -36,7 +36,7 @@ public class OntGenerationConfig {
      * A value of {@link #UNTYPED_LITERAL} stands for a literal without language information,
      * i.e. a untyped literal.
      */
-    private List<String> javadocLangPreference = new ArrayList<>();
+    private final List<String> javadocLangPreference = new ArrayList<>();
 
     /**
      * The validators used to validate setter and adder arguments.

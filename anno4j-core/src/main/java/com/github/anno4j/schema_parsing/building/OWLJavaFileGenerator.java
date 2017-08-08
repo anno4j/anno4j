@@ -61,17 +61,17 @@ import java.util.Iterator;
  */
 public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGenerator {
 
-    private OntModel model;
+    private final OntModel model;
 
     /**
      * The Anno4j instance where RDFS information is persisted to.
      */
-    private Anno4j anno4j;
+    private final Anno4j anno4j;
 
     /**
      * The logger used for printing progress.
      */
-    private Logger logger = LoggerFactory.getLogger(OWLJavaFileGenerator.class);
+    private final Logger logger = LoggerFactory.getLogger(OWLJavaFileGenerator.class);
 
     /**
      * Initializes the generator without a connection to an external repository,
@@ -186,7 +186,7 @@ public class OWLJavaFileGenerator implements OntologyModelBuilder, JavaFileGener
      * @return All pairwise distinct named classes in the repository.
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    public Collection<BuildableRDFSClazz> getDistinctClasses() throws RepositoryException {
+    private Collection<BuildableRDFSClazz> getDistinctClasses() throws RepositoryException {
         try {
             ObjectConnection connection = anno4j.getObjectRepository().getConnection();
             ObjectQuery query = connection.prepareObjectQuery(

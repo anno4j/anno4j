@@ -51,7 +51,7 @@ public abstract class SchemaPersistingManager {
     /**
      * Connection to the triplestore, which will receive the schema information.
      */
-    private ObjectConnection connection;
+    private final ObjectConnection connection;
 
     /**
      * Persists the schema information implied by schema annotations to the default graph of the connected triplestore.
@@ -62,7 +62,7 @@ public abstract class SchemaPersistingManager {
      * @throws ContradictorySchemaException Thrown if the schema information imposed by annotations contradicts with
      * schema information that is already present in the connected triplestore.
      */
-    public abstract void persistSchema(Reflections types) throws RepositoryException, InconsistentAnnotationException, ContradictorySchemaException;
+    public abstract void persistSchema(Reflections types) throws RepositoryException, InconsistentAnnotationException;
 
     /**
      * @param connection Connection to the triplestore that should receive schema information.
@@ -74,7 +74,7 @@ public abstract class SchemaPersistingManager {
     /**
      * @return Returns the connection to the triplestore that should receive schema information.
      */
-    public ObjectConnection getConnection() {
+    ObjectConnection getConnection() {
         return connection;
     }
 }

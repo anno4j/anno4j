@@ -40,7 +40,7 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
      * @return Returns the schema annotations that could be derived from OWL data present in the repository.
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
-    protected Collection<AnnotationSpec> buildSchemaAnnotations(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
+    Collection<AnnotationSpec> buildSchemaAnnotations(RDFSClazz domainClazz, OntGenerationConfig config) throws RepositoryException {
         Collection<AnnotationSpec> annotations = new HashSet<>();
 
         // Add characteristic annotations:
