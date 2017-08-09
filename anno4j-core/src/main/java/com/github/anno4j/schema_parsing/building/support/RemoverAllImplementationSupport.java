@@ -74,11 +74,11 @@ public abstract class RemoverAllImplementationSupport extends RemoverAllSupport 
             // Remove all values and sanitize schema afterwards using SchemaSanitizingObjectSupport:
             removerAllBuilder.beginControlFlow("for($T _current : _containedValues)", rangeClassName)
                              .addStatement("removeValue($S, _current)", getResourceAsString())
-                             .endControlFlow()
-                             .addStatement("sanitizeSchema($S)", getResourceAsString());
+                             .endControlFlow() // End for
+                             .endControlFlow(); // End if(!_containedValues.isEmpty())
 
             TypeName propertySet = ClassName.get(PropertySet.class);
-            removerAllBuilder.endControlFlow() // End if(!_containedValues.isEmpty())
+            removerAllBuilder.addStatement("sanitizeSchema($S)", getResourceAsString())
                              .addComment("Refresh values:")
                              .beginControlFlow("if($N() instanceof $T)", getter, propertySet)
                              .addStatement("(($T) $N()).refresh()", propertySet, getter)
