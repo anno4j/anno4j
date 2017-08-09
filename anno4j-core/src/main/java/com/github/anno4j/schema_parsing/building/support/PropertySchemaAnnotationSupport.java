@@ -125,16 +125,31 @@ public abstract class PropertySchemaAnnotationSupport extends RDFSPropertySuppor
             if(!restriction.getSomeValuesFrom().isEmpty()) {
                 annotations.add(buildTypeArrayAnnotation(SomeValuesFrom.class, restriction.getSomeValuesFrom(), config));
             }
-            if(!restriction.getMinCardinality().isEmpty()) {
-                int minCardinality = restriction.getMinCardinality().iterator().next().intValue();
+            if(!restriction.getMinCardinality().isEmpty() || !restriction.getMinQualifiedCardinality().isEmpty()) {
+                int minCardinality;
+                if(!restriction.getMinCardinality().isEmpty()) {
+                    minCardinality = restriction.getMinCardinality().iterator().next().intValue();
+                } else {
+                    minCardinality = restriction.getMinQualifiedCardinality().iterator().next().intValue();
+                }
                 annotations.add(buildQualifiedAnnotation(MinCardinality.class, restriction, minCardinality, config));
             }
-            if(!restriction.getMaxCardinality().isEmpty()) {
-                int maxCardinality = restriction.getMaxCardinality().iterator().next().intValue();
+            if(!restriction.getMaxCardinality().isEmpty() || !restriction.getMaxQualifiedCardinality().isEmpty()) {
+                int maxCardinality;
+                if(!restriction.getMaxCardinality().isEmpty()) {
+                    maxCardinality = restriction.getMaxCardinality().iterator().next().intValue();
+                } else {
+                    maxCardinality = restriction.getMaxQualifiedCardinality().iterator().next().intValue();
+                }
                 annotations.add(buildQualifiedAnnotation(MaxCardinality.class, restriction, maxCardinality, config));
             }
-            if(!restriction.getCardinality().isEmpty()) {
-                int cardinality = restriction.getCardinality().iterator().next().intValue();
+            if(!restriction.getCardinality().isEmpty() || !restriction.getQualifiedCardinality().isEmpty()) {
+                int cardinality;
+                if(!restriction.getCardinality().isEmpty()) {
+                    cardinality = restriction.getCardinality().iterator().next().intValue();
+                } else {
+                    cardinality = restriction.getQualifiedCardinality().iterator().next().intValue();
+                }
                 annotations.add(buildQualifiedAnnotation(Cardinality.class, restriction, cardinality, config));
             }
         }

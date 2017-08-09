@@ -121,6 +121,12 @@ public class OWL {
     public final static String MIN_CARDINALITY = NS + "minCardinality";
 
     /**
+     * Refers to http://www.w3.org/2002/07/owl#minQualifiedCardinality
+     * The property that determines the cardinality of a minimum qualified cardinality restriction.
+     */
+    public final static String MIN_QUALIFIED_CARDINALITY = NS + "minQualifiedCardinality";
+
+    /**
      * Refers to http://www.w3.org/2002/07/owl#maxCardinality
      * Cardinality is stated on a property with respect to a particular class. If a maxCardinality of 1 is stated on a
      * property with respect to a class, then any instance of that class will be related to at most one individual by
@@ -129,11 +135,23 @@ public class OWL {
     public final static String MAX_CARDINALITY = NS + "maxCardinality";
 
     /**
+     * Refers to http://www.w3.org/2002/07/owl#maxQualifiedCardinality
+     * The property that determines the cardinality of a maximum qualified cardinality restriction.
+     */
+    public final static String MAX_QUALIFIED_CARDINALITY = NS + "maxQualifiedCardinality";
+
+    /**
      * Refers to http://www.w3.org/2002/07/owl#cardinality
      * Cardinality is provided as a convenience when it is useful to state that a property on a class has
      * both minCardinality 0 and maxCardinality 0 or both minCardinality 1 and maxCardinality 1.
      */
     public final static String CARDINALITY = NS + "cardinality";
+
+    /**
+     * Refers to http://www.w3.org/2002/07/owl#qualifiedCardinality
+     * The property that determines the cardinality of an exact qualified cardinality restriction.
+     */
+    public final static String QUALIFIED_CARDINALITY = NS + "qualifiedCardinality";
 
     /**
      * Refers to http://www.w3.org/2002/07/owl#hasValue

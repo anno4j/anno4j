@@ -160,7 +160,7 @@ public class OWLSchemaPersistingManagerTest {
                 "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r3 . " +
                 "   ?r3 owl:onProperty <http://example.de/#partner> . " +
                 "   ?r3 owl:onClass <http://example.de/#validly_annotated_person> . " +
-                "   ?r3 owl:minCardinality ?v3 . " +
+                "   ?r3 owl:minQualifiedCardinality ?v3 . " +
                 "   FILTER ( ?v3 = 0 )" +
 
                 "   ?r4 a owl:Restriction . " +
@@ -177,7 +177,7 @@ public class OWLSchemaPersistingManagerTest {
                 "   ?r6 a owl:Restriction . " +
                 "   <http://example.de/#validly_annotated_person> rdfs:subClassOf ?r6 . " +
                 "   ?r6 owl:onProperty <http://example.de/#has_activity> . " +
-                "   ?r6 owl:minCardinality ?v6 . " +
+                "   ?r6 owl:minQualifiedCardinality ?v6 . " +
                 "   ?r6 owl:onClass <http://example.de/#job> . " +
                 "   FILTER( ?v6 = 1 )" +
                 "}";

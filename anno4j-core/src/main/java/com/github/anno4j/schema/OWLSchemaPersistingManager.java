@@ -272,9 +272,9 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
         // Cardinalities must be non-negative:
         for (AccessibleObject object : filterObjectsWithAnnotation(annotatedObjects, MinCardinality.class)) {
             Iri iri = object.getAnnotation(Iri.class);
-            Collection<MinCardinality> cardinalities = unpackAnnotations(object, MinCardinality.class);
+            Collection<MinCardinality> minCardinalities = unpackAnnotations(object, MinCardinality.class);
 
-            for(MinCardinality cardinality : cardinalities) {
+            for(MinCardinality cardinality : minCardinalities) {
                 if(cardinality.value() < 0) {
                     throw new InconsistentAnnotationException("Minimum cardinality of property " + iri.value() +
                             " in " + getDeclaringJavaClazz(object).getName() + " must be non-negative.");
@@ -312,7 +312,8 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                 int cardinality = cardinalityAnnotation.value();
 
                 for(MinCardinality minCardinalityAnnotation : minCardinalities) {
-                    if(minCardinalityAnnotation.value() != cardinality) {
+                    // Check that minimum cardinality is the same as exact cardinality wrt. qualified class:
+                    if(minCardinalityAnnotation.value() != cardinality && minCardinalityAnnotation.onClass() == cardinalityAnnotation.onClass()) {
                         String propertyIri = getIriFromObject(object);
                         String clazzIri = getIriFromObject(getDeclaringJavaClazz(object));
                         throw new InconsistentAnnotationException("Mapping for property " + propertyIri
@@ -321,7 +322,8 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                     }
                 }
                 for(MaxCardinality maxCardinalityAnnotation : maxCardinalities) {
-                    if(maxCardinalityAnnotation.value() != cardinality) {
+                    // Check that maximum cardinality is the same as exact cardinality wrt. qualified class:
+                    if(maxCardinalityAnnotation.value() != cardinality && maxCardinalityAnnotation.onClass() == cardinalityAnnotation.onClass()) {
                         String propertyIri = getIriFromObject(object);
                         String clazzIri = getIriFromObject(getDeclaringJavaClazz(object));
                         throw new InconsistentAnnotationException("Mapping for property " + propertyIri
@@ -697,6 +699,8 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
      * Only the <code>owl:onClass</code> and <code>owl:onProperty</code> properties are set for this restriction.
      * Note that restrictions constrain properties only in the scope of the class the are defined in.
      * @param propertyObject The {@link Iri} annotated method or field for which the restriction should be created.
+     * @param onClazzIri The IRI of the class in which context the property is restricted. If this parameter
+     *                   is {@code null} the {@code owl:onClass} property is not set for the restriction.
      * @return The created restriction object.s
      * @throws RepositoryException Thrown if an error occurs while creating the restriction object.
      */
@@ -979,7 +983,11 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
 
                 // Add the cardinality to the restriction:
                 Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
-                restriction.setMinCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(minCardinality)));
+                if(onClazzIri == null) {
+                    restriction.setMinCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(minCardinality)));
+                } else {
+                    restriction.setMinQualifiedCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(minCardinality)));
+                }
             }
         }
     }
@@ -1006,7 +1014,11 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                 Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
 
                 // Add the cardinality to the restriction:
-                restriction.setMaxCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(maxCardinality)));
+                if(onClazzIri == null) {
+                    restriction.setMaxCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(maxCardinality)));
+                } else {
+                    restriction.setMaxQualifiedCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(maxCardinality)));
+                }
             }
         }
     }
@@ -1030,10 +1042,17 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                     onClazzIri = getIriFromObject(cardinalityAnnotation.onClass());
                 }
 
-                Restriction restriction = buildRestrictionForProperty(object, onClazzIri);
-                // Add the cardinality to the restriction:
-                restriction.setMaxCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
-                restriction.setMinCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
+                Restriction minRestriction = buildRestrictionForProperty(object, onClazzIri);
+                Restriction maxRestriction = buildRestrictionForProperty(object, onClazzIri);
+
+                // Add the cardinality to the restrictions:
+                if(onClazzIri == null) {
+                    minRestriction.setMinCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
+                    maxRestriction.setMaxCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
+                } else {
+                    minRestriction.setMinQualifiedCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
+                    maxRestriction.setMaxQualifiedCardinality(Sets.<Number>newHashSet(BigInteger.valueOf(cardinality)));
+                }
             }
         }
     }

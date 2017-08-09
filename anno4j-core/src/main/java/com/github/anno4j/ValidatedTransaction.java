@@ -549,7 +549,7 @@ public class ValidatedTransaction extends Transaction {
      * @throws QueryEvaluationException Thrown if the issued query could not be evaluated.
      */
     private int getValuesOfTypeCount(String subjectURI, String propertyURI, String valueTypeURI) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        ObjectQuery query = getConnection().prepareObjectQuery(QUERY_PREFIX + "SELECT (COUNT(?o) as ?count) " +
+        ObjectQuery query = getConnection().prepareObjectQuery(QUERY_PREFIX + "SELECT (COUNT(DISTINCT ?o) as ?count) " +
                                                             "{" +
                                                             "   <" + subjectURI + "> <" + propertyURI + "> ?o . " +
                                                             "   { " +
@@ -565,8 +565,10 @@ public class ValidatedTransaction extends Transaction {
     }
 
     /**
-     * Checks whether every <code>owl:minCardinality</code> restriction imposed on any of the classes of the instances
-     * <code>anchors</code> is fulfilled.
+     * Checks whether every <code>owl:minCardinality</code>/<code>owl:minQualifiedCardinality</code>
+     * restriction imposed on any of the classes of the instances <code>anchors</code> is fulfilled.
+     * Also evaluates against <code>owl:cardinality</code>/<code>owl:qualifiedCardinality</code> restrictions
+     * wrt. the minimum number of values.
      * Also checks the validity of <code>owl:onClass</code> constraints.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
@@ -577,11 +579,12 @@ public class ValidatedTransaction extends Transaction {
         String q = QUERY_PREFIX + "SELECT ?p ?mc (COUNT(DISTINCT ?o) as ?c) ?oc ?i " +
                 "{" +
                 buildValuesClause(anchors, "i") +
+                "  VALUES ?rp { owl:minCardinality owl:minQualifiedCardinality owl:cardinality owl:qualifiedCardinality } " +
                 "  ?i a ?t ." +
                 "  ?t rdfs:subClassOf+ ?r ." +
                 "  ?r a owl:Restriction ." +
                 "  ?r owl:onProperty ?p ." +
-                "  ?r owl:minCardinality ?mc ." +
+                "  ?r ?rp ?mc ." +
 
                 "  OPTIONAL {" +
                 "     ?i ?p ?o ." +
@@ -645,8 +648,10 @@ public class ValidatedTransaction extends Transaction {
 
 
     /**
-     * Checks whether every <code>owl:maxCardinality</code> restriction imposed on any of the classes of the instances
-     * <code>anchors</code> is fulfilled.
+     * Checks whether every <code>owl:maxCardinality</code>/<code>owl:maxQualifiedCardinality</code>
+     * restriction imposed on any of the classes of the instances <code>anchors</code> is fulfilled.
+     * Also evaluates against <code>owl:cardinality</code>/<code>owl:qualifiedCardinality</code> restrictions
+     * wrt. the maximum number of values.
      * Also checks the validity of <code>owl:onClass</code> constraints.
      * @param anchors A set of resources which properties will be checked.
      * @throws RepositoryException Thrown if an error occurs querying the connected triplestore.
@@ -657,11 +662,12 @@ public class ValidatedTransaction extends Transaction {
         String q = QUERY_PREFIX + "SELECT ?p ?mc (COUNT(DISTINCT ?o) as ?c) ?oc ?i " +
                 "{" +
                 buildValuesClause(anchors, "i") +
+                "  VALUES ?rp { owl:maxCardinality owl:maxQualifiedCardinality owl:cardinality owl:qualifiedCardinality } " +
                 "  ?i a ?t ." +
                 "  ?t rdfs:subClassOf+ ?r ." +
                 "  ?r a owl:Restriction ." +
                 "  ?r owl:onProperty ?p ." +
-                "  ?r owl:maxCardinality ?mc ." +
+                "  ?r ?rp ?mc ." +
 
                 "  ?i ?p ?o ." +
 

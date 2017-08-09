@@ -65,8 +65,8 @@ public class SchemaAnnotationGenerationTest {
     }
 
     /**
-     * Fetches the annotation specification of a certain type that the code generation would add to the field
-     * in the generated support class.
+     * Fetches the annotation specification of a certain type that the code generation would add to the
+     * getter method of the generated interface.
      * @param declaringClazzIri The IRI of the class for which the field would be generated.
      * @param propertyIri The IRI of the property that is mapped by the field.
      * @param annotationType The type of the annotation to get.
@@ -85,8 +85,17 @@ public class SchemaAnnotationGenerationTest {
             throw new RepositoryException(e);
         }
 
-        MethodSpec field = property.buildGetter(clazz, generationConfig);
-        for (AnnotationSpec currentAnnotation : field.annotations) {
+        MethodSpec getter = property.buildGetter(clazz, generationConfig);
+        for (AnnotationSpec currentAnnotation : getter.annotations) {
+            // Check for container annotations:
+            if(currentAnnotation.type.equals(ClassName.get(MinCardinalities.class)) && annotationType.equals(MinCardinality.class)) {
+                return currentAnnotation;
+            } else if(currentAnnotation.type.equals(ClassName.get(MaxCardinalities.class)) && annotationType.equals(MaxCardinality.class)) {
+                return currentAnnotation;
+            } else if(currentAnnotation.type.equals(ClassName.get(Cardinalities.class)) && annotationType.equals(Cardinality.class)) {
+                return currentAnnotation;
+            }
+
             if(currentAnnotation.type.equals(AnnotationSpec.builder(annotationType).build().type)) {
                 return currentAnnotation;
             }
@@ -174,7 +183,9 @@ public class SchemaAnnotationGenerationTest {
     public void testMaxCardinalityAnnotation() throws Exception {
         AnnotationSpec maxCardinalityAnnotation = getBuiltAnnotation("http://example.de/ont#Menu", "http://example.de/ont#contains", MaxCardinality.class);
         assertNotNull(maxCardinalityAnnotation);
-        assertEquals(CodeBlock.of("5"), maxCardinalityAnnotation.members.get("value").get(0));
+        assertEquals(ClassName.get(MaxCardinalities.class), maxCardinalityAnnotation.type);
+        assertTrue(maxCardinalityAnnotation.members.get("value").toString().replace(" ", "").contains("value=1,onClass=de.example.Drink"));
+        assertTrue(maxCardinalityAnnotation.members.get("value").toString().replace(" ", "").contains("(5)"));
     }
 
     @Test

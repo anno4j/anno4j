@@ -31,17 +31,35 @@ public interface Restriction extends ResourceObject {
     @Iri(OWL.MIN_CARDINALITY)
     void setMinCardinality(Set<Number> minCardinality);
 
+    @Iri(OWL.MIN_QUALIFIED_CARDINALITY)
+    Set<Number> getMinQualifiedCardinality();
+
+    @Iri(OWL.MIN_QUALIFIED_CARDINALITY)
+    void setMinQualifiedCardinality(Set<Number> minCardinality);
+
     @Iri(OWL.MAX_CARDINALITY)
     Set<Number> getMaxCardinality();
 
     @Iri(OWL.MAX_CARDINALITY)
     void setMaxCardinality(Set<Number> maxCardinality);
 
+    @Iri(OWL.MAX_QUALIFIED_CARDINALITY)
+    Set<Number> getMaxQualifiedCardinality();
+
+    @Iri(OWL.MAX_QUALIFIED_CARDINALITY)
+    void setMaxQualifiedCardinality(Set<Number> minCardinality);
+
     @Iri(OWL.CARDINALITY)
     Set<Number> getCardinality();
 
     @Iri(OWL.CARDINALITY)
     void setCardinality(Set<Number> cardinality);
+
+    @Iri(OWL.QUALIFIED_CARDINALITY)
+    Set<Number> getQualifiedCardinality();
+
+    @Iri(OWL.QUALIFIED_CARDINALITY)
+    void setQualifiedCardinality(Set<Number> minCardinality);
 
     @Iri(OWL.ALL_VALUES_FROM)
     Set<OWLClazz> getAllValuesFrom();
