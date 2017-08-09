@@ -28,4 +28,17 @@ public abstract class AnnotationCollectionSupport extends ResourceObjectSupport 
         labels.add(label);
         this.setLabels(labels);
     }
+
+    @Override
+    public int getTotal() {
+        int total = 0;
+        AnnotationPage page = this.getFirstPage();
+
+        while(page != null) {
+            total += page.getItems().size();
+            page = page.getNext();
+        }
+
+        return total;
+    }
 }
