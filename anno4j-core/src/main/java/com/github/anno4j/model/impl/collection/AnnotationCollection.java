@@ -4,6 +4,7 @@ import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.AS;
 import com.github.anno4j.model.namespaces.RDFS;
 import org.openrdf.annotations.Iri;
+import org.openrdf.rio.RDFFormat;
 
 import java.util.Set;
 
@@ -50,9 +51,13 @@ public interface AnnotationCollection extends ResourceObject {
      *
      * The total number of Annotations in the Collection.
      *
+     * Marked as deprecated because it is not advised to use this method. getTotal does calculate the total number
+     * of annotations by calculating them, rather than relying on this value.
+     *
      * @param total The value to set for the http://www.w3.org/ns/activitystreams#totalItems relationship.
      */
     @Iri(AS.TOTAL_ITEMS)
+    @Deprecated
     void setTotal(int total);
 
     /**
@@ -72,8 +77,9 @@ public interface AnnotationCollection extends ResourceObject {
      *
      * @param page  The AnnotationPage to define the http://www.w3.org/ns/activitystreams#first relationship point to.
      */
-    @Iri(AS.FIRST)
     void setFirstPage(AnnotationPage page);
+
+    void setFirstPageCascading(AnnotationPage page);
 
     /**
      * Gets the AnnotationPage currently defined at the http://www.w3.org/ns/activitystreams#first relationship.
@@ -82,7 +88,6 @@ public interface AnnotationCollection extends ResourceObject {
      *
      * @return  The AnnotationPage currently defined for the http://www.w3.org/ns/activitystreams#first relationship.
      */
-    @Iri(AS.FIRST)
     AnnotationPage getFirstPage();
 
     /**
@@ -92,8 +97,9 @@ public interface AnnotationCollection extends ResourceObject {
      *
      * @param page  The AnnotationPage to set for the http://www.w3.org/ns/activitystreams#last relationship.
      */
-    @Iri(AS.LAST)
     void setLastPage(AnnotationPage page);
+
+    void setLastPageCascading(AnnotationPage page);
 
     /**
      * Gets the AnnotationPage currently defined for the http://www.w3.org/ns/activitystreams#last relationship.
@@ -102,6 +108,7 @@ public interface AnnotationCollection extends ResourceObject {
      *
      * @return  The AnnotationPage currently defined for the http://www.w3.org/ns/activitystreams#last relationship.
      */
-    @Iri(AS.LAST)
     AnnotationPage getLastPage();
+
+    String getTriplesExpanded(RDFFormat format);
 }
