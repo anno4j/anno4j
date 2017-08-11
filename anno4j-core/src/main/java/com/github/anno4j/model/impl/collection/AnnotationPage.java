@@ -73,8 +73,9 @@ public interface AnnotationPage extends ResourceObject {
      *
      * @param page  The AnnotationPage to set the http://www.w3.org/ns/activitystreams#next relationship to.
      */
-    @Iri(AS.NEXT)
     void setNext(AnnotationPage page);
+
+    void setNextSymmetric(AnnotationPage page);
 
     /**
      * Gets the value currently defined for the http://www.w3.org/ns/activitystreams#next relationship.
@@ -84,7 +85,6 @@ public interface AnnotationPage extends ResourceObject {
      * @return  The AnnotationPage that is currently set for the http://www.w3.org/ns/activitystreams#next
      *          relationship.
      */
-    @Iri(AS.NEXT)
     AnnotationPage getNext();
 
     /**
@@ -94,8 +94,9 @@ public interface AnnotationPage extends ResourceObject {
      *
      * @param page  The AnnotationPage to set the http://www.w3.org/ns/activitystreams#prev relationship to.
      */
-    @Iri(AS.PREV)
     void setPrev(AnnotationPage page);
+
+    void setPrevSymmetric(AnnotationPage page);
 
     /**
      * Gets the value currently defined for the http://www.w3.org/ns/activitystreams#prev relationship.
@@ -105,7 +106,6 @@ public interface AnnotationPage extends ResourceObject {
      * @return  The AnnotationPage that is currently set for the http://www.w3.org/ns/activitystreams#prev
      *          relationship.
      */
-    @Iri(AS.PREV)
     AnnotationPage getPrev();
 
     /**

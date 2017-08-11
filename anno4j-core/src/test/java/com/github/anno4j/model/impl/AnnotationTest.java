@@ -15,6 +15,7 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -253,5 +254,24 @@ public class AnnotationTest {
         List<Annotation> result = qs.execute(Annotation.class);
 
         assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testGetTriples() throws RepositoryException, IllegalAccessException, InstantiationException, UpdateExecutionException, MalformedQueryException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        // Create specific resource1
+        SpecificResource specificResource = anno4j.createObject(SpecificResource.class);
+        ResourceObject resourceObject = anno4j.createObject(ResourceObject.class);
+        resourceObject.setResourceAsString("http://www.somepage.org/resource1/");
+        specificResource.setSource(resourceObject);
+        annotation.addTarget(specificResource);
+
+        Motivation comment = MotivationFactory.getCommenting(this.anno4j);
+
+        annotation.addTarget(specificResource);
+        annotation.addMotivation(comment);
+
+        System.out.println(annotation.getTriples(RDFFormat.RDFXML));
     }
 }

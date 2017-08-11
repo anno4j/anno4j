@@ -82,15 +82,7 @@ public abstract class SpecificResourceSupport extends ExternalWebResourceSupport
             if (getSelector() != null) {
                 parser.parse(IOUtils.toInputStream(getSelector().getTriples(RDFFormat.NTRIPLES), "UTF-8"), "");
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        } catch (RDFParseException e) {
-            e.printStackTrace();
-        } catch (RepositoryException e) {
+        } catch (IOException | RDFHandlerException | RDFParseException | RepositoryException e) {
             e.printStackTrace();
         }
 
