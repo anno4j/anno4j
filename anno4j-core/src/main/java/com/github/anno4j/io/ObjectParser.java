@@ -30,8 +30,6 @@ public class ObjectParser {
 
     private Anno4j anno4j;
 
-    private final URIImpl[] motivations;
-
     /**
      * Basic constructor, which sets up all the necessary repositories.
      *
@@ -40,7 +38,7 @@ public class ObjectParser {
      */
     public ObjectParser() throws RepositoryException, RepositoryConfigException {
         this.anno4j = new Anno4j();
-        this.motivations = new URIImpl[] {
+        URIImpl[] motivations = new URIImpl[]{
                 new URIImpl(OADM.MOTIVATION_BOOKMARKING),
                 new URIImpl(OADM.MOTIVATION_CLASSIFYING),
                 new URIImpl(OADM.MOTIVATION_COMMENTING),

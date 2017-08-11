@@ -4,6 +4,9 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.model.Target;
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.impl.body.TextualBody;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.model.namespaces.DCTYPES;
 import com.github.anno4j.model.namespaces.RDF;
 import org.junit.Before;
@@ -86,6 +89,40 @@ public class InputOutputTest {
         } catch (RepositoryException | RepositoryConfigException | MalformedURLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testInputAndOutput() throws RepositoryException, IllegalAccessException, InstantiationException, RepositoryConfigException, MalformedURLException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        SpecificResource specificResource = this.anno4j.createObject(SpecificResource.class);
+        ResourceObject source = this.anno4j.createObject(ResourceObject.class);
+        specificResource.setSource(source);
+
+        TextualBody textualBody = this.anno4j.createObject(TextualBody.class);
+        textualBody.setValue("someText");
+
+        annotation.addTarget(specificResource);
+        annotation.addBody(textualBody);
+
+        // Create JSONLD of the Annotation
+        String jsonld = annotation.getTriples(RDFFormat.JSONLD);
+
+        System.out.println("JsonLD representation of the Annotation:");
+        System.out.println(jsonld);
+
+        // Parse the JSONLD String
+        ObjectParser parser = new ObjectParser();
+        List<Annotation> parsed = parser.parse(jsonld, new URL("http://example.com/"), RDFFormat.JSONLD);
+
+        assertEquals(1, parsed.size());
+        assertEquals(annotation.getResourceAsString(), parsed.get(0).getResourceAsString());
+
+        // Get the JSONLD of the parsed Annotation object
+        String jsonldParsed = annotation.getTriples(RDFFormat.JSONLD);
+
+        System.out.println("JsonLD representation of the PARSED Annotation:");
+        System.out.println(jsonldParsed);
     }
 
     /**
