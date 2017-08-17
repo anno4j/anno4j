@@ -115,6 +115,10 @@ public class Anno4j implements TransactionCommands {
     }
 
     public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext, boolean persistSchemaAnnotations) throws RepositoryConfigException, RepositoryException {
+        this(repository, idGenerator, defaultContext, persistSchemaAnnotations, null);
+    }
+
+    public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext, boolean persistSchemaAnnotations, Set<URL> additionalClasses) throws RepositoryConfigException, RepositoryException {
         this.idGenerator = idGenerator;
         this.defaultContext = defaultContext;
 
@@ -123,6 +127,9 @@ public class Anno4j implements TransactionCommands {
         classpath.addAll(ClasspathHelper.forJavaClassPath());
         classpath.addAll(ClasspathHelper.forManifest());
         classpath.addAll(ClasspathHelper.forPackage(""));
+        if(additionalClasses != null) {
+            classpath.addAll(additionalClasses);
+        }
 
         Reflections annotatedClasses = new Reflections(new ConfigurationBuilder()
                 .setUrls(classpath)
