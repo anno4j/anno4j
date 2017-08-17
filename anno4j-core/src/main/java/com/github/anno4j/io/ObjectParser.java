@@ -65,7 +65,8 @@ public class ObjectParser {
     /**
      * Clears the Anno4j underlying triplestore.
      * This is required in order to prevent a drop in throughput while parsing.
-     * @throws RepositoryException Thrown if no connection to the object repository could be made.
+     *
+     * @throws RepositoryException      Thrown if no connection to the object repository could be made.
      * @throws UpdateExecutionException Thrown if an error occurred while executing the clearing query.
      */
     private void clear() throws RepositoryException, UpdateExecutionException {
@@ -88,11 +89,13 @@ public class ObjectParser {
     /**
      * Shutdown method, closing all repositories and corresponding connection
      * objects.
+     * Does also call the clear() method, which removes all statements from the local Anno4j instance.
      *
      * @throws RepositoryException
      */
-    public void shutdown() throws RepositoryException {
+    public void shutdown() throws RepositoryException, UpdateExecutionException {
 //        Add anno4j shutdown method here.
+        this.clear();
         this.anno4j.getObjectRepository().getConnection().close();
         this.anno4j.getRepository().getConnection().close();
     }
@@ -121,15 +124,17 @@ public class ObjectParser {
      * Used to parse a given text content, supported in a given serialization
      * format.
      * The Annotations are then returned as a list.
-     * For performance reasons, the local memorystore in then cleared.
+     * For performance reasons, the local memorystore can be cleared by defining the boolean parameter as true,
+     * which is the standard behaviour.
      *
-     * @param content The String representation of the textcontent.
+     * @param content     The String representation of the textcontent.
      * @param documentURL The basic URL used for namespaces.
-     * @param format The format of the given serialization. Needs to be
-     * supported of an instance of RDFFormat.
+     * @param format      The format of the given serialization. Needs to be
+     *                    supported of an instance of RDFFormat.
+     * @param clear       Determines, if the local Anno4j instance should be cleared or not after a call to parse().
      * @return A list of annotations
      */
-    public List<Annotation> parse(String content, URL documentURL, RDFFormat format) {
+    public List<Annotation> parse(String content, URL documentURL, RDFFormat format, boolean clear) {
         RDFParser parser = Rio.createParser(format);
         try {
             StatementSailHandler handler = new StatementSailHandler(this.anno4j.getRepository().getConnection());
@@ -144,11 +149,13 @@ public class ObjectParser {
 
         List<Annotation> annotations = getAnnotations();
 
-        // Clear all triples in the triplestore:
-        try {
-            clear();
-        } catch (RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
+        // Possibly clear all triples in the triplestore:
+        if (clear) {
+            try {
+                clear();
+            } catch (RepositoryException | UpdateExecutionException e) {
+                e.printStackTrace();
+            }
         }
 
         return annotations;
