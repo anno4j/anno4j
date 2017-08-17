@@ -183,9 +183,8 @@ public class SchemaAnnotationGenerationTest {
     public void testMaxCardinalityAnnotation() throws Exception {
         AnnotationSpec maxCardinalityAnnotation = getBuiltAnnotation("http://example.de/ont#Menu", "http://example.de/ont#contains", MaxCardinality.class);
         assertNotNull(maxCardinalityAnnotation);
-        assertEquals(ClassName.get(MaxCardinalities.class), maxCardinalityAnnotation.type);
-        assertTrue(maxCardinalityAnnotation.members.get("value").toString().replace(" ", "").contains("value=1,onClass=de.example.Drink"));
-        assertTrue(maxCardinalityAnnotation.members.get("value").toString().replace(" ", "").contains("(5)"));
+        assertEquals(ClassName.get(MaxCardinality.class), maxCardinalityAnnotation.type);
+        assertEquals(CodeBlock.of("5"), maxCardinalityAnnotation.members.get("value").get(0));
     }
 
     @Test

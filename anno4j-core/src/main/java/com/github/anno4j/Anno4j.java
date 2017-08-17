@@ -417,7 +417,9 @@ public class Anno4j implements TransactionCommands {
 
         if(partialClasses != null) {
             for(Class<?> clazz : this.partialClasses){
-                config.addBehaviour(clazz);
+                if (!clazz.getSimpleName().endsWith("AbstractClass")) {
+                    config.addBehaviour(clazz);
+                }
             }
         }
 

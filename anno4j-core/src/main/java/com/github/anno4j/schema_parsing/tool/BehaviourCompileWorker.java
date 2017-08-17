@@ -2,7 +2,10 @@ package com.github.anno4j.schema_parsing.tool;
 
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.Transaction;
+import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import org.openrdf.annotations.Iri;
+import org.openrdf.model.Resource;
+import org.openrdf.model.impl.URIImpl;
 
 class BehaviourCompileWorker implements Runnable {
 
@@ -30,10 +33,14 @@ class BehaviourCompileWorker implements Runnable {
         try {
             Class<?> clazz = jarClassLoader.loadClass(className);
 
-            if(clazz.getAnnotation(Iri.class) != null) {
+            Iri iriAnnotation;
+            if((iriAnnotation = clazz.getAnnotation(Iri.class)) != null) {
+
+                anno4j.createObject(RDFSClazz.class, (Resource) new URIImpl(iriAnnotation.value()));
+
                 Transaction transaction = anno4j.createTransaction();
                 transaction.begin();
-                transaction.createObject(clazz);
+                transaction.createObject(clazz, (Resource) new URIImpl("urn:anno4j:foo"));
                 transaction.rollback();
             }
 

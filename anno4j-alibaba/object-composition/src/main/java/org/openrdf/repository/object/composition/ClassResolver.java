@@ -182,7 +182,6 @@ public class ClassResolver {
 		synchronized (cp) {
 			try {
 				Class<?> loadedClass = cp.classForName(className);
-				logger.info("Class " + className + " found and loaded!");
 
 				List<Class<?>> types = new ArrayList<>(roles.size());
 				types.addAll(roles);
@@ -196,7 +195,6 @@ public class ClassResolver {
 				return loadedClass;
 
 			} catch (ClassNotFoundException e1) {
-				logger.info("Class " + className + " not found. Will be composed now...");
 				return composeBehaviours(className, roles);
 			}
 		}

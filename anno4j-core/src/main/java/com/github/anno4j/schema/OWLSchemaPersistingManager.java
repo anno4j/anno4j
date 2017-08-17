@@ -57,9 +57,17 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
     public void persistSchema(Reflections types) throws InconsistentAnnotationException, RepositoryException {
         Collection<AccessibleObject> iriAnnotatedObjects = new HashSet<>();
         // Add methods with @Iri annotation:
-        iriAnnotatedObjects.addAll(types.getMethodsAnnotatedWith(Iri.class));
+        for(AccessibleObject object : types.getMethodsAnnotatedWith(Iri.class)) {
+            if(!isFromLoadedBehaviour(object)) {
+                iriAnnotatedObjects.add(object);
+            }
+        }
         // Add fields with @Iri annotation:
-        iriAnnotatedObjects.addAll(types.getFieldsAnnotatedWith(Iri.class));
+        for (AccessibleObject object : types.getFieldsAnnotatedWith(Iri.class)) {
+            if(!isFromLoadedBehaviour(object)) {
+                iriAnnotatedObjects.add(object);
+            }
+        }
 
         // Check whether schema annotations contradict each other:
         checkSchemaAnnotationConsistency(iriAnnotatedObjects);
@@ -1122,6 +1130,20 @@ public class OWLSchemaPersistingManager extends SchemaPersistingManager {
                 return a1.equals(a2);
             }
 
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Whether the object is defined in a class that is a backed up implementation, e.g. a entity proxy.
+     * @param object The object to check for.
+     * @return Returns true if the object is defined in a reloaded behaviour or entity proxy.
+     */
+    private boolean isFromLoadedBehaviour(AccessibleObject object) {
+        Class<?> declaringClazz = getDeclaringJavaClazz(object);
+        if(declaringClazz != null) {
+            return declaringClazz.getSimpleName().contains("EntityProxy") || declaringClazz.getSimpleName().endsWith("AbstractClass");
         } else {
             return false;
         }

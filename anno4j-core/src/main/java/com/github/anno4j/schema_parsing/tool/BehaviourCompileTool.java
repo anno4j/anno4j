@@ -3,7 +3,11 @@ package com.github.anno4j.schema_parsing.tool;
 import com.github.anno4j.Anno4j;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.*;
+import org.openrdf.annotations.Iri;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
+import org.openrdf.repository.object.composition.ClassFactory;
+import org.openrdf.repository.object.composition.ClassResolver;
+import org.openrdf.repository.object.managers.RoleMapper;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.reflections.util.ClasspathHelper;
@@ -14,9 +18,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -30,17 +35,25 @@ public class BehaviourCompileTool {
         Options options = new Options();
 
         Option input = new Option("i", "input", true, "Path to the directory " +
-                "where the compiled resource objects and support classes are stored.");
+                "where the resource objects and support classes source are stored.");
         input.setRequired(true);
         options.addOption(input);
 
-        Option output = new Option("o", "output", true, "Path of the JAR file to create.");
+        Option output = new Option("o", "output", true, "Path to the directory where the generated JAR files will be stored.");
         output.setRequired(true);
         options.addOption(output);
 
         Option threadNum = new Option("t", "threads", true, "Number of threads to use for building behaviour classes. Default: 1");
         threadNum.setType(Integer.class);
         options.addOption(threadNum);
+
+        Option classpath = new Option("cp", "classpath", true, "Classpath for compiling sources. Separated by " + File.pathSeparator);
+        classpath.setType(String.class);
+        options.addOption(classpath);
+
+        Option pattern = new Option("p", "pattern", true, "RegEx describing the files that will be compiled.");
+        pattern.setType(String.class);
+        options.addOption(pattern);
 
         return options;
     }
@@ -145,36 +158,83 @@ public class BehaviourCompileTool {
      */
     public static void main(String[] args) {
         try {
+            // Get CLI arguments:
             CommandLine commandLine = parseCommandLineArguments(args);
-
+            // Input JAR file containing compiled classes:
             File input = new File(commandLine.getOptionValue("input"));
-            if(input.isDirectory() || !input.getName().toLowerCase().endsWith(".jar")) {
-                System.err.println(input + " must be a JAR file.");
+            if(!input.isDirectory() || !input.canRead()) {
+                System.err.println(input + " must be a readable directory.");
+                System.exit(1);
             }
-
-            // TODO compile code here?
-
-            int numThreads = Integer.parseInt(commandLine.getOptionValue("threads"));
-            if(numThreads < 1) {
-                System.err.println("Number of threads must be positive");
-            } else if(numThreads > Runtime.getRuntime().availableProcessors()) {
-                System.out.println("Number of threads greater than available processors.");
+            // Output JAR file containing implemented proxies:
+            File output = new File(commandLine.getOptionValue("output"));
+            if(!(output.isDirectory() || output.mkdirs()) || !output.canWrite()) {
+                System.err.println(output + " must be a writable directory.");
+                System.exit(1);
             }
+            String outputPath = output.getAbsolutePath();
+            if(!outputPath.endsWith(File.separator)) {
+                outputPath += File.separator;
+            }
+            // Number of threads:
+            String threadNumStr = commandLine.getOptionValue("threads");
+            int numThreads;
+            if(threadNumStr != null) {
+                numThreads = Integer.parseInt(threadNumStr);
+                if(numThreads < 1) {
+                    System.err.println("Number of threads must be positive");
+                } else if(numThreads > Runtime.getRuntime().availableProcessors()) {
+                    System.out.println("Number of threads greater than available processors.");
+                }
+            } else {
+                numThreads = 1;
+            }
+            // Pattern:
+            Pattern pattern = Pattern.compile(commandLine.getOptionValue("pattern", ".*"));
+            // Classpath for compiling:
+            JavaSourceCompiler compiler = new JavaSourceCompiler();
+            for (String depencency : commandLine.getOptionValue("classpath", "").split(File.pathSeparator)) {
+                compiler.addDependency(depencency);
+            }
+            File ontologyJar = new File(outputPath + "ontology.jar");
+            compiler.compileDirectory(input, ontologyJar, pattern);
 
+            // Create an Anno4j instance that can load from the input JAR:
             Set<URL> clazzes = new HashSet<>();
-            clazzes.addAll(ClasspathHelper.forManifest(input.toURI().toURL()));
+            clazzes.addAll(ClasspathHelper.forManifest(ontologyJar.toURI().toURL()));
             Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false, clazzes);
+
             BehaviourCompileWorker.ProgressCallback progressCallback = new BehaviourCompileWorker.ProgressCallback();
 
             // Get a class loader that can read from JAR file:
-            ClassLoader classLoader = new URLClassLoader(new URL[]{input.toURI().toURL()}, ClassLoader.getSystemClassLoader());
+            ClassLoader classLoader = new URLClassLoader(new URL[]{ontologyJar.toURI().toURL()}, ClassLoader.getSystemClassLoader());
 
-            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-            for (final String className : getClassNamesInJar(input)) {
-                executor.submit(new BehaviourCompileWorker(anno4j, classLoader, className, progressCallback));
+            // Register concepts found in JAR:
+            RoleMapper mapper = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getRoleMapper();
+            for (final String className : getClassNamesInJar(ontologyJar)) {
+                Class<?> clazz = classLoader.loadClass(className);
+                if(clazz.getAnnotation(Iri.class) != null) {
+                    mapper.addConcept(clazz);
+                }
             }
-            executor.shutdown();
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+
+            // Run the implementation tasks in multiple threads:
+            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+            Collection<Callable<Object>> tasks = new ArrayList<>();
+            for (final String className : getClassNamesInJar(ontologyJar)) {
+                Runnable task = new BehaviourCompileWorker(anno4j, classLoader, className, progressCallback);
+                tasks.add(Executors.callable(task));
+            }
+            executor.invokeAll(tasks);
+
+            // Pack cached proxy implementations into a JAR:
+            ClassFactory factory = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getClassFactory();
+            JarPacker packer = new JarPacker(new File(outputPath + "proxies.jar"));
+            packer.addFile(factory.getOutput());
+            packer.close();
+
+            System.out.println("Packed behaviour implementations into JAR: " + output.getAbsolutePath());
+            System.exit(0);
 
         } catch (Exception e){
             e.printStackTrace();

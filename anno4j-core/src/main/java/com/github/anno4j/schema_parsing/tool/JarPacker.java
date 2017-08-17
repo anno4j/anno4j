@@ -27,7 +27,16 @@ class JarPacker {
     public JarPacker(File file) throws IOException {
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        JarOutputStream target = new JarOutputStream(new FileOutputStream(file), manifest);
+        jarStream = new JarOutputStream(new FileOutputStream(file), manifest);
+    }
+
+    public void addFile(File file) throws IOException {
+        String basePath = file.getPath();
+        if (!basePath.endsWith(File.separator)) {
+            basePath += File.separator;
+        }
+
+        addFile(file, basePath);
     }
 
     /**
@@ -35,10 +44,11 @@ class JarPacker {
      * @param file The file or directory to add.
      * @throws IOException Thrown if an error occurs while writing to the JAR file.
      */
-    public void addFile(File file) throws IOException {
+    private void addFile(File file, String basePath) throws IOException {
         if (file.isDirectory())
         {
-            String name = file.getPath().replace("\\", "/");
+            String name = file.getPath().substring(Math.min(file.getPath().length(), basePath.length()))
+                                .replace("\\", "/");
             if (!name.isEmpty())
             {
                 if (!name.endsWith("/"))
@@ -52,13 +62,14 @@ class JarPacker {
             File[] containedFiles = file.listFiles();
             if(containedFiles != null) {
                 for (File nestedFile : containedFiles) {
-                    addFile(nestedFile);
+                    addFile(nestedFile, basePath);
                 }
             }
             return;
         }
 
-        JarEntry entry = new JarEntry(file.getPath().replace("\\", "/"));
+        JarEntry entry = new JarEntry(file.getPath().substring(Math.min(file.getPath().length(), basePath.length()))
+                .replace("\\", "/"));
         entry.setTime(file.lastModified());
         jarStream.putNextEntry(entry);
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
