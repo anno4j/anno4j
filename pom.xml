@@ -62,6 +62,7 @@
         <module>anno4j-core</module>
         <module>anno4j-recommendation</module>
         <module>anno4j-extensions</module>
+        <module>anno4j-compile-tool</module>
     </modules>
 
     <distributionManagement>

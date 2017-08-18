@@ -1,12 +1,12 @@
-package com.github.anno4j.schema_parsing.tool;
+package com.github.anno4j.compiletool;
 
 import com.github.anno4j.Anno4j;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.*;
 import org.openrdf.annotations.Iri;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.composition.ClassFactory;
-import org.openrdf.repository.object.composition.ClassResolver;
 import org.openrdf.repository.object.managers.RoleMapper;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class BehaviourCompileTool {
+public class ProxyCompileTool {
 
     /**
      * Returns the supported command line options of this tool.
@@ -152,6 +152,126 @@ public class BehaviourCompileTool {
     }
 
     /**
+     * @param commandLine The parsed command line arguments.
+     * @return Returns the input directory.
+     */
+    private static File getInputDirectory(CommandLine commandLine) {
+        File input = new File(commandLine.getOptionValue("input"));
+        if(!input.isDirectory() || !input.canRead()) {
+            System.err.println(input + " must be a readable directory.");
+            System.exit(1);
+        }
+        return input;
+    }
+
+    /**
+     * @param commandLine The parsed command line arguments.
+     * @return Returns the output directory.
+     */
+    private static File getOutputDirectory(CommandLine commandLine) {
+        File output = new File(commandLine.getOptionValue("output"));
+        if(!(output.isDirectory() || output.mkdirs()) || !output.canWrite()) {
+            System.err.println(output + " must be a writable directory.");
+            System.exit(1);
+        }
+        return output;
+    }
+
+    /**
+     * Returns the absolute path to the output directory with a trailing slash.
+     * @param commandLine The parsed command line arguments.
+     * @return The output path.
+     */
+    private static String getOutputPath(CommandLine commandLine) {
+        String outputPath = getOutputDirectory(commandLine).getAbsolutePath();
+        if(!outputPath.endsWith(File.separator)) {
+            outputPath += File.separator;
+        }
+        return outputPath;
+    }
+
+    /**
+     * @param commandLine The parsed command line arguments.
+     * @return Returns the number of threads to use.
+     */
+    private static int getNumberOfThreads(CommandLine commandLine) {
+        String threadNumStr = commandLine.getOptionValue("threads");
+        int numThreads;
+        if(threadNumStr != null) {
+            numThreads = Integer.parseInt(threadNumStr);
+            if(numThreads < 1) {
+                System.err.println("Number of threads must be positive");
+            } else if(numThreads > Runtime.getRuntime().availableProcessors()) {
+                System.out.println("Number of threads greater than available processors.");
+            }
+        } else {
+            numThreads = 1;
+        }
+        return numThreads;
+    }
+
+    /**
+     * Compiles the sources found in the input directory that match the regex pattern (-p option of command line)
+     * and outputs a JAR file in the output directory.
+     * @param commandLine The parsed command line arguments.
+     * @param input The input directory.
+     * @param output The output directory.
+     * @return Returns the written JAR file containing compiled {@code class} files.
+     * @throws IOException Thrown if an error occurs while writing the JAR file.
+     * @throws JavaSourceCompiler.CompileException Thrown if an error occurs during compilation.
+     */
+    private static File compileSources(CommandLine commandLine, File input, File output) throws IOException, JavaSourceCompiler.CompileException {
+        // Pattern:
+        Pattern pattern = Pattern.compile(commandLine.getOptionValue("pattern", ".*"));
+        // Classpath for compiling:
+        JavaSourceCompiler compiler = new JavaSourceCompiler();
+        for (String depencency : commandLine.getOptionValue("classpath", "").split(File.pathSeparator)) {
+            compiler.addDependency(depencency);
+        }
+        File ontologyJar = new File(getOutputPath(commandLine) + "ontology.jar");
+        compiler.compileDirectory(input, ontologyJar, pattern);
+
+        return ontologyJar;
+    }
+
+    /**
+     * Creates an Anno4j instance that can use the concepts contained in the given JAR file.
+     * @param ontologyJar A JAR file containing concepts.
+     * @return Returns an Anno4j instance.
+     * @throws Exception Thrown on error.
+     */
+    private static Anno4j getAnno4jWithDependency(File ontologyJar, ClassLoader classLoader) throws Exception {
+        Set<URL> clazzes = new HashSet<>();
+        clazzes.addAll(ClasspathHelper.forManifest(ontologyJar.toURI().toURL()));
+        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false, clazzes);
+
+        // Register concepts found in JAR:
+        RoleMapper mapper = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getRoleMapper();
+        for (final String className : getClassNamesInJar(ontologyJar)) {
+            Class<?> clazz = classLoader.loadClass(className);
+            if(clazz.getAnnotation(Iri.class) != null) {
+                mapper.addConcept(clazz);
+            }
+        }
+
+        return anno4j;
+    }
+
+    /**
+     * Packs the proxies created by the Anno4j instance into a JAR file.
+     * @param commandLine The parsed command line arguments.
+     * @param anno4j The Anno4j instance.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     * @throws IOException Thrown if an error occurs while writing the JAR file.
+     */
+    private static void packProxies(CommandLine commandLine, Anno4j anno4j) throws RepositoryException, IOException {
+        ClassFactory factory = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getClassFactory();
+        JarPacker packer = new JarPacker(new File(getOutputPath(commandLine) + "proxies.jar"));
+        packer.addFile(factory.getOutput());
+        packer.close();
+    }
+
+    /**
      * Main entry point for this tool.
      * See {@link #getCLIOptions()} for supported arguments.
      * @param args The CLI arguments passed to the application.
@@ -161,77 +281,34 @@ public class BehaviourCompileTool {
             // Get CLI arguments:
             CommandLine commandLine = parseCommandLineArguments(args);
             // Input JAR file containing compiled classes:
-            File input = new File(commandLine.getOptionValue("input"));
-            if(!input.isDirectory() || !input.canRead()) {
-                System.err.println(input + " must be a readable directory.");
-                System.exit(1);
-            }
+            File input = getInputDirectory(commandLine);
             // Output JAR file containing implemented proxies:
-            File output = new File(commandLine.getOptionValue("output"));
-            if(!(output.isDirectory() || output.mkdirs()) || !output.canWrite()) {
-                System.err.println(output + " must be a writable directory.");
-                System.exit(1);
-            }
-            String outputPath = output.getAbsolutePath();
-            if(!outputPath.endsWith(File.separator)) {
-                outputPath += File.separator;
-            }
+            File output = getOutputDirectory(commandLine);
             // Number of threads:
-            String threadNumStr = commandLine.getOptionValue("threads");
-            int numThreads;
-            if(threadNumStr != null) {
-                numThreads = Integer.parseInt(threadNumStr);
-                if(numThreads < 1) {
-                    System.err.println("Number of threads must be positive");
-                } else if(numThreads > Runtime.getRuntime().availableProcessors()) {
-                    System.out.println("Number of threads greater than available processors.");
-                }
-            } else {
-                numThreads = 1;
-            }
-            // Pattern:
-            Pattern pattern = Pattern.compile(commandLine.getOptionValue("pattern", ".*"));
-            // Classpath for compiling:
-            JavaSourceCompiler compiler = new JavaSourceCompiler();
-            for (String depencency : commandLine.getOptionValue("classpath", "").split(File.pathSeparator)) {
-                compiler.addDependency(depencency);
-            }
-            File ontologyJar = new File(outputPath + "ontology.jar");
-            compiler.compileDirectory(input, ontologyJar, pattern);
+            int numThreads = getNumberOfThreads(commandLine);
 
-            // Create an Anno4j instance that can load from the input JAR:
-            Set<URL> clazzes = new HashSet<>();
-            clazzes.addAll(ClasspathHelper.forManifest(ontologyJar.toURI().toURL()));
-            Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false, clazzes);
-
-            BehaviourCompileWorker.ProgressCallback progressCallback = new BehaviourCompileWorker.ProgressCallback();
+            // Compile sources:
+            File ontologyJar = compileSources(commandLine, input, output);
 
             // Get a class loader that can read from JAR file:
             ClassLoader classLoader = new URLClassLoader(new URL[]{ontologyJar.toURI().toURL()}, ClassLoader.getSystemClassLoader());
 
-            // Register concepts found in JAR:
-            RoleMapper mapper = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getRoleMapper();
-            for (final String className : getClassNamesInJar(ontologyJar)) {
-                Class<?> clazz = classLoader.loadClass(className);
-                if(clazz.getAnnotation(Iri.class) != null) {
-                    mapper.addConcept(clazz);
-                }
-            }
+            // Create an Anno4j instance that can load from the input JAR:
+            Anno4j anno4j = getAnno4jWithDependency(ontologyJar, classLoader);
+
+            ProxyCompileWorker.ProgressCallback progressCallback = new ProxyCompileWorker.ProgressCallback(getClassNamesInJar(ontologyJar).size());
 
             // Run the implementation tasks in multiple threads:
             ExecutorService executor = Executors.newFixedThreadPool(numThreads);
             Collection<Callable<Object>> tasks = new ArrayList<>();
             for (final String className : getClassNamesInJar(ontologyJar)) {
-                Runnable task = new BehaviourCompileWorker(anno4j, classLoader, className, progressCallback);
+                Runnable task = new ProxyCompileWorker(anno4j, classLoader, className, progressCallback);
                 tasks.add(Executors.callable(task));
             }
             executor.invokeAll(tasks);
 
             // Pack cached proxy implementations into a JAR:
-            ClassFactory factory = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getClassFactory();
-            JarPacker packer = new JarPacker(new File(outputPath + "proxies.jar"));
-            packer.addFile(factory.getOutput());
-            packer.close();
+            packProxies(commandLine, anno4j);
 
             System.out.println("Packed behaviour implementations into JAR: " + output.getAbsolutePath());
             System.exit(0);

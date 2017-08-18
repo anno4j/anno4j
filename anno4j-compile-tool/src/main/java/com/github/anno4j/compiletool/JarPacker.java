@@ -1,4 +1,4 @@
-package com.github.anno4j.schema_parsing.tool;
+package com.github.anno4j.compiletool;
 
 import java.io.*;
 import java.util.jar.Attributes;
