@@ -222,7 +222,7 @@ public class ProxyCompileTool {
      */
     private static File compileSources(CommandLine commandLine, File input, File output) throws IOException, JavaSourceCompiler.CompileException {
         // Pattern:
-        Pattern pattern = Pattern.compile(commandLine.getOptionValue("pattern", ".*"));
+        Pattern pattern = Pattern.compile(commandLine.getOptionValue("pattern", ".*\\.java$"));
         // Classpath for compiling:
         JavaSourceCompiler compiler = new JavaSourceCompiler();
         for (String depencency : commandLine.getOptionValue("classpath", "").split(File.pathSeparator)) {

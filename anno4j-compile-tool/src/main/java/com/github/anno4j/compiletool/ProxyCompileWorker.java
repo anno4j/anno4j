@@ -47,10 +47,14 @@ class ProxyCompileWorker implements Runnable {
                 return;
             }
 
+            finishedTasksCount++;
+            float percent = Math.round((finishedTasksCount/(float) totalTasksCount)*10000f)/100f;
+            System.out.print("(" + percent + "%)");
             Iri iriAnnotation = clazz.getAnnotation(Iri.class);
             if(iriAnnotation != null) {
-                float percent = Math.round((finishedTasksCount/(float) totalTasksCount)*10000f)/100f;
-                System.out.println("(" + percent + "%) Built proxies for " + clazz.getName() + " (" + iriAnnotation.value() + ")");
+                System.out.println(" Built proxies for " + clazz.getName() + " (" + iriAnnotation.value() + ")");
+            } else {
+                System.out.println();
             }
         }
     }
