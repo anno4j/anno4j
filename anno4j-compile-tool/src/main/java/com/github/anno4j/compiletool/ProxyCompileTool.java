@@ -3,6 +3,7 @@ package com.github.anno4j.compiletool;
 import com.github.anno4j.Anno4j;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 import org.openrdf.annotations.Iri;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.repository.RepositoryException;
@@ -161,6 +162,12 @@ public class ProxyCompileTool {
         File input = new File(commandLine.getOptionValue("input"));
         if(!input.isDirectory() || !input.canRead()) {
             System.err.println(input + " must be a readable directory.");
+            System.exit(1);
+        }
+        // Check input contains source files:
+        Collection<File> siblings = FileUtils.listFiles(input, new String[]{".java"}, true);
+        if(siblings.isEmpty()) {
+            System.err.println(input + " does not contain sources.");
             System.exit(1);
         }
         return input;
