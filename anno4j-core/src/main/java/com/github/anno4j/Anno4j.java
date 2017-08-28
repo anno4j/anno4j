@@ -414,6 +414,19 @@ public class Anno4j implements TransactionCommands {
      * @throws RepositoryException
      * @throws RepositoryConfigException
      */
+    public void setRepository(Repository repository) throws RepositoryException, RepositoryConfigException {
+        setRepository(repository, Sets.<URL>newHashSet(), Sets.<URL>newHashSet());
+    }
+
+    /**
+     * Configures the Repository (Connector for local/remote SPARQL repository) to use in Anno4j.
+     *
+     * @param repository Repository to use in Anno4j.
+     * @param conceptJars URLs of JAR-files that are scanned for concepts.
+     * @param behaviourJars URLs of JAR-files that are scanned for behaviours.
+     * @throws RepositoryException
+     * @throws RepositoryConfigException
+     */
     public void setRepository(Repository repository, Set<URL> conceptJars, Set<URL> behaviourJars) throws RepositoryException, RepositoryConfigException {
         this.repository = repository;
         // update alibaba wrapper
