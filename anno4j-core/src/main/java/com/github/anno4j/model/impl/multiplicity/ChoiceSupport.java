@@ -1,21 +1,19 @@
 package com.github.anno4j.model.impl.multiplicity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
-
-import com.github.anno4j.model.Body;
-import com.github.anno4j.model.impl.ResourceObject;
-import org.apache.commons.io.IOUtils;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.object.RDFObject;
-
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import org.apache.commons.io.IOUtils;
+import org.openrdf.annotations.Precedes;
+import org.openrdf.repository.object.RDFObject;
 import org.openrdf.rio.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+
 @Partial
+@Precedes(ResourceObjectSupport.class)
 public abstract class ChoiceSupport extends ResourceObjectSupport implements Choice {
 
     @Override
@@ -42,16 +40,21 @@ public abstract class ChoiceSupport extends ResourceObjectSupport implements Cho
         parser.setRDFHandler(writer);
 
         try {
-            this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
+            StringBuilder sb = new StringBuilder();
 
-            if(this.getItems() != null) {
-                for(RDFObject item : this.getItems()) {
-                    if(item instanceof ResourceObject) {
-                        parser.parse(IOUtils.toInputStream( ((ResourceObject)item).getTriples(format)), "");
-                    }
+            sb.append(super.getTriples(RDFFormat.NTRIPLES));
+
+            if (this.getItems() != null) {
+                for (RDFObject object : this.getItems()) {
+                    ResourceObject objectCast = (ResourceObject) object;
+
+                    sb.append(objectCast.getTriples(RDFFormat.NTRIPLES));
                 }
             }
-        } catch (IOException | RDFHandlerException | RDFParseException | RepositoryException e) {
+
+            parser.parse(IOUtils.toInputStream(sb.toString()), "");
+
+        } catch (IOException | RDFHandlerException | RDFParseException e) {
             e.printStackTrace();
         }
 
