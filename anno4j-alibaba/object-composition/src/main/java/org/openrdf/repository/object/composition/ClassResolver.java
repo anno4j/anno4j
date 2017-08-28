@@ -182,6 +182,7 @@ public class ClassResolver {
 		synchronized (cp) {
 			try {
 				Class<?> loadedClass = cp.classForName(className);
+				logger.debug("Proxy " + className + " found.");
 
 				List<Class<?>> types = new ArrayList<>(roles.size());
 				types.addAll(roles);
@@ -195,6 +196,7 @@ public class ClassResolver {
 				return loadedClass;
 
 			} catch (ClassNotFoundException e1) {
+				logger.debug("Proxy " + className + " not found.");
 				return composeBehaviours(className, roles);
 			}
 		}
