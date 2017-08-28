@@ -9,6 +9,7 @@ import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
 import com.github.anno4j.schema.OWLSchemaPersistingManager;
 import com.github.anno4j.schema.SchemaPersistingManager;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -81,6 +82,11 @@ public class Anno4j implements TransactionCommands {
      */
     private Set<Class<?>> partialClasses;
 
+    /**
+     * The classpath scanned for partial classes.
+     */
+    private Set<URL> classpath;
+
 
     public Anno4j() throws RepositoryException, RepositoryConfigException {
         this(new SailRepository(new MemoryStore()));
@@ -115,14 +121,14 @@ public class Anno4j implements TransactionCommands {
     }
 
     public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext, boolean persistSchemaAnnotations) throws RepositoryConfigException, RepositoryException {
-        this(repository, idGenerator, defaultContext, persistSchemaAnnotations, null);
+        this(repository, idGenerator, defaultContext, persistSchemaAnnotations, Sets.<URL>newHashSet());
     }
 
     public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext, boolean persistSchemaAnnotations, Set<URL> additionalClasses) throws RepositoryConfigException, RepositoryException {
         this.idGenerator = idGenerator;
         this.defaultContext = defaultContext;
 
-        Set<URL> classpath = new HashSet<>();
+        classpath = new HashSet<>();
         classpath.addAll(ClasspathHelper.forClassLoader());
         classpath.addAll(ClasspathHelper.forJavaClassPath());
         classpath.addAll(ClasspathHelper.forManifest());
@@ -150,7 +156,7 @@ public class Anno4j implements TransactionCommands {
             repository.initialize();
         }
 
-        this.setRepository(repository);
+        this.setRepository(repository, additionalClasses, additionalClasses);
 
         // Persist schema information to repository:
         if(persistSchemaAnnotations) {
@@ -408,12 +414,19 @@ public class Anno4j implements TransactionCommands {
      * @throws RepositoryException
      * @throws RepositoryConfigException
      */
-    public void setRepository(Repository repository) throws RepositoryException, RepositoryConfigException {
+    public void setRepository(Repository repository, Set<URL> conceptJars, Set<URL> behaviourJars) throws RepositoryException, RepositoryConfigException {
         this.repository = repository;
         // update alibaba wrapper
 
         ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
         ObjectRepositoryConfig config = factory.getConfig();
+
+        for(URL conceptJar : conceptJars) {
+            config.addConceptJar(conceptJar);
+        }
+        for(URL behaviourJar : behaviourJars) {
+            config.addBehaviourJar(behaviourJar);
+        }
 
         if(partialClasses != null) {
             for(Class<?> clazz : this.partialClasses){
@@ -494,5 +507,12 @@ public class Anno4j implements TransactionCommands {
         return transaction;
     }
 
-
+    /**
+     * Returns the classpath that is scanned for {@link org.openrdf.annotations.Iri} and
+     * {@link Partial} annotated classes.
+     * @return Returns the classpath scanned.
+     */
+    public Set<URL> getScannedClasspath() {
+        return Collections.unmodifiableSet(classpath);
+    }
 }

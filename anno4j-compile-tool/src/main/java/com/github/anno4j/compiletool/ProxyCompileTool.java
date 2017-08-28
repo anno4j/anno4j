@@ -14,7 +14,9 @@ import org.reflections.util.ClasspathHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -211,6 +213,28 @@ public class ProxyCompileTool {
     }
 
     /**
+     * Parses the command line option {@code -cp} which specifies various dependency files separated by
+     * {@link File#pathSeparator}.
+     * @param commandLine The parsed command line arguments.
+     * @return Returns the URLs of the elements of the users classpath.
+     * @throws MalformedURLException Thrown if any of the specified files has a URL that does not satisfy the requirements.
+     * @throws FileNotFoundException Thrown if any of the specified files is not found.
+     */
+    private static URL[] getCompileDependencies(CommandLine commandLine) throws MalformedURLException, FileNotFoundException {
+        String[] splits = commandLine.getOptionValue("classpath", "").split(File.pathSeparator);
+        URL[] dependencies = new URL[splits.length];
+        for (int i = 0; i < splits.length; i++) {
+            File file = new File(splits[i]);
+            if(file.exists()) {
+                dependencies[i] = file.toURI().toURL();
+            } else {
+                throw new FileNotFoundException("Dependency " + splits[i] + " not found!");
+            }
+        }
+        return dependencies;
+    }
+
+    /**
      * Compiles the sources found in the input directory that match the regex pattern (-p option of command line)
      * and outputs a JAR file in the output directory.
      * @param commandLine The parsed command line arguments.
@@ -225,8 +249,8 @@ public class ProxyCompileTool {
         Pattern pattern = Pattern.compile(commandLine.getOptionValue("pattern", ".*\\.java$"));
         // Classpath for compiling:
         JavaSourceCompiler compiler = new JavaSourceCompiler();
-        for (String depencency : commandLine.getOptionValue("classpath", "").split(File.pathSeparator)) {
-            compiler.addDependency(depencency);
+        for (URL depencency : getCompileDependencies(commandLine)) {
+            compiler.addDependency(depencency.getPath());
         }
         File ontologyJar = new File(getOutputPath(commandLine) + "ontology.jar");
         compiler.compileDirectory(input, ontologyJar, pattern);
@@ -237,13 +261,15 @@ public class ProxyCompileTool {
     /**
      * Creates an Anno4j instance that can use the concepts contained in the given JAR file.
      * @param ontologyJar A JAR file containing concepts.
+     * @param classLoader The class loader to use.
+     * @param persistSchemaAnnotations Whether schema annotations should be scanned.
      * @return Returns an Anno4j instance.
      * @throws Exception Thrown on error.
      */
-    private static Anno4j getAnno4jWithDependency(File ontologyJar, ClassLoader classLoader) throws Exception {
+    private static Anno4j getAnno4jWithClassLoader(File ontologyJar, ClassLoader classLoader, boolean persistSchemaAnnotations) throws Exception {
         Set<URL> clazzes = new HashSet<>();
         clazzes.addAll(ClasspathHelper.forManifest(ontologyJar.toURI().toURL()));
-        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false, clazzes);
+        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, persistSchemaAnnotations, clazzes);
 
         // Register concepts found in JAR:
         RoleMapper mapper = anno4j.getObjectRepository().getConnection().getObjectFactory().getResolver().getRoleMapper();
@@ -290,11 +316,21 @@ public class ProxyCompileTool {
             // Compile sources:
             File ontologyJar = compileSources(commandLine, input, output);
 
-            // Get a class loader that can read from JAR file:
-            ClassLoader classLoader = new URLClassLoader(new URL[]{ontologyJar.toURI().toURL()}, ClassLoader.getSystemClassLoader());
+            // Get the dependencies:
+            URL[] compileDependencies = getCompileDependencies(commandLine);
+            URL[] dependencyURLs = new URL[1 + compileDependencies.length];
+            dependencyURLs[0] = ontologyJar.toURI().toURL();
+            System.arraycopy(compileDependencies, 0, dependencyURLs, 1, compileDependencies.length);
+            System.out.println("Using the following dependencies:");
+            for(URL dependency : dependencyURLs) {
+                System.out.println(dependency);
+            }
+
+            // Get a class loader that can read from JAR files:
+            ClassLoader classLoader = new URLClassLoader(dependencyURLs, ClassLoader.getSystemClassLoader());
 
             // Create an Anno4j instance that can load from the input JAR:
-            Anno4j anno4j = getAnno4jWithDependency(ontologyJar, classLoader);
+            Anno4j anno4j = getAnno4jWithClassLoader(ontologyJar, classLoader, false);
 
             ProxyCompileWorker.ProgressCallback progressCallback = new ProxyCompileWorker.ProgressCallback(getClassNamesInJar(ontologyJar).size());
 
