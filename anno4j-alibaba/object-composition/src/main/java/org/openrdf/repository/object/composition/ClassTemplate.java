@@ -45,13 +45,7 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
-import javassist.bytecode.AccessFlag;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.MethodInfo;
-import javassist.bytecode.ParameterAnnotationsAttribute;
-import javassist.bytecode.SignatureAttribute;
+import javassist.bytecode.*;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.ClassMemberValue;
@@ -134,7 +128,12 @@ public class ClassTemplate {
 		try {
 			CtField field = new CtField(get(type), fieldName, cc);
 			field.setModifiers(Modifier.PUBLIC | Modifier.STATIC);
-			cc.addField(field);
+
+			try {
+				cc.addField(field);
+			} catch (DuplicateMemberException ignored) {
+				// ignore
+			}
 		} catch (CannotCompileException e) {
 			throw new ObjectCompositionException(e);
 		}
@@ -157,7 +156,11 @@ public class ClassTemplate {
 			logger.trace("public {} {};", type.getName(), fieldName);
 			CtField field = new CtField(get(type), fieldName, cc);
 			field.setModifiers(Modifier.PUBLIC);
-			cc.addField(field);
+			try {
+				cc.addField(field);
+			} catch (DuplicateMemberException ignored) {
+				// ignored
+			}
 		} catch (CannotCompileException e) {
 			throw new ObjectCompositionException(e);
 		}

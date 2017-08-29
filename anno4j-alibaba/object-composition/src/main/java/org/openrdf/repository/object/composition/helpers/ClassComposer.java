@@ -123,7 +123,7 @@ public class ClassComposer {
 		this.allBehaviours.addAll(factories);
 	}
 
-	public Class<?> compose() throws Exception {
+	public Class<?> compose(String className) throws Exception {
 		logger.trace("public class {} extends {}", className, baseClass);
 		cc = cp.createClassTemplate(className, baseClass);
 		for (BehaviourFactory behaviours : allBehaviours) {
@@ -136,7 +136,7 @@ public class ClassComposer {
 		}
 		behaviours = new HashMap<String, Set<BehaviourFactory>>();
 		for (BehaviourFactory clazz : allBehaviours) {
-			addBehaviour(clazz);
+			addBehaviour(clazz, className);
 			for (Method m : clazz.getMethods()) {
 				if (!isSpecial(m)) {
 					Set<BehaviourFactory> s = behaviours.get(m.getName());
@@ -154,13 +154,13 @@ public class ClassComposer {
 		for (Method method : methods) {
 			if (!method.getName().startsWith("_$")) {
 				boolean bridge = isBridge(method, methods);
-				implementMethod(method, method.getName(), bridge);
+				implementMethod(method, method.getName(), bridge, className);
 			}
 		}
 		try {
 			Class<?> createdClass = cp.createClass(cc);
 			for (BehaviourFactory clazz : allBehaviours) {
-				populateBehaviourField(clazz, createdClass);
+				populateBehaviourField(clazz, createdClass, className, clazz);
 			}
 			return createdClass;
 		} catch (LinkageError e) {
@@ -280,10 +280,10 @@ public class ClassComposer {
 		return false;
 	}
 
-	private boolean implementMethod(Method method, String name, boolean bridge)
+	private boolean implementMethod(Method method, String name, boolean bridge, String className)
 			throws Exception {
 		List<BehaviourMethod> chain = chain(method);
-		List<Object[]> implementations = getImpls(chain, method);
+		List<Object[]> implementations = getImpls(chain, method, className);
 		if (implementations.isEmpty())
 			return false;
 		Class<?> type = method.getReturnType();
@@ -426,7 +426,7 @@ public class ClassComposer {
 	/**
 	 * @return list of <String, Method>
 	 */
-	private List<Object[]> getImpls(List<BehaviourMethod> behaviours, Method method)
+	private List<Object[]> getImpls(List<BehaviourMethod> behaviours, Method method, String className)
 			throws Exception {
 		List<Object[]> list = new ArrayList<Object[]>();
 		Class<?> type = method.getReturnType();
@@ -435,10 +435,10 @@ public class ClassComposer {
 		if (behaviours != null) {
 			for (BehaviourMethod behaviour : sort(behaviours, behaviours.size())) {
 				if (behaviour.getFactory().isSingleton()) {
-					String target = getBehaviourFieldName(behaviour.getFactory());
+					String target = getBehaviourFieldName(behaviour.getFactory(), className, behaviour.getFactory());
 					list.add(new Object[] { target, behaviour.getMethod() });
 				} else {
-					String target = getPrivateBehaviourMethod(behaviour.getFactory()) + "()";
+					String target = getPrivateBehaviourMethod(behaviour.getFactory(), className, behaviour.getFactory()) + "()";
 					list.add(new Object[] { target, behaviour.getMethod() });
 				}
 			}
@@ -625,16 +625,16 @@ public class ClassComposer {
 		return m;
 	}
 
-	private void addBehaviour(BehaviourFactory factory) throws Exception {
+	private void addBehaviour(BehaviourFactory factory, String className) throws Exception {
 		if (factory.isSingleton()) {
-			String fieldName = getBehaviourFieldName(factory);
+			String fieldName = getBehaviourFieldName(factory, className, factory);
 			Class<?> clazz = factory.getBehaviourType();
 			cc.assignStaticField(clazz, fieldName).code("null").end();
 		} else {
-			String getterName = getPrivateBehaviourMethod(factory);
-			String fieldFactoryName = getBehaviourFactoryFieldName(factory);
+			String getterName = getPrivateBehaviourMethod(factory, className, factory);
+			String fieldFactoryName = getBehaviourFactoryFieldName(factory, className, factory);
 			cc.assignStaticField(BehaviourFactory.class, fieldFactoryName).code("null").end();
-			String fieldName = getBehaviourFieldName(factory);
+			String fieldName = getBehaviourFieldName(factory, className, factory);
 			Class<?> clazz = factory.getBehaviourType();
 			cc.createField(clazz, fieldName);
 			CodeBuilder code = cc.createPrivateMethod(clazz, getterName);
@@ -646,30 +646,37 @@ public class ClassComposer {
 		}
 	}
 
-	private void populateBehaviourField(BehaviourFactory factory,
-			Class<?> createdClass) throws NoSuchFieldException,
+	public static void populateBehaviourField(BehaviourFactory factory,
+			Class<?> createdClass, String className, BehaviourFactory behaviour) throws NoSuchFieldException,
 			IllegalAccessException {
 		if (factory.isSingleton()) {
-			String fieldName = getBehaviourFieldName(factory);
+			String fieldName = getBehaviourFieldName(factory, className, behaviour);
 			createdClass.getField(fieldName).set(null, factory.getSingleton());
 		} else {
-			String fieldName = getBehaviourFactoryFieldName(factory);
+			String fieldName = getBehaviourFactoryFieldName(factory, className, behaviour);
 			createdClass.getField(fieldName).set(null, factory);
 		}
 	}
 
-	private String getPrivateBehaviourMethod(BehaviourFactory factory) {
+	private static String getPrivateBehaviourMethod(BehaviourFactory factory, String className, BehaviourFactory behaviour) {
+		int[] methodHashes = new int[behaviour.getMethods().length];
+		for(int i = 0; i < behaviour.getMethods().length; i++) {
+			methodHashes[i] = behaviour.getMethods()[i].hashCode();
+		}
+		Arrays.sort(methodHashes);
+		int methodsHash = Arrays.hashCode(methodHashes);
+
 		String simpleName = factory.getName().replaceAll("\\W", "_");
-		return "_$get" + simpleName + "Behaviour" + Integer.toHexString(System.identityHashCode(factory));
+		return "_$get" + simpleName + "Behaviour" + Integer.toHexString(Math.abs(methodsHash));
 	}
 
-	private String getBehaviourFieldName(BehaviourFactory factory) {
-		String getterName = getPrivateBehaviourMethod(factory);
+	private static String getBehaviourFieldName(BehaviourFactory factory, String className, BehaviourFactory behaviour) {
+		String getterName = getPrivateBehaviourMethod(factory, className, behaviour);
 		return "_$" + getterName.substring(5);
 	}
 
-	private String getBehaviourFactoryFieldName(BehaviourFactory factory) {
-		String getterName = getPrivateBehaviourMethod(factory);
+	private static String getBehaviourFactoryFieldName(BehaviourFactory factory, String className, BehaviourFactory behaviour) {
+		String getterName = getPrivateBehaviourMethod(factory, className, behaviour);
 		return "_$" + getterName.substring(5) + "Factory";
 	}
 

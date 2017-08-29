@@ -1,12 +1,11 @@
 package testcases.org.openrdf.concepts.dc;
 
-import java.lang.Object;
-import java.lang.String;
-import java.util.Set;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.openrdf.annotations.localized;
 import org.openrdf.annotations.rdf;
 import org.openrdf.concepts.rdfs.Resource;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Set;
 
 @rdf("http://www.w3.org/2000/01/rdf-schema#Resource")
 public interface DcResource extends Resource {

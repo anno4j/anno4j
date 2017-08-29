@@ -414,4 +414,8 @@ public class ObjectFactory {
     public void setIdGenerator(IDGenerator idGenerator) {
         this.idGenerator = idGenerator;
     }
+
+	public ClassResolver getResolver() {
+		return resolver;
+	}
 }
