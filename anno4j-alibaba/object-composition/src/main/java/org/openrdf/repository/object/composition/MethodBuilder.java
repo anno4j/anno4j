@@ -35,6 +35,7 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.DuplicateMemberException;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
@@ -95,7 +96,11 @@ public class MethodBuilder extends CodeBuilder {
 			mod = Modifier.clear(mod, Modifier.NATIVE);
 			cm.setModifiers(mod);
 			cm.setBody(body);
-			cc.addMethod(cm);
+			try {
+				cc.addMethod(cm);
+			} catch (DuplicateMemberException ignored) {
+				// ignore
+			}
 			if (logger.isTraceEnabled()) {
 				logger.trace(
 						"public {} {}({}) {{}}",

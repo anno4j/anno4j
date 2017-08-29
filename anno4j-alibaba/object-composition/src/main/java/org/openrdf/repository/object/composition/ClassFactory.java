@@ -230,7 +230,7 @@ public class ClassFactory extends ClassLoader {
 		}
 	}
 
-	private void appendClassLoader(ClassLoader cl) {
+	public void appendClassLoader(ClassLoader cl) {
 		synchronized (alternatives) {
 			alternatives.add(cl);
 		}
@@ -336,5 +336,12 @@ public class ClassFactory extends ClassLoader {
 		}
 		String name = Descriptor.toJavaName(Descriptor.toJvmName(cc));
 		return classForName(name);
+	}
+
+	/**
+	 * @return The directory where class files are looked up.
+	 */
+	public File getOutput() {
+		return output;
 	}
 }

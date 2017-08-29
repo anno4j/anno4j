@@ -27,6 +27,7 @@ master branch: [![Build Status](https://travis-ci.org/anno4j/anno4j.svg?branch=m
     - [Transactions](#transactions)
     - [Graph Context](#graph-context)
     - [Input and Output](#input-and-output)
+    - [Java file generation](#Generating-annotated-java-files-from-an-existing-ontology)
 - [Example](#example)
 - [Restrictions](#restrictions)
 - [Contributors](#contributors)
@@ -263,6 +264,257 @@ Annotation annotation = anno4j.createObject(Annotation.class);
 // Add something to the Annotation
 
 String annotationAsTurtle = annotation.getTriples(RDFFormat.TURTLE);
+```
+
+## Schema Annotations and Validation
+
+Anno4j features the annotation of schema information directly in the Java classes, which is translated into
+OWL DL and stored in the Anno4j connected triplestore.
+Currently the following annotations are available:
+
+| Annotation           | OWL equivalent                  | Description                                                                                                                  |
+|----------------------|---------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `@AllValuesFrom`     | `owl:allValuesFrom`             | All values of the property must have a certain type (intersection).                                                          |
+| `@Functional`        | `owl:FunctionalProperty`        | There can be only one distinct value of the property for each individual.                                                    |
+| `@InverseFunctional` | `owl:InverseFunctionalProperty` | There can be only one distinct individual for each value of the property.                                                    |
+| `@Bijective`         |                                 | Shorthand for `@Functional` and `@InverseFunctional`.                                                                        |
+| `@MinCardinality`    | `owl:minCardinality`            | Minimum number of values a property must have for each individual.                                                           |
+| `@MaxCardinality`    | `owl:maxCardinality`            | Maximum number of values a property must have for each individual.                                                           |
+| `@Cardinality`       | `owl:cardinality`               | Shorthand for `@MinCardinality` and `@MaxCardinality` with same value.                                                       |
+| `@InverseOf`         | `owl:inverseOf`                 | The property is the inverse of another.                                                                                      |
+| `@SomeValuesFrom`    | `owl:someValuesFrom`            | At least one value mapped by the annotated property must be of the given classes (intersection).                             |
+| `@SubPropertyOf`     | `rdfs:subPropertyOf`            | Denotes that the property is the subproperty of another, i.e. all superproperties have at least the values of this property. |
+| `@Symmetric`         | `owl:SymmetricProperty`         | If X is mapped by the property to Y, then also Y is mapped to X by it.                                                       |
+| `@Transitive`        | `owl:TransitiveProperty`        | If X is mapped by the property to Y and Y to Z, then also X is mapped to Z by it.
+
+Annotations can be added to `@Iri` annotated getter- and/or setter-methods.
+The following example states that each menu must at least contain one drink and one main dish.
+In order to add multiple annotations of the same type they must be enclosed in a container annotation, e.g. `@MinCardinalities`.
+Adding the `@InverseOf` annotation to the second property requires that the corresponding restaurant objects have the menu as value of their `http://example.de/serves_dish` property.
+
+```java
+
+@Iri("http://example.de/menu")
+public interface Menu extends ResourceObject {
+    
+    @MinCardinalities({
+        @MinCardinality( value = 1, onClass = Drink.class ),
+        @MinCardinality( value = 1, onClass = MainDish.class )
+    })
+    @Iri("http://example.de/has_dishes")
+    Set<Dish> getDishes();
+    
+    @InverseOf("http://example.de/serves_dish")
+    @Iri("http://example.de/served_at")
+    Set<Restaurant> getServedAt();
+}
+
+```
+
+
+### Generating annotated Java files from an existing ontology
+
+To make working with an existing RDFS ontology even easier, the Java classes required by Anno4j can be automatically generated.
+
+Simply add your ontology data to a `RDFSJavaFileGenerator`. 
+It does the inferencing, type checking and schema logic for you:
+```java
+OntGenerationConfig config = new OntGenerationConfig();
+// Set your preferences with config (see below)...
+
+JavaFileGenerator generator = new RDFSJavaFileGenerator();
+generator.addRDF("http://example.com/your_ontology.rdf.xml");
+
+File outputDir = new File("/path/to/destination");
+generator.generateJavaFiles(config, outputDir);
+```
+
+For each RDFS class a Anno4j resource object class and a support class is created in `outputDir`.
+Consider the following definition of a RDFS class in the input:
+
+```xml
+<rdfs:Class rdf:about="http://example.de/#Player">
+    <rdfs:comment>A user playing a game.</rdfs:comment>
+</rdfs:Class>
+
+<rdf:Description rdf:about="http://example.de/#score">
+    <rdfs:domain rdf:resource="http://example.de/#Player"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+</rdf:Description>
+```
+
+The following resource object class would be generated:
+
+```java
+/**
+ * A user playing a game.
+ * Generated class for http://example.de/#Player */
+@Iri("http://example.de/#Player")
+public interface Player extends ResourceObject {
+
+    Set<Integer> getScores();
+    
+    void setScores(Set<Integer> scores);
+
+    // ...
+}
+```
+
+Furthermore a support class is generated implementing checks:
+```java
+// ...
+/**
+   *
+   * @param scores The elements to set.
+   * @throws IllegalArgumentException If values is not in the value space.
+   * The value space is defined as:<ol>
+   * 	<li>The value space is the infinite set {0,1,2,...}.</li>
+   * </ol> */
+  @Override
+  public void setScores(Set<Integer> scores) {
+    for(Integer current : scores) {
+        if(current < 0) {
+            throw new IllegalArgumentException("Value must be non-negative.");
+        }
+    }
+  }
+// ...
+```
+
+If you want to have the ontology information persisted to your Anno4j underlying
+triplestore, you can do so by passing the Anno4j object to the generator.
+
+```java
+Anno4j anno4j = new Anno4j();
+anno4j.setRepository(...);
+// ...
+JavaFileGenerator generator = new RDFSJavaFileGenerator(anno4j);
+```
+
+
+### Language preferences
+
+The purpose of the `OntGenerationConfig` basically is defining a preference for the natural languages to use for class names and JavaDoc.
+Those are extracted from `rdfs:label` and `rdfs:comment` literals.
+
+```
+OntGenerationConfig config = new OntGenerationConfig();
+
+// Set which language you prefer for class names and for JavaDoc:
+config.setIdentifierLanguagePreference(new String[] {"en", "de"});
+config.setJavaDocLanguagePreference(new String[] {"de"});
+```
+
+In this example only german JavaDoc should be generated, but the names of Java classes should be preferably in english.
+See [BCP47](https://tools.ietf.org/html/bcp47) for the language codes.
+
+### Validation of datatypes
+
+Validation code can be automatically generated, checking that the value set for a property
+is actually allowed by the datatype defined in the ontology.
+
+For example a call `addWeight(-42)` for a property `weight` with datatype `xsd:nonNegativeInteger` will throw a `IllegalArgumentException`.
+The generation of such checks can be controlled by providing validators to the `OntGenerationConfig`.
+
+```java
+ValidatorChain validators = new ValidatorChain();
+validators.add(new NotNullValidator());
+config.setValidators(validators);
+```
+In this example only checks for the value being not null will be added to the generated method implementations.
+If no validator chain is explicitly provided, checks for `null` and the XSD datatypes are generated.
+
+#### Validators for custom datatypes
+
+Maybe your ontology uses some datatypes that are not from the XSD vocabulary.
+In this case you can define your own validators and add them to the `OntGenerationConfig`s
+validator chain.
+Assume there is a datatype `ex:oddInt` which has as value space all integers that are odd.
+Lets define a validator class for this datatype:
+
+```java
+class OddIntegerValidator implements Validator {
+
+    @Override
+    public void addValueSpaceCheck(MethodSpec.Builder methodBuilder, ParameterSpec symbol, RDFSClazz range) {
+        // Generate the value space check:
+        methodBuilder.addStatement("int i = $T.parseInt($N.toString())", ClassName.get(Integer.class), symbol) // Convert to int
+                     .beginControlFlow("if(i % 2 == 0)")
+                     .addStatement("throw new $T($S)", ClassName.get(IllegalArgumentException.class), "Value must be odd.")
+                     .endControlFlow();
+    }
+
+    @Override
+    public String getValueSpaceDefinition(RDFSClazz clazz) {
+        // Human readable value space definition as used in JavaDoc:
+        return "Value must be an odd integer.";
+    }
+
+    @Override
+    public boolean isValueSpaceConstrained(RDFSClazz clazz) {
+        // This validator only constrains ex:oddInt:
+        return clazz.getResourceAsString().equals("http://example.de/ont#oddInt");
+    }
+}
+```
+The first method generates the actual validation code. For details on the syntax see
+[JavaPoet](https://github.com/square/javapoet).
+The convention for validators is that they throw an `IllegalArgumentException` if the value is not in the datatypes value space.
+Note also that Anno4j Java file generation maps all unknown datatypes (must be subclass of `rdfs:Literal`) by default to the Java type `CharSequence`.
+Thus it may be necessary to convert types, as above with `Integer.parseInt()`. See next section on how to define your own mappings.
+
+The second method simply returns a human readable definition of the value space, which is used in generated JavaDoc.
+The third method checks if the given class is covered by this validator (thus a check should be generated).
+
+Now you can add an instance of your custom validator to the generation configuration object.
+
+```java
+ValidatorChain chain = ValidatorChain.getRDFSDefault();
+chain.add(new OddIntegerValidator());
+config.setValidators(chain);
+```
+
+The set- and add-methods of properties with `ex:oddInt` will now throw an exception if they get an value that is even.
+
+```java
+public void setHasOddNums(Set<? extends CharSequence> hasOddNums) {
+    // ...
+    for(CharSequence current : hasOddNums) {
+      int i = Integer.parseInt(current.toString());
+      if(i % 2 == 0) {
+        throw new IllegalArgumentException("Value must be odd.");
+      }
+    }
+    // ...
+}
+```
+
+#### Mappings for custom datatypes
+
+As seen in the above example, Java file generation by default maps all RDF datatypes unknown to it to the Java type
+`CharSequence`. This makes conversions necessary and thus using the custom datatypes inconvenient.
+But the `OntGenerationConfig` allows you to define your own mappings from RDF datatypes
+to Java types. To do so you must define a `DatatypeMapper` and add it to the generation configuration:
+
+```java
+class OddIntegerMapper implements DatatypeMapper {
+    @Override
+    public Class<?> mapType(RDFSClazz type) {
+        if(type.getResourceAsString().equals("http://example.de/ont#oddInt")) {
+            return Integer.class;
+        } else {
+            return null;
+        }
+    }
+}
+// ...
+config.setDatatypeMappers(new DatatypeMapper[] {new OddIntegerMapper()});
+```
+Now the datatype of the parameters of generated methods will be `Integer` for this datatype
+and you can omit the above conversion in your validation code.
+
+```java
+public void setHasOddNums(Set<Integer> hasOddNums);
 ```
 
 ## Example

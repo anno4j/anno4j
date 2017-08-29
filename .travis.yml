@@ -5,6 +5,7 @@ notifications:
   - andreas.eisenkolb@gmail.com
   - berndl.emanuel@gmail.com
   - weissger@posteo.de
+  - mail@matthias-fisch.de
 script: ./scripts/build.sh
 env:
   global:

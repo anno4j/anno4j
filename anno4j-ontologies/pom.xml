@@ -16,10 +16,6 @@
 
     <description />
 
-    <modules>
-        <module>ontologies-mico</module>
-    </modules>
-
     <dependencies>
     </dependencies>
 </project>
