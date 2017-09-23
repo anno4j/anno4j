@@ -18,7 +18,7 @@
     <scm>
         <developerConnection>scm:git:https://github.com/anno4j/anno4j.git</developerConnection>
         <url>https://github.com/anno4j/anno4j.git</url>
-        <tag>HEAD</tag>
+        <tag>v2.4</tag>
     </scm>
 
     <organization>
