@@ -556,6 +556,34 @@ public class ObjectConnection extends ContextAwareConnection {
 	}
 
 	/**
+	 * Creates an resource object of the given type.
+	 * @param clazz The concept of the instance to create.
+	 * @param <T> The type of the instances concept.
+	 * @return The created object.
+	 * @throws RepositoryException Thrown if an error occurs while instantiating.
+	 */
+	public <T> T createObject(Class<T> clazz) throws RepositoryException {
+		return createObject(clazz, null);
+	}
+
+	/**
+	 * Creates an resource object with the given URI.
+	 * @param clazz The concept of the instance to create.
+	 * @param id The ID/URI of the instance to create.
+	 * @param <T> The type of the instances concept.
+	 * @return The created object.
+	 * @throws RepositoryException Thrown if an error occurs while instantiating.
+	 */
+	public <T> T createObject(Class<T> clazz, Resource id) throws RepositoryException {
+		ObjectFactory objectFactory = getObjectFactory();
+
+		Resource resource = (id != null) ? id : IDGenerator.BLANK_RESOURCE;
+
+		T object = objectFactory.createObject(resource, clazz);
+		return addDesignation(object, clazz);
+	}
+
+	/**
 	 * Finds a single object of given concept and uri.
 	 */
 	public synchronized <T> T findObject(Class<T> concept, Resource resource) throws RepositoryException, QueryEvaluationException {

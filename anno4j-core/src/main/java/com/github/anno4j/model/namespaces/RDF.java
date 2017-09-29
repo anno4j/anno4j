@@ -81,4 +81,25 @@ public class RDF {
      * The class rdf:XMLLiteral is the class of XML literal values.
      */
     public final static String XMLLiteral = NS + "XMLLiteral";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#List
+     * rdf:RDFList is an instance of rdfs:Class that can be used to build descriptions of collections and other list-like structures.
+     */
+    public final static String LIST = NS + "List";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#first
+     */
+    public final static String FIRST = NS + "first";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#rest
+     */
+    public final static String REST = NS + "rest";
+
+    /**
+     * Refers to https://www.w3.org/TR/rdf-schema/#nil
+     */
+    public final static String NIL = NS + "nil";
 }
