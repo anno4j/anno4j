@@ -8,6 +8,7 @@ import com.github.anno4j.model.namespaces.RDF;
 import com.github.anno4j.io.ObjectParser;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.rio.RDFFormat;
@@ -15,6 +16,7 @@ import org.openrdf.rio.RDFFormat;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -25,13 +27,13 @@ import static org.junit.Assert.assertEquals;
 public class ObjectParserTest {
 
     @Test
-    public void testJSONLD() {
+    public void testJSONLD() throws UpdateExecutionException {
 
         try {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
-            List<Annotation> annotations = objectParser.parse(JSONLD, url, RDFFormat.JSONLD);
+            List<Annotation> annotations = objectParser.parse(JSONLD, url, RDFFormat.JSONLD, true);
 
             for(Annotation anno : annotations) {
                 System.out.println(anno.toString());
@@ -46,12 +48,12 @@ public class ObjectParserTest {
     }
 
     @Test
-    public void testTurtle() {
+    public void testTurtle() throws UpdateExecutionException {
         try {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
-            List<Annotation> annotations = objectParser.parse(TURTLE, url, RDFFormat.TURTLE);
+            List<Annotation> annotations = objectParser.parse(TURTLE, url, RDFFormat.TURTLE, true);
 
             for(Annotation anno : annotations) {
                 System.out.println(anno.toString());
@@ -66,15 +68,16 @@ public class ObjectParserTest {
     }
 
     @Test
-    public void testMultipleTurtle() {
+    public void testMultipleTurtle() throws UpdateExecutionException {
         try {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
 
-            objectParser.parse(TURTLE, url, RDFFormat.TURTLE);
-            objectParser.parse(TURTLE2, url, RDFFormat.TURTLE);
-            List<Annotation> annotations = objectParser.parse(TURTLE3, url, RDFFormat.TURTLE);
+            List<Annotation> annotations = new LinkedList<>();
+            annotations.addAll(objectParser.parse(TURTLE, url, RDFFormat.TURTLE, true));
+            annotations.addAll(objectParser.parse(TURTLE2, url, RDFFormat.TURTLE, true));
+            annotations.addAll(objectParser.parse(TURTLE3, url, RDFFormat.TURTLE, true));
 
             assertEquals(3, annotations.size());
 
@@ -89,12 +92,12 @@ public class ObjectParserTest {
     }
 
     @Test
-    public void testMultipleInOneTurtle() {
+    public void testMultipleInOneTurtle() throws UpdateExecutionException {
         try {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
-            List<Annotation> annotations = objectParser.parse(TURTLE_MULTIPLE, url, RDFFormat.TURTLE);
+            List<Annotation> annotations = objectParser.parse(TURTLE_MULTIPLE, url, RDFFormat.TURTLE, true);
 
             assertEquals(3, annotations.size());
 

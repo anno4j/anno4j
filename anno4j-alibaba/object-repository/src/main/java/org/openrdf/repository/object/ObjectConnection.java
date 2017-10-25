@@ -824,4 +824,8 @@ public class ObjectConnection extends ContextAwareConnection {
             of.setIdGenerator(idGenerator);
         }
     }
+
+    public Map<Resource, RDFObject> getCachedObjects() {
+		return cachedObjects;
+	}
 }

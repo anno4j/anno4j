@@ -7,6 +7,9 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
+import com.github.anno4j.schema.OWLSchemaPersistingManager;
+import com.github.anno4j.schema.SchemaPersistingManager;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.http.annotation.NotThreadSafe;
 import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
@@ -27,6 +30,8 @@ import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
 import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -77,6 +82,11 @@ public class Anno4j implements TransactionCommands {
      */
     private Set<Class<?>> partialClasses;
 
+    /**
+     * The classpath scanned for partial classes.
+     */
+    private Set<URL> classpath;
+
 
     public Anno4j() throws RepositoryException, RepositoryConfigException {
         this(new SailRepository(new MemoryStore()));
@@ -87,40 +97,51 @@ public class Anno4j implements TransactionCommands {
     }
 
     public Anno4j(IDGenerator idGenerator) throws RepositoryException, RepositoryConfigException {
-        this(new SailRepository(new MemoryStore()), idGenerator, null);
+        this(new SailRepository(new MemoryStore()), idGenerator, null, true);
     }
 
     public Anno4j(IDGenerator idGenerator, URI defaultContext) throws RepositoryException, RepositoryConfigException {
-        this(new SailRepository(new MemoryStore()), idGenerator, defaultContext);
+        this(new SailRepository(new MemoryStore()), idGenerator, defaultContext, true);
     }
 
     public Anno4j(Repository repository) throws RepositoryException, RepositoryConfigException {
-        this(repository, new IDGeneratorAnno4jURN(), null);
+        this(repository, new IDGeneratorAnno4jURN(), null, true);
     }
 
     public Anno4j(Repository repository, IDGenerator idGenerator) throws RepositoryException, RepositoryConfigException {
-        this(repository, idGenerator, null);
+        this(repository, idGenerator, null, true);
     }
 
     public Anno4j(Repository repository, URI defaultContext) throws RepositoryException, RepositoryConfigException {
-        this(repository, new IDGeneratorAnno4jURN(), defaultContext);
+        this(repository, new IDGeneratorAnno4jURN(), defaultContext, true);
     }
 
-    public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext) throws RepositoryConfigException, RepositoryException {
+    public Anno4j(Repository repository, URI defaultContext, boolean persistSchemaAnnotations) throws RepositoryException, RepositoryConfigException {
+        this(repository, new IDGeneratorAnno4jURN(), defaultContext, persistSchemaAnnotations);
+    }
+
+    public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext, boolean persistSchemaAnnotations) throws RepositoryConfigException, RepositoryException {
+        this(repository, idGenerator, defaultContext, persistSchemaAnnotations, Sets.<URL>newHashSet());
+    }
+
+    public Anno4j(Repository repository, IDGenerator idGenerator, URI defaultContext, boolean persistSchemaAnnotations, Set<URL> additionalClasses) throws RepositoryConfigException, RepositoryException {
         this.idGenerator = idGenerator;
         this.defaultContext = defaultContext;
 
-        Set<URL> classpath = new HashSet<>();
+        classpath = new HashSet<>();
         classpath.addAll(ClasspathHelper.forClassLoader());
         classpath.addAll(ClasspathHelper.forJavaClassPath());
         classpath.addAll(ClasspathHelper.forManifest());
         classpath.addAll(ClasspathHelper.forPackage(""));
+        if(additionalClasses != null) {
+            classpath.addAll(additionalClasses);
+        }
 
         Reflections annotatedClasses = new Reflections(new ConfigurationBuilder()
                 .setUrls(classpath)
                 .useParallelExecutor()
                 .filterInputsBy(FilterBuilder.parsePackages("-java, -javax, -sun, -com.sun"))
-                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
+                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), new FieldAnnotationsScanner()));
 
         // Bugfix: Searching for Reflections creates a lot ot Threads, that are not closed at the end by themselves,
         // so we close them manually.
@@ -135,7 +156,38 @@ public class Anno4j implements TransactionCommands {
             repository.initialize();
         }
 
-        this.setRepository(repository);
+        this.setRepository(repository, additionalClasses, additionalClasses);
+
+        // Persist schema information to repository:
+        if(persistSchemaAnnotations) {
+            persistSchemaAnnotations(annotatedClasses);
+        }
+    }
+
+    /**
+     * Persists the schema information implied by schema annotations to the default graph of the connected triplestore.
+     * Performs a validation that the schema annotations are consistent.
+     * @param types The types which methods and field should be scanned for schema information.
+     * @throws RepositoryException Thrown if an error occurs while persisting schema information.
+     * @throws SchemaPersistingManager.InconsistentAnnotationException Thrown if the schema annotations are inconsistent.
+     * @throws SchemaPersistingManager.ContradictorySchemaException Thrown if the schema information imposed by annotations contradicts with
+     * schema information that is already present in the connected triplestore.
+     */
+    private void persistSchemaAnnotations(Reflections types) throws RepositoryException {
+        Transaction transaction = createTransaction();
+        transaction.begin();
+
+        try {
+            SchemaPersistingManager persistingManager = new OWLSchemaPersistingManager(transaction.getConnection());
+            persistingManager.persistSchema(types);
+
+        } catch (SchemaPersistingManager.InconsistentAnnotationException | SchemaPersistingManager.ContradictorySchemaException e) {
+            // Rollback on error and rethrow exception:
+            transaction.rollback();
+            throw e;
+        }
+
+        transaction.commit();
     }
     
     private void scanForEvaluators(Reflections annotatedClasses) {
@@ -363,15 +415,37 @@ public class Anno4j implements TransactionCommands {
      * @throws RepositoryConfigException
      */
     public void setRepository(Repository repository) throws RepositoryException, RepositoryConfigException {
+        setRepository(repository, Sets.<URL>newHashSet(), Sets.<URL>newHashSet());
+    }
+
+    /**
+     * Configures the Repository (Connector for local/remote SPARQL repository) to use in Anno4j.
+     *
+     * @param repository Repository to use in Anno4j.
+     * @param conceptJars URLs of JAR-files that are scanned for concepts.
+     * @param behaviourJars URLs of JAR-files that are scanned for behaviours.
+     * @throws RepositoryException
+     * @throws RepositoryConfigException
+     */
+    public void setRepository(Repository repository, Set<URL> conceptJars, Set<URL> behaviourJars) throws RepositoryException, RepositoryConfigException {
         this.repository = repository;
         // update alibaba wrapper
 
         ObjectRepositoryFactory factory = new ObjectRepositoryFactory();
         ObjectRepositoryConfig config = factory.getConfig();
 
+        for(URL conceptJar : conceptJars) {
+            config.addConceptJar(conceptJar);
+        }
+        for(URL behaviourJar : behaviourJars) {
+            config.addBehaviourJar(behaviourJar);
+        }
+
         if(partialClasses != null) {
             for(Class<?> clazz : this.partialClasses){
-                config.addBehaviour(clazz);
+                if (!clazz.getSimpleName().endsWith("AbstractClass")) {
+                    config.addBehaviour(clazz);
+                }
             }
         }
 
@@ -403,5 +477,55 @@ public class Anno4j implements TransactionCommands {
 
     public Transaction createTransaction() throws RepositoryException {
         return new Transaction(objectRepository, evaluatorConfiguration);
+    }
+
+    /**
+     * Creates a transaction operating on the given context.
+     * @param context The context the transaction should operate on.
+     * @return Returns the transaction.
+     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     */
+    public Transaction createTransaction(URI context) throws RepositoryException {
+        Transaction transaction = createTransaction();
+        transaction.setAllContexts(context); // Let the transaction operate on the given context
+        return transaction;
+    }
+
+    /**
+     * Creates a new transaction which provides schema validation services at commit time.
+     * Note that the validation assumes that the state present is valid when {@link ValidatedTransaction#begin()}
+     * is called.
+     * Schema annotations made at {@link ResourceObject} classes will be scanned the first time a validated transaction
+     * is created.
+     * @return The validated transaction. {@link ValidatedTransaction#begin()} must be called afterwards.
+     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     */
+    public ValidatedTransaction createValidatedTransaction() throws RepositoryException {
+        return createValidatedTransaction(null);
+    }
+
+    /**
+     * Creates a new transaction which provides schema validation services at commit time.
+     * Note that the validation assumes that the state present is valid when {@link ValidatedTransaction#begin()}
+     * is called.
+     * Schema annotations made at {@link ResourceObject} classes will be scanned the first time a validated transaction
+     * is created.
+     * @param context The context on which the transaction will operate on.
+     * @return The validated transaction. {@link ValidatedTransaction#begin()} must be called afterwards.
+     * @throws RepositoryException Thrown if an error occurs regarding the connection to the triplestore.
+     */
+    public ValidatedTransaction createValidatedTransaction(URI context) throws RepositoryException {
+        ValidatedTransaction transaction = new ValidatedTransaction(objectRepository, evaluatorConfiguration);
+        transaction.setAllContexts(context);
+        return transaction;
+    }
+
+    /**
+     * Returns the classpath that is scanned for {@link org.openrdf.annotations.Iri} and
+     * {@link Partial} annotated classes.
+     * @return Returns the classpath scanned.
+     */
+    public Set<URL> getScannedClasspath() {
+        return Collections.unmodifiableSet(classpath);
     }
 }

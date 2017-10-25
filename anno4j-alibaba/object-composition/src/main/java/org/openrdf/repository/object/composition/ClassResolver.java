@@ -181,11 +181,56 @@ public class ClassResolver {
 			Collection<Class<?>> roles) throws Exception {
 		synchronized (cp) {
 			try {
-				return cp.classForName(className);
+				Class<?> loadedClass = cp.classForName(className);
+				logger.debug("Proxy " + className + " found.");
+
+				List<Class<?>> types = new ArrayList<>(roles.size());
+				types.addAll(roles);
+				types = removeSuperClasses(types);
+
+				Collection<BehaviourFactory> behaviours = getAllBehaviours(types);
+				for (BehaviourFactory behaviour : behaviours) {
+					ClassComposer.populateBehaviourField(behaviour, loadedClass, className, behaviour);
+				}
+
+				return loadedClass;
+
 			} catch (ClassNotFoundException e1) {
+				logger.debug("Proxy " + className + " not found.");
 				return composeBehaviours(className, roles);
 			}
 		}
+	}
+
+	private Set<BehaviourConstructor> getConcreteBehaviours(Collection<Class<?>> roles) {
+		Set<BehaviourConstructor> concretes = new HashSet<>();
+		for (Class<?> role : roles) {
+			if(!role.isInterface() && !baseClassRoles.contains(role) && !isAbstract(role.getModifiers())) {
+				try {
+					concretes.add(new BehaviourConstructor(role));
+				} catch (NoSuchMethodException ignored) {
+					// ignore
+				}
+			}
+		}
+		return concretes;
+	}
+
+	private Set<Class<?>> getBaseRoles(Collection<Class<?>> roles) {
+		Set<Class<?>> bases = new HashSet<>();
+		for (Class<?> role : roles) {
+			if (!role.isInterface() && baseClassRoles.contains(role)) {
+				bases.add(role);
+			}
+		}
+		return bases;
+	}
+
+	private Set<BehaviourFactory> getAllBehaviours(Collection<Class<?>> roles) throws IOException {
+		Set<BehaviourFactory> allBehaviours = new HashSet<>();
+		allBehaviours.addAll(getConcreteBehaviours(roles));
+		allBehaviours.addAll(behaviourService.findImplementations(properties, roles, getBaseRoles(roles)));
+		return allBehaviours;
 	}
 
 	private Class<?> composeBehaviours(String className,
@@ -231,7 +276,7 @@ public class ClassResolver {
 		PropertyMapper pm = properties;
 		cc.addAllBehaviours(concretes);
 		cc.addAllBehaviours(behaviourService.findImplementations(pm, allRoles, bases));
-		return cc.compose();
+		return cc.compose(className);
 	}
 
 	private List<Class<?>> removeSuperClasses(List<Class<?>> classes) {
@@ -281,4 +326,7 @@ public class ClassResolver {
 		return Long.toHexString(hashCode);
 	}
 
+	public ClassFactory getClassFactory() {
+		return cp;
+	}
 }

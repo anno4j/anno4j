@@ -5,8 +5,10 @@ import com.github.anno4j.model.Annotation;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import static org.junit.Assert.*;
 
@@ -67,6 +69,47 @@ public class AnnotationPageTest {
         assertEquals(next.getResourceAsString(), result.getNext().getResourceAsString());
 
         assertEquals(0, page.getStartIndex());
-//        assertEquals(collection.getResourceAsString(), result.getPartof().getResourceAsString());
+        assertEquals(collection.getResourceAsString(), result.getPartOf().getResourceAsString());
+    }
+
+    @Test
+    public void testSymmetricSetters() throws RepositoryException, IllegalAccessException, InstantiationException {
+        AnnotationPage prev = this.anno4j.createObject(AnnotationPage.class);
+        AnnotationPage next = this.anno4j.createObject(AnnotationPage.class);
+
+        AnnotationPage prev2 = this.anno4j.createObject(AnnotationPage.class);
+        AnnotationPage next2 = this.anno4j.createObject(AnnotationPage.class);
+
+        next.setPrevSymmetric(prev);
+
+        prev2.setNextSymmetric(next2);
+
+        assertEquals(prev.getResourceAsString(), next.getPrev().getResourceAsString());
+        assertEquals(next.getResourceAsString(), prev.getNext().getResourceAsString());
+
+        assertEquals(prev2.getResourceAsString(), next2.getPrev().getResourceAsString());
+        assertEquals(next2.getResourceAsString(), prev2.getNext().getResourceAsString());
+    }
+
+    @Test
+    public void testGetTriples() throws RepositoryException, IllegalAccessException, InstantiationException {
+        AnnotationPage page = this.anno4j.createObject(AnnotationPage.class);
+
+        AnnotationCollection collection = this.anno4j.createObject(AnnotationCollection.class);
+        collection.addLabel("someLabel");
+        collection.setTotal(3);
+        page.setPartOf(collection);
+
+        AnnotationPage next = this.anno4j.createObject(AnnotationPage.class);
+        page.setNextSymmetric(next);
+
+        page.setStartIndex(0);
+
+        Annotation annotation1 = this.anno4j.createObject(Annotation.class);
+        Annotation annotation2 = this.anno4j.createObject(Annotation.class);
+        page.addItem(annotation1);
+        page.addItem(annotation2);
+
+        System.out.println(page.getTriples(RDFFormat.JSONLD));
     }
 }

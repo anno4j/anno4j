@@ -1,13 +1,19 @@
 package com.github.anno4j.model.impl.multiplicity;
 
+import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.impl.ResourceObjectSupport;
+import org.apache.commons.io.IOUtils;
+import org.openrdf.annotations.Precedes;
+import org.openrdf.repository.object.RDFObject;
+import org.openrdf.rio.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashSet;
 
-import org.openrdf.repository.object.RDFObject;
-
-import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.impl.ResourceObjectSupport;
-
 @Partial
+@Precedes(ResourceObjectSupport.class)
 public abstract class CompositeSupport extends ResourceObjectSupport implements Composite {
 
     @Override
@@ -25,5 +31,33 @@ public abstract class CompositeSupport extends ResourceObjectSupport implements 
         items.add(item);
         this.setItems(items);
     }
-    
+
+    @Override
+    public String getTriples(RDFFormat format) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RDFParser parser = Rio.createParser(RDFFormat.NTRIPLES);
+        RDFWriter writer = Rio.createWriter(format, out);
+        parser.setRDFHandler(writer);
+
+        try {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(super.getTriples(RDFFormat.NTRIPLES));
+
+            if (this.getItems() != null) {
+                for (RDFObject object : this.getItems()) {
+                    ResourceObject objectCast = (ResourceObject) object;
+
+                    sb.append(objectCast.getTriples(RDFFormat.NTRIPLES));
+                }
+            }
+
+            parser.parse(IOUtils.toInputStream(sb.toString()), "");
+
+        } catch (IOException | RDFHandlerException | RDFParseException e) {
+            e.printStackTrace();
+        }
+
+        return out.toString();
+    }
 }

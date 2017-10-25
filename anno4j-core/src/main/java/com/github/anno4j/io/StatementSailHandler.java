@@ -1,10 +1,8 @@
 package com.github.anno4j.io;
 
-import com.github.anno4j.io.ObjectParser;
 import org.openrdf.model.Statement;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.rio.helpers.RDFHandlerBase;
 
 /**

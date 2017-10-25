@@ -4,12 +4,18 @@ import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.model.Target;
+import com.github.anno4j.model.impl.ResourceObject;
+import com.github.anno4j.model.impl.body.TextualBody;
+import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.model.namespaces.DCTYPES;
 import com.github.anno4j.model.namespaces.RDF;
+import com.github.anno4j.querying.QueryService;
+import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
@@ -48,7 +54,7 @@ public class InputOutputTest {
             ObjectParser objectParser = new ObjectParser();
 
             // Parse the annotation JS
-            List<Annotation> annotations = objectParser.parse(JSONLD, url, RDFFormat.JSONLD);
+            List<Annotation> annotations = objectParser.parse(JSONLD, url, RDFFormat.JSONLD, true);
 
             // Print the (parsed) annotation
             Annotation annotation = annotations.get(0);
@@ -86,6 +92,53 @@ public class InputOutputTest {
         } catch (RepositoryException | RepositoryConfigException | MalformedURLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testInputAndOutput() throws RepositoryException, IllegalAccessException, InstantiationException, RepositoryConfigException, MalformedURLException, UpdateExecutionException, MalformedQueryException, ParseException, QueryEvaluationException {
+        Annotation annotation = this.anno4j.createObject(Annotation.class);
+
+        SpecificResource specificResource = this.anno4j.createObject(SpecificResource.class);
+        ResourceObject source = this.anno4j.createObject(ResourceObject.class);
+        specificResource.setSource(source);
+
+        TextualBody textualBody = this.anno4j.createObject(TextualBody.class);
+        textualBody.setValue("someText");
+
+        annotation.addTarget(specificResource);
+        annotation.addBody(textualBody);
+
+        // Create JSONLD of the Annotation
+        String jsonld = annotation.getTriples(RDFFormat.JSONLD);
+
+        System.out.println("JsonLD representation of the Annotation:");
+        System.out.println(jsonld);
+
+        // Parse the JSONLD String
+        ObjectParser parser = new ObjectParser();
+        List<Annotation> parsed = parser.parse(jsonld, new URL("http://example.com/"), RDFFormat.JSONLD, false);
+
+        assertEquals(1, parsed.size());
+        assertEquals(annotation.getResourceAsString(), parsed.get(0).getResourceAsString());
+
+        // Get the JSONLD of the parsed Annotation object
+        Annotation parsedAnnotation = parsed.get(0);
+
+        String jsonldParsed = parsedAnnotation.getTriples(RDFFormat.RDFXML);
+
+        System.out.println("JsonLD representation of the PARSED Annotation:");
+        System.out.println(jsonldParsed);
+
+        parser.shutdown();
+
+        // Write Annotations to "real" Anno4j and query them afterwards works, but is really inconvenient
+        //        this.anno4j.getObjectRepository().getConnection().addObject(parsedAnnotation);
+        //
+        //        parsedAnnotation.setResourceAsString(parsedAnnotation.getResourceAsString() + "1");
+        //        QueryService qs = this.anno4j.createQueryService();
+        //        qs.addCriteria(".", parsedAnnotation.getResourceAsString());
+        //
+        //        Annotation queriedAnnotation = qs.execute(Annotation.class).get(0);
     }
 
     /**

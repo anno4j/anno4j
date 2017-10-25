@@ -4,7 +4,7 @@
 
     <groupId>com.github.anno4j</groupId>
     <artifactId>anno4j-parent</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4</version>
     <packaging>pom</packaging>
     <name>Anno4j Parent</name>
     <description>Read and write API for W3C Web Annotation Data Model (http://www.w3.org/TR/annotation-model/) and W3C
@@ -18,7 +18,7 @@
     <scm>
         <developerConnection>scm:git:https://github.com/anno4j/anno4j.git</developerConnection>
         <url>https://github.com/anno4j/anno4j.git</url>
-        <tag>HEAD</tag>
+        <tag>v2.4</tag>
     </scm>
 
     <organization>
@@ -44,7 +44,15 @@
         </developer>
         <developer>
             <name>Emanuel Berndl</name>
-            <email>emanuel.berndl@gmail.com</email>
+            <email>berndl.emanuel@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Thomas Weißgerber</name>
+            <email>weissger@posteo.de</email>
+        </developer>
+        <developer>
+            <name>Matthias Fisch</name>
+            <email>github@matthias-fisch.de</email>
         </developer>
     </developers>
 
@@ -54,7 +62,7 @@
         <module>anno4j-core</module>
         <module>anno4j-recommendation</module>
         <module>anno4j-extensions</module>
-        <module>wap-server</module>
+        <module>anno4j-compile-tool</module>
     </modules>
 
     <distributionManagement>
@@ -109,7 +117,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <configuration>
                             <defaultKeyring>false</defaultKeyring>
                             <homedir>/home/travis/build/anno4j/anno4j/keyrings</homedir>
@@ -203,17 +211,6 @@
                 <artifactId>anno4j-ontologies</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.anno4j</groupId>
-                <artifactId>anno4j-ontologies-mico</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.anno4j</groupId>
-                <artifactId>anno4j-ontologies-mmm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -222,7 +219,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.6.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -231,7 +228,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.19.1</version>
                 <configuration>
                     <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                     <!--<reuseForks>false</reuseForks>-->
@@ -244,7 +241,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.3</version>
+                <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -255,7 +252,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -268,7 +265,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>2.10.4</version>
                 <configuration>
                     <failOnError>false</failOnError>
                 </configuration>
@@ -284,11 +281,19 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.2</version>
+                <version>2.5.3</version>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
             </plugin>
         </plugins>

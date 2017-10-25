@@ -4,15 +4,13 @@ package com.github.anno4j.transaction;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.Transaction;
 import com.github.anno4j.model.Annotation;
-import com.github.anno4j.querying.GraphContextQueryTest;
-import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.model.impl.agent.Person;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
-
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -62,7 +60,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void roolbackTest() throws Exception {
+    public void rollbackTest() throws Exception {
         Transaction transaction = anno4j.createTransaction();
         transaction.begin();
 
@@ -77,16 +75,17 @@ public class TransactionTest {
 
     @Test
     public void insertSubgraphTest() throws Exception {
-        Transaction transaction = anno4j.createTransaction();
+        Transaction transaction = anno4j.createTransaction(subgraph);
         transaction.begin();
-        transaction.setAllContexts(subgraph);
 
-        transaction.createObject(Annotation.class);
+        transaction.createObject(Annotation.class, (Resource) new URIImpl("urn:test:resource1"));
         assertEquals(1, transaction.findAll(Annotation.class).size());
         transaction.commit();
 
         // check with new connection
-        assertEquals(1, anno4j.findAll(Annotation.class).size());
+        assertEquals(1, anno4j.createQueryService(subgraph)
+                                        .addCriteria(".", "urn:test:resource1")
+                                        .execute().size());
     }
 
     @Test
@@ -100,6 +99,36 @@ public class TransactionTest {
         assertEquals(0, anno4j.findAll(Annotation.class, subgraph).size());
         // check with new connection in global graph
         assertEquals(1, anno4j.findAll(Annotation.class).size());
+
+        // Now create a resource in the subgraph:
+        transaction = anno4j.createTransaction(subgraph);
+        transaction.begin();
+        transaction.createObject(Annotation.class);
+        transaction.commit();
+
+        assertEquals(1, anno4j.findAll(Annotation.class, subgraph).size());
+        assertEquals(2, anno4j.findAll(Annotation.class).size());
     }
 
+    @Test
+    public void testSubgraphPersistence() throws Exception {
+        Anno4j anno4j = new Anno4j();
+
+        // Create an object in a named context:
+        anno4j.createObject(Person.class, subgraph, new URIImpl("urn:test:some_resource"));
+
+        // Refind and modify the object using a transaction:
+        Transaction transaction = anno4j.createTransaction(subgraph);
+        transaction.begin();
+        Person found = transaction.findByID(Person.class, "urn:test:some_resource");
+        found.setName("Foo");
+        transaction.commit();
+
+        // Refind the object:
+        Person resource = anno4j.createQueryService(subgraph)
+                .addCriteria(".", "urn:test:some_resource")
+                .execute(Person.class)
+                .get(0);
+        assertEquals("Foo", resource.getName());
+    }
 }

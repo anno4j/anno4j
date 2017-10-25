@@ -12,12 +12,15 @@ import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.idGenerator.IDGenerator;
+import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
@@ -31,7 +34,32 @@ public class ResourceObjectTest {
 
     @Before
     public void setUp() throws Exception {
-        this.anno4j = new Anno4j();
+        // Disable scanning for schema annotations:
+        this.anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false);
+    }
+
+    @Test
+    public void testPrefix() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        Annotation anno = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://example.org/anno1"));
+        Annotation anno2 = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://xmlns.com/foaf/0.1/anno2"));
+        Annotation anno3 = this.anno4j.createObject(Annotation.class, (Resource) new URIImpl("http://purl.org/dc/terms/anno3"));
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addPrefix("ex", "http://example.org/");
+
+        List<Annotation> result = qs.addCriteria(".", "ex:anno1").execute(Annotation.class);
+
+        assertEquals(1, result.size());
+
+        QueryService qs2 = this.anno4j.createQueryService();
+        List<Annotation> result2 = qs2.addCriteria(".", "foaf:anno2").execute(Annotation.class);
+
+        assertEquals(1, result2.size());
+
+        QueryService qs3 = this.anno4j.createQueryService();
+        List<Annotation> result3 = qs3.addCriteria(".", "dcterms:anno3").execute(Annotation.class);
+
+        assertEquals(1, result3.size());
     }
 
     @Test
@@ -47,6 +75,18 @@ public class ResourceObjectTest {
         qs.addCriteria("oa:hasBody", "http://example.org/resource1");
 
         List<Annotation> result = qs.execute(Annotation.class);
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testQueryYourself() throws RepositoryException, IllegalAccessException, InstantiationException, ParseException, MalformedQueryException, QueryEvaluationException {
+        TextualBody body = this.anno4j.createObject(TextualBody.class, (Resource) new URIImpl("http://example.org/resource1"));
+
+        QueryService qs = this.anno4j.createQueryService();
+        qs.addCriteria(".", "http://example.org/resource1");
+
+        List<TextualBody> result = qs.execute(TextualBody.class);
 
         assertEquals(1, result.size());
     }

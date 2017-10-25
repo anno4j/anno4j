@@ -1,6 +1,7 @@
 package com.github.anno4j.model.impl;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.namespaces.RDF;
 import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
@@ -11,6 +12,7 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.RDFObject;
 import org.openrdf.repository.object.traits.ObjectMessage;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -47,27 +49,38 @@ public abstract class ResourceObjectSupport implements ResourceObject {
         return out.toString();
     }
 
+
     @Override
     public void setResource(Resource resource) throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
-        String query = "DELETE {?s ?p ?old}" +
-                " INSERT {?s ?p ?new}" +
-                " WHERE {" +
-                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
-                " BIND(<"+resource+"> as ?new)" +
-                " ?s ?p ?old.};" +
-                " DELETE {?s ?old ?o}" +
-                " INSERT {?s ?new ?o}" +
-                " WHERE {" +
-                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
-                " BIND(<"+resource+"> as ?new)" +
-                " ?s ?old ?o.};" +
-                " DELETE {?old ?p ?o}" +
+        String subjectQuery = "DELETE {?old ?p ?o}" +
                 " INSERT {?new ?p ?o}" +
                 " WHERE {" +
                 " BIND(<"+this.getResourceAsString()+"> as ?old)" +
                 " BIND(<"+resource+"> as ?new)" +
                 " ?old ?p ?o.};";
+
+        String predicateQuery = "DELETE {?s ?old ?o}" +
+                " INSERT {?s ?new ?o}" +
+                " WHERE {" +
+                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
+                " BIND(<"+resource+"> as ?new)" +
+                " ?s ?old ?o.};";
+
+        String objectQuery = "DELETE {?s ?p ?old}" +
+                " INSERT {?s ?p ?new}" +
+                " WHERE {" +
+                " BIND(<"+this.getResourceAsString()+"> as ?old)" +
+                " BIND(<"+resource+"> as ?new)" +
+                " ?s ?p ?old.};";
+
+        String query;
+        if (this.getObjectConnection().getInsertContext() != null) {
+            String with = "With <" + this.getObjectConnection().getInsertContext().stringValue()+ "> ";
+            query = with + subjectQuery + " " + with + predicateQuery + " " + with + objectQuery;
+        } else {
+            query = subjectQuery + " " + predicateQuery + " " + objectQuery;
+        }
 
         this.getObjectConnection().getDelegate().prepareUpdate(QueryLanguage.SPARQL, query).execute();
 

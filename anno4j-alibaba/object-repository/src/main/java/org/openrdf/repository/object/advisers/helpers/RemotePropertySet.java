@@ -30,19 +30,7 @@ package org.openrdf.repository.object.advisers.helpers;
 
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.ConvertingIteration;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
+import org.openrdf.model.*;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
@@ -52,6 +40,8 @@ import org.openrdf.repository.object.exceptions.ObjectStoreException;
 import org.openrdf.repository.object.result.ObjectIterator;
 import org.openrdf.repository.object.traits.ManagedRDFObject;
 import org.openrdf.repository.object.traits.Refreshable;
+
+import java.util.*;
 
 /**
  * A set for a given getResource(), predicate.
@@ -197,11 +187,13 @@ public class RemotePropertySet implements PropertySet, Set<Object> {
 	}
 
 	/**
-	 * This method always returns <code>true</code>
+	 * Removes the specified element from this set if it is present.
 	 * 
-	 * @return <code>true</code>
+	 * @return <code>true</code> if this set contained the specified element.
 	 */
 	public boolean remove(Object o) {
+		boolean contained = contains(o);
+
 		ObjectConnection conn = getObjectConnection();
 		try {
 			Value value = getValue(o);
@@ -214,7 +206,7 @@ public class RemotePropertySet implements PropertySet, Set<Object> {
 		}
 		refresh(o);
 		refresh();
-		return true;
+		return contained;
 	}
 
 	public boolean removeAll(Collection<?> c) {
