@@ -1,6 +1,5 @@
 package com.github.anno4j.schema_parsing.building;
 
-import com.github.anno4j.Anno4j;
 import com.github.anno4j.schema.model.owl.OWLClazz;
 import org.junit.Before;
 import org.junit.Test;

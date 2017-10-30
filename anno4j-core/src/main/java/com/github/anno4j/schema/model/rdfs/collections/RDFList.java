@@ -14,7 +14,7 @@ import java.util.List;
  * For how to create RDF lists please also see the convenience functions in {@link RDFLists}.
  */
 @Iri(RDF.LIST)
-public interface RDFList extends ResourceObject, Iterable<Object>, List<Object> {
+public interface RDFList extends ResourceObject, List<Object> {
 
     /**
      * @return The value attached to this list node.
