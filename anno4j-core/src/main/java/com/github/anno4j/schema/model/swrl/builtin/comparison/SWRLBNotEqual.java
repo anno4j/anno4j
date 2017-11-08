@@ -45,6 +45,10 @@ public class SWRLBNotEqual extends SWRLBuiltin implements SPARQLSerializable {
         Object value1 = getParameterValue(0, bindings);
         Object value2 = getParameterValue(1, bindings);
 
-        return !value1.equals(value2);
+        if(value1 instanceof Number && value2 instanceof Number) {
+            return ((Number) value1).doubleValue() != ((Number) value2).doubleValue();
+        } else {
+            return !value1.equals(value2);
+        }
     }
 }

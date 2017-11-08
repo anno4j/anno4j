@@ -41,7 +41,7 @@ public class SWRLBUnaryPlus extends SWRLBuiltin implements SPARQLSerializable, C
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UndeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -54,7 +54,7 @@ public class SWRLBUnaryPlus extends SWRLBuiltin implements SPARQLSerializable, C
         } else if (getArgument(1) instanceof Variable && !(getArgument(0) instanceof Variable)) {
             solutions.add(new Bindings(bindings, (Variable) getArgument(1), ((Number) x).doubleValue()));
         } else {
-            throw new UndeterminedSolutionException();
+            throw new UnderDeterminedSolutionException();
         }
 
         return solutions;

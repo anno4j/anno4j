@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  * The factory determines an execution plan for the evaluation of an SWRL atom conjunction.
- * Using {@link #reorderAtoms(AtomList)} a conjunction of atoms can be reordered, such that the following holds:
+ * Using {@link #reorderAtoms(AtomList, ObjectConnection)} a conjunction of atoms can be reordered, such that the following holds:
  * <ul>
  *     <li>All atoms of type {@link ClassAtom}, {@link DatavaluedPropertyAtom}, {@link IndividualPropertyAtom}
  *     are at the front of the result ordering</li>
@@ -27,7 +27,7 @@ import java.util.*;
  *     <li>{@code v'} can't be determined by another built-in atom (recursively).</li>
  * </ul>
  */
-class ExecutionPlanFactory {
+class ExecutionPlanner {
 
     /**
      * Represents a node in the dependency forest.
@@ -143,7 +143,7 @@ class ExecutionPlanFactory {
      * </ul>
      * @param atom The atom for which the computable variable should be determined.
      * @param atomList All atoms of the conjunction (including class/role atoms).
-     * @return Returns the variable computable variable of {@code atom} or null if all arguments of the atom are determined.
+     * @return Returns the computable variable of {@code atom} or null if all arguments of the atom are determined.
      * @throws SWRLInferenceEngine.UnboundVariableException Thrown if any variable is neither bound by a class/role atom or as the computable
      * variable of any built-in atom.
      * @throws InstantiationException Thrown if the corresponding {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin} object
@@ -165,7 +165,7 @@ class ExecutionPlanFactory {
             for (BuiltinAtom builtinAtom : atomList.getBuiltInAtoms()) {
                 if (builtinAtom.getBuiltin() instanceof Computation) {
                     // Get the arguments of the computation that are still considered free:
-                    Collection<Variable> variables = atomList.getVariables();
+                    Collection<Variable> variables = new ArrayList<>(builtinAtom.getVariables());
                     variables.retainAll(freeVariables);
 
                     // If there is only one free variable, it can be bound by the computation:
@@ -230,7 +230,7 @@ class ExecutionPlanFactory {
         // Construct the dependency edges between the nodes:
         for (BuiltinAtom atom : builtinAtoms) {
             // Get the variables of the atom that are not bound by class or role atom:
-            Collection<Variable> atomFreeVariables = atomList.getVariables();
+            Collection<Variable> atomFreeVariables = new ArrayList<>(atom.getVariables());
             atomFreeVariables.removeAll(bound);
 
             BuiltinDependencyNode node = dependencyNodesByAtom.get(atom);

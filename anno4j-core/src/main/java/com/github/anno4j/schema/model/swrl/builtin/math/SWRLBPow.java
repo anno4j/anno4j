@@ -40,7 +40,7 @@ public class SWRLBPow extends SWRLBuiltin implements Computation {
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UndeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -62,7 +62,7 @@ public class SWRLBPow extends SWRLBuiltin implements Computation {
                 solutions.add(new Bindings(bindings, (Variable) getArgument(2), Math.log(((Number) x).doubleValue()) / Math.log(((Number) y).doubleValue())));
             }
         } else {
-            throw new UndeterminedSolutionException();
+            throw new UnderDeterminedSolutionException();
         }
 
         return solutions;

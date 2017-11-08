@@ -40,7 +40,7 @@ public class SWRLBDivide extends SWRLBuiltin implements Computation {
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UndeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -64,7 +64,7 @@ public class SWRLBDivide extends SWRLBuiltin implements Computation {
                 solutions.add(new Bindings(bindings, (Variable) getArgument(2), ((Number) y).doubleValue() / ((Number) x).doubleValue()));
             }
         } else {
-            throw new UndeterminedSolutionException();
+            throw new UnderDeterminedSolutionException();
         }
 
         return solutions;

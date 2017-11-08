@@ -50,10 +50,13 @@ public class SWRLBLessThanOrEqual extends SWRLBuiltin implements SPARQLSerializa
         Object value1 = getParameterValue(0, bindings);
         Object value2 = getParameterValue(1, bindings);
 
-        if (value1 instanceof Comparable && value2 instanceof Comparable) {
+        if (value1 instanceof Comparable && value2 instanceof Comparable && value1.getClass().equals(value2.getClass())) {
             return ((Comparable) value1).compareTo(value2) <= 0;
+        } else if(value1 instanceof Number && value2 instanceof Number) {
+            return ((Number) value1).doubleValue() <= ((Number) value2).doubleValue();
         } else {
             return false;
         }
+
     }
 }

@@ -2,6 +2,9 @@ package com.github.anno4j.schema.model.swrl;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
+import com.github.anno4j.schema.model.rdfs.collections.RDFListSupport;
+import org.openrdf.annotations.Precedes;
+import org.openrdf.repository.object.behaviours.RDFSContainer;
 
 import java.util.*;
 
@@ -9,12 +12,15 @@ import java.util.*;
  * Support class for {@link AtomList}.
  */
 @Partial
-public abstract class AtomListSupport extends ResourceObjectSupport implements AtomList {
+@Precedes({RDFSContainer.class, ResourceObjectSupport.class, RDFListSupport.class})
+public abstract class AtomListSupport extends RDFListSupport implements AtomList {
 
     @Override
     public Set<Variable> getVariables() {
         Set<Variable> variables = new HashSet<>();
-        for(Object item : this) {
+        Iterator<Object> i = iterator();
+        while (i.hasNext()) {
+            Object item = i.next();
             if(item instanceof Atom) {
                 variables.addAll(((Atom) item).getVariables());
             } else {
@@ -28,12 +34,14 @@ public abstract class AtomListSupport extends ResourceObjectSupport implements A
     public Set<Variable> getBoundVariables() {
         Set<Variable> bound = new HashSet<>();
 
-        for(Object item : this) {
+        Iterator<Object> i = iterator();
+        while (i.hasNext()) {
+            Object item = i.next();
             // Variables are bound if they occur in a class or role atom:
             if(item instanceof ClassAtom || item instanceof DatavaluedPropertyAtom || item instanceof IndividualPropertyAtom) {
                 bound.addAll(((Atom) item).getVariables());
 
-            } else { // All atoms must be an Anno4j ResourceObject:
+            } else if(!(item instanceof BuiltinAtom)) { // All atoms must be an Anno4j ResourceObject:
                 throw new IllegalArgumentException("Atom lists must contain atoms.");
             }
         }
@@ -55,7 +63,9 @@ public abstract class AtomListSupport extends ResourceObjectSupport implements A
     @Override
     public Collection<Atom> getClassAndRoleAtoms() {
         Collection<Atom> classAndRoleAtoms = new HashSet<>();
-        for(Object item : this) {
+        Iterator<Object> i = iterator();
+        while (i.hasNext()) {
+            Object item = i.next();
             if((item instanceof ClassAtom) || (item instanceof DatavaluedPropertyAtom) || (item instanceof IndividualPropertyAtom)) {
                 classAndRoleAtoms.add((Atom) item);
             }
@@ -66,7 +76,9 @@ public abstract class AtomListSupport extends ResourceObjectSupport implements A
     @Override
     public Collection<BuiltinAtom> getBuiltInAtoms() {
         Collection<BuiltinAtom> builtinAtoms = new HashSet<>();
-        for(Object atom : this) {
+        Iterator<Object> i = iterator();
+        while (i.hasNext()) {
+            Object atom = i.next();
             if(atom instanceof BuiltinAtom) {
                 builtinAtoms.add((BuiltinAtom) atom);
             }
@@ -77,7 +89,9 @@ public abstract class AtomListSupport extends ResourceObjectSupport implements A
     @Override
     public List<Atom> asList() {
         List<Atom> list = new ArrayList<>(size());
-        for(Object item : this) {
+        Iterator<Object> i = iterator();
+        while (i.hasNext()) {
+            Object item = i.next();
             if(item instanceof Atom) {
                 list.add((Atom) item);
             }

@@ -3,6 +3,8 @@ package com.github.anno4j.schema.model.swrl.engine;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.schema.model.swrl.*;
 import com.github.anno4j.schema.model.swrl.builtin.SPARQLSerializable;
+import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService;
+import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin;
 import org.openrdf.repository.object.LangString;
 
 import java.util.LinkedList;
@@ -36,28 +38,39 @@ class SPARQLSerializer {
 
     /**
      * Returns if the given atoms can be translated to SPARQL.
-     * This is the case for class/role atoms and some built-ins (those implementing {@link SPARQLSerializable}.
+     * This is the case for class/role atoms and some built-ins (those implementing {@link SPARQLSerializable}).
+     * The built-in implementation is determined using {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService}.
      * @param atom The atom to check.
      * @return Returns true iff the given atom can be serialized to SPARQL.
+     * @throws InstantiationException Thrown if the atom is a built-in and its implementation could not be instantiated.
      */
-    boolean isSPARQLSerializable(Object atom) {
+    boolean isSPARQLSerializable(Object atom) throws InstantiationException {
         // An atom is serializable if its a class/role atom or a built-in thats serializable:
-        return atom instanceof ClassAtom
+        boolean serializable = atom instanceof ClassAtom
                 || atom instanceof IndividualPropertyAtom
-                || atom instanceof DatavaluedPropertyAtom
-                || atom instanceof SPARQLSerializable;
+                || atom instanceof DatavaluedPropertyAtom;
+
+        if(atom instanceof BuiltinAtom) {
+            SWRLBuiltInService service = SWRLBuiltInService.getBuiltInService();
+            SWRLBuiltin builtin = service.getBuiltIn((BuiltinAtom) atom);
+
+            serializable |= builtin instanceof SPARQLSerializable;
+        }
+
+        return serializable;
     }
 
     /**
      * Returns the longest prefix of the given plan for which every atom suffices {@link #isSPARQLSerializable(Object)}.
      * @param atoms The execution plan.
      * @return Returns the longest prefix of SPARQL serializable atoms.
+     * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
      */
-    List<Atom> longestSPARQLSerializablePrefix(AtomList atoms) {
+    List<Atom> longestSPARQLSerializablePrefix(List<Atom> atoms) throws InstantiationException {
         List<Atom> prefix = new LinkedList<>();
 
         boolean isSPARQLSerializable;
-        ListIterator<Object> i = atoms.listIterator();
+        ListIterator<Atom> i = atoms.listIterator();
         do {
             Object item = i.next();
 
@@ -66,9 +79,19 @@ class SPARQLSerializer {
             if(isSPARQLSerializable) {
                 prefix.add((Atom) item);
             }
-        } while (isSPARQLSerializable); // Terminate if first non-serializable atom is reached
+        } while (isSPARQLSerializable && i.hasNext()); // Terminate if first non-serializable atom is reached
 
         return prefix;
+    }
+
+    /**
+     * Returns the longest prefix of the given plan for which every atom suffices {@link #isSPARQLSerializable(Object)}.
+     * @param atoms The execution plan.
+     * @return Returns the longest prefix of SPARQL serializable atoms.
+     * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
+     */
+    List<Atom> longestSPARQLSerializablePrefix(AtomList atoms) throws InstantiationException {
+        return longestSPARQLSerializablePrefix(atoms.asList());
     }
 
     /**
@@ -100,7 +123,7 @@ class SPARQLSerializer {
                 } else { // If not a rdf:langString then return as untyped literal:
                     return s;
                 }
-            } else if(o instanceof Number) {
+            } else if(o instanceof Number || o instanceof Boolean) {
                 return o.toString();
             } else {
                 return "\"" + o.toString() + "\"";

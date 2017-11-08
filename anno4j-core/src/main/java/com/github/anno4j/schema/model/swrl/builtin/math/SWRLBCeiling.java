@@ -1,0 +1,64 @@
+package com.github.anno4j.schema.model.swrl.builtin.math;
+
+import com.github.anno4j.model.namespaces.SWRLB;
+import com.github.anno4j.schema.model.swrl.Variable;
+import com.github.anno4j.schema.model.swrl.builtin.SPARQLSerializable;
+import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin;
+import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltinIri;
+import com.github.anno4j.schema.model.swrl.engine.Bindings;
+import com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine;
+
+import java.util.List;
+
+/**
+ * Implementation of the SWRL Built-in function
+ * <a href="http://www.w3.org/2003/11/swrlb#ceiling">http://www.w3.org/2003/11/swrlb#ceiling</a> .
+ * It receives two arguments x, y. The predicate is true iff x = ceil(y) holds.
+ * This built-in is SPARQL serializable.
+ */
+@SWRLBuiltinIri(SWRLB.CEILING)
+public class SWRLBCeiling extends SWRLBuiltin implements SPARQLSerializable {
+
+    /**
+     * Initializes the built-in.
+     * @param arguments List of two arguments.
+     * @throws IllegalArgumentException Thrown if less than two arguments are passed or any non-variable
+     * argument is non-numeric.
+     */
+    public SWRLBCeiling(List<Object> arguments) {
+        super(arguments);
+
+        // Check that there are two arguments:
+        if(arguments.size() != 2) {
+            throw new IllegalArgumentException("swrlb:ceiling expects two arguments. " + arguments.size() + " passed.");
+        }
+        // Check all non-variable arguments are numeric:
+        for(Object argument : arguments) {
+            if(!(argument instanceof Variable || argument instanceof Number)) {
+                throw new IllegalArgumentException("swrlb:ceiling expects non-variable arguments to be numeric.");
+            }
+        }
+    }
+
+    @Override
+    public String asSPARQLFilterExpression() {
+        return new StringBuilder()
+                .append(getArgumentAsFilterExpression(0))
+                .append(" = CEIL(")
+                .append(getArgumentAsFilterExpression(1))
+                .append(")")
+                .toString();
+    }
+
+    @Override
+    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+        Object value1 = getParameterValue(0, bindings);
+        Object value2 = getParameterValue(1, bindings);
+
+        if(value1 instanceof Number && value2 instanceof Number) {
+            return ((Number) value1).doubleValue() == Math.ceil(((Number) value2).doubleValue());
+        } else {
+            return false;
+        }
+    }
+}

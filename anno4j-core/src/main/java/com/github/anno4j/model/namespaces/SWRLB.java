@@ -99,4 +99,80 @@ public class SWRLB {
      * Satisfied iff the first argument is the absolute value of the second argument.
      */
     public final static String ABS = NS + "abs";
+
+    /**
+     * Satisfied iff the first argument is the smallest number with no fractional part that is greater than or equal to the second argument.
+     */
+    public final static String CEILING = NS + "ceiling";
+
+    /**
+     * Satisfied iff the first argument is the largest number with no fractional part that is less than or equal to the second argument.
+     */
+    public static final String FLOOR = NS + "floor";
+
+    /**
+     * Satisfied iff the first argument is equal to the nearest number to the second argument with no fractional part.
+     */
+    public static final String ROUND = NS + "round";
+
+    /**
+     * Satisfied iff the first argument is the same as the second argument (upper/lower case ignored)
+     */
+    public static final String STRING_EQUAL_IGNORE_CASE = NS + "stringEqualIgnoreCase";
+
+    /**
+     * Satisfied iff the first argument is equal to the string resulting from the concatenation of the strings the second argument through the last argument.
+     */
+    public static final String STRING_CONCAT = NS + "stringConcat";
+
+    /**
+     * Satisfied iff the first argument is equal to the substring of optional length the fourth argument starting at
+     * character offset the third argument in the string the second argument.
+     */
+    public static final String SUBSTRING = NS + "substring";
+
+    /**
+     * Satisfied iff the first argument is equal to the length of the second argument.
+     */
+    public static final String STRING_LENGTH = NS + "stringLength";
+
+    /**
+     * Satisfied iff the first argument is equal to the whitespace-normalized value of the second argument.
+     */
+    public static final String NORMALIZE_SPACE = NS + "normalizeSpace";
+
+    /**
+     * Satisfied iff the first argument is equal to the upper-cased value of the second argument.
+     */
+    public static final String UPPERCASE = NS + "upperCase";
+
+    /**
+     * Satisfied iff the first argument is equal to the lower-cased value of the second argument.
+     */
+    public static final String LOWERCASE = NS + "lowerCase";
+
+    /**
+     * Satisfied iff the first argument contains the second argument (case sensitive).
+     */
+    public static final String CONTAINS = NS + "contains";
+
+    /**
+     * Satisfied iff the first argument contains the second argument (case ignored).
+     */
+    public static final String CONTAINS_IGNORE_CASE = NS + "containsIgnoreCase";
+
+    /**
+     * Satisfied iff the first argument starts with the second argument.
+     */
+    public static final String STARTS_WITH = NS + "startsWith";
+
+    /**
+     * Satisfied iff the first argument ends with the second argument.
+     */
+    public static final String ENDS_WITH = NS + "endsWith";
+
+    /**
+     * Satisfied iff the first argument matches the regular expression the second argument.
+     */
+    public static final String MATCHES = NS + "matches";
 }

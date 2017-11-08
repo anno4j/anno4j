@@ -15,7 +15,7 @@ import java.util.List;
  * This implementation is capable of binding a variable by computing its unique value.
  */
 @SWRLBuiltinIri(SWRLB.MULTIPLY)
-public class SWRLMultiply extends SWRLBuiltin implements Computation {
+public class SWRLBMultiply extends SWRLBuiltin implements Computation {
 
     /**
      * Initializes the built-in.
@@ -23,7 +23,7 @@ public class SWRLMultiply extends SWRLBuiltin implements Computation {
      * @throws IllegalArgumentException Thrown if less than three arguments are passed or any non-variable
      * argument is not numeric.
      */
-    public SWRLMultiply(List<Object> arguments) {
+    public SWRLBMultiply(List<Object> arguments) {
         super(arguments);
         // Check that there are three arguments:
         if(arguments.size() != 3) {
@@ -39,7 +39,7 @@ public class SWRLMultiply extends SWRLBuiltin implements Computation {
 
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UndeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -59,7 +59,7 @@ public class SWRLMultiply extends SWRLBuiltin implements Computation {
             validateNumeric(x, y);
             solutions.add(new Bindings(bindings, (Variable) getArgument(2), ((Number) x).doubleValue() / ((Number) y).doubleValue()));
         } else {
-            throw new UndeterminedSolutionException();
+            throw new UnderDeterminedSolutionException();
         }
 
         return solutions;

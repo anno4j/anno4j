@@ -89,6 +89,10 @@ public class SWRLBuiltInService {
     public SWRLBuiltin getBuiltIn(String iri, List<Object> arguments) throws InstantiationException {
         Class<SWRLBuiltin> type = getBuiltIn(iri); // Get the built-in type
 
+        if(type == null) {
+            throw new InstantiationException("Unsupported SWRL built-in function " + iri);
+        }
+
         try {
             Constructor<SWRLBuiltin> constructor = type.getConstructor(List.class);
             return constructor.newInstance(arguments);

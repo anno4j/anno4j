@@ -6,12 +6,11 @@ import com.github.anno4j.schema.model.swrl.engine.Bindings;
 import com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * SWRL Built-in implementations are concrete instantiations of built-in atoms found in SWRL rules.
  * Thus a built-in implementation is initialized with the arguments defined in the respective atom rule.
- * Every built-in is a predicate and can be evaluated given a set of variable bindings (s. {@link #evaluate(Map)}.
+ * Every built-in is a predicate and can be evaluated given a set of variable bindings (s. {@link #evaluate(Bindings)}.
  * This is the base class of all SWRL built-in implementations and provides some convenience methods.
  * Concrete SWRL built-in implementations must have the {@link SWRLBuiltinIri} annotation and can be instantiated
  * by {@link SWRLBuiltInService}.
@@ -110,12 +109,16 @@ public abstract class SWRLBuiltin {
      * Returns null if the requested parameter is a variable which is not bound by {@code bindings}.
      */
     protected Object getParameterValue(int index, Bindings bindings) {
-        Object argument = arguments.get(index);
+        if(index >= 0 && index < arguments.size()) {
+            Object argument = arguments.get(index);
 
-        if(argument instanceof Variable) {
-            return bindings.get((Variable) argument);
+            if(argument instanceof Variable) {
+                return bindings.get((Variable) argument);
+            } else {
+                return argument;
+            }
         } else {
-            return argument;
+            return null;
         }
     }
 }

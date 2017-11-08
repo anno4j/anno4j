@@ -11,7 +11,7 @@ import java.util.Iterator;
  * A collection of {@link Bindings}. Thus every element of contains
  * a possible solution binding for a problem.
  */
-class SolutionSet implements Iterable<Bindings> {
+public class SolutionSet implements Iterable<Bindings> {
 
     /**
      * The different solution bindings.
@@ -57,10 +57,35 @@ class SolutionSet implements Iterable<Bindings> {
     public void add(Bindings solution, Variable variable, Object value) {
         Bindings enriched = new Bindings(solution);
         enriched.bind(variable, value);
+        solutions.add(enriched);
     }
 
+    /**
+     * Adds all bindings in {@code solutions} to this solution set.
+     * @param solutions The bindings to add.
+     */
     public void addAll(SolutionSet solutions) {
         this.solutions.addAll(solutions.getBindings());
+    }
+
+    /**
+     * Removes all bindings from this solution set that are both in this set and in {@code solutions}.
+     * @param solutions The solutions to remove (if present).
+     */
+    public void removeAll(SolutionSet solutions) {
+        this.solutions.removeAll(solutions.getBindings());
+    }
+
+    /**
+     * Returns all variables that are bound in any binding of this solution set.
+     * @return Returns the set of all variables.
+     */
+    public Collection<Variable> getVariables() {
+        Collection<Variable> variables = new HashSet<>();
+        for (Bindings solution : solutions) {
+            variables.addAll(solution.variables());
+        }
+        return variables;
     }
 
     @Override

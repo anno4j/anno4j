@@ -6,6 +6,8 @@ import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
+import java.util.Collection;
+
 /**
  * A solution processor takes a set of solutions and a SWRL rule head.
  * It inserts the head into a triplestore subsequently replacing the variables
@@ -120,13 +122,15 @@ class SolutionProcessor extends SPARQLSerializer {
      * inserts the resulting triples into the triplestore.
      * @param head The head of the rule which variables will be replaced.
      * @param bindings Bindings for variables.
+     * @param assertions Atoms that are also true due to axiomatic rules. All variables must be bound by {@code bindings}.
      * @param connection A connection to the triplestore in which the resulting triples should be inserted.
      * @return Returns true if the triplestore was changed as result to the update.
      * @throws SPARQLSerializer.SPARQLSerializationException Thrown if an error occurs while transforming to SPARQL.
      * @throws SWRLInferenceEngine.UnboundVariableException Thrown if a variable occurs in the {@code head} that is not bound by {@code bindings}.
      * @throws SWRLException Thrown if any error occurs processing the solution.
+     * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
      */
-    boolean commitHead(AtomList head, Bindings bindings, ObjectConnection connection) throws SWRLException {
+    boolean commitHead(AtomList head, Bindings bindings, Collection<Atom> assertions, ObjectConnection connection) throws SWRLException, InstantiationException {
         // Validate that the head is fully SPARQL serializable:
         for (Object atom : head) {
             if(!isSPARQLSerializable(atom)) {
@@ -143,6 +147,9 @@ class SolutionProcessor extends SPARQLSerializer {
             } else {
                 throw new SWRLException("Atom lists must contain only atoms.");
             }
+        }
+        for (Atom assertion : assertions) {
+            dataBuilder.append(asSubgraphPattern(assertion, bindings));
         }
         dataBuilder.append("}");
 

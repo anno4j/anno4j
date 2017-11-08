@@ -36,7 +36,11 @@ public class SWRLBEqual extends SWRLBuiltin implements SPARQLSerializable, Compu
         Object value1 = getParameterValue(0, bindings);
         Object value2 = getParameterValue(1, bindings);
 
-        return value1.equals(value2);
+        if(value1 instanceof Number && value2 instanceof Number) {
+            return ((Number) value1).doubleValue() == ((Number) value2).doubleValue();
+        } else {
+            return value1.equals(value2);
+        }
     }
 
     @Override
@@ -49,7 +53,7 @@ public class SWRLBEqual extends SWRLBuiltin implements SPARQLSerializable, Compu
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UndeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -60,7 +64,7 @@ public class SWRLBEqual extends SWRLBuiltin implements SPARQLSerializable, Compu
         } else if (getArgument(1) instanceof Variable && !(getArgument(0) instanceof Variable)) {
             solutions.add(new Bindings(bindings, (Variable) getArgument(1), x));
         } else {
-            throw new UndeterminedSolutionException();
+            throw new UnderDeterminedSolutionException();
         }
 
         return solutions;

@@ -5,6 +5,8 @@ import com.github.anno4j.schema.model.swrl.Atom;
 import com.github.anno4j.schema.model.swrl.AtomList;
 import com.github.anno4j.schema.model.swrl.Rule;
 import com.github.anno4j.schema.model.swrl.Variable;
+import com.github.anno4j.schema.model.swrl.engine.conflictorder.ConflictResolutionStrategy;
+import com.github.anno4j.schema.model.swrl.engine.conflictorder.SequentialStrategy;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
@@ -16,7 +18,7 @@ public class SWRLInferenceEngine {
     /**
      * Reorders rule bodies wrt. to built-in dependency relations and maximum SPARQL serializability.
      */
-    private ExecutionPlanFactory executionPlanner = new ExecutionPlanFactory();
+    private ExecutionPlanner executionPlanner = new ExecutionPlanner();
 
     /**
      * Retrieves candidate solutions by executing a (maximal) subset of rule bodies using a SPARQL query.
@@ -78,13 +80,19 @@ public class SWRLInferenceEngine {
     /**
      * The rules that will be executed by {@link #executeSWRLRuleBase()}.
      */
-    private Collection<Rule> ruleBase;
+    private List<Rule> ruleBase = new ArrayList<>();
 
     /**
      * Links variables to their true axiomatic atoms, i.e. those atoms that must hold for every
      * body (wrt. that variable).
      */
-    private Map<Variable, List<Atom>> trueAxioms = new HashMap<>();
+    private Map<Variable, List<Atom>> assertions = new HashMap<>();
+
+    /**
+     * Negative assertions are those rules in the rule base that have an empty consequent and thus
+     * their body must never hold.
+     */
+    private Set<Rule> negativeAssertions = new HashSet<>();
 
     /**
      * A connection to the triplestore on which will be evaluated.
@@ -111,17 +119,34 @@ public class SWRLInferenceEngine {
     private boolean optimizationDone = false;
 
     /**
+     * Whether the candidate bindings retrieved for the SPARQL-serializable prefixes should be cached each round.
+     * This way the number of necessary SPARQL-queries is reduced, but maybe more rounds are needed to reach the same state.
+     */
+    private boolean useCandidateCache = true;
+
+    /**
+     * Contains the candidate bindings determined for SPARQL-serializable prefixes in the current round.
+     * This cache must be invalidated after every round and is only used if {@link #useCandidateCache} is set.
+     */
+    private Map<List<Atom>, SolutionSet> candidateCache = new HashMap<>();
+
+    /**
+     * Rule execution order is determined by this strategy.
+     */
+    private ConflictResolutionStrategy conflictResolutionStrategy = new SequentialStrategy();
+
+    /**
      * Initializes the SWRL inference engine with the given rule base for execution on the connected triplestore.
      * The created engine will store reordered bodies (cf. {@link #setStoreOptimizedOrders(boolean)}) and has no
-     * limit on the number of rule base executions (cf. {@link #setMaxExecutionRounds(int)}).
+     * limit on the number of rule base executions (cf. {@link #setMaxExecutionRounds(int)}). Candidate caching is used.
      * @param ruleBase The rules that will be used for inference.
      * @param connection A connection to the triplestore on which rules will be evaluated.
      */
     public SWRLInferenceEngine(Collection<Rule> ruleBase, ObjectConnection connection) {
-        this.ruleBase = ruleBase;
+        this.ruleBase.addAll(ruleBase);
         this.connection = connection;
 
-        indexAxiomaticAtoms();
+        indexAxioms();
     }
 
     /**
@@ -135,29 +160,37 @@ public class SWRLInferenceEngine {
         this(anno4j.findAll(Rule.class), anno4j.getObjectRepository().getConnection());
     }
 
-    private void indexAxiomaticAtoms() {
+    private void indexAxioms() {
+        Collection<Rule> axioms = new HashSet<>(); // Set of all axioms (positive and negative):
         for(Rule rule : ruleBase) {
             // The head of rules with an empty body are treated as trivially true:
-            if(rule.getBody().isEmpty()) {
+            if(rule.getBody() == null || rule.getBody().isEmpty()) {
                 for(Atom atom : rule.getHead().asList()) {
                     for(Variable variable : atom.getVariables()) {
                         // If this is the first time the variable is encountered in an axiomatic atom:
-                        if(!trueAxioms.containsKey(variable)) {
-                            trueAxioms.put(variable, new ArrayList<Atom>()); // create atom
+                        if(!assertions.containsKey(variable)) {
+                            assertions.put(variable, new ArrayList<Atom>()); // create atom
                         }
 
-                        trueAxioms.get(variable).add(atom);
+                        assertions.get(variable).add(atom);
                     }
                 }
+                axioms.add(rule);
             }
 
-            // TODO false axioms
+            // Rules with empty head must never head:
+            if(rule.getHead() == null || rule.getHead().isEmpty()) {
+                negativeAssertions.add(rule);
+                axioms.add(rule);
+            }
         }
+        ruleBase.removeAll(axioms); // Remove all axioms from rule base
     }
 
     /**
      * Evaluates the given rules body on the connected triplestore. All bindings fulfilling the body will be returned.
      * This method will reorder the atoms of the body if {@link #storeOptimizedOrders} is set.
+     * Uses caching of candidate bindings if {@link #useCandidateCache} is set.
      * @param rule The rule which body will be evaluated.
      * @return Returns a set of binding combinations for the rules variables that represent a solution.
      * @throws RepositoryException Thrown if an error occurs while accessing the triplestore.
@@ -183,15 +216,29 @@ public class SWRLInferenceEngine {
 
         List<Atom> assertions = new ArrayList<>();
         for (Variable variable : plan.getVariables()) {
-            if(trueAxioms.containsKey(variable)) {
-                assertions.addAll(trueAxioms.get(variable));
+            if(this.assertions.containsKey(variable)) {
+                assertions.addAll(this.assertions.get(variable));
             }
         }
 
         System.out.println("Current execution plan: " + plan); // TODO remove
 
-        // Get candidates by SPARQL query:
-        SolutionSet candidateBindings = bodySparqlEvaluator.findCandidateBindings(plan, connection);
+        SolutionSet candidateBindings;
+        // Check if we've cached the resulsts for this subplan already:
+        List<Atom> sparqlSerializablePrefix = bodySparqlEvaluator.longestSPARQLSerializablePrefix(plan);
+        if(candidateCache.containsKey(sparqlSerializablePrefix)) {
+            // Get the candidates from cache:
+            candidateBindings = candidateCache.get(sparqlSerializablePrefix);
+
+        } else {
+            // Get candidates by SPARQL query:
+            candidateBindings = bodySparqlEvaluator.findCandidateBindings(plan, connection);
+
+            // Cache bindings if caching is activated:
+            if(useCandidateCache) {
+                candidateCache.put(sparqlSerializablePrefix, candidateBindings);
+            }
+        }
 
         System.out.println("Candidates: " + candidateBindings); // TODO remove
 
@@ -219,14 +266,44 @@ public class SWRLInferenceEngine {
 
             System.out.println("Starting SWRL inference round " + (executions + 1)); // TODO remove
 
-            // TODO Axioms?
+            // Get the bindins that must never be true:
+            SolutionSet forbiddenBindings = new SolutionSet();
+            for (Rule negativeAssertion : negativeAssertions) {
+                forbiddenBindings.addAll(evaluateBody(negativeAssertion));
+            }
 
-            for (Rule rule : ruleBase) {
-                SolutionSet bindings = evaluateBody(rule);
-                System.out.println("Solutions: " + bindings); // TODO remove
+            boolean roundFinished = false;
+            while (!roundFinished) {
+                Rule rule = conflictResolutionStrategy.fire(ruleBase, assertions, negativeAssertions);
 
-                for(Bindings binding : bindings) {
-                    modified |= headSPARQLEvaluator.commitHead(rule.getHead(), binding, connection);
+                if(rule != null) {
+                    // Get all bindings that fulfill the body:
+                    SolutionSet bindings = evaluateBody(rule);
+                    bindings.removeAll(forbiddenBindings); // Remove illegal bindings
+                    System.out.println("Solutions: " + bindings); // TODO remove
+
+                    // Get those atoms that are axiomatic for the bound variables:
+                    Collection<Atom> axiomaticAtoms = new HashSet<>();
+                    Collection<Variable> boundVariables = bindings.getVariables();
+                    for(Variable variable : boundVariables) {
+                        if(assertions.containsKey(variable)) {
+                            for(Atom atom : assertions.get(variable)) {
+                                // There must be no no free variables:
+                                if(boundVariables.containsAll(atom.getVariables())) {
+                                    axiomaticAtoms.add(atom);
+                                }
+                            }
+                        }
+                    }
+
+                    boolean modificationByRule = false;
+                    for(Bindings binding : bindings) {
+                        modificationByRule |= headSPARQLEvaluator.commitHead(rule.getHead(), binding, axiomaticAtoms, connection);
+                    }
+                    modified |= modificationByRule;
+
+                } else {
+                    roundFinished = true;
                 }
             }
 
@@ -235,7 +312,11 @@ public class SWRLInferenceEngine {
                 optimizationDone = true;
             }
 
-            executions++;
+            // Invalidate cache:
+            if(useCandidateCache) {
+                candidateCache.clear();
+            }
+            executions++; // Count execution so we can terminate on maxExecutionRounds
         }
         System.out.println("Done (State not modified in last round)"); // TODO remove
     }
@@ -288,5 +369,45 @@ public class SWRLInferenceEngine {
      */
     public void setStoreOptimizedOrders(boolean storeOptimizedOrders) {
         this.storeOptimizedOrders = storeOptimizedOrders;
+    }
+
+    /**
+     * Returns whether candidate solutions are cached. Candidate solutions are retrieved from the triplestore during
+     * inference. These candidates can be cached during an inference round such that subsequent rules with the same
+     * SPARQL-serializable prefix can use the cached bindings instead of retrieving it again. This way the number
+     * of necessary SPARQL-queries can be reduced, but the inference process takes some rounds more in general
+     * (because triples inferred by rules are not available for other rules in the same round).
+     * @return Returns true if candidate caching is activated.
+     */
+    public boolean isUseCandidateCache() {
+        return useCandidateCache;
+    }
+
+    /**
+     * Turns candidate caching on or off. Candidate solutions are retrieved from the triplestore during
+     * inference. These candidates can be cached during an inference round such that subsequent rules with the same
+     * SPARQL-serializable prefix can use the cached bindings instead of retrieving them again. This way the number
+     * of necessary SPARQL-queries can be reduced, but the inference process takes some rounds more in general
+     * (because triples inferred by rules are not available for other rules in the same round).
+     * @param useCandidateCache Whether candidate solutions should be cached.
+     */
+    public void setUseCandidateCache(boolean useCandidateCache) {
+        this.useCandidateCache = useCandidateCache;
+    }
+
+    /**
+     * The conflict resolution strategy defines in which order rules are executed each round.
+     * @return Returns the current conflict resolution strategy.
+     */
+    public ConflictResolutionStrategy getConflictResolutionStrategy() {
+        return conflictResolutionStrategy;
+    }
+
+    /**
+     * The conflict resolution strategy defines in which order rules are executed each round.
+     * @param conflictResolutionStrategy The conflict resolution strategy to use from now on.
+     */
+    public void setConflictResolutionStrategy(ConflictResolutionStrategy conflictResolutionStrategy) {
+        this.conflictResolutionStrategy = conflictResolutionStrategy;
     }
 }

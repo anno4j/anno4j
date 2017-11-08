@@ -33,7 +33,7 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
             This way XQuery interpretation of filter will recognize equivalent values of different types.
             The values must be written without or with quotes for numbers and other other types respectively:
              */
-            if(o instanceof Number) {
+            if(o instanceof Number || o instanceof Boolean) {
                 return "?literal" + o.hashCode() + " FILTER(?literal" + o.hashCode() + " = " + o.toString() + ")";
             } else {
                 return "?literal" + o.hashCode() + " FILTER(?literal" + o.hashCode() + " = \"" + o.toString() + "\")";
@@ -141,178 +141,32 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
         }
     }
 
-    private String getClassAtomContradiction(ClassAtom clazzAtom) {
-        if(clazzAtom.getArgument1() instanceof Variable) {
-            Variable x = (Variable) clazzAtom.getArgument1();
-            ResourceObject clazz = clazzAtom.getClazzPredicate();
-
-            // A class atom is violated if the variables type is in a disjunctive class:
-            return toSPARQLSubgraphTerm(x) + " a ?disjClazz" + clazzAtom.hashCode() + " . \n"
-                    + "?disjClazz" + clazzAtom.hashCode() + " owl:disjointWith " + toSPARQLSubgraphTerm(clazz);
-        } else {
-            return "";
-        }
-    }
-
-    private String getRoleAtomContradiction(Atom propertyAtom, ResourceObject property, Object argument1, Object argument2) {
-        String atomSuffix;
-        if (propertyAtom.hashCode() >= 0) {
-            atomSuffix = "" + propertyAtom.hashCode();
-        } else {
-            atomSuffix = "_" + propertyAtom.hashCode();
-        }
-
-        StringBuilder builder = new StringBuilder();
-        /*
-        Argument 1 can't occur as the subject of the atoms property p if there is already
-        a explicitly different subject x in relation by p to argument 2 and one of the following holds:
-        - p is inverse functional
-        - there is an inverse property pinv and its (max)cardinality is 1
-        Both can only be checked if arg2 isn't a variable.
-        Sketch of the below SPARQL MINUS pattern:
-
-        # There x has arg2 as value of property p:
-        ?x <p> <arg2> .
-
-        # arg1 and x are different individuals:
-        { <arg1> owl:differentFrom ?x . } UNION { ?x owl:differentFrom <arg1> }
-
-        { # Case 1: p is inverse functional:
-            <p> a owl:InverseFunctionalProperty .
-
-        } UNION { # Case 2: p has inverse property pinv with cardinality 1:
-            { ?pinv owl:inverseOf <p> . } UNION { <p> owl:inverseOf ?pinv . }
-
-            <arg2> a ?c .
-            ?c rdfs:subClassOf ?r .
-            ?r a owl:Restriction .
-            ?r owl:onProperty ?pinv .
-            { ?r owl:maxCardinality 1 . } UNION { ?r owl:cardinality 1 . }
-        }
-         */
-        if(!(argument2 instanceof Variable)) {
-            String suffix = atomSuffix + "_1"; // Suffix for unique variable names
-            builder.append(
-                    "?x" + suffix + " " + toSPARQLSubgraphTerm(property) + " " + toSPARQLSubgraphTerm(argument2) + " .\n" +
-
-                    "{ " + toSPARQLSubgraphTerm(argument1) + " owl:differentFrom ?x" + suffix + " . } " +
-                            "UNION { ?x" + suffix + " owl:differentFrom " + toSPARQLSubgraphTerm(argument1) + " }\n" +
-
-                    "{\n" +
-                    "    " + toSPARQLSubgraphTerm(property) + " a owl:InverseFunctionalProperty .\n" +
-                    "} UNION {\n" +
-                    "    { ?pinv" + suffix + " owl:inverseOf " + toSPARQLSubgraphTerm(property) + " . } UNION { "
-                            + toSPARQLSubgraphTerm(property) + " owl:inverseOf ?pinv" + suffix + " . }\n" +
-
-                    "   " + toSPARQLSubgraphTerm(argument2) + " a ?c" + suffix + " .\n" +
-                    "    ?c" + suffix + " rdfs:subClassOf ?r" + suffix + " .\n" +
-                    "    ?r" + suffix + " a owl:Restriction .\n" +
-                    "    ?r" + suffix + " owl:onProperty ?pinv" + suffix + " .\n" +
-                    "    { ?r" + suffix + " owl:maxCardinality 1 . } UNION { ?r" + suffix + " owl:cardinality 1 . }\n" +
-                    "}"
-            );
-        }
-        /*
-        Argument 2 can't occur as object of the atoms property p if there is already
-        a explicitly different object x as arg1's value of p and one of the following holds:
-        - p is functional
-        - p has (max)cardinality 1 for any type of arg1
-        Both can only be checked of arg1 isn't a variable.
-
-        # ?x is p-value of arg1:
-        <arg1> <p> ?x .
-
-        # arg2 and x are different individuals or different literals:
-        { <arg2> owl:differentFrom ?x . } UNION { ?x owl:differentFrom <arg2> }
-        FILTER((isLiteral(<arg2>) && !isLiteral(?x)) || (!isLiteral(<arg2>) && isLiteral(?x)) || (<arg2> != ?x))
-
-        { # Case 1: p is functional:
-            <p> a owl:FunctionalProperty .
-
-        } UNION {
-            <arg1> a ?c .
-            ?c rdfs:subClassOf ?r .
-            ?r a owl:Restriction .
-            ?r owl:onProperty <p> .
-            { ?r owl:maxCardinality 1 . } UNION { ?r owl:cardinality 1 . }
-        }
-         */
-        if(!(argument1 instanceof Variable)) {
-            String suffix = atomSuffix + "_2"; // Suffix for unique variable names
-            builder.append(
-                    toSPARQLSubgraphTerm(argument1) + " " + toSPARQLSubgraphTerm(property) + " ?x" + suffix + " . \n" +
-
-                    "{ " + toSPARQLSubgraphTerm(argument2) + " owl:differentFrom ?x" + suffix + " . } " +
-                            "UNION { ?x" + suffix + " owl:differentFrom " + toSPARQLSubgraphTerm(argument2) + " } \n" +
-
-                    "FILTER((isLiteral(" + toSPARQLSubgraphTerm(argument2) + ") && !isLiteral(?x" + suffix
-                            + ")) || (!isLiteral(" + toSPARQLSubgraphTerm(argument2) + ") && isLiteral(?x"
-                            + suffix + ")) || (" + toSPARQLSubgraphTerm(argument2) + " != ?x" + suffix + ")) \n" +
-
-                    "   {\n" +
-                    "       " + toSPARQLSubgraphTerm(property) + " a owl:FunctionalProperty .\n" +
-                    "   } UNION {\n" +
-                    "   " + toSPARQLSubgraphTerm(argument1) + " a ?c" + suffix + " .\n" +
-                    "   ?c" + suffix + " rdfs:subClassOf ?r"+ suffix + " .\n" +
-                    "   ?r" + suffix + " a owl:Restriction .\n" +
-                    "   ?r" + suffix + " owl:onProperty " + toSPARQLSubgraphTerm(property) + " .\n" +
-                    "   { ?r" + suffix + " owl:maxCardinality 1 . } UNION { ?r" + suffix + " owl:cardinality 1 . }\n" +
-                    "}"
-            );
-        }
-
-        return builder.toString();
-    }
-
-    private String getIndividualPropertyAtomContradiction(IndividualPropertyAtom propertyAtom) {
-        Object argument1 = propertyAtom.getArgument1();
-        Object argument2 = propertyAtom.getArgument2();
-        ResourceObject property = propertyAtom.getPropertyPredicate();
-
-        return getRoleAtomContradiction(propertyAtom, property, argument1, argument2);
-    }
-
-    private String getDatavaluedPropertyAtomContradiction(DatavaluedPropertyAtom propertyAtom) {
-        Object argument1 = propertyAtom.getArgument1();
-        Object argument2 = propertyAtom.getArgument2();
-        ResourceObject property = propertyAtom.getPropertyPredicate();
-
-        return getRoleAtomContradiction(propertyAtom, property, argument1, argument2);
-    }
-
-    private String getAtomContradiction(Atom atom) {
-        if (atom instanceof ClassAtom) {
-            return getClassAtomContradiction((ClassAtom) atom);
-        } else if(atom instanceof IndividualPropertyAtom) {
-            return getIndividualPropertyAtomContradiction((IndividualPropertyAtom) atom);
-        } else if(atom instanceof DatavaluedPropertyAtom) {
-            return getDatavaluedPropertyAtomContradiction((DatavaluedPropertyAtom) atom);
-        } else {
-            return "";
-        }
-    }
-
     /**
      * Selects candidate solutions for the given atom execution plan by selecting a SPARQL serializable prefix, transforming it
      * to a SPARQL query and executing it.
      * Note that the given plan must be in executable order (wrt. dependencies of built-ins) and should by optimized
-     * for SPARQL execution e.g. by {@link ExecutionPlanFactory}.
+     * for SPARQL execution e.g. by {@link ExecutionPlanner}.
      * @param plan The plan for which to get candidate solutions.
-     * @param assertions Atoms that must not be violated (but must not necessarily be true due to open world assumption).
      * @param connection Connection to a triplestore from which to get candidate solutions.
      * @return Returns candidate solutions.
      * @throws SPARQLSerializationException Thrown if an error occurs while transforming to SPARQL.
      * @throws SWRLInferenceEngine.IllegalSWRLRuleException Thrown if there is no SPARQL serializable prefix.
+     * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
      */
-    public SolutionSet findCandidateBindings(AtomList plan, List<Atom> assertions, ObjectConnection connection) throws SPARQLSerializationException, SWRLInferenceEngine.IllegalSWRLRuleException {
+    public SolutionSet findCandidateBindings(AtomList plan, ObjectConnection connection) throws SPARQLSerializationException, SWRLInferenceEngine.IllegalSWRLRuleException, InstantiationException {
+        if(plan.isEmpty()) {
+            throw new SWRLInferenceEngine.IllegalSWRLRuleException("The rules body is empty.");
+        }
+
         // Get the part of the plan that is SPARQL serializable:
         List<Atom> serializablePrefix = longestSPARQLSerializablePrefix(plan);
 
         // Get all variables in the prefix in a fixed order:
-        List<Variable> variables = new ArrayList<>(plan.getVariables());
+        List<Variable> variables = new ArrayList<>();
+        variables.addAll(plan.getVariables());
         // If there are no variables, there's nothing to do:
         if(variables.isEmpty()) {
-            throw new SWRLInferenceEngine.IllegalSWRLRuleException();
+            throw new SWRLInferenceEngine.IllegalSWRLRuleException("No variables bound through class or role atoms.");
         }
 
         SolutionSet solutions = new SolutionSet();
@@ -330,13 +184,6 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
             queryBuilder.append(asSubgraphPattern(atom))
                         .append("\n");
         }
-
-        // Subtract bindings that contradict assertions:
-        queryBuilder.append("MINUS {");
-        for (Atom assertion : assertions) {
-            queryBuilder.append(getAtomContradiction(assertion));
-        }
-        queryBuilder.append("}");
 
         queryBuilder.append("}");
 
@@ -360,9 +207,10 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
                 // For each variable-binding find the variable and add to intermediate result:
                 Bindings bindings = new Bindings();
                 for (int i = 0; i < values.length; i++) {
-                    Variable variable = variables.get(i);
-
-                    bindings.bind(variable, values[i]);
+                    if(values[i] != null) {
+                        Variable variable = variables.get(i);
+                        bindings.bind(variable, values[i]);
+                    }
                 }
 
                 // Add the binding-combination to result:

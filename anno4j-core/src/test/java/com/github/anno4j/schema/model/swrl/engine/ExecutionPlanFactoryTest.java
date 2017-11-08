@@ -20,7 +20,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Test for {@link ExecutionPlanFactory}
+ * Test for {@link ExecutionPlanner}
  */
 public class ExecutionPlanFactoryTest {
 
@@ -42,6 +42,8 @@ public class ExecutionPlanFactoryTest {
 
     private BuiltinAtom addAtomVUW;
 
+    private ObjectConnection connection;
+
     /**
      * @param atom The atom to check.
      * @return Returns true iff {@code atom} is one of:
@@ -51,7 +53,7 @@ public class ExecutionPlanFactoryTest {
      *     <li>{@link DatavaluedPropertyAtom}</li>
      * </ul>
      */
-    private static boolean isClassOrRoleAtom(Atom atom) {
+    private static boolean isClassOrRoleAtom(Object atom) {
         return atom instanceof ClassAtom
                 || atom instanceof IndividualPropertyAtom
                 || atom instanceof DatavaluedPropertyAtom;
@@ -60,7 +62,7 @@ public class ExecutionPlanFactoryTest {
     @Before
     public void setUp() throws Exception {
         Anno4j anno4j = new Anno4j();
-        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
+        connection = anno4j.getObjectRepository().getConnection();
 
         // Variables:
         Variable u = anno4j.createObject(Variable.class, (Resource) new URIImpl("urn:var:u"));
@@ -114,16 +116,18 @@ public class ExecutionPlanFactoryTest {
 
     @Test
     public void testEmptyPlan() throws Exception {
-        ExecutionPlanFactory factory = new ExecutionPlanFactory();
-        List<Atom> plan = factory.reorderAtoms(Lists.<Atom>newArrayList());
+        ExecutionPlanner factory = new ExecutionPlanner();
+        AtomList plan = factory.reorderAtoms(connection.createObject(AtomList.class), connection);
         assertTrue(plan.isEmpty());
     }
 
     @Test
     public void testSimpleDependentPlan() throws Exception {
         // Determine plan:
-        ExecutionPlanFactory factory = new ExecutionPlanFactory();
-        List<Atom> plan = factory.reorderAtoms(Lists.newArrayList(eqAtomUZ, classAtom, addAtomUYZ, propAtom1, propAtom2));
+        ExecutionPlanner factory = new ExecutionPlanner();
+        AtomList atoms = connection.createObject(AtomList.class);
+        atoms.addAll(Lists.newArrayList(eqAtomUZ, classAtom, addAtomUYZ, propAtom1, propAtom2));
+        AtomList plan = factory.reorderAtoms(atoms, connection);
 
         // Test created plan:
         assertTrue(isClassOrRoleAtom(plan.get(0)));
@@ -137,8 +141,10 @@ public class ExecutionPlanFactoryTest {
     public void testMultiDependentPlan() throws Exception {
         // Axioms: C(x) p(x, y) p(x, z) add(v, u, w) add(u, y, z) add(w, u, z) eq(x, y)
         // Determine plan:
-        ExecutionPlanFactory factory = new ExecutionPlanFactory();
-        List<Atom> plan = factory.reorderAtoms(Lists.newArrayList(classAtom, propAtom1, propAtom2, addAtomVUW, addAtomUYZ, addAtomWUZ));
+        ExecutionPlanner factory = new ExecutionPlanner();
+        AtomList atoms = connection.createObject(AtomList.class);
+        atoms.addAll(Lists.newArrayList(classAtom, propAtom1, propAtom2, addAtomVUW, addAtomUYZ, addAtomWUZ));
+        AtomList plan = factory.reorderAtoms(atoms, connection);
 
         // Test created plan:
         assertEquals(6, plan.size());
@@ -153,8 +159,10 @@ public class ExecutionPlanFactoryTest {
     @Test
     public void testIndependentPlan() throws Exception {
         // Determine plan:
-        ExecutionPlanFactory factory = new ExecutionPlanFactory();
-        List<Atom> plan = factory.reorderAtoms(Lists.newArrayList(eqAtomYZ, classAtom, propAtom1, propAtom2, addAtomUYZ));
+        ExecutionPlanner factory = new ExecutionPlanner();
+        AtomList atoms = connection.createObject(AtomList.class);
+        atoms.addAll(Lists.newArrayList(eqAtomYZ, classAtom, propAtom1, propAtom2, addAtomUYZ));
+        AtomList plan = factory.reorderAtoms(atoms, connection);
 
         // Test created plan:
         assertTrue(isClassOrRoleAtom(plan.get(0)));
@@ -165,27 +173,16 @@ public class ExecutionPlanFactoryTest {
     }
 
     @Test
-    public void testUndeterminedPlan() throws Exception {
+    public void testUnderDeterminedPlan() throws Exception {
         // Determine plan:
-        ExecutionPlanFactory factory = new ExecutionPlanFactory();
+        ExecutionPlanner factory = new ExecutionPlanner();
+
+        AtomList atoms = connection.createObject(AtomList.class);
+        atoms.addAll(Lists.newArrayList(eqAtomUZ, classAtom));
 
         boolean exceptionThrown = false;
         try {
-            factory.reorderAtoms(Lists.newArrayList(eqAtomUZ, classAtom));
-        } catch (SWRLInferenceEngine.UnboundVariableException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(exceptionThrown);
-    }
-
-    @Test
-    public void testCyclicDependentPlan() throws Exception {
-        // Determine plan:
-        ExecutionPlanFactory factory = new ExecutionPlanFactory();
-
-        boolean exceptionThrown = false;
-        try {
-            factory.reorderAtoms(Lists.newArrayList(eqAtomUZ, classAtom));
+            factory.reorderAtoms(atoms, connection);
         } catch (SWRLInferenceEngine.UnboundVariableException e) {
             exceptionThrown = true;
         }

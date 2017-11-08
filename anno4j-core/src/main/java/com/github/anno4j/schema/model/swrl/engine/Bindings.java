@@ -8,7 +8,7 @@ import java.util.*;
  * Instances of this class represent a set of bindings of
  * {@link com.github.anno4j.schema.model.swrl.Variable}s to a concrete value.
  */
-class Bindings {
+public class Bindings {
 
     /**
      * Function associating variables with their bound values.

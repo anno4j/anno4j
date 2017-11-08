@@ -53,7 +53,7 @@ public class SWRLBIntegerDivide extends SWRLBuiltin implements Computation {
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UndeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -70,14 +70,16 @@ public class SWRLBIntegerDivide extends SWRLBuiltin implements Computation {
             }
         } else if (getArgument(1) instanceof Variable && y == null && x != null && z != null) {
             validateNumeric(x, z);
-            solutions.add(new Bindings(bindings, (Variable) getArgument(1), ((Number) x).intValue() * ((Number) z).intValue()));
+            for(int i = 0; i < ((Number) z).intValue(); i++) {
+                solutions.add(new Bindings(bindings, (Variable) getArgument(1), ((Number) x).intValue() * ((Number) z).intValue() + i));
+            }
         } else if (getArgument(2) instanceof Variable && z == null && x != null && y != null) {
             validateNumeric(x, y);
             if(((Number) x).intValue() != 0) {
                 solutions.add(new Bindings(bindings, (Variable) getArgument(2), ((Number) y).intValue() / ((Number) x).intValue()));
             }
         } else {
-            throw new UndeterminedSolutionException();
+            throw new UnderDeterminedSolutionException();
         }
 
         return solutions;
