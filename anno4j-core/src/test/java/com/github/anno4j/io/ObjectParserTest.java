@@ -27,9 +27,8 @@ import static org.junit.Assert.assertEquals;
 public class ObjectParserTest {
 
     @Test
-    public void testJSONLD() throws UpdateExecutionException {
+    public void testJSONLD() throws Exception {
 
-        try {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
@@ -42,14 +41,10 @@ public class ObjectParserTest {
             assertEquals(1, annotations.size());
 
             objectParser.shutdown();
-        } catch (RepositoryException | MalformedURLException | RepositoryConfigException e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
-    public void testTurtle() throws UpdateExecutionException {
-        try {
+    public void testTurtle() throws Exception {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
@@ -62,14 +57,10 @@ public class ObjectParserTest {
             assertEquals(1, annotations.size());
 
             objectParser.shutdown();
-        } catch (IOException | RepositoryException | RepositoryConfigException e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
-    public void testMultipleTurtle() throws UpdateExecutionException {
-        try {
+    public void testMultipleTurtle() throws Exception {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
@@ -86,14 +77,10 @@ public class ObjectParserTest {
             }
 
             objectParser.shutdown();
-        } catch (IOException | RepositoryException | RepositoryConfigException e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
-    public void testMultipleInOneTurtle() throws UpdateExecutionException {
-        try {
+    public void testMultipleInOneTurtle() throws Exception {
             URL url = new URL("http://example.com/");
 
             ObjectParser objectParser = new ObjectParser();
@@ -106,9 +93,6 @@ public class ObjectParserTest {
             }
 
             objectParser.shutdown();
-        } catch (IOException | RepositoryException | RepositoryConfigException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
