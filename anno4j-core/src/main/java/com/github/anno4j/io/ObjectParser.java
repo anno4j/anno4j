@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -106,11 +107,10 @@ public class ObjectParser {
 
     /**
      * Returns all instances of the given type (and its subtypes) that are present in this parsers Anno4j instance.
-     * The result of this method call isn't guaranteed to be unique and may contain duplicates.
      * @param type An {@link org.openrdf.annotations.Iri}-annotated type that all returned objects must have.
      * @param <T> The type of the returned objects.
-     * @return Returns all instances present in the Anno4j connected triplestore having the given {@code type}. This
-     * result may contain duplicates.
+     * @return Returns all instances present in the Anno4j connected triplestore having the given {@code type}.
+     * Doesn't contain duplicates.
      * @throws RepositoryException Thrown if an error occurs accessing the connected triplestore.
      */
     private <T extends ResourceObject> List<T> getInstancesOfType(Class<? extends T> type) throws RepositoryException {
@@ -118,7 +118,7 @@ public class ObjectParser {
         ObjectConnection connection = anno4j.getObjectRepository().getConnection();
 
         try {
-            instances.addAll(connection.getObjects(type).asList());
+            instances.addAll(connection.getObjects(type).asSet());
         } catch (QueryEvaluationException e) {
             throw new RepositoryException(e);
         }
@@ -127,12 +127,37 @@ public class ObjectParser {
     }
 
     /**
+     * Parses the given RDF-document that is in the specified {@code format} and stores all triples in the
+     * repository of the local Anno4j instance.
+     * @param content The RDF-serialization to read from. This must be in the format specified by {@code format}.
+     * @param documentURL The base URL used for namespaces.
+     * @param format The format of the given RDF-serialization.
+     * @throws RepositoryException Thrown if an error occurred accessing the connected triplestore of the underlying
+     * Anno4j instance.
+     * @throws RDFParseException Thrown if an error occurs while parsing the RDF-document.
+     */
+    private void readRDF(String content, URL documentURL, RDFFormat format) throws RDFParseException, RepositoryException {
+        // Parse the document using RIO parser. All read statements will be inserted into the Anno4j connected triplestore:
+        RDFParser parser = Rio.createParser(format);
+        try {
+            StatementSailHandler handler = new StatementSailHandler(this.anno4j.getRepository().getConnection());
+            parser.setRDFHandler(handler);
+            byte[] bytes = content.getBytes("UTF-8");
+            try (InputStream stream = new ByteArrayInputStream(bytes)) {
+                parser.parse(stream, documentURL.toString());
+            }
+        } catch (RDFHandlerException | IOException e) {
+            throw new RDFParseException(e);
+        }
+    }
+
+    /**
      * Used to parse {@link Annotation}-objects from a the RDF-document supplied.
      * All annotations found are returned as a list.
      * For performance reasons, the local memorystore can be cleared by defining the boolean parameter as true.
      * <br>
-     * <b>Note:</b> This method is supported for legacy purposes. In order to parse resource objects of any type use
-     * the more general method {@link #parse(Class, String, URL, RDFFormat, boolean)}.
+     * <b>Important:</b> This method is deprecated and will be removed in future versions.
+     * Use the method {@link #parse(Class, String, URL, RDFFormat, boolean)} instead.
      *
      * @param content     The String representation of the textcontent.
      * @param documentURL The basic URL used for namespaces.
@@ -140,18 +165,41 @@ public class ObjectParser {
      *                    supported of an instance of RDFFormat.
      * @param clear       Determines, if the local Anno4j instance should be cleared or not after a call to parse().
      * @return The annotations contained in the given RDF-document or an empty list if an error occurred.
+     * The result is not guaranteed to be duplicate free.
      */
+    @Deprecated
     public List<Annotation> parse(String content, URL documentURL, RDFFormat format, boolean clear) {
+        // Read the RDF-document and store triples in the repository of the anno4j instance:
         try {
-            return parse(Annotation.class, content, documentURL, format, clear);
-
-        } catch (RepositoryException | RDFParseException e) {
+            readRDF(content, documentURL, format);
+        } catch (RDFParseException | RepositoryException e) {
             e.printStackTrace();
-            return new ArrayList<>();
+            return new LinkedList<>();
         }
+
+        // Get the annotations
+        List<Annotation> annotations = new LinkedList<>();
+        try {
+            annotations = anno4j.getObjectRepository().getConnection().getObjects(Annotation.class).asList();
+        } catch (QueryEvaluationException | RepositoryException e) {
+            e.printStackTrace();
+        }
+
+        // Possibly clear all triples in the triplestore:
+        if (clear) {
+            try {
+                clear();
+            } catch (RepositoryException | UpdateExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return annotations;
     }
 
     /**
+     * Parses the given RDF-document and returns all resources of the specified type.
+     * In contrary to {@link #parse(String, URL, RDFFormat, boolean)} the returned objects are duplicate free.
      *
      * @param type An {@link org.openrdf.annotations.Iri}-annotated type that all returned objects must have.
      * @param content The RDF-serialization to read from. This must be in the format specified by {@code format}.
@@ -167,18 +215,8 @@ public class ObjectParser {
      * @throws RDFParseException Thrown if an error occurs while parsing the RDF-document.
      */
     public <T extends ResourceObject> List<T> parse(Class<? extends T> type, String content, URL documentURL, RDFFormat format, boolean clear) throws RepositoryException, RDFParseException {
-        // Parse the document using RIO parser. All read statements will be inserted into the Anno4j connected triplestore:
-        RDFParser parser = Rio.createParser(format);
-        try {
-            StatementSailHandler handler = new StatementSailHandler(this.anno4j.getRepository().getConnection());
-            parser.setRDFHandler(handler);
-            byte[] bytes = content.getBytes("UTF-8");
-            try (InputStream stream = new ByteArrayInputStream(bytes)) {
-                parser.parse(stream, documentURL.toString());
-            }
-        } catch (RDFHandlerException | IOException e) {
-            throw new RDFParseException(e);
-        }
+        // Read the RDF-document and store triples in the repository of the anno4j instance:
+        readRDF(content, documentURL, format);
 
         // Get the instances of the requested type:
         List<T> instances = getInstancesOfType(type);
