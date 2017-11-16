@@ -40,7 +40,7 @@ public class SWRLBDivide extends SWRLBuiltin implements Computation {
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -71,7 +71,7 @@ public class SWRLBDivide extends SWRLBuiltin implements Computation {
     }
 
     @Override
-    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+    public boolean evaluate(Bindings bindings) {
         Object x = getParameterValue(0, bindings);
         Object y = getParameterValue(1, bindings);
         Object z = getParameterValue(2, bindings);

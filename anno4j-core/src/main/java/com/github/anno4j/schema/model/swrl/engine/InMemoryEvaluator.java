@@ -153,7 +153,7 @@ class InMemoryEvaluator {
      * {@link SWRLBuiltInService}.
      */
     public SolutionSet evaluate(List<Atom> plan, SolutionSet candidateBindings) throws SWRLException, InstantiationException {
-        // The solution set is a subset of the candidates. So if it's emtpy the solution is empty:
+        // The solution set is a subset of the candidates. So if it's empty the solution is empty:
         if(candidateBindings.size() == 0) {
             return new SolutionSet();
         }

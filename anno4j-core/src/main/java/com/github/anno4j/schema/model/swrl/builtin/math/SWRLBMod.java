@@ -39,7 +39,7 @@ public class SWRLBMod extends SWRLBuiltin {
     }
 
     @Override
-    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+    public boolean evaluate(Bindings bindings) {
         Object x = getParameterValue(0, bindings);
         Object y = getParameterValue(1, bindings);
         Object z = getParameterValue(2, bindings);

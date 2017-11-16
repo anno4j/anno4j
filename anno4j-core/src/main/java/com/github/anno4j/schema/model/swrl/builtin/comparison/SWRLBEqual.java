@@ -51,7 +51,7 @@ public class SWRLBEqual extends SWRLBuiltin implements SPARQLSerializable, Compu
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);

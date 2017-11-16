@@ -2,8 +2,6 @@ package com.github.anno4j.schema.model.swrl.builtin;
 
 import com.github.anno4j.schema.model.swrl.engine.Bindings;
 
-import java.util.Map;
-
 /**
  * This exception is thrown if the number of possible solutions
  * computable by {@link Computation#solve(Bindings)} for a binding is infinite.

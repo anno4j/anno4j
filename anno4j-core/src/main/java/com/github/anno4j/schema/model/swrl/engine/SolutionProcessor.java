@@ -97,7 +97,7 @@ class SolutionProcessor extends SPARQLSerializer {
     }
 
     /**
-     * Transformes the given atom to a equivalent SPARQL expression replacing all variables by their respective bindings.
+     * Transforms the given atom to a equivalent SPARQL expression replacing all variables by their respective bindings.
      * @param atom The atom to transform.
      * @param bindings Bindings for variables.
      * @return Returns the equivalent SPARQL expression with all variables replaced.

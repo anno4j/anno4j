@@ -140,7 +140,7 @@ public class SWRLInferenceEngine {
     private int maxExecutionRounds = -1;
 
     /**
-     * Whether to store the reorderings of rule bodies in the triplestore.
+     * Whether to store the reordering of rule bodies in the triplestore.
      * Doing so reduces the time needed for rule execution but reorders the atoms in the rules bodies
      * (in a semantically equivalent way).
      */
@@ -307,7 +307,7 @@ public class SWRLInferenceEngine {
 
             logger.info("Starting SWRL inference round " + (executions + 1));
 
-            // Get the bindins that must never be true:
+            // Get the bindings that must never be true:
             SolutionSet forbiddenBindings = new SolutionSet();
             for (Rule negativeAssertion : negativeAssertions) {
                 forbiddenBindings.addAll(evaluateBody(negativeAssertion));
@@ -315,13 +315,14 @@ public class SWRLInferenceEngine {
 
             boolean roundFinished = false;
             while (!roundFinished) {
+                // Get the next rule according to the conflict resolution strategy:
                 Rule rule = conflictResolutionStrategy.fire(ruleBase, assertions, negativeAssertions);
 
                 if(rule != null) {
                     // Get all bindings that fulfill the body:
                     SolutionSet bindings = evaluateBody(rule);
-                    bindings.removeAllContaining(forbiddenBindings); // Remove illegal bindings
-                    logger.debug("Solutions: " + bindings);
+
+                    bindings.removeAll(forbiddenBindings); // Remove illegal bindings
 
                     // Get those atoms that are axiomatic for the bound variables:
                     Collection<Atom> axiomaticAtoms = new HashSet<>();

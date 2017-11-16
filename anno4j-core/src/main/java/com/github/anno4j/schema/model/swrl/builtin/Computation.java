@@ -13,5 +13,5 @@ public interface Computation {
      * @throws InfiniteResultException Thrown if there is an infinite number of solutions.
      * @throws IllegalArgumentException Thrown if any parameter has a wrong type.
      */
-    SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException;
+    SolutionSet solve(Bindings bindings) throws IllegalArgumentException, UnderDeterminedSolutionException;
 }

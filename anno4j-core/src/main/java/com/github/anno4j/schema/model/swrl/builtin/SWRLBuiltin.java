@@ -19,7 +19,7 @@ public abstract class SWRLBuiltin {
 
     /**
      * The arguments the built-in has. Values can be {@link Variable}, {@link ResourceObject}
-     * or any primitve datatype.
+     * or any primitive datatype.
      */
     private List<Object> arguments;
 
@@ -37,7 +37,7 @@ public abstract class SWRLBuiltin {
      * @throws SWRLInferenceEngine.UnboundVariableException Thrown
      * if any of the variables in the arguments of this built-in instantiation is not bound by {@code bindings}.
      */
-    public abstract boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException;
+    public abstract boolean evaluate(Bindings bindings);
 
     /**
      * @return Returns the arguments of this built-in instantiation.

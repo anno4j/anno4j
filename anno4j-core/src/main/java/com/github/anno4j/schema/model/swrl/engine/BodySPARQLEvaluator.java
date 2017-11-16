@@ -14,6 +14,17 @@ import org.openrdf.repository.object.ObjectQuery;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Evaluates a portion of a SWRL rules body by issuing a SPARQL-query to a triplestore.
+ * Solutions for a SWRL rule body are found in two steps. First candidate solutions are found
+ * by an instance of this class and then these bindings are checked whether they satisfy the rest of the body.
+ * Instances of this class translate a maximum length prefix of a rules body into a SPARQL-query and executes
+ * it in order to retrieve candidate bindings. This requires that all {@link ClassAtom}s, {@link IndividualPropertyAtom}s
+ * and {@link DatavaluedPropertyAtom} are in front of any other atom. Also SWRL built-in which have an implementation
+ * implementing {@link SPARQLSerializable} (as determined by the {@link SWRLBuiltInService}) can be evaluated by this class.
+ * Thus the atom sequence passed to {@link #findCandidateBindings(AtomList, ObjectConnection)} should first be reordered
+ * by {@link ExecutionPlanner}.
+ */
 class BodySPARQLEvaluator extends SPARQLSerializer {
 
     /**
@@ -121,7 +132,7 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
     }
 
     /**
-     * Transformes the given atom to a equivalent SPARQL expression.
+     * Transforms the given atom to a equivalent SPARQL expression.
      * @param atom The atom to transform.
      * @return Returns the equivalent SPARQL expression.
      * @throws SPARQLSerializationException Thrown if an error occurs while transforming the atom to its

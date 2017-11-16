@@ -31,7 +31,7 @@ public interface AtomList extends RDFList {
      *     <li>{@link IndividualPropertyAtom}: The variable represents the subject or object of object-relation.</li>
      *     <li>{@link DatavaluedPropertyAtom}: The variable represents the subject of a datavalued relation.</li>
      * </ul>
-     * If a variable is not bound in the aboce sense, it's said to be free (s. {@link #getFreeVariables()}.
+     * If a variable is not bound in the above sense, it's said to be free (s. {@link #getFreeVariables()}.
      * @return Returns all bound variables of this atom list.
      */
     Set<Variable> getBoundVariables();

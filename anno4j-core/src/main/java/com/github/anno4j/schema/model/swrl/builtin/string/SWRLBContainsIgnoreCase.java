@@ -38,7 +38,7 @@ public class SWRLBContainsIgnoreCase extends SWRLBuiltin implements SPARQLSerial
     }
 
     @Override
-    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+    public boolean evaluate(Bindings bindings) {
         Object value1 = getParameterValue(0, bindings);
         Object value2 = getParameterValue(1, bindings);
 

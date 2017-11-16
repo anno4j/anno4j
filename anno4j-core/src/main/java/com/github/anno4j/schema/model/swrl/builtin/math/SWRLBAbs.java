@@ -41,7 +41,7 @@ public class SWRLBAbs extends SWRLBuiltin implements Computation, SPARQLSerializ
     }
 
     @Override
-    public SolutionSet solve(Bindings bindings) throws InfiniteResultException, IllegalArgumentException, UnderDeterminedSolutionException {
+    public SolutionSet solve(Bindings bindings) throws IllegalArgumentException, UnderDeterminedSolutionException {
         SolutionSet solutions = new SolutionSet();
 
         Object x = getParameterValue(0, bindings);
@@ -73,7 +73,7 @@ public class SWRLBAbs extends SWRLBuiltin implements Computation, SPARQLSerializ
     }
 
     @Override
-    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+    public boolean evaluate(Bindings bindings) {
         Object value1 = getParameterValue(0, bindings);
         Object value2 = getParameterValue(1, bindings);
 

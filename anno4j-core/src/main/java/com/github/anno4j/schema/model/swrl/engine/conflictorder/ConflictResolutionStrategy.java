@@ -18,7 +18,7 @@ import java.util.Map;
 public interface ConflictResolutionStrategy {
 
     /**
-     * Chooses the fire rule for evaluation. Implementations can return the same rule mutiple times but should
+     * Chooses the fire rule for evaluation. Implementations can return the same rule multiple times but should
      * signalize the end of a round by returning null once. This way termination of the inference procedure is ensured.
      * @param ruleBase All rules in the rule base without axioms.
      * @param positiveAssertions The positive assertions indexed by their variables, i.e. axioms that always hold.

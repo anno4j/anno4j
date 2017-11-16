@@ -40,7 +40,7 @@ public class SWRLBStringConcat extends SWRLBuiltin {
     }
 
     @Override
-    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+    public boolean evaluate(Bindings bindings) {
         Object value1 = getParameterValue(0, bindings);
 
         if(value1 instanceof CharSequence) {

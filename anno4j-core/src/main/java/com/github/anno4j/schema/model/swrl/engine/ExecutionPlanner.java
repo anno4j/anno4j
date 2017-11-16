@@ -3,6 +3,8 @@ package com.github.anno4j.schema.model.swrl.engine;
 import com.github.anno4j.schema.model.swrl.*;
 import com.github.anno4j.schema.model.swrl.builtin.Computation;
 import com.github.anno4j.schema.model.swrl.builtin.SPARQLSerializable;
+import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService;
+import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
@@ -308,6 +310,8 @@ class ExecutionPlanner {
      * @throws InstantiationException Thrown if a built-in implementation couldn't be instantiated.
      */
     private void optimizePlan(List<BuiltinDependencyNode> plan) throws InstantiationException {
+        SWRLBuiltInService service = SWRLBuiltInService.getBuiltInService();
+
         boolean changed = true;
         while (changed) {
             changed = false;
@@ -315,8 +319,11 @@ class ExecutionPlanner {
                 BuiltinDependencyNode first = plan.get(i - 1);
                 BuiltinDependencyNode second = plan.get(i);
 
+                SWRLBuiltin firstBuiltin = service.getBuiltIn(first.getAtom());
+                SWRLBuiltin secondBuiltin = service.getBuiltIn(second.getAtom());
+
                 // Only bubble forward SPARQL-serializable over other nodes:
-                if (second instanceof SPARQLSerializable && !(first instanceof SPARQLSerializable)) {
+                if (secondBuiltin instanceof SPARQLSerializable && !(firstBuiltin instanceof SPARQLSerializable)) {
                     // But only if the second is not dependent on the first:
                     if(!second.getDependencies().contains(first)) {
                         plan.set(i - 1, second);

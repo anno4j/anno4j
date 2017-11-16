@@ -45,7 +45,7 @@ class SPARQLSerializer {
      * @throws InstantiationException Thrown if the atom is a built-in and its implementation could not be instantiated.
      */
     boolean isSPARQLSerializable(Object atom) throws InstantiationException {
-        // An atom is serializable if its a class/role atom or a built-in thats serializable:
+        // An atom is serializable if its a class/role atom or a built-in that's serializable:
         boolean serializable = atom instanceof ClassAtom
                 || atom instanceof IndividualPropertyAtom
                 || atom instanceof DatavaluedPropertyAtom;

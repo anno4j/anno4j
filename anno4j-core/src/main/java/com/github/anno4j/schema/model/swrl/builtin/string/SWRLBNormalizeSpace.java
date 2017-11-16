@@ -31,12 +31,12 @@ public class SWRLBNormalizeSpace extends SWRLBuiltin {
     }
 
     @Override
-    public boolean evaluate(Bindings bindings) throws SWRLInferenceEngine.UnboundVariableException {
+    public boolean evaluate(Bindings bindings) {
         Object value1 = getParameterValue(0, bindings);
         Object value2 = getParameterValue(1, bindings);
 
         if(value1 instanceof CharSequence && value2 instanceof CharSequence) {
-            String s2 = "" + ((CharSequence) value2);
+            String s2 = "" + value2;
             return value1.equals(s2.replaceAll("\\s+", " ").trim());
         } else {
             return false;
