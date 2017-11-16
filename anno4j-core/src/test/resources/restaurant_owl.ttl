@@ -61,7 +61,13 @@ ex:has_main_dish a owl:FunctionalProperty ;
 		  rdfs:subPropertyOf ex:contains ;
 		  rdfs:label "hat Hauptgang"@de;
 		  rdfs:label "has main dish"@en .
-		  
+
+ex:is_organic a owl:DatatypeProperty ;
+          rdfs:domain ex:Dish ;
+          rdfs:range xsd:boolean ;
+          rdfs:label "ist vegetarisch"@de ;
+          rdfs:label "is organic"@en .
+
 ex:isMainDishOf a owl:InverseFunctionalProperty ;
 		 rdfs:subPropertyOf ex:isContainedIn ;
 		 rdfs:label "ist Hauptgang von"@de ;
@@ -122,3 +128,8 @@ ex:PartialItalianMenu rdfs:subClassOf _:r7 ;
 _:r7 	a owl:Restriction ;
 		owl:onProperty ex:contains ;
 		owl:someValuesFrom ex:ItalianDish .
+
+ex:Dish rdfs:subClassOf _:r8 .
+_:r8    a owl:Restriction ;
+	    owl:onProperty ex:is_organic ;
+		owl:maxCardinality "1"^^xsd:unsignedInt .
