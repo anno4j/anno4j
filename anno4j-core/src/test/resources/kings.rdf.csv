@@ -1,0 +1,5 @@
+Subject;rdf:type;ex:label;ex:age;ex:predecessor;ex:birthDate
+dbr:Ludwig_II_of_Bavaria;ex:King;"Ludwig II von Bayern"@de;53;dbr:Maximilian_II_of_Bavaria;
+;;"Ludwig II of Bavaria"@en;;;26.08.2017
+;;Ludwig II of Bavaria;;;
+dbr:Maximilian_II_of_Bavaria;ex:King;Maximilian II;42;;am 12 12 1812
