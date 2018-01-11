@@ -42,7 +42,7 @@ public class JenaSesameUtils {
             return asSesameURI(theRes.as(Property.class));
         }
         else {
-            return FACTORY.createBNode(theRes.getId().getLabelString());
+            return FACTORY.createURI("urn:anno4j:" + theRes.getId().getLabelString());
         }
     }
 
