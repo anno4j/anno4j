@@ -33,7 +33,7 @@ public class ExampleTest {
         // Create the base annotation
         Annotation annotation = anno4j.createObject(Annotation.class);
         annotation.setCreated("2014-09-28T12:00:00Z");
-        annotation.setGenerated("2013-02-04T12:00:00Z");
+        annotation.setGenerated("2013-02-04T12:00:00.0Z");
         annotation.addMotivation((MotivationFactory.getCommenting(anno4j)));
 
         // Create the person agent for the annotation
