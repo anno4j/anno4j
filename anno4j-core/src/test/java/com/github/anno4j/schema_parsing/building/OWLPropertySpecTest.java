@@ -62,6 +62,7 @@ public class OWLPropertySpecTest {
         BuildableRDFSClazz dish = anno4j.findByID(BuildableRDFSClazz.class, "http://example.de/ont#Dish");
         BuildableRDFSProperty nameProperty = anno4j.findByID(BuildableRDFSProperty.class, "http://example.de/ont#name");
         BuildableRDFSProperty servesProperty = anno4j.findByID(BuildableRDFSProperty.class, "http://example.de/ont#serves");
+        BuildableRDFSProperty isOrganicProperty = anno4j.findByID(BuildableRDFSProperty.class, "http://example.de/ont#is_organic");
 
         // Build the getter method signature:
         MethodSpec nameGetter = nameProperty.buildGetter(restaurant, generationConfig);
@@ -81,6 +82,16 @@ public class OWLPropertySpecTest {
         assertEquals("getServes", servesGetter.name);
         ClassName setType = ClassName.get(Set.class);
         assertEquals(ParameterizedTypeName.get(setType, dish.getJavaPoetClassName(generationConfig)), servesGetter.returnType);
+
+        // Build the getter method signature:
+        MethodSpec isOrganicGetter = isOrganicProperty.buildGetter(dish, generationConfig);
+
+        assertEquals(2, isOrganicGetter.annotations.size());
+        assertEquals(0, isOrganicGetter.parameters.size());
+        assertEquals("getIsOrganic", isOrganicGetter.name);
+
+        // The cardinality of the property is one, so there should be a single value return type:
+        assertEquals(ClassName.get(Boolean.class), isOrganicGetter.returnType);
     }
 
     @Test

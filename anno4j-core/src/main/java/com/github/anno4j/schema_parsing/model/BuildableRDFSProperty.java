@@ -27,8 +27,22 @@ public interface BuildableRDFSProperty extends RDFSProperty, BuildableOntologyPr
 
     /**
      * Returns the cardinality set for the property declared at the given class.
+     * The cardinality can be specified explicitly through {@code owl:cardinality} or implicitly
+     * through {@code owl:minCardinality} and {@code owl:maxCardinality} with the same value.
+     * @param domainClazz The class for which to retrieve the cardinality.
      * @return Returns the cardinality or null if there is no fixed cardinality set.
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
     Integer getCardinality(RDFSClazz domainClazz) throws RepositoryException;
+
+    /**
+     * Returns the maximum cardinality of the property declared at the given class.
+     * The maximum cardinality can be specified explicitly through {@code owl:maxCardinality} or
+     * implicitly through a fixed cardinality ({@code owl:cardinality}).
+     * @param domainClazz The class for which to retrieve the minimum cardinality.
+     * @return Returns the cardinality or null if there is no upper bound on the cardinality of this property
+     * in context of the given class.
+     * @throws RepositoryException Thrown if an error occurs while querying the repository.
+     */
+    Integer getMaximumCardinality(RDFSClazz domainClazz) throws RepositoryException;
 }

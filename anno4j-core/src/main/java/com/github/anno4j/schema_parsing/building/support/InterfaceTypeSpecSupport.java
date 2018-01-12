@@ -62,8 +62,11 @@ public abstract class InterfaceTypeSpecSupport extends ClazzBuildingSupport impl
 
             // Don't generate methods for properties from OWL, RDFS...:
             if(!isFromSpecialVocabulary(property)) {
-                // Only add the method to the type spec if it was not already defined in a superclass:
-                if(!isDefinedInSuperclass(property)) {
+                // Only add the method to the type spec if it was not already defined in a superclass
+                // and if it can have values for this class:
+                Integer maxCardinality = buildable.getMaximumCardinality(this);
+                if(!isDefinedInSuperclass(property) && (maxCardinality == null || maxCardinality > 0)) {
+
                     getters.add(buildable.buildGetter(this, config));
                     setters.add(buildable.buildSetter(this, config));
                     setters.add(buildable.buildVarArgSetter(this, config));

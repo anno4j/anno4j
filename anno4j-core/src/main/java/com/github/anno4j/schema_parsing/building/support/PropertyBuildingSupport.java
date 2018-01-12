@@ -219,14 +219,14 @@ public abstract class PropertyBuildingSupport extends PropertySchemaAnnotationSu
 
     /**
      * Returns whether the property has a single value in the given context.
-     * This is the case if the property has a cardinality of one.
+     * This is the case if the property has a (maximum) cardinality of one.
      * @param domainClazz The class defining the context.
      * @return Returns true iff the setter should have a single value parameter.
      * @throws RepositoryException Thrown if an error occurs while querying the repository.
      */
     boolean isSingleValueProperty(RDFSClazz domainClazz) throws RepositoryException {
-        Integer cardinality = getCardinality(domainClazz);
-        return cardinality != null && cardinality == 1;
+        Integer maximumCardinality = getMaximumCardinality(domainClazz);
+        return maximumCardinality != null && maximumCardinality == 1;
     }
 
     /**
