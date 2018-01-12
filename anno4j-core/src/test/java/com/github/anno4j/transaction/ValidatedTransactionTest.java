@@ -12,6 +12,7 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.List;
 import java.util.Set;
@@ -149,41 +150,106 @@ public class ValidatedTransactionTest {
     @Test
     public void testPersistence() throws Exception {
         Anno4j anno4j = new Anno4j();
+        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
 
-        // Add some initial objects:
-        SpecialTestResource resource = anno4j.createObject(SpecialTestResource.class, (Resource) new URIImpl("http://example.de/res1"));
-        resource.setQualifiedCardinality(Sets.<TestResource>newHashSet(resource));
-        resource.setCardinality(Sets.<Integer>newHashSet(1, 2, 3));
-        resource.setSuperproperty1(Sets.<Integer>newHashSet(1, 2));
-
-        // Open the validated transaction:
-        Transaction transaction = anno4j.createValidatedTransaction();
+        // Case 1: Test committing of valid resource:
+        ValidatedTransaction transaction = anno4j.createValidatedTransaction();
         transaction.begin();
-        // Find the resource and modify it:
-        resource = transaction.createQueryService()
-                       .addCriteria(".", "http://example.de/res1")
-                       .execute(SpecialTestResource.class)
-                       .get(0);
-        assertNotNull(resource);
-        resource.setCardinality(Sets.newHashSet(1, 2));
+        SpecialTestResource resource = transaction.createObject(SpecialTestResource.class, (Resource) new URIImpl("http://example.de/res1"));
+        resource.setCardinality(Sets.newHashSet(1, 2, 3));
+        resource.setQualifiedCardinality(Sets.<TestResource>newHashSet(resource));
 
-        // Refind the resource and check that changes are still present:
-        resource = transaction.createQueryService()
-                        .addCriteria(".", "http://example.de/res1")
-                        .execute(SpecialTestResource.class)
-                        .get(0);
-        assertEquals(Sets.newHashSet(1, 2), resource.getCardinality());
+        // Commit the transaction should succeed:
+        boolean exceptionThrown = false;
+        try {
+            transaction.commit();
+        } catch (ValidatedTransaction.ValidationFailedException e) {
+            exceptionThrown = true;
+        }
+        assertFalse(exceptionThrown);
 
-        // Commit the transaction:
-        transaction.commit();
+        // Test whether data was persisted:
+        SpecialTestResource found = anno4j.findByID(SpecialTestResource.class, "http://example.de/res1");
+        assertNotNull(found);
+        connection.refresh(found); // Make sure current values are read
+        assertEquals(Sets.newHashSet(1, 2, 3), found.getCardinality());
+        assertEquals(Sets.<TestResource>newHashSet(resource), found.getQualifiedCardinality());
 
-        // Refind the resource using the Anno4j object and validate that changes were persisted:
-        resource = anno4j.createQueryService()
-                         .addCriteria(".", "http://example.de/res1")
-                         .execute(SpecialTestResource.class)
-                         .get(0);
-        assertEquals(Sets.newHashSet(1, 2), resource.getCardinality());
-        assertEquals(Sets.newHashSet(1, 2), resource.getSuperproperty1());
+
+        // Case 2: Test committing invalid resource with rollback:
+        transaction = anno4j.createValidatedTransaction();
+        transaction.begin();
+        resource = transaction.findByID(SpecialTestResource.class, "http://example.de/res1"); // Find resource created above
+        resource.setCardinality(Sets.newHashSet(1)); // Too few elements
+
+        // Committing the transaction should fail:
+        exceptionThrown = false;
+        try {
+            transaction.commit();
+        } catch (ValidatedTransaction.ValidationFailedException e) {
+            // Rollback transaction. All changes should be undone:
+            e.rollback();
+        }
+
+        // Test whether no data was persisted:
+        found = anno4j.findByID(SpecialTestResource.class, "http://example.de/res1");
+        assertNotNull(found);
+        connection.refresh(found); // Make sure current values are read
+        assertEquals(Sets.newHashSet(1, 2, 3), found.getCardinality());
+        assertEquals(Sets.<TestResource>newHashSet(resource), found.getQualifiedCardinality());
+
+
+        // Case 3: Test committing invalid resource with forced commit:
+        transaction = anno4j.createValidatedTransaction();
+        transaction.begin();
+        resource = transaction.findByID(SpecialTestResource.class, "http://example.de/res1"); // Find resource created above
+        resource.setCardinality(Sets.newHashSet(1)); // Too few elements
+
+        // Committing the transaction should fail:
+        exceptionThrown = false;
+        try {
+            transaction.commit();
+        } catch (ValidatedTransaction.ValidationFailedException e) {
+            exceptionThrown = true;
+            // Commit anyway. Invalid changes should be persisted:
+            e.forceCommit();
+        }
+
+        assertTrue(exceptionThrown);
+        // Test whether invalid data was persisted:
+        found = anno4j.findByID(SpecialTestResource.class, "http://example.de/res1");
+        assertNotNull(found);
+        connection.refresh(found); // Make sure current values are read
+        assertEquals(Sets.newHashSet(1), found.getCardinality());
+        assertEquals(Sets.<TestResource>newHashSet(resource), found.getQualifiedCardinality());
+
+
+        // Case 4: Test committing invalid resource and fixing them afterwards:
+        transaction = anno4j.createValidatedTransaction();
+        transaction.begin();
+        resource = transaction.findByID(SpecialTestResource.class, "http://example.de/res1"); // Find resource created above
+        resource.setCardinality(Sets.newHashSet(1)); // Too few elements
+
+        // Committing the transaction should fail:
+        exceptionThrown = false;
+        try {
+            transaction.commit();
+        } catch (ValidatedTransaction.ValidationFailedException e) {
+            exceptionThrown = true;
+
+            // Now set correct cardinality and commit again (with validation):
+            found = e.getTransaction().findByID(SpecialTestResource.class, "http://example.de/res1");
+            found.setCardinality(Sets.newHashSet(1, 2, 3));
+            e.commit();
+        }
+
+        assertTrue(exceptionThrown);
+        // Test whether invalid data was persisted:
+        found = anno4j.findByID(SpecialTestResource.class, "http://example.de/res1");
+        assertNotNull(found);
+        connection.refresh(found); // Make sure current values are read
+        assertEquals(Sets.newHashSet(1, 2, 3), found.getCardinality());
+        assertEquals(Sets.<TestResource>newHashSet(resource), found.getQualifiedCardinality());
     }
 
     @Test
@@ -200,9 +266,7 @@ public class ValidatedTransactionTest {
         // Modify the resources using a validated transaction:
         Transaction transaction = anno4j.createValidatedTransaction(context1);
         transaction.begin();
-        List<SpecialTestResource> resources = transaction.createQueryService()
-                                                         .addCriteria(".", "urn:test:res1")
-                                                         .execute(SpecialTestResource.class);
+        List<SpecialTestResource> resources = transaction.findAll(SpecialTestResource.class);
         for(SpecialTestResource current : resources) {
             current.setSuperproperty1(Sets.newHashSet(1, 2, 3));
         }
