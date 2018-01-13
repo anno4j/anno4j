@@ -1,5 +1,6 @@
 package com.github.anno4j.util.csv;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -156,7 +157,7 @@ class CSVFieldParser {
         // If any pattern matched try to parse the value as date:
         if(datePatternMatch) {
             try {
-                return dateTimeFormatter.parseDateTime(value).toDate();
+                return dateTimeFormatter.parseDateTime(value).toDateTime(DateTimeZone.UTC).toDate();
             } catch (IllegalArgumentException ignored) {
                 return null; // Return null if this isn't really in a supported format.
             }
@@ -173,10 +174,7 @@ class CSVFieldParser {
      * @return Returns the Sesame literal object.
      */
     private Value asDateTimeValue(Date date) {
-        TimeZone timezone = TimeZone.getTimeZone("UTC");
-        // 2017-12-11T22:45:36.880+01:00
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        format.setTimeZone(timezone);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
         return new LiteralImpl(format.format(date), new URIImpl("java:java.util.Date"));
     }
 

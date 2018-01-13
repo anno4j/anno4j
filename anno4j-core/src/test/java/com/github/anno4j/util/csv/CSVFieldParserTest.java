@@ -97,9 +97,9 @@ public class CSVFieldParserTest {
 
         CSVFieldParser parser = new CSVFieldParser(Arrays.asList("dd.MM.yyyy", "dd _ MM ! yyyy"), DEFAULT_URI_PREFIXES);
         // Test default:
-        assertEquals(new CalendarLiteralImpl(calendar), parser.parseToRDFValue("11.12.2017"));
+        assertEquals(new LiteralImpl("2017-12-11T00:00:00.000", new URIImpl("java:java.util.Date")), parser.parseToRDFValue("11.12.2017"));
         // Test custom:
-        assertEquals(new CalendarLiteralImpl(calendar), parser.parseToRDFValue("11 _ 12 ! 2017"));
+        assertEquals(new LiteralImpl("2017-12-11T00:00:00.000", new URIImpl("java:java.util.Date")), parser.parseToRDFValue("11 _ 12 ! 2017"));
         // Test unsupported:
         assertEquals(new LiteralImpl("11 :) 12 :D 2017"), parser.parseToRDFValue("11 :) 12 :D 2017"));
     }
@@ -116,7 +116,7 @@ public class CSVFieldParserTest {
 
         CSVFieldParser parser = new CSVFieldParser(Arrays.asList("dd.MM.yyyy HH:mm"), DEFAULT_URI_PREFIXES);
         // Test valid:
-        assertEquals(new CalendarLiteralImpl(calendar), parser.parseToRDFValue("11.12.2017 22:30"));
+        assertEquals(new LiteralImpl("2017-12-11T22:30:00.000", new URIImpl("java:java.util.Date")), parser.parseToRDFValue("11.12.2017 22:30"));
         // Test invalid:
         assertEquals(new LiteralImpl("11 :) 12 :D 2017 22.30"), parser.parseToRDFValue("11 :) 12 :D 2017 22.30"));
     }

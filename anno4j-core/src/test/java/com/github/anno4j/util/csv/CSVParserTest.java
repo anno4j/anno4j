@@ -65,7 +65,7 @@ public class CSVParserTest {
 
         assertEquals(53, ludwig2.getAge());
         // The date has to be after 1970 here. Else there is an unpredictable offset in the date:
-        assertEquals("Sat Aug 26 00:00:00 CEST 2017", ludwig2.getBirthDate().toString());
+        assertTrue(ludwig2.getBirthDate().toString().matches("Sat Aug 26 00:00:00 ([A-Z])+ 2017"));
         assertEquals(Sets.newHashSet(maximilian2), ludwig2.getPredecessors());
         assertTrue(ludwig2.getLabel().contains(new LangString("Ludwig II von Bayern", "de")));
         assertTrue(ludwig2.getLabel().contains(new LangString("Ludwig II of Bavaria", "en")));
