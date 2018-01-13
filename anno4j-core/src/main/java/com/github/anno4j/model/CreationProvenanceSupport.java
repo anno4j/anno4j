@@ -4,16 +4,12 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.DCTERMS;
-import com.github.anno4j.util.TimeHelper;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
+import com.github.anno4j.util.TimeUtils;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Support class for the CreationProvenance interface.
@@ -38,7 +34,7 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
      * {@inheritDoc}
      */
     public void setCreated(String created) {
-        if (created == null || TimeHelper.testTimeString(created)) {
+        if (created == null || TimeUtils.testTimeString(created)) {
             this.created = created;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
@@ -60,7 +56,7 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
      * {@inheritDoc}
      */
     public void setModified(String modification) {
-        if (modification == null || TimeHelper.testTimeString(modification)) {
+        if (modification == null || TimeUtils.testTimeString(modification)) {
             this.modified = modification;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
@@ -80,7 +76,7 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
      * {@inheritDoc}
      */
     public void setModified(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
-        this.setModified(TimeHelper.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+        this.setModified(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     @Override
@@ -88,7 +84,7 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
      * {@inheritDoc}
      */
     public void setCreated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
-        this.setCreated(TimeHelper.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+        this.setCreated(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     /**
