@@ -187,8 +187,6 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
 
         queryBuilder.append("}");
 
-        System.out.println(queryBuilder); // TODO Remove
-
         // Execute query:
         try {
 

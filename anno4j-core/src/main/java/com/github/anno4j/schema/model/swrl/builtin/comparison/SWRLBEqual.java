@@ -45,11 +45,9 @@ public class SWRLBEqual extends SWRLBuiltin implements SPARQLSerializable, Compu
 
     @Override
     public String asSPARQLFilterExpression() {
-        return new StringBuilder()
-                .append(getArgumentAsFilterExpression(0))
-                .append(" = ")
-                .append(getArgumentAsFilterExpression(1))
-                .toString();
+        return getArgumentAsFilterExpression(0) +
+                " = " +
+                getArgumentAsFilterExpression(1);
     }
 
     @Override

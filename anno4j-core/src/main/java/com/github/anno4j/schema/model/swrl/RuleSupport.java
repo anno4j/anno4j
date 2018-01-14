@@ -7,6 +7,9 @@ import org.openrdf.repository.RepositoryException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Support class for {@link Rule}.
+ */
 @Partial
 public abstract class RuleSupport extends ResourceObjectSupport implements Rule {
 

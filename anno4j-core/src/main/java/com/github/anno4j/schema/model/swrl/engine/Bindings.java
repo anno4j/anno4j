@@ -150,4 +150,23 @@ public class Bindings {
         }
         return builder.append(")").toString();
     }
+
+    /**
+     * Checks whether this binding has the same values bound for all variables in {@code bindings},
+     * i.e. for every variable {@code v} in {@code bindings} with bound value {@code w} it holds that:
+     * <ul>
+     *     <li>{@code v} is also bound in this binding set</li>
+     *     <li>{@code w'} is the value of {@code v} in this binding set and w'.equals(w)</li>
+     * </ul>
+     * @param bindings The bindings to check.
+     * @return Returns true iff the given bindings are contained in this binding set.
+     */
+    public boolean contains(Bindings bindings) {
+        for(Variable v : bindings.variables()) {
+            if(!bound(v) || !get(v).equals(bindings.get(v))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

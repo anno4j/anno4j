@@ -33,11 +33,9 @@ public class SWRLBNotEqual extends SWRLBuiltin implements SPARQLSerializable {
 
     @Override
     public String asSPARQLFilterExpression() {
-        return new StringBuilder()
-                .append(getArgumentAsFilterExpression(0))
-                .append(" != ")
-                .append(getArgumentAsFilterExpression(1))
-                .toString();
+        return getArgumentAsFilterExpression(0) +
+                " != " +
+                getArgumentAsFilterExpression(1);
     }
 
     @Override

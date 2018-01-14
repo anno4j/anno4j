@@ -42,12 +42,10 @@ public class SWRLBFloor extends SWRLBuiltin implements SPARQLSerializable {
 
     @Override
     public String asSPARQLFilterExpression() {
-        return new StringBuilder()
-                .append(getArgumentAsFilterExpression(0))
-                .append(" = FLOOR(")
-                .append(getArgumentAsFilterExpression(1))
-                .append(")")
-                .toString();
+        return getArgumentAsFilterExpression(0) +
+                " = FLOOR(" +
+                getArgumentAsFilterExpression(1) +
+                ")";
     }
 
     @Override

@@ -57,7 +57,7 @@ class ExecutionPlanner {
         }
 
         /**
-         * @returnThe atom represented by this node.
+         * @return The atom represented by this node.
          */
         public BuiltinAtom getAtom() {
             return atom;

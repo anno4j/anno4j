@@ -9,10 +9,39 @@ import com.github.anno4j.schema.model.swrl.engine.conflictorder.ConflictResoluti
 import com.github.anno4j.schema.model.swrl.engine.conflictorder.SequentialStrategy;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-
+/**
+ * Inference engine for a subset of the <a href="https://www.w3.org/Submission/SWRL/">Semantic Web Rule Language (SWRL)</a>.<br/>
+ * The engine infers new triples by subsequently checking the applicability of rules and applying the head of the rule.
+ * The order of rule application within a round is determined by {@link #getConflictResolutionStrategy()}.<br/>
+ * <b>Definitions:</b><br/>
+ * <i>DL-bound variables</i> A variable is said to be DL-bound in a rule r if it occurs in at least one class
+ * or role atom of the body of r. Otherwise it's free.<br/>
+ * <i>Computable variable</i> A free variable x occurring in a built-in atom b is said to be computable by b if:
+ * <ul>
+ *     <li>Every other variable y in b is either DL-bound or is computable by another built-in b'.</li>
+ *     <li>Computation for b is supported, i.e. there exists a corresponding class
+ *     {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin} that implements
+ *     {@link com.github.anno4j.schema.model.swrl.builtin.Computation}.</li>
+ * </ul>
+ * <i>Dependent built-in</i> A built-in b is dependent on b' if b has a computable variable that is computable by b'
+ * and not by b. (i.e. in precedural means b' needs to "compute" first such that the result can be used in b).<br/>
+ * <b>Supported subset of SWRL:</b>
+ * A SWRL rule r := a ⇒ h is supported if:
+ * <ul>
+ *     <li>r only uses OWL Lite constructs (classes/roles must be named)</li>
+ *     <li>a contains at least one class or role atom</li>
+ *     <li>Every built-in atom b in a has at most one variable that is computable by it</li>
+ *     <li>a contains no free variables that are not computable</li>
+ *     <li>The dependency relation of built-ins in a is cycle free</li>
+ *     <li>h consists entirely of class and role atoms</li>
+ *     <li>All variables of h are DL-bound or computable in a</li>
+ * </ul>
+ */
 public class SWRLInferenceEngine {
 
     /**
@@ -78,6 +107,11 @@ public class SWRLInferenceEngine {
     }
 
     /**
+     * The logger used to log information about the reasoning process.
+     */
+    private Logger logger = LoggerFactory.getLogger(SWRLInferenceEngine.class);
+
+    /**
      * The rules that will be executed by {@link #executeSWRLRuleBase()}.
      */
     private List<Rule> ruleBase = new ArrayList<>();
@@ -138,7 +172,8 @@ public class SWRLInferenceEngine {
     /**
      * Initializes the SWRL inference engine with the given rule base for execution on the connected triplestore.
      * The created engine will store reordered bodies (cf. {@link #setStoreOptimizedOrders(boolean)}) and has no
-     * limit on the number of rule base executions (cf. {@link #setMaxExecutionRounds(int)}). Candidate caching is used.
+     * limit on the number of rule base executions (cf. {@link #setMaxExecutionRounds(int)}).
+     * Candidate caching is used (cf. {@link #isCandidateCacheUsed()}).
      * @param ruleBase The rules that will be used for inference.
      * @param connection A connection to the triplestore on which rules will be evaluated.
      */
@@ -153,6 +188,7 @@ public class SWRLInferenceEngine {
      * Initializes the SWRL inference engine using all rules in the Anno4j connected triplestore.
      * The created engine will store reordered bodies (cf. {@link #setStoreOptimizedOrders(boolean)}) and has no
      * limit on the number of rule base executions (cf. {@link #setMaxExecutionRounds(int)}).
+     * Candidate caching is used (cf. {@link #isCandidateCacheUsed()}).
      * @param anno4j An Anno4j object connected to a triplestore containing SWRL rules.
      * @throws RepositoryException Thrown if an error occurs while accessing the triplestore.
      */
@@ -160,6 +196,10 @@ public class SWRLInferenceEngine {
         this(anno4j.findAll(Rule.class), anno4j.getObjectRepository().getConnection());
     }
 
+    /**
+     * Removes all axioms (rules with an empty body or head) and adds them to {@link #assertions} or
+     * {@link #negativeAssertions} respectively.
+     */
     private void indexAxioms() {
         Collection<Rule> axioms = new HashSet<>(); // Set of all axioms (positive and negative):
         for(Rule rule : ruleBase) {
@@ -214,17 +254,10 @@ public class SWRLInferenceEngine {
             plan = rule.getBody();
         }
 
-        List<Atom> assertions = new ArrayList<>();
-        for (Variable variable : plan.getVariables()) {
-            if(this.assertions.containsKey(variable)) {
-                assertions.addAll(this.assertions.get(variable));
-            }
-        }
-
-        System.out.println("Current execution plan: " + plan); // TODO remove
+        logger.debug("Evaluation sequence for SWRL rule " + rule.getResourceAsString() + " is: " + plan);
 
         SolutionSet candidateBindings;
-        // Check if we've cached the resulsts for this subplan already:
+        // Check if we've cached the results for this subplan already:
         List<Atom> sparqlSerializablePrefix = bodySparqlEvaluator.longestSPARQLSerializablePrefix(plan);
         if(candidateCache.containsKey(sparqlSerializablePrefix)) {
             // Get the candidates from cache:
@@ -240,7 +273,8 @@ public class SWRLInferenceEngine {
             }
         }
 
-        System.out.println("Candidates: " + candidateBindings); // TODO remove
+        logger.debug("Candidate bindings after SPARQL-evaluation of prefix " + sparqlSerializablePrefix.size()
+                + "/" + plan.size() + ": " + candidateBindings.size());
 
         // Determine ultimate bindings by evaluating in memory:
         return inMemoryEvaluator.evaluate(plan.asList(), candidateBindings);
@@ -261,10 +295,17 @@ public class SWRLInferenceEngine {
         int executions = 0;
         boolean modified = true;
 
+        logger.info("Starting SWRL inference (" + ruleBase.size() + " rules, " + assertions.size()
+                + " positive assertions, " + negativeAssertions.size() + " negative assertions)");
+        logger.info("Max. rounds: " + (maxExecutionRounds >= 0 ? maxExecutionRounds : "Infinite")
+                + ", CRS: " + conflictResolutionStrategy.getClass().getName()
+                + ", Store optimized orders: " + (storeOptimizedOrders ? "yes" : "no")
+                + ", Cache candidates: " + (useCandidateCache ? "yes" : "no"));
+
         while (modified && executions != maxExecutionRounds) {
             modified = false;
 
-            System.out.println("Starting SWRL inference round " + (executions + 1)); // TODO remove
+            logger.info("Starting SWRL inference round " + (executions + 1));
 
             // Get the bindins that must never be true:
             SolutionSet forbiddenBindings = new SolutionSet();
@@ -279,8 +320,8 @@ public class SWRLInferenceEngine {
                 if(rule != null) {
                     // Get all bindings that fulfill the body:
                     SolutionSet bindings = evaluateBody(rule);
-                    bindings.removeAll(forbiddenBindings); // Remove illegal bindings
-                    System.out.println("Solutions: " + bindings); // TODO remove
+                    bindings.removeAllContaining(forbiddenBindings); // Remove illegal bindings
+                    logger.debug("Solutions: " + bindings);
 
                     // Get those atoms that are axiomatic for the bound variables:
                     Collection<Atom> axiomaticAtoms = new HashSet<>();
@@ -318,7 +359,13 @@ public class SWRLInferenceEngine {
             }
             executions++; // Count execution so we can terminate on maxExecutionRounds
         }
-        System.out.println("Done (State not modified in last round)"); // TODO remove
+
+        if(executions != maxExecutionRounds) {
+            logger.info("Done (State not modified in last round)");
+        } else {
+            logger.info("Done (Execution limit exceeded)");
+        }
+
     }
 
     /**
@@ -379,7 +426,7 @@ public class SWRLInferenceEngine {
      * (because triples inferred by rules are not available for other rules in the same round).
      * @return Returns true if candidate caching is activated.
      */
-    public boolean isUseCandidateCache() {
+    public boolean isCandidateCacheUsed() {
         return useCandidateCache;
     }
 
@@ -391,7 +438,7 @@ public class SWRLInferenceEngine {
      * (because triples inferred by rules are not available for other rules in the same round).
      * @param useCandidateCache Whether candidate solutions should be cached.
      */
-    public void setUseCandidateCache(boolean useCandidateCache) {
+    public void useCandidateCache(boolean useCandidateCache) {
         this.useCandidateCache = useCandidateCache;
     }
 

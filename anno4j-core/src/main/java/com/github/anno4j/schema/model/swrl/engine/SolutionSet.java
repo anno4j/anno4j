@@ -77,6 +77,23 @@ public class SolutionSet implements Iterable<Bindings> {
     }
 
     /**
+     * Removes all bindings from this solution set that have (maybe among others) the same variable bindings
+     * as one binding in {@code removeBindings}.
+     * @param removeBindings The solutions to remove if they appear as part of a solution in this set.
+     */
+    public void removeAllContaining(SolutionSet removeBindings) {
+        Collection<Bindings> toRemove = new HashSet<>();
+        for(Bindings binding : this.solutions) {
+            for(Bindings remove: removeBindings) {
+                if(binding.contains(remove)) {
+                    toRemove.add(binding);
+                }
+            }
+        }
+        solutions.removeAll(toRemove);
+    }
+
+    /**
      * Returns all variables that are bound in any binding of this solution set.
      * @return Returns the set of all variables.
      */

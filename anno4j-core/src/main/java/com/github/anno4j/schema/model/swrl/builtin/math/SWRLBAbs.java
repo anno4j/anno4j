@@ -66,12 +66,10 @@ public class SWRLBAbs extends SWRLBuiltin implements Computation, SPARQLSerializ
 
     @Override
     public String asSPARQLFilterExpression() {
-        return new StringBuilder()
-                .append(getArgumentAsFilterExpression(0))
-                .append(" = ABS(")
-                .append(getArgumentAsFilterExpression(1))
-                .append(")")
-                .toString();
+        return getArgumentAsFilterExpression(0) +
+                " = ABS(" +
+                getArgumentAsFilterExpression(1) +
+                ")";
     }
 
     @Override

@@ -5,6 +5,9 @@ import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService;
 import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin;
 
+/**
+ * Support class for {@link BuiltinAtom}.
+ */
 @Partial
 public abstract class BuiltinAtomSupport extends ResourceObjectSupport implements BuiltinAtom {
 

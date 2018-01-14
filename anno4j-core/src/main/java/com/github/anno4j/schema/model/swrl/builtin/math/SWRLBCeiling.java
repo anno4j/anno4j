@@ -42,12 +42,10 @@ public class SWRLBCeiling extends SWRLBuiltin implements SPARQLSerializable {
 
     @Override
     public String asSPARQLFilterExpression() {
-        return new StringBuilder()
-                .append(getArgumentAsFilterExpression(0))
-                .append(" = CEIL(")
-                .append(getArgumentAsFilterExpression(1))
-                .append(")")
-                .toString();
+        return getArgumentAsFilterExpression(0) +
+                " = CEIL(" +
+                getArgumentAsFilterExpression(1) +
+                ")";
     }
 
     @Override

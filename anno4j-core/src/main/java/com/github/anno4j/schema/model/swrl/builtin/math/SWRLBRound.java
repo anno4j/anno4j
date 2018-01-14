@@ -42,12 +42,10 @@ public class SWRLBRound extends SWRLBuiltin implements SPARQLSerializable {
 
     @Override
     public String asSPARQLFilterExpression() {
-        return new StringBuilder()
-                .append(getArgumentAsFilterExpression(0))
-                .append(" = ROUND(")
-                .append(getArgumentAsFilterExpression(1))
-                .append(")")
-                .toString();
+        return getArgumentAsFilterExpression(0) +
+                " = ROUND(" +
+                getArgumentAsFilterExpression(1) +
+                ")";
     }
 
     @Override

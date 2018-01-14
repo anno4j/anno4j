@@ -51,6 +51,10 @@ public class SWRLBuiltInService {
         }
     }
 
+    /**
+     * Scans the classpath for types that have the {@link SWRLBuiltinIri} annotation.
+     * @return Returns all SWRL built-in types in the classpath.
+     */
     private static Collection<Class<?>> getAvailableBuiltIns() {
         // Construct the classpath:
         Set<URL> classpath = new HashSet<>();
@@ -126,6 +130,12 @@ public class SWRLBuiltInService {
         return instance;
     }
 
+    /**
+     * Creates resources for the {@link SWRLBuiltinIri} annotated types in the classpath.
+     * This is necessary for accessing the resources later.
+     * @param connection The connection to the repository.
+     * @throws RepositoryException Thrown if an error occurs while adding the resources.
+     */
     public void registerBuiltIns(ObjectConnection connection) throws RepositoryException {
         for(Class<?> builtinType : getAvailableBuiltIns()) {
             SWRLBuiltinIri builtInIriAnnotation = builtinType.getAnnotation(SWRLBuiltinIri.class);

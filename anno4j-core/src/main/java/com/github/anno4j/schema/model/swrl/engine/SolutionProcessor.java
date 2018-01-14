@@ -153,14 +153,10 @@ class SolutionProcessor extends SPARQLSerializer {
         }
         dataBuilder.append("}");
 
-        System.out.println("ASK " + dataBuilder); // TODO Remove
-
         try {
             // Check if the data is already present in the triplestore:
             BooleanQuery askQuery = connection.prepareBooleanQuery(QueryLanguage.SPARQL, "ASK " + dataBuilder);
             if (!askQuery.evaluate()) {
-                System.out.println("INSERT DATA " + dataBuilder); // TODO Remove
-
                 // If the data is not there then insert it:
                 Update update = connection.prepareUpdate("INSERT DATA " + dataBuilder.toString());
                 update.execute();
