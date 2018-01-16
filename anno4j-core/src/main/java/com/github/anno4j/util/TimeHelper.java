@@ -61,12 +61,27 @@ public class TimeHelper {
      * @throws IllegalArgumentException If the format is not aligned with the ISO 8601 specification.
      */
     public static boolean testTimeString(String time) throws IllegalArgumentException {
-        DateTimeFormatter format = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC();
+        return (testMillisFormat(time) || testNoMillisFormat(time));
+    }
+
+    private static boolean testNoMillisFormat(String time) {
+        DateTimeFormatter formatNoMillis = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC();
 
         try {
-            format.parseDateTime(time);
+            formatNoMillis.parseDateTime(time);
             return true;
-        } catch (IllegalArgumentException e) {
+        }  catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private static boolean testMillisFormat(String time) {
+        DateTimeFormatter formatWithMillis = ISODateTimeFormat.dateTime().withZoneUTC();
+
+        try {
+            formatWithMillis.parseDateTime(time);
+            return true;
+        }  catch (IllegalArgumentException e) {
             return false;
         }
     }
