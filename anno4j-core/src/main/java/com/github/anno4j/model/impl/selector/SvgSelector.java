@@ -26,18 +26,6 @@ public interface SvgSelector extends Selector {
     String getValue();
 
     /**
-     * Gets http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
-     * <p/>
-     * An established standard to which the described resource conforms..
-     *
-     * @return Value of http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
-     * <p/>
-     * An established standard to which the described resource conforms..
-     */
-    @Iri(DCTERMS.CONFORMS_TO)
-    String getConformsTo();
-
-    /**
      * Sets new Refers to http:www.w3.orgTRrdf-schema#ch_value
      * <p/>
      * rdf:value is an instance of rdf:Property that may be used in describing structured values..
@@ -48,4 +36,16 @@ public interface SvgSelector extends Selector {
      */
     @Iri(RDF.VALUE)
     void setValue(String value);
+    /**
+     *
+     * Gets http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     * <p/>
+     * An established standard to which the described resource conforms..
+     *
+     * @return Value of http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
+     * <p/>
+     * An established standard to which the described resource conforms..
+     */
+    @Iri(DCTERMS.CONFORMS_TO)
+    String getConformsTo();
 }
