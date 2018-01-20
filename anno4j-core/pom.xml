@@ -91,6 +91,12 @@
             <artifactId>pellet-jena-ignazio1977</artifactId>
             <version>2.4.0-ignazio1977</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.4</version>
+        </dependency>
     </dependencies>
 
     <repositories>

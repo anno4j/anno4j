@@ -25,9 +25,17 @@ public class TimeUtils {
      */
     public static String createTimeString(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
         StringBuilder builder = new StringBuilder();
-        builder.append(Integer.toString(year)).append("-").
-                append(Integer.toString(month)).append("-").
-                append(Integer.toString(day)).append("T");
+        builder.append(Integer.toString(year)).append("-");
+
+        if (month < 10) {
+            builder.append(0);
+        }
+        builder.append(Integer.toString(month)).append("-");
+
+        if (day < 10) {
+            builder.append(0);
+        }
+        builder.append(Integer.toString(day)).append("T");
 
         if (hours < 10) {
             builder.append(0);
@@ -54,6 +62,25 @@ public class TimeUtils {
         return builder.toString();
     }
 
+    public static String createTimeStringWithMillis(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID) {
+        String baseTimeString = createTimeString(year, month, day, hours, minutes, seconds, timezoneID);
+
+        // Find out position of seconds
+        int positionSeconds = baseTimeString.lastIndexOf(":");
+        int lengthSeconds = String.valueOf(seconds).length();
+        String endToReplace = baseTimeString.substring(positionSeconds + 1);
+
+        String endWithMilliseconds = "";
+        if (seconds < 10) {
+            endWithMilliseconds += "0";
+        }
+        endWithMilliseconds += Integer.toString(seconds) + '.' + Integer.toString(milliseconds) + createTimezoneString(timezoneID);
+
+        String timeStringWithMillis = baseTimeString.replace(endToReplace, endWithMilliseconds);
+
+        return timeStringWithMillis;
+    }
+
     /**
      * Tests if the supported String is a correctly formatted time String, following ISO 8601.
      *
@@ -70,7 +97,7 @@ public class TimeUtils {
         try {
             formatNoMillis.parseDateTime(time);
             return true;
-        }  catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
@@ -81,7 +108,7 @@ public class TimeUtils {
         try {
             formatWithMillis.parseDateTime(time);
             return true;
-        }  catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }

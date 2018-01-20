@@ -58,6 +58,20 @@ public interface CreationProvenance extends ResourceObject {
     void setCreated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
+     * Set the value of the http://purl.org/dc/terms/created property.
+     *
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param milliseconds  The milliseconds to set.
+     * @param timezoneID    The timezone to set.
+     */
+    void setCreated(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID);
+
+    /**
      * Gets the value of the http://purl.org/dc/terms/modified property.
      *
      * @return  The timestamp value of the dcterms:modified property.
@@ -83,6 +97,20 @@ public interface CreationProvenance extends ResourceObject {
      * @param timezoneID    The timezone to set.
      */
     void setModified(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
+
+    /**
+     * Set the value of the http://purl.org/dc/terms/modified property.
+     *
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param milliseconds  The milliseconds to set.
+     * @param timezoneID    The timezone to set.
+     */
+    void setModified(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID);
 
     /**
      * Sets the values for the http://purl.org/dc/terms/rights relationship.

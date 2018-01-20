@@ -79,6 +79,14 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
         this.setModified(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
+//    @Override
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public void setModified(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID) {
+//        this.setModified(TimeUtils.createTimeStringWithMillis(year, month, day, hours, minutes, seconds, milliseconds, timezoneID));
+//    }
+
     @Override
     /**
      * {@inheritDoc}
@@ -86,6 +94,14 @@ public abstract class CreationProvenanceSupport extends ResourceObjectSupport im
     public void setCreated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
         this.setCreated(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
+
+//    @Override
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public void setCreated(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID) {
+//        this.setCreated(TimeUtils.createTimeStringWithMillis(year, month, day, hours, minutes, seconds, milliseconds, timezoneID));
+//    }
 
     /**
      * {@inheritDoc}

@@ -246,6 +246,14 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
         this.setGenerated(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
+//    @Override
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID) {
+//        this.setGenerated(TimeUtils.createTimeStringWithMillis(year, month, day, hours, minutes, seconds, milliseconds, timezoneID));
+//    }
+
     @Deprecated
     @Override
     /**

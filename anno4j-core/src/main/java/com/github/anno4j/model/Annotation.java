@@ -150,6 +150,20 @@ public interface Annotation extends CreationProvenance {
     void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID);
 
     /**
+     * Sets the value of the http://purl.org/dc/terms/issued property.
+     *
+     * @param year          The year to set.
+     * @param month         The month to set.
+     * @param day           The day to set.
+     * @param hours         The hours to set.
+     * @param minutes       The minutes to set.
+     * @param seconds       The seconds to set.
+     * @param milliseconds  The milliseconds to set.
+     * @param timezoneID    The timezone to set.
+     */
+    void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, int milliseconds, String timezoneID);
+
+    /**
      * Gets http:www.w3.org/ns/oa#serializedBy relationship.
      *
      * @return Value of http:www.w3.org/ns/oa#serializedBy.
