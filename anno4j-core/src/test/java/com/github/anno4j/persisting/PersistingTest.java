@@ -44,6 +44,9 @@ public class PersistingTest {
 
     @Test
     public void testPresistence() throws Exception {
+        // Clean up any old backup directories:
+        removeDirectory(new File(USER_HOME + "object"));
+
         // Create an Anno4j instacne without persisting schema annotations:
         Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), new IDGeneratorAnno4jURN(), null, false);
 
