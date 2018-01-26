@@ -6,16 +6,16 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TimeHelperTest {
+public class TimeUtilsTest {
 
     private final static String WADM_EXAMPLE_11_TIME_STRING = "2015-01-28T12:00:00Z";
     private final static String WADM_EXAMPLE_11_TIME_STRING_WITH_MILLIS = "2015-01-28T12:00:00.0Z";
 
     @Test
     public void testTimeStringImplementation(){
-        assertTrue(TimeHelper.testTimeString(WADM_EXAMPLE_11_TIME_STRING));
+        assertTrue(TimeUtils.testTimeString(WADM_EXAMPLE_11_TIME_STRING));
 
-        assertTrue(TimeHelper.testTimeString(WADM_EXAMPLE_11_TIME_STRING_WITH_MILLIS));
+        assertTrue(TimeUtils.testTimeString(WADM_EXAMPLE_11_TIME_STRING_WITH_MILLIS));
     }
 
     @Test

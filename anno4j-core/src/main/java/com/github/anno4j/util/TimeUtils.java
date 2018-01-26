@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Class supports various helping method concerning timestamps.
  */
-public class TimeHelper {
+public class TimeUtils {
 
     /**
      * Creates a timestamp conform to the ISO 8601 specification, supported its single information bits.
