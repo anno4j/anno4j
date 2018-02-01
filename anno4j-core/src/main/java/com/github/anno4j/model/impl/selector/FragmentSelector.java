@@ -1,10 +1,13 @@
 package com.github.anno4j.model.impl.selector;
 
 import com.github.anno4j.model.Selector;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
 import com.github.anno4j.model.namespaces.RDF;
 import org.openrdf.annotations.Iri;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 /**
  * Conforms to http://www.w3.org/ns/oa#FragmentSelector
@@ -30,7 +33,7 @@ public interface FragmentSelector extends Selector {
      *                   An established standard to which the described resource conforms..
      */
     @Iri(DCTERMS.CONFORMS_TO)
-    void setConformsTo(String conformsTo);
+    void setConformsTo(ResourceObject conformsTo);
 
     /**
      * Gets http:dublincore.orgdocumentsdcmi-terms#terms-conformsTo
@@ -42,7 +45,7 @@ public interface FragmentSelector extends Selector {
      * An established standard to which the described resource conforms..
      */
     @Iri(DCTERMS.CONFORMS_TO)
-    String getConformsTo();
+    ResourceObject getConformsTo() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException;
 
     /**
      * Gets Refers to http:www.w3.orgTRrdf-schema#ch_value

@@ -1,11 +1,15 @@
 package com.github.anno4j.model.impl.selector;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Selector;
+import com.github.anno4j.model.SelectorFactory;
 import com.github.anno4j.model.SelectorSupport;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.selector.enums.FragmentSpecification;
 import com.github.anno4j.annotations.Partial;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.rio.*;
 
 import java.io.ByteArrayOutputStream;
@@ -14,8 +18,10 @@ import java.io.IOException;
 @Partial
 public abstract class SvgSelectorSupport extends SelectorSupport implements SvgSelector {
     @Override
-    public String getConformsTo() {
-        return FragmentSpecification.SVG.toString();
+    public ResourceObject getConformsTo() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
+        Anno4j anno4j = new Anno4j(this.getObjectConnection().getRepository());
+
+        return SelectorFactory.getSvgSpecification(anno4j);
     }
 
     /**
