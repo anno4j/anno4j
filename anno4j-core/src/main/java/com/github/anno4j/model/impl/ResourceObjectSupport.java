@@ -5,10 +5,12 @@ import org.openrdf.annotations.Iri;
 import org.openrdf.annotations.ParameterTypes;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.object.traits.ObjectMessage;
 import org.openrdf.rio.RDFFormat;
@@ -17,6 +19,8 @@ import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 @Partial
 public abstract class ResourceObjectSupport implements ResourceObject {
@@ -103,16 +107,76 @@ public abstract class ResourceObjectSupport implements ResourceObject {
      */
     @Override
     public String getTriples(RDFFormat format) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         try {
-            RDFWriter writer = Rio.createWriter(format, out);
-            this.getObjectConnection().exportStatements(this.getResource(), null, null, true, writer);
-
+            return getTriples(format, 1, null);
         } catch (RepositoryException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public String getTriples(RDFFormat format, int maxPathLength, Resource... contexts) throws RepositoryException {
+        ObjectConnection connection = getObjectConnection();
+
+        // Prepare a writer that exports to the requested format:
+        ByteArrayOutputStream out = new ByteArrayOutputStream(); // Will contain serialized RDF
+        RDFWriter writer = Rio.createWriter(format, out);
+
+        try {
+            writer.startRDF();
         } catch (RDFHandlerException e) {
-            e.printStackTrace();
+            throw new RepositoryException(e);
+        }
+
+        // Set that contains those resources that are processed next, i.e. the next level:
+        Set<Resource> nextNodes = new HashSet<>();
+        nextNodes.add(getResource());
+
+        // Traverse the graph until there are no more nodes reachable or the depth limit is reached:
+        int currentLevel = 0;
+        while (!nextNodes.isEmpty() && currentLevel <= maxPathLength) {
+            // We'll process the remembered nodes now and use nextNodes to store those of the next cycle.
+            // Copy and clear the remembered nodes:
+            Set<Resource> current = nextNodes;
+            nextNodes = new HashSet<>();
+
+            for (Resource node : current) {
+                // Get all statements of which the current node is the subject:
+                RepositoryResult<Statement> statements = connection.getStatements(node, null, null, true, contexts);
+
+                while(statements.hasNext()) {
+                    Statement statement = statements.next();
+
+                    // Export if the statement is in a requested context:
+                    boolean inExportContext = false;
+                    contexts = (contexts != null ? contexts : new Resource[]{null}); // Ensure this is an array
+                    for (Resource context : contexts) {
+                        inExportContext |= (context == statement.getContext()) || (context != null && context.equals(statement.getContext()));
+                    }
+                    if(inExportContext) {
+                        // The maximum depth was not yet reached. Write the found triple:
+                        try {
+                            writer.handleStatement(statement);
+                        } catch (RDFHandlerException e) {
+                            throw new RepositoryException(e);
+                        }
+                    }
+
+                    // If the object of the triple is a resource it may appear as the subject of another triple. Remember it:
+                    if(statement.getObject() instanceof Resource) {
+                        nextNodes.add((Resource) statement.getObject());
+                    }
+                }
+            }
+
+            currentLevel++; // All nodes in this level were processed.
+        }
+
+        try {
+            writer.endRDF();
+        } catch (RDFHandlerException e) {
+            throw new RepositoryException(e);
         }
 
         return out.toString();
