@@ -9,7 +9,6 @@ import com.github.anno4j.model.impl.body.TextualBody;
 import com.github.anno4j.model.impl.targets.SpecificResource;
 import com.github.anno4j.model.namespaces.DCTYPES;
 import com.github.anno4j.model.namespaces.RDF;
-import com.github.anno4j.querying.QueryService;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -208,7 +207,7 @@ public class InputOutputTest {
             " \"@id\": \"http://example.org/anno1\" , \n" +
             " \"@type\":\"oa:Annotation\" , \n" +
 //            " \"oa:motivatedBy\": { \"@id\" : \"oa:describing\" } , \n" +
-            " \"motivation\" : \"oa:describing\" , \n" +
+            " \"motivation\" : { \"@id\" : \"oa:describing\", \"@type\": \"oa:Motivation\" } , \n" +
             " \"body\": { \n" +
             " \"@id\":\"http://example.org/body1\", \n" +
             " \"@type\":\"dctypes:Sound\", \n" +
