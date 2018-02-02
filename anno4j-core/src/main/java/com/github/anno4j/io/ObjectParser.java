@@ -163,12 +163,21 @@ public class ObjectParser {
      * @param documentURL The basic URL used for namespaces.
      * @param format      The format of the given serialization. Needs to be
      *                    supported of an instance of RDFFormat.
-     * @param clear       Determines, if the local Anno4j instance should be cleared or not after a call to parse().
+     * @param clear       Determines, if the local Anno4j instance should be cleared or not in the beginning.
      * @return The annotations contained in the given RDF-document or an empty list if an error occurred.
      * The result is not guaranteed to be duplicate free.
      */
     @Deprecated
     public List<Annotation> parse(String content, URL documentURL, RDFFormat format, boolean clear) {
+        // Clear all triples in the triplestore if requested:
+        if (clear) {
+            try {
+                clear();
+            } catch (RepositoryException | UpdateExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Read the RDF-document and store triples in the repository of the anno4j instance:
         try {
             readRDF(content, documentURL, format);
@@ -185,15 +194,6 @@ public class ObjectParser {
             e.printStackTrace();
         }
 
-        // Possibly clear all triples in the triplestore:
-        if (clear) {
-            try {
-                clear();
-            } catch (RepositoryException | UpdateExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-
         return annotations;
     }
 
@@ -205,7 +205,7 @@ public class ObjectParser {
      * @param content The RDF-serialization to read from. This must be in the format specified by {@code format}.
      * @param documentURL The base URL used for namespaces.
      * @param format The format of the given RDF-serialization.
-     * @param clear Determines, if the local Anno4j instance should be cleared or not after a call to parse().
+     * @param clear Determines, if the local Anno4j instance should be cleared or not in the beginning.
      *              This can be set to increase performance.
      * @param <T> The type of the returned objects.
      * @return Returns all resources having the given type as their {@code rdf:type}. This result will also contain
@@ -215,13 +215,7 @@ public class ObjectParser {
      * @throws RDFParseException Thrown if an error occurs while parsing the RDF-document.
      */
     public <T extends ResourceObject> List<T> parse(Class<? extends T> type, String content, URL documentURL, RDFFormat format, boolean clear) throws RepositoryException, RDFParseException {
-        // Read the RDF-document and store triples in the repository of the anno4j instance:
-        readRDF(content, documentURL, format);
-
-        // Get the instances of the requested type:
-        List<T> instances = getInstancesOfType(type);
-
-        // Possibly clear all triples in the triplestore:
+        // Clear all triples in the triplestore if requested:
         if (clear) {
             try {
                 clear();
@@ -229,6 +223,12 @@ public class ObjectParser {
                 throw new RepositoryException(e);
             }
         }
+
+        // Read the RDF-document and store triples in the repository of the anno4j instance:
+        readRDF(content, documentURL, format);
+
+        // Get the instances of the requested type:
+        List<T> instances = getInstancesOfType(type);
 
         return instances;
     }

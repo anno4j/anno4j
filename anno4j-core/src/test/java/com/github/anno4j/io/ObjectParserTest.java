@@ -1,17 +1,21 @@
 package com.github.anno4j.io;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.model.Target;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.DCTYPES;
 import com.github.anno4j.model.namespaces.RDF;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -124,6 +128,37 @@ public class ObjectParserTest {
         } catch (IOException | RepositoryException | RepositoryConfigException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testClearing() throws Exception {
+        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), null, false);
+        ObjectParser parser = new ObjectParser();
+
+        List<Annotation> annotations = parser.parse(Annotation.class, TURTLE, new URL("http://example.com/"), RDFFormat.TURTLE, true);
+        assertEquals(1, annotations.size());
+
+        // Persist the annotations:
+        for(Annotation annotation : annotations) {
+            anno4j.persist(annotation);
+        }
+        // Test that values are available in the anno4j-connected repository:
+        Body body1 = anno4j.findByID(Body.class,"http://www.example.com/ns#body1");
+        Annotation anno1 = anno4j.findByID(Annotation.class,"http://www.example.com/ns#anno1");
+        assertEquals(Sets.newHashSet(body1), anno1.getBodies());
+
+        // Read another document clearing the internal triplestore:
+        annotations = parser.parse(Annotation.class, TURTLE2, new URL("http://example.com/"), RDFFormat.TURTLE, true);
+        assertEquals(1, annotations.size());
+
+        // Persist the annotations:
+        for(Annotation annotation : annotations) {
+            anno4j.persist(annotation);
+        }
+        // Test that values are available in the anno4j-connected repository:
+        Body body2 = anno4j.findByID(Body.class,"http://www.example.com/ns#body2");
+        Annotation anno2 = anno4j.findByID(Annotation.class,"http://www.example.com/ns#anno2");
+        assertEquals(Sets.newHashSet(body2), anno2.getBodies());
     }
 
     @Test
