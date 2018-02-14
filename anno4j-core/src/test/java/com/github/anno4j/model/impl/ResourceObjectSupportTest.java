@@ -3,6 +3,7 @@ package com.github.anno4j.model.impl;
 import com.github.anno4j.Anno4j;
 import com.github.anno4j.io.ObjectParser;
 import com.github.anno4j.model.Annotation;
+import com.github.anno4j.model.impl.agent.Person;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
@@ -20,6 +21,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -208,5 +210,20 @@ public class ResourceObjectSupportTest {
         assertNotNull(parsed.findByID(SpecialAnnotation.class, "http://example.de/h"));
         assertNotNull(parsed.findByID(SpecialAnnotation.class, "http://example.de/i"));
         assertNull(parsed.findByID(SpecialAnnotation.class, "http://example.de/f"));
+    }
+
+    @Test
+    public void testRefreshing() throws Exception {
+        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), null, false);
+
+        Person a = anno4j.createObject(Person.class, (Resource) new URIImpl("http://example.de/anno1"));
+        a.setMbox("alice@example.org");
+
+        Person b = anno4j.createObject(Person.class, (Resource) new URIImpl("http://example.de/anno1"));
+        b.setMbox("bob@example.org");
+
+        // Refresh the first object and check whether it returns the new value:
+        a.update();
+        assertEquals("bob@example.org", a.getMbox());
     }
 }

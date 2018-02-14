@@ -47,4 +47,11 @@ public interface ResourceObject extends RDFObject {
     String getResourceAsString();
 
     void delete();
+
+    /**
+     * Refreshes the (possibly) cached values of the properties of this resource and guarantees that subsequent calls to getter-methods
+     * will return current values. Please note that refreshing an object may also affect other objects representing the same resource.
+     * @throws RepositoryException Thrown if an error occurs while loading values from the connected repository.
+     */
+    void update() throws RepositoryException;
 }
