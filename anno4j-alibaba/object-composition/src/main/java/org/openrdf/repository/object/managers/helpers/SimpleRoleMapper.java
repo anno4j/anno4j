@@ -28,21 +28,14 @@
  */
 package org.openrdf.repository.object.managers.helpers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.URIImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tracks types and maps them to their assigned roles.
@@ -184,7 +177,15 @@ public class SimpleRoleMapper implements Cloneable {
 	}
 
 	private Collection<Class<?>> findBaseRoles() {
-		return roles.get(baseType);
+		Collection<Class<?>> baseRoles = roles.get(baseType);
+
+		// Add the Anno4j base roles if available:
+		Collection<Class<?>> anno4jBaseRoles = roles.get(new URIImpl("https://github.com/anno4j/ns#Resource"));
+		if(anno4jBaseRoles != null) {
+			baseRoles.addAll(anno4jBaseRoles);
+		}
+
+		return baseRoles;
 	}
 
 	private void unregistered(URI type) {

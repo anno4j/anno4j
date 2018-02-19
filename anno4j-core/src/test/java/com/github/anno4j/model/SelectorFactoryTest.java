@@ -37,10 +37,10 @@ public class SelectorFactoryTest {
         ResourceObject fragmentSpec = SelectorFactory.getMediaFragmentsSpecification(this.anno4j);
 
         List<ResourceObject> result = this.anno4j.findAll(ResourceObject.class);
-        assertEquals(1, result.size());
+        assertEquals(3, result.size());
 
         ResourceObject fragmentSpec2 = SelectorFactory.getMediaFragmentsSpecification(this.anno4j);
-        assertEquals(1, result.size());
+        assertEquals(3, result.size());
 
         QueryService qs = this.anno4j.createQueryService();
         qs.addCriteria(".", FragmentSpecification.W3C_MEDIA_FRAGMENTS.toString());

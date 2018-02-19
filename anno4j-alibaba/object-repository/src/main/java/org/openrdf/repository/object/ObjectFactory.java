@@ -32,6 +32,7 @@ package org.openrdf.repository.object;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.model.*;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.repository.object.advisers.helpers.ObjectQueryFactory;
 import org.openrdf.repository.object.composition.ClassResolver;
 import org.openrdf.repository.object.exceptions.ObjectCompositionException;
@@ -57,11 +58,17 @@ public class ObjectFactory {
 	private Map<Class<?>, ObjectQueryFactory> factories;
     private IDGenerator idGenerator;
 
+	/**
+	 * The Java class that corresponds to {@code rdfs:Resource} as assigned by {@link #resolver}.
+	 */
+	private Class<?> topConcept;
+
 	protected ObjectFactory(ClassResolver resolver, LiteralManager lm) {
 		assert lm != null;
 		assert resolver != null;
 		this.lm = lm;
 		this.resolver = resolver;
+		topConcept = resolver.resolveEntity(RDFS.RESOURCE);
 	}
 
 	/**
@@ -245,29 +252,39 @@ public class ObjectFactory {
 		StringBuilder select = new StringBuilder();
 		StringBuilder where = new StringBuilder();
 		select.append("SELECT REDUCED ?subj");
+
+		// There is a special case when the concept is the top concept (rdfs:Resource):
+		URI uri = getNameOf(concept);
+		boolean isTopConcept = concept.isAssignableFrom(topConcept);
+
 		boolean namedTypePresent = resolver.getRoleMapper().isNamedTypePresent();
 		if (namedTypePresent) {
 			select.append(" ?subj_class");
 		}
 		where.append("\nWHERE { ");
-		URI uri = getNameOf(concept);
 		boolean typed = uri != null && bindings == 0;
 		if (typed) {
-			Collection<URI> types = new HashSet<URI>();
-			resolver.getRoleMapper().findSubTypes(concept, types);
-			Iterator<URI> iter = types.iterator();
-			assert iter.hasNext();
-			while (iter.hasNext()) {
-				where.append("\n{ ?subj a <");
-				where.append(iter.next().stringValue()).append(">}");
-				if (iter.hasNext()) {
-					where.append(" UNION ");
+			if(isTopConcept) {
+				// If the top concept is requested return everything that has an IRI:
+				where.append("{ ?subj ?p ?o . } UNION { ?s ?subj ?o . } UNION { ?s ?p ?subj . }\nFILTER(isIRI(?subj))");
+
+			} else { // If a more special type is requested than rdfs:Resource:
+				Collection<URI> types = new HashSet<URI>();
+				resolver.getRoleMapper().findSubTypes(concept, types);
+				Iterator<URI> iter = types.iterator();
+				assert iter.hasNext();
+				while (iter.hasNext()) {
+					where.append("\n{ ?subj a <");
+					where.append(iter.next().stringValue()).append(">}");
+					if (iter.hasNext()) {
+						where.append(" UNION ");
+					}
 				}
-			}
-			if (namedTypePresent) {
-				where.append("\nOPTIONAL {").append(" ?subj <");
-				where.append(RDF.TYPE);
-				where.append("> ?subj_class } ");
+				if (namedTypePresent) {
+					where.append("\nOPTIONAL {").append(" ?subj <");
+					where.append(RDF.TYPE);
+					where.append("> ?subj_class } ");
+				}
 			}
 		} else {
 			where.append("\n?subj a ?subj_class .");
