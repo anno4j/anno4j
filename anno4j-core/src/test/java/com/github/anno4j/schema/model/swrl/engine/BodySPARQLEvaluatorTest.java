@@ -7,6 +7,7 @@ import com.github.anno4j.schema.model.owl.OWLClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema.model.rdfs.collections.RDFLists;
 import com.github.anno4j.schema.model.swrl.*;
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
@@ -291,5 +292,40 @@ public class BodySPARQLEvaluatorTest {
         assertEquals(1, solutions.size());
         Bindings binding = solutions.getBindings().iterator().next();
         assertEquals(building1, binding.get(x));
+    }
+
+    @Test
+    public void testDependentSparqlSerializable() throws Exception {
+        ObjectConnection connection = anno4j.getObjectRepository().getConnection();
+
+        Variable x = anno4j.createObject(Variable.class);
+        Variable y = anno4j.createObject(Variable.class);
+        Variable z = anno4j.createObject(Variable.class);
+
+        DatavaluedPropertyAtom heightAtom = anno4j.createObject(DatavaluedPropertyAtom.class);
+        heightAtom.setPropertyPredicate(anno4j.createObject(RDFSProperty.class, (Resource) new URIImpl("http://example.org/heightInMeters")));
+        heightAtom.setArgument1(x);
+        heightAtom.setArgument2(y);
+
+        BuiltinAtom equalXZ = anno4j.createObject(BuiltinAtom.class);
+        equalXZ.setBuiltinResource(anno4j.createObject(BuiltinAtom.class, (Resource) new URIImpl(SWRLB.EQUAL)));
+        equalXZ.setArguments(RDFLists.asRDFList(connection, x, z));
+
+        BuiltinAtom lessThanZ0 = anno4j.createObject(BuiltinAtom.class);
+        lessThanZ0.setBuiltinResource(anno4j.createObject(BuiltinAtom.class, (Resource) new URIImpl(SWRLB.LESS_THAN)));
+        lessThanZ0.setArguments(RDFLists.asRDFList(connection, z, 0));
+
+        /*
+        p(x, y) equal(x, z) lessThan(z, 0)
+
+        lessThan(z, 0) is SPARQL-serializable, but depends on equal(x, z) which is an computation.
+         */
+        AtomList atoms = anno4j.createObject(AtomList.class);
+        atoms.add(heightAtom);
+        atoms.add(equalXZ);
+        atoms.add(lessThanZ0);
+
+        SPARQLSerializer serializer = new SPARQLSerializer();
+        assertEquals(Lists.newArrayList(heightAtom), serializer.longestSPARQLSerializablePrefix(atoms));
     }
 }

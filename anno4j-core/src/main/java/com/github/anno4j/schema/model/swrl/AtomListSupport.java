@@ -3,6 +3,7 @@ package com.github.anno4j.schema.model.swrl;
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.schema.model.rdfs.collections.RDFListSupport;
+import com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine;
 import org.openrdf.annotations.Precedes;
 import org.openrdf.repository.object.behaviours.RDFSContainer;
 
@@ -84,6 +85,15 @@ public abstract class AtomListSupport extends RDFListSupport implements AtomList
             }
         }
         return builtinAtoms;
+    }
+
+    @Override
+    public Variable getComputableVariable(Atom atom) throws InstantiationException, SWRLInferenceEngine.UnboundVariableException {
+        if(atom instanceof BuiltinAtom) {
+            return ((BuiltinAtom) atom).getComputableVariable(this);
+        } else {
+            throw new IllegalArgumentException("The atom " + atom.getResourceAsString() + " isn't a built-in atom.");
+        }
     }
 
     @Override

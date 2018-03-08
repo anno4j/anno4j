@@ -163,8 +163,10 @@ class BodySPARQLEvaluator extends SPARQLSerializer {
      * @throws SPARQLSerializationException Thrown if an error occurs while transforming to SPARQL.
      * @throws SWRLInferenceEngine.IllegalSWRLRuleException Thrown if there is no SPARQL serializable prefix.
      * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
+     * @throws com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine.UnboundVariableException Thrown if more than
+     * one variable doesn't have determined bindings in any atom of {@code atomList}.
      */
-    public SolutionSet findCandidateBindings(AtomList plan, ObjectConnection connection) throws SPARQLSerializationException, SWRLInferenceEngine.IllegalSWRLRuleException, InstantiationException {
+    public SolutionSet findCandidateBindings(AtomList plan, ObjectConnection connection) throws SPARQLSerializationException, SWRLInferenceEngine.IllegalSWRLRuleException, InstantiationException, SWRLInferenceEngine.UnboundVariableException {
         if(plan.isEmpty()) {
             throw new SWRLInferenceEngine.IllegalSWRLRuleException("The rules body is empty.");
         }

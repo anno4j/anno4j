@@ -136,67 +136,6 @@ class ExecutionPlanner {
     }
 
     /**
-     * Returns the computable variable of the given atom.
-     * A variable of the atom is qualified as being computable if:
-     * <ul>
-     *     <li>The corresponding built-in function (as assigned by
-     *     {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService}) is of type {@link Computation}</li>
-     *     <li>All other variables are bound by class/role atoms or are the computable variable of another built-in atom.</li>
-     * </ul>
-     * @param atom The atom for which the computable variable should be determined.
-     * @param atomList All atoms of the conjunction (including class/role atoms).
-     * @return Returns the computable variable of {@code atom} or null if all arguments of the atom are determined.
-     * @throws SWRLInferenceEngine.UnboundVariableException Thrown if any variable is neither bound by a class/role atom or as the computable
-     * variable of any built-in atom.
-     * @throws InstantiationException Thrown if the corresponding {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin} object
-     * could not be instantiated.
-     * @throws IllegalArgumentException Thrown if the built-in function corresponding to {@code atom} isn't a {@link Computation}.
-     */
-    private Variable getComputableVariable(BuiltinAtom atom, AtomList atomList) throws SWRLInferenceEngine.UnboundVariableException, InstantiationException {
-        if(!(atom.getBuiltin() instanceof Computation)) {
-            throw new IllegalArgumentException(atom + " must correspond to a computable built-in function.");
-        }
-
-        Collection<Variable> freeVariables = atomList.getFreeVariables();
-
-        // Iterate as long new variables can be determined bound by a built-in computation:
-        boolean changed = true;
-        while (changed) {
-            changed = false;
-
-            for (BuiltinAtom builtinAtom : atomList.getBuiltInAtoms()) {
-                if (builtinAtom.getBuiltin() instanceof Computation) {
-                    // Get the arguments of the computation that are still considered free:
-                    Collection<Variable> variables = new ArrayList<>(builtinAtom.getVariables());
-                    variables.retainAll(freeVariables);
-
-                    // If there is only one free variable, it can be bound by the computation:
-                    if(variables.size() == 1) {
-                        // The variable is bound by this computation. Remove it from free variable set:
-                        freeVariables.removeAll(variables);
-                        changed = true;
-                    }
-
-
-                    if (builtinAtom.equals(atom)) {
-                        // If this atom is the searched one and it has only one free variable. This variable is the one that's computable:
-                        if(variables.size() == 1) {
-                            return variables.iterator().next();
-
-                        } else if(variables.size() == 0) { // No free variables? No computation (atom is simply a boolean predicate)
-                            return null;
-                        }
-                    }
-                }
-            }
-        }
-
-        // At least one built-in atom has more than one free variable:
-        throw new SWRLInferenceEngine.UnboundVariableException("Variables " + freeVariables.toString()
-                + " can neither be bound by a class atom, role atom or computable built-in atom.");
-    }
-
-    /**
      * Constructs the dependency graph of the built-in atoms.
      * A built-in atom {@code x} depends on another built-in atom {@code y} iff
      * any free variable of {@code x} is bound as a computation result of {@code y}.
@@ -222,7 +161,7 @@ class ExecutionPlanner {
         Map<Variable, BuiltinDependencyNode> computableVariables = new HashMap<>();
         for (BuiltinAtom atom : builtinAtoms) {
             if(atom.getBuiltin() instanceof Computation) {
-                Variable computableVariable = getComputableVariable(atom, atomList);
+                Variable computableVariable = atom.getComputableVariable(atomList);
                 if(computableVariable != null) {
                     computableVariables.put(computableVariable, dependencyNodesByAtom.get(atom));
                 }

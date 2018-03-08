@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.Resource;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
@@ -30,6 +31,24 @@ public class InMemoryEvaluatorTest {
 
     private ExecutionPlanner planner = new ExecutionPlanner();
 
+    /**
+     * Creates an atom list with the specified atoms.
+     * @param atoms The atoms to add to the list (in that order).
+     * @return Returns the populated atom list.
+     * @throws RepositoryException
+     */
+    private AtomList newAtomList(Atom... atoms) throws RepositoryException {
+        try {
+            AtomList list = anno4j.createObject(AtomList.class);
+            for (Atom atom : atoms) {
+                list.add(atom);
+            }
+            return list;
+
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new RepositoryException(e);
+        }
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -52,7 +71,7 @@ public class InMemoryEvaluatorTest {
         SolutionSet solutions = new SolutionSet();
         solutions.add(new Bindings(), x, 5);
 
-        assertEquals(solutions, evaluator.evaluate(Lists.<Atom>newArrayList(roleAtom), solutions));
+        assertEquals(solutions, evaluator.evaluate(newAtomList(roleAtom), solutions));
     }
 
     @Test
@@ -63,30 +82,7 @@ public class InMemoryEvaluatorTest {
         atom.setBuiltinResource(anno4j.createObject(ResourceObject.class, (Resource) new URIImpl(SWRLB.EQUAL)));
         atom.setArguments(RDFLists.asRDFList(connection));
 
-        assertEquals(solutions, evaluator.evaluate(Lists.<Atom>newArrayList(atom), solutions));
-    }
-
-    @Test
-    public void testFullyDetermined() throws Exception {
-        Variable x = anno4j.createObject(Variable.class);
-
-        BuiltinAtom atom1 = anno4j.createObject(BuiltinAtom.class);
-        atom1.setBuiltinResource(anno4j.createObject(ResourceObject.class, (Resource) new URIImpl(SWRLB.MULTIPLY)));
-        atom1.setArguments(RDFLists.asRDFList(connection, 12.0, 3, 4));
-
-        BuiltinAtom atom2 = anno4j.createObject(BuiltinAtom.class);
-        atom2.setBuiltinResource(anno4j.createObject(ResourceObject.class, (Resource) new URIImpl(SWRLB.SUBTRACT)));
-        atom2.setArguments(RDFLists.asRDFList(connection, 0, 42, 42));
-
-        BuiltinAtom atom3 = anno4j.createObject(BuiltinAtom.class);
-        atom3.setBuiltinResource(anno4j.createObject(ResourceObject.class, (Resource) new URIImpl(SWRLB.SUBTRACT)));
-        atom3.setArguments(RDFLists.asRDFList(connection, 42, 42, 42));
-
-        SolutionSet candidates = new SolutionSet();
-        candidates.add(new Bindings(), x, 1337);
-
-        assertEquals(candidates, evaluator.evaluate(Lists.<Atom>newArrayList(atom1, atom2), candidates));
-        assertEquals(new SolutionSet(), evaluator.evaluate(Lists.<Atom>newArrayList(atom1, atom2, atom3), candidates));
+        assertEquals(solutions, evaluator.evaluate(newAtomList(atom), solutions));
     }
 
     @Test
@@ -103,7 +99,7 @@ public class InMemoryEvaluatorTest {
         candidates.add(new Bindings(), x, 2);
         candidates.add(new Bindings(), x, 3);
 
-        SolutionSet solutions = evaluator.evaluate(Lists.<Atom>newArrayList(atom), candidates);
+        SolutionSet solutions = evaluator.evaluate(newAtomList(atom), candidates);
 
         assertEquals(1, solutions.size());
         assertEquals(3, solutions.iterator().next().get(x));
@@ -145,7 +141,7 @@ public class InMemoryEvaluatorTest {
         SolutionSet candidates = new SolutionSet();
         candidates.add(new Bindings(), x, 2.0);
 
-        SolutionSet solutions = evaluator.evaluate(atoms.asList(), candidates);
+        SolutionSet solutions = evaluator.evaluate(atoms, candidates);
         assertEquals(1, solutions.size());
         Bindings bindings = solutions.iterator().next();
         assertEquals(2.0, bindings.get(x));

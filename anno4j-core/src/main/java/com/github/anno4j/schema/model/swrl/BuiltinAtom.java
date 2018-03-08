@@ -4,6 +4,7 @@ import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.SWRL;
 import com.github.anno4j.schema.model.rdfs.collections.RDFList;
 import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin;
+import com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine;
 import org.openrdf.annotations.Iri;
 
 /**
@@ -47,4 +48,21 @@ public interface BuiltinAtom extends Atom {
      * @throws InstantiationException Thrown if the built-in service can't instantiate the representation.
      */
     SWRLBuiltin getBuiltin() throws InstantiationException;
+
+    /**
+     * Returns the variable for which bindings can be determined by this built-in atom.
+     * In the supported SWRL fragment bindings are computable for built-in atoms
+     * with a certain built-in function (see {@link com.github.anno4j.schema.model.swrl.builtin.SPARQLSerializable})
+     * having only one variable with undetermined bindings.
+     * @param list The atom list in dependency order on basis of which to determine the variable.
+     *             This atom must be part of this list.
+     * @return Returns the variable for which bindings can be computed by this atom on basis of the given atom list.
+     * Returns null if this atom can't compute bindings or all variable occuring in the atom are determined.
+     * @throws IllegalArgumentException Thrown if this atom is not part of {@code list}.
+     * @throws InstantiationException Thrown if the {@link SWRLBuiltin} object for this atom can't be instantiated
+     * by {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService}.
+     * @throws SWRLInferenceEngine.UnboundVariableException Thrown if more than
+     * one variable doesn't have determined bindings in any atom of {@code list}.
+     */
+    Variable getComputableVariable(AtomList list) throws InstantiationException, SWRLInferenceEngine.UnboundVariableException;
 }

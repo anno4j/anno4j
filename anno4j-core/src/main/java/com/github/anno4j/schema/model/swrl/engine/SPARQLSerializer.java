@@ -41,40 +41,47 @@ class SPARQLSerializer {
      * This is the case for class/role atoms and some built-ins (those implementing {@link SPARQLSerializable}).
      * The built-in implementation is determined using {@link com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService}.
      * @param atom The atom to check.
+     * @param atomList The list of atoms <b>in dependency order</b> in which the {@code atom} occurs.
      * @return Returns true iff the given atom can be serialized to SPARQL.
      * @throws InstantiationException Thrown if the atom is a built-in and its implementation could not be instantiated.
+     * @throws com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine.UnboundVariableException Thrown if more than
+     * one variable doesn't have determined bindings in any atom of {@code atomList}.
      */
-    boolean isSPARQLSerializable(Object atom) throws InstantiationException {
+    boolean isSPARQLSerializable(Object atom, AtomList atomList) throws InstantiationException, SWRLInferenceEngine.UnboundVariableException {
         // An atom is serializable if its a class/role atom or a built-in that's serializable:
         boolean serializable = atom instanceof ClassAtom
                 || atom instanceof IndividualPropertyAtom
                 || atom instanceof DatavaluedPropertyAtom;
 
         if(atom instanceof BuiltinAtom) {
+            // The built-in must have an SPARQL-serializable function and must not compute bindings:
             SWRLBuiltInService service = SWRLBuiltInService.getBuiltInService();
             SWRLBuiltin builtin = service.getBuiltIn((BuiltinAtom) atom);
 
-            serializable |= builtin instanceof SPARQLSerializable;
+            serializable |= builtin instanceof SPARQLSerializable
+                    && ((BuiltinAtom) atom).getComputableVariable(atomList) == null;
         }
 
         return serializable;
     }
 
     /**
-     * Returns the longest prefix of the given plan for which every atom suffices {@link #isSPARQLSerializable(Object)}.
+     * Returns the longest prefix of the given plan for which every atom suffices {@link #isSPARQLSerializable(Object, AtomList)}.
      * @param atoms The execution plan.
      * @return Returns the longest prefix of SPARQL serializable atoms.
      * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
+     * @throws com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine.UnboundVariableException Thrown if more than
+     * one variable doesn't have determined bindings in any atom of {@code atomList}.
      */
-    List<Atom> longestSPARQLSerializablePrefix(List<Atom> atoms) throws InstantiationException {
+    List<Atom> longestSPARQLSerializablePrefix(AtomList atoms) throws InstantiationException, SWRLInferenceEngine.UnboundVariableException {
         List<Atom> prefix = new LinkedList<>();
 
         boolean isSPARQLSerializable;
-        ListIterator<Atom> i = atoms.listIterator();
+        ListIterator<Object> i = atoms.listIterator();
         do {
             Object item = i.next();
 
-            isSPARQLSerializable = isSPARQLSerializable(item);
+            isSPARQLSerializable = isSPARQLSerializable(item, atoms);
 
             if(isSPARQLSerializable) {
                 prefix.add((Atom) item);
@@ -82,16 +89,6 @@ class SPARQLSerializer {
         } while (isSPARQLSerializable && i.hasNext()); // Terminate if first non-serializable atom is reached
 
         return prefix;
-    }
-
-    /**
-     * Returns the longest prefix of the given plan for which every atom suffices {@link #isSPARQLSerializable(Object)}.
-     * @param atoms The execution plan.
-     * @return Returns the longest prefix of SPARQL serializable atoms.
-     * @throws InstantiationException Thrown if the implementation of any built-in could not be instantiated.
-     */
-    List<Atom> longestSPARQLSerializablePrefix(AtomList atoms) throws InstantiationException {
-        return longestSPARQLSerializablePrefix(atoms.asList());
     }
 
     /**

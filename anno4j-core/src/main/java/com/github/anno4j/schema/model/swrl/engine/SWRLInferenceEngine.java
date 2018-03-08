@@ -277,7 +277,7 @@ public class SWRLInferenceEngine {
                 + "/" + plan.size() + ": " + candidateBindings.size());
 
         // Determine ultimate bindings by evaluating in memory:
-        return inMemoryEvaluator.evaluate(plan.asList(), candidateBindings);
+        return inMemoryEvaluator.evaluate(plan, candidateBindings);
     }
 
     /**

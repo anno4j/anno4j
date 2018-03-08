@@ -8,8 +8,8 @@ import com.github.anno4j.schema.model.swrl.builtin.Computation;
 import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltInService;
 import com.github.anno4j.schema.model.swrl.builtin.SWRLBuiltin;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * This evaluator executes suffices of execution plans (cf. {@link ExecutionPlanner}) that are not
@@ -51,10 +51,16 @@ class InMemoryEvaluator {
      * @return Returns the non-SPARQL-serializable suffix of the atom sequence.
      * @throws InstantiationException Thrown if a SWRL built-in implementation derived from a built-in atom in the sequence
      * could not be instantiated.
+     * @throws com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine.UnboundVariableException Thrown if more than
+     * one variable doesn't have determined bindings in any atom of {@code atomList}.
      */
-    private List<Atom> getNonSPARQLSerializableSuffix(List<Atom> atoms) throws InstantiationException {
+    private List<Atom> getNonSPARQLSerializableSuffix(AtomList atoms) throws InstantiationException, SWRLInferenceEngine.UnboundVariableException {
         List<Atom> sparqlSerializable = new BodySPARQLEvaluator().longestSPARQLSerializablePrefix(atoms);
-        return atoms.subList(sparqlSerializable.size(), atoms.size());
+        List<Atom> nonSparqlSerializable = new ArrayList<>(atoms.size() - sparqlSerializable.size());
+        for (Object item : atoms.subList(sparqlSerializable.size(), atoms.size())) {
+            nonSparqlSerializable.add((Atom) item);
+        }
+        return nonSparqlSerializable;
     }
 
     /**
@@ -65,11 +71,12 @@ class InMemoryEvaluator {
      *     <li>{@code v} is bound by a class or role atom</li>
      *     <li>{@code v} is computable by another built-in atom {@code b'}</li>
      * </ul>
-     * And addition the {@link SWRLBuiltin} implementation as derived by {@link SWRLBuiltInService}
+     * And in addition the {@link SWRLBuiltin} implementation as derived by {@link SWRLBuiltInService}
      * for {@code b} must be a {@link Computation}.
+     * The returned bindings are valid bindings for all atoms in {@code plan}.
      * @param plan The non-SPARQL-serializable suffix of a plan. This list must only contain {@link BuiltinAtom}s.
      * @param bindings Bindings for the non-computable variables.
-     * @return Returns all possible solutions of the plan based on the initial bindings.
+     * @return Returns the augmented bindings based on {@code bindings} satisfying all atoms in {@code plan}.
      * @throws SWRLException Thrown if an error occurs while determining the computable variable bindings for the plan.
      * @throws InstantiationException Thrown if any implementation of a SWRL built-in atom can't be instantiated.
      */
@@ -106,8 +113,16 @@ class InMemoryEvaluator {
                 }
                 return fullBindings;
 
-            } else { // If this is not a computation then we can't bind a variable in this step:
-                return computeFreeVariables(plan.subList(1, plan.size()), bindings);
+            } else if(!hasFreeVariable) {
+                // If all variables are determined, continue if current atom is fulfilled by the current bindings:
+                if(builtin.evaluate(bindings)) {
+                    return computeFreeVariables(plan.subList(1, plan.size()), bindings);
+                } else {
+                    return new SolutionSet();
+                }
+
+            } else { // If this isn't a computation and there are free variables this is a malformed rule:
+                throw new InMemoryEvaluationException("Undetermined variable(s) in " + plan.get(0));
             }
 
         } else {
@@ -125,9 +140,10 @@ class InMemoryEvaluator {
      * </ul>
      * And addition the {@link SWRLBuiltin} implementation as derived by {@link SWRLBuiltInService}
      * for {@code b} must be a {@link Computation}.
+     * The returned bindings are valid bindings for all atoms in {@code atoms}.
      * @param atoms The non-SPARQL-serializable suffix of a plan. This list must only contain {@link BuiltinAtom}s.
      * @param bindings Set of bindings for the non-computable variables.
-     * @return Returns all possible solutions of the plan based on each of the initial bindings.
+     * @return Returns the augmented bindings based on {@code bindings} satisfying all atoms in {@code atoms}.
      * @throws SWRLException Thrown if an error occurs while determining the computable variable bindings for the plan.
      * @throws InstantiationException Thrown if any implementation of a SWRL built-in atom can't be instantiated.
      */
@@ -151,41 +167,19 @@ class InMemoryEvaluator {
      * @throws SWRLException Thrown if an error occurs while determining the solutions.
      * @throws InstantiationException Thrown if any implementation of a SWRL built-in couldn't be instantiated by
      * {@link SWRLBuiltInService}.
+     * @throws com.github.anno4j.schema.model.swrl.engine.SWRLInferenceEngine.UnboundVariableException Thrown if more than
+     * one variable doesn't have determined bindings in any atom of {@code atomList}.
      */
-    public SolutionSet evaluate(List<Atom> plan, SolutionSet candidateBindings) throws SWRLException, InstantiationException {
+    public SolutionSet evaluate(AtomList plan, SolutionSet candidateBindings) throws SWRLException, InstantiationException {
         // The solution set is a subset of the candidates. So if it's empty the solution is empty:
         if(candidateBindings.size() == 0) {
             return new SolutionSet();
         }
 
         // Get the part that can't be evaluated by the SPARQL evaluator:
-        plan = getNonSPARQLSerializableSuffix(plan);
+        List<Atom> nonSparqlSerialized = getNonSPARQLSerializableSuffix(plan);
 
         // Determine possible bindings for the computable variables:
-        SolutionSet bindings = computeFreeVariables(plan, candidateBindings);
-
-        /*
-        bindings now contains bindings for every variable.
-        Determine which of them satisfies all atoms:
-         */
-        SolutionSet resultBindings = new SolutionSet();
-        for(Bindings binding : bindings) {
-            boolean match = true;
-
-            ListIterator<Atom> planIterator = plan.listIterator();
-            while (match && planIterator.hasNext()) {
-                Atom atom = planIterator.next();
-                if (atom instanceof BuiltinAtom) {
-                    SWRLBuiltin builtin = builtInService.getBuiltIn((BuiltinAtom) atom);
-                    match = builtin.evaluate(binding);
-                }
-            }
-
-            if(match) {
-                resultBindings.add(binding);
-            }
-        }
-
-        return resultBindings;
+        return computeFreeVariables(nonSparqlSerialized, candidateBindings);
     }
 }

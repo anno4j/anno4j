@@ -133,7 +133,7 @@ class SolutionProcessor extends SPARQLSerializer {
     boolean commitHead(AtomList head, Bindings bindings, Collection<Atom> assertions, ObjectConnection connection) throws SWRLException, InstantiationException {
         // Validate that the head is fully SPARQL serializable:
         for (Object atom : head) {
-            if(!isSPARQLSerializable(atom)) {
+            if(!isSPARQLSerializable(atom, head)) {
                 throw new SPARQLSerializationException(atom.toString() + " is not SPARQL serializable");
             }
         }
