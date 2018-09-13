@@ -28,11 +28,5 @@ public interface FileGenerator {
         }
     }
 
-    void addJava(InputStream javaInput, String format);
-
-    void addJava(String url, String format);
-
-    // void addJava(InputStream javaInput, String base, String format);
-
-    void generateFile(File outputDirectory) throws FileGenerator.FileGenerationException, IOException, RepositoryException;;
+    void generateFile() throws FileGenerator.FileGenerationException, IOException, RepositoryException;;
 }

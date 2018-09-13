@@ -1,32 +1,52 @@
 package com.github.anno4j.rdf_generation.generation;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.JFileChooser;
+import com.github.anno4j.rdf_generation.reflection.Extractor;
 
-import com.github.anno4j.schema_parsing.building.OWLJavaFileGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class RdfFileGenerator extends ClassLoader implements FileGenerator {
 
-public class RdfFileGenerator implements FileGenerator {
+	String interfaceAsString;
 
-    /**
-     * The logger used for printing progress.
-     */
-    private final Logger logger = LoggerFactory.getLogger(OWLJavaFileGenerator.class);
+	public RdfFileGenerator() {
+		interfaceAsString = null;
+	}
 
-    public RdfFileGenerator() {
-    }
+	@Override
+	public void generateFile() {
 
-    @Override
-    public void addJava(InputStream javaInput, String format){
-    }
+		try (BufferedReader br = new BufferedReader(new FileReader(chooseFile()))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				interfaceAsString = line + "\n";
+			}
 
-    @Override
-    public void addJava(String uri, String format){
-    }
+			Class<?> convclass = classConvertion(interfaceAsString);
 
-    @Override
-    public void generateFile(File outputDirectory) {
+			System.out.println(convclass);
+			Extractor.reflect(convclass);
 
-    }
+			// Eigentlich hier nur noch abspeicherung, umleitung der Befehle/Methoden über
+			// alle anderen Klassen
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Class<?> classConvertion(String interfaceAsString) {
+		return interfaceAsString.getClass();
+	}
+
+	private String chooseFile() {
+		JFileChooser chooser = new JFileChooser();
+		chooser.setCurrentDirectory(null);
+		int retrival = chooser.showSaveDialog(null);
+		if (retrival == JFileChooser.APPROVE_OPTION) {
+			return chooser.getSelectedFile().getAbsolutePath();
+		} else {
+			return null;
+		}
+	}
 }
