@@ -1,42 +1,42 @@
 package com.github.anno4j.rdf_generation.generation;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+
 import javax.swing.JFileChooser;
-import com.github.anno4j.rdf_generation.reflection.Extractor;
+
+import com.github.anno4j.rdf_generation.building.Extractor;
+import com.github.anno4j.rdf_generation.konverter.Konverter;
 
 public class RdfFileGenerator extends ClassLoader implements FileGenerator {
 
-	String interfaceAsString;
+	private String interfaceAsString;
+	private String content;
 
 	public RdfFileGenerator() {
-		interfaceAsString = null;
+		interfaceAsString = "";
+		content = "";
 	}
 
 	@Override
-	public void generateFile() {
-
+	public void generateFile(String path) {
 		try (BufferedReader br = new BufferedReader(new FileReader(chooseFile()))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				interfaceAsString = line + "\n";
+				interfaceAsString += line + "\r\n";
 			}
+			
+			Class<?> convclass = Konverter.classConvertion(interfaceAsString);
 
-			Class<?> convclass = classConvertion(interfaceAsString);
-
-			System.out.println(convclass);
-			Extractor.reflect(convclass);
-
-			// Eigentlich hier nur noch abspeicherung, umleitung der Befehle/Methoden über
-			// alle anderen Klassen
+			content =  Extractor.reflect(convclass);
+			writeFile(content, path);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private Class<?> classConvertion(String interfaceAsString) {
-		return interfaceAsString.getClass();
 	}
 
 	private String chooseFile() {
@@ -48,5 +48,16 @@ public class RdfFileGenerator extends ClassLoader implements FileGenerator {
 		} else {
 			return null;
 		}
+	}
+	
+	public void writeFile(String content, String path) throws IOException {
+	    BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		writer.write(content);
+	    writer.close();
 	}
 }

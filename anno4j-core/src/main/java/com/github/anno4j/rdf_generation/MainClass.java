@@ -10,20 +10,9 @@ import com.github.anno4j.rdf_generation.generation.RdfFileGenerator;
 
 public class MainClass {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws RepositoryException, FileGenerationException, IOException {
 		FileGenerator generator = new RdfFileGenerator();
-		try {
-			generator.generateFile();
-		} catch (RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileGenerationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		generator.generateFile("C:\\Users\\Brinninger Sandra\\Documents\\result.txt");
 	}
 
 }
