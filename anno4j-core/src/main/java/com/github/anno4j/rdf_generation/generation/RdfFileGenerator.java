@@ -31,8 +31,8 @@ public class RdfFileGenerator extends ClassLoader implements FileGenerator {
 			
 			Class<?> convclass = Konverter.classConvertion(interfaceAsString);
 
-			content =  Extractor.reflect(convclass);
-			writeFile(content, path);
+			content =  Extractor.extractFrom(convclass);
+			writeFile("", path); //delete "", only to avoid NullPointer
 			
 		} catch (IOException e) {
 			e.printStackTrace();
