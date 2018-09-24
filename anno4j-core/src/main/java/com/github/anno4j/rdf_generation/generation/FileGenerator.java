@@ -28,5 +28,5 @@ public interface FileGenerator {
         }
     }
 
-    void generateFile(String path) throws FileGenerator.FileGenerationException, IOException, RepositoryException;;
+    void generateFile(String path, String serial) throws FileGenerator.FileGenerationException, IOException, RepositoryException;;
 }

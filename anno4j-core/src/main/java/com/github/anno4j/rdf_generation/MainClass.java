@@ -12,7 +12,7 @@ public class MainClass {
 
 	public static void main(String[] args) throws RepositoryException, FileGenerationException, IOException {
 		FileGenerator generator = new RdfFileGenerator();
-		generator.generateFile("C:\\Users\\Brinninger Sandra\\Documents\\result.txt");
+		generator.generateFile("C:\\Users\\Brinninger Sandra\\Documents\\result.txt","RDF/XML");
 	}
 
 }

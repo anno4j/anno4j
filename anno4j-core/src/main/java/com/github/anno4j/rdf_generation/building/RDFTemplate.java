@@ -39,19 +39,19 @@ public class RDFTemplate {
 	}
 
 	public String insertEndProperty() {
-		return;
+		return "</rdf:Property>";
 	}
 
-	public String insertType() {
-		return;
+	public String insertType(String resource) {
+		return "<rdf:type rdf:resource=''" + resource + "''/>";
 	}
 
-	public String insertDomain() {
-		return;
+	public String insertDomain(String resource) {
+		return "<rdf:domain rdf:resource=''" + resource + "''/>";
 	}
 
-	public String insertRange() {
-		return;
+	public String insertRange(String resource) {
+		return "<rdf:range rdf:resource=''" + resource + "''/>";
 	}
 
 }

@@ -11,10 +11,11 @@ import javax.swing.JFileChooser;
 import com.github.anno4j.rdf_generation.building.Extractor;
 import com.github.anno4j.rdf_generation.konverter.Konverter;
 
-public class RdfFileGenerator extends ClassLoader implements FileGenerator {
+public class RdfFileGenerator implements FileGenerator {
 
 	private String interfaceAsString;
 	private String content;
+	private String serialization;
 
 	public RdfFileGenerator() {
 		interfaceAsString = "";
@@ -22,18 +23,27 @@ public class RdfFileGenerator extends ClassLoader implements FileGenerator {
 	}
 
 	@Override
-	public void generateFile(String path) {
+	public void generateFile(String path, String serial) {
+		// Add serialization, different cases (and converter)
+		serialization = serial;
 		try (BufferedReader br = new BufferedReader(new FileReader(chooseFile()))) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				interfaceAsString += line + "\r\n";
 			}
-			
+
 			Class<?> convclass = Konverter.classConvertion(interfaceAsString);
 
-			content =  Extractor.extractFrom(convclass);
-			writeFile("", path); //delete "", only to avoid NullPointer
-			
+			content = Extractor.extractFrom(convclass);
+			if (getSerial() == "RDF/XML") {
+				writeFile("", path); // delete "", only to avoid NullPointer since generating class doesn't work
+			} else if (getSerial() == "TURTLE") {
+				// Converter
+			} else if (getSerial() == "N3") {
+				// Converter
+			} else {
+				System.out.println("WRONG SERIALIZATION");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,15 +59,19 @@ public class RdfFileGenerator extends ClassLoader implements FileGenerator {
 			return null;
 		}
 	}
-	
+
 	public void writeFile(String content, String path) throws IOException {
-	    BufferedWriter writer = null;
+		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		writer.write(content);
-	    writer.close();
+		writer.close();
+	}
+
+	private String getSerial() {
+		return serialization;
 	}
 }
