@@ -2,9 +2,9 @@ package com.github.anno4j.rdf_generation.generation;
 
 import org.openrdf.repository.RepositoryException;
 
-import java.io.File;
+import com.github.anno4j.rdf_generation.configuration.Configuration;
+
 import java.io.IOException;
-import java.io.InputStream;
 
 public interface FileGenerator {
 
@@ -28,5 +28,5 @@ public interface FileGenerator {
         }
     }
 
-    void generateFile(String path, String serial) throws FileGenerator.FileGenerationException, IOException, RepositoryException;;
+    void generateFile(String packages, Configuration config) throws FileGenerator.FileGenerationException, IOException, RepositoryException;;
 }

@@ -1,64 +1,48 @@
 package com.github.anno4j.rdf_generation.generation;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.swing.JFileChooser;
-
+import com.github.anno4j.rdf_generation.configuration.Configuration;
 import com.github.anno4j.rdf_generation.building.Extractor;
-import com.github.anno4j.rdf_generation.konverter.Konverter;
+import com.google.common.reflect.ClassPath;
 
 public class RdfFileGenerator implements FileGenerator {
 
-	private String interfaceAsString;
 	private String content;
-	private String serialization;
 
 	public RdfFileGenerator() {
-		interfaceAsString = "";
 		content = "";
 	}
 
 	@Override
-	public void generateFile(String path, String serial) {
-		// Add serialization, different cases (and converter)
-		serialization = serial;
-		try (BufferedReader br = new BufferedReader(new FileReader(chooseFile()))) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				interfaceAsString += line + "\r\n";
+	public void generateFile(String packages, Configuration config) throws IOException {
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		// Start reader by specifying for example how the name of the package "starts
+		// with"
+		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
+			if (info.getName().startsWith(packages)) {
+					final Class<?> clazz = info.load();
+					// do something with your clazz
+
+					System.out.println(clazz.getCanonicalName());
+					content = Extractor.extractFrom(clazz);
+				} else {
+					//...
+				}
 			}
-
-			Class<?> convclass = Konverter.classConvertion(interfaceAsString);
-
-			content = Extractor.extractFrom(convclass);
-			if (getSerial() == "RDF/XML") {
-				writeFile("", path); // delete "", only to avoid NullPointer since generating class doesn't work
-			} else if (getSerial() == "TURTLE") {
+			if (config.getSerialization() == "RDF/XML") {
+				writeFile("", config.getOutputPath()); // delete "", only to avoid NullPointer since generating class
+														// doesn't work
+			} else if (config.getSerialization() == "TURTLE") {
 				// Converter
-			} else if (getSerial() == "N3") {
+			} else if (config.getSerialization() == "N3") {
 				// Converter
 			} else {
 				System.out.println("WRONG SERIALIZATION");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-	}
-
-	private String chooseFile() {
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(null);
-		int retrival = chooser.showSaveDialog(null);
-		if (retrival == JFileChooser.APPROVE_OPTION) {
-			return chooser.getSelectedFile().getAbsolutePath();
-		} else {
-			return null;
-		}
-	}
 
 	public void writeFile(String content, String path) throws IOException {
 		BufferedWriter writer = null;
@@ -69,9 +53,5 @@ public class RdfFileGenerator implements FileGenerator {
 		}
 		writer.write(content);
 		writer.close();
-	}
-
-	private String getSerial() {
-		return serialization;
 	}
 }

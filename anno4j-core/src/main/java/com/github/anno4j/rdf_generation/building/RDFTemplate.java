@@ -26,10 +26,6 @@ public class RDFTemplate {
 		return "</rdfs:Class>";
 	}
 
-	public String insertComment(String comment) {
-		return "<rdfs:comment> " + comment + " </rdf:comment>";
-	}
-
 	public String insertSubclass(String subclass) {
 		return "<rdfs:subClassOf rdfs:resource=''" + subclass + "''/>";
 	}
