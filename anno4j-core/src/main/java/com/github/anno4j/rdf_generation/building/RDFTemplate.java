@@ -1,6 +1,5 @@
 package com.github.anno4j.rdf_generation.building;
 
-import com.hp.hpl.jena.rdf.model.NsIterator;
 
 public class RDFTemplate { //FINAL??
 
@@ -8,10 +7,14 @@ public class RDFTemplate { //FINAL??
 		return "<?xml version=''1.0''encoding=''utf-8''?>";
 	}
 
-	public static String insertNamespaceTemp(int numberNS, String abbreviation, String namespace) {
-		return "<rdf:RDF xmlns:" + insertNamespaces(numberNS, abbreviation, namespace) + ">";
+	public static String insertRdf() {
+		return "<rdf:RDF ";
 	}
 
+	public static String insertNamespaceTemp(int numberNS, String abbreviation, String namespace) {
+		return "xmlns:" + insertNamespaces(numberNS, abbreviation, namespace) + ">";
+	}
+	
 	public static String insertNamespaces(int numberNS, String abbreviation, String namespace) {
 		return abbreviation + "=''" + namespace + "''";
 	}

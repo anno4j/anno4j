@@ -8,6 +8,13 @@ public class Builder {
 
 	public static String build() {
 		content = RDFTemplate.insertHead() + "\r\n" + "\r\n";
+		content += RDFTemplate.insertRdf() + "\r\n";
+		
+//		for() {
+//			content += RDFTemplate.insertNamespaceTemp(0, "", "") + "\r\n";
+//		}
+//		content += "\r\n";
+		
 		content += RDFTemplate.insertClass(Extractor.getClassvalue()) + "\r\n";
 		
 		for(int i = 0; i < Extractor.getSubclassof().size(); i++) {
@@ -23,6 +30,8 @@ public class Builder {
 				content += RDFTemplate.insertRange("") + "\r\n";
 				content += RDFTemplate.insertEndProperty() + "\r\n" + "\r\n";
 			}
+			
+		content += RDFTemplate.insertEndRDF();
 		return content; //call template und parameter mit Mapper.map(...) sowie aufruf zu den Namespaces
 	}
 }
