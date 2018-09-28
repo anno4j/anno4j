@@ -1,7 +1,9 @@
 package com.github.anno4j.rdf_generation.building;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openrdf.annotations.Iri;
@@ -11,7 +13,7 @@ public class Extractor {
 	private static String classvalue;
 	private static String classcomment;
 	private static boolean superclassExists;
-	private static Class<?>[] subclassof;
+	private static List<String> subclassof;
 	private static int id;
 	private static Map<Integer, String> idNameMap = new HashMap<Integer, String>(); // id and methodname
 	private static Map<Integer, String> methodIriMap = new HashMap<Integer, String>(); // id and "about" of property
@@ -25,6 +27,11 @@ public class Extractor {
 		id = 0;
 	}
 
+	public static String extractFromList(List<Class<?>> classes) { // passt noch nicht, alle classen später in 1
+																	// dokument
+		return null;
+	}
+
 	public static String extractFrom(Class<?> refclass) {
 
 		if (refclass.isAnnotationPresent(Iri.class)) {
@@ -35,13 +42,7 @@ public class Extractor {
 
 		if (refclass.getInterfaces() != null) {
 			superclassExists = true;
-			subclassof = refclass.getInterfaces();
-			
-			for(int i = 0; i < subclassof.length; i++) {
-				System.out.println("SubClasses: " + subclassof[i]);
-			}
-			System.out.println();
-
+			subclassof = giveSimpleName(refclass.getInterfaces());
 		}
 
 		Method[] methods = refclass.getDeclaredMethods();
@@ -50,7 +51,20 @@ public class Extractor {
 				mapSetup(id++, methods[i]);
 			}
 		}
-		return Mapper.mapToRDF(returnIriMap, typeIriMap);
+		return Builder.build();
+	}
+
+	private static List<String> giveSimpleName(Class<?>[] interfaces) {
+		List<String> shortnames = new ArrayList<String>();
+		for (int i = 0; i < interfaces.length; i++) {
+			String name = interfaces[i].getCanonicalName();
+			int nameindexFirst = name.lastIndexOf(".");
+			int nameindexLast = name.length();
+			shortnames.add(name.substring(nameindexFirst+1, nameindexLast));
+			
+			System.out.println("SubClasses: " + name.substring(nameindexFirst+1, nameindexLast));
+		}
+		return shortnames;
 	}
 
 	private static void mapSetup(int mapID, Method method) {
@@ -72,10 +86,6 @@ public class Extractor {
 		System.out.println();
 //		System.out.println("typeIriMap: " + type);
 	}
-	
-	private static void extractComment(Class<?> refclass) {
-		
-	}
 
 	public static String getClassvalue() {
 		return classvalue;
@@ -89,7 +99,7 @@ public class Extractor {
 		return superclassExists;
 	}
 
-	public static Class<?>[] getSubclassof() {
+	public static List<String> getSubclassof() {
 		return subclassof;
 	}
 
