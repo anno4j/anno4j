@@ -11,6 +11,18 @@ import com.github.anno4j.rdf_generation.generation.RdfFileGenerator;
 
 public class MainClass {
 
+	/**
+	 * User needs to add the following:
+	 * -packagestructure
+	 * -outputfile
+	 * -serialisierung
+	 * -bundled serialisierung, if a package was chosen
+	 * 
+	 * @param args
+	 * @throws RepositoryException
+	 * @throws FileGenerationException
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws RepositoryException, FileGenerationException, IOException {
 		String packages = "com.github.anno4j.rdf_generation.examples.Player";
 		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "RDF/XML",

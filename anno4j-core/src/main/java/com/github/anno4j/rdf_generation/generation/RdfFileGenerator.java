@@ -23,24 +23,31 @@ public class RdfFileGenerator implements FileGenerator {
 		this.packages = packages;
 	}
 
+	/**
+	 * Extracts all classes the user inputted, if not bundled, each class will be
+	 * converted separately, if bundled there will be only one output file, no
+	 * matter how many input classes.
+	 */
 	@Override
-	public void generate() throws IOException { // generiert alle
-
+	public void generate() throws IOException {
 		allclasses = loadAllClasses();
-
 		if (!config.isBundled()) {
 			for (Class<?> clazz : allclasses) { // nur für !bundled
 //				System.out.println("Size of my Classes-List :" + allclasses.size());
-				generateFile(clazz);
+				generateFile(clazz); // jede file wird extra generiert.
 			}
 		} else {
-			generateBundledFile(allclasses);
-			// auch alle klassen in der list aber es gehört ALLES IN 1 DOKUMENT
+			generateBundledFile(allclasses); // einmalige file als allen klassen
 		}
 	}
 
+	/**
+	 * Loads all classes from the packagesuructure the user typed in
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	private List<Class<?>> loadAllClasses() throws IOException {
-
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// Start reader by specifying for example how the name of the package "starts
 		// with"
@@ -50,26 +57,45 @@ public class RdfFileGenerator implements FileGenerator {
 				final Class<?> clazz = info.load();
 				allclasses.add(clazz);
 //				System.out.println(clazz.getCanonicalName());
-				return allclasses;
-			} else if(info.getName().startsWith(packages) && packages.endsWith(".")) {
+				return allclasses; // lädt nur eine klasse, da packagestruktur nicht mit punkt endete und ein pfad
+									// perfekt mit der eingabe übereinstimmt
+			} else if (info.getName().startsWith(packages) && packages.endsWith(".")) {
 				final Class<?> clazz = info.load();
-				allclasses.add(clazz);
+				allclasses.add(clazz); // lädt alle klassen in dem package
 			}
 
 		}
 		return allclasses;
 	}
-	
+
+	/**
+	 * Generates only one file from many input classes and writes the RDFS File
+	 * 
+	 * @param allclasses
+	 * @throws IOException
+	 */
 	private void generateBundledFile(List<Class<?>> allclasses) throws IOException {
-		content = Extractor.extractFromList(allclasses);
+		content = Extractor.extractMany(allclasses);
 		serialCheckAndWrite(content);
 	}
 
+	/**
+	 * Generates a RDFS file from one input class and writes the generated file
+	 * 
+	 * @param clazz
+	 * @throws IOException
+	 */
 	private void generateFile(Class<?> clazz) throws IOException { // generiert eine
-		content = Extractor.extractFrom(clazz);
+		content = Extractor.extractOne(clazz);
 		serialCheckAndWrite(content);
 	}
-	
+
+	/**
+	 * Wählt die richtige serialisierungsart aus und schreibt das dokument
+	 * 
+	 * @param content
+	 * @throws IOException
+	 */
 	private void serialCheckAndWrite(String content) throws IOException {
 		if (config.getSerialization() == "RDF/XML") {
 			writeFile(content, config.getOutputPath()); // delete "", only to avoid NullPointer since generating class
@@ -81,9 +107,16 @@ public class RdfFileGenerator implements FileGenerator {
 		} else {
 			System.out.println("WRONG SERIALIZATION");
 		}
-		
+
 	}
 
+	/**
+	 * Writes the RDFS-File
+	 * 
+	 * @param content
+	 * @param path
+	 * @throws IOException
+	 */
 	public void writeFile(String content, String path) throws IOException {
 		BufferedWriter writer = null;
 		try {

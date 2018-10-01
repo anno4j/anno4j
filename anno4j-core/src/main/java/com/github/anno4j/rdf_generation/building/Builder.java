@@ -1,5 +1,7 @@
 package com.github.anno4j.rdf_generation.building;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class Builder {
@@ -15,13 +17,19 @@ public class Builder {
 //		}
 //		content += "\r\n";
 		
-		content += RDFTemplate.insertClass(Extractor.getClassvalue()) + "\r\n";
-		
-		for(int i = 0; i < Extractor.getSubclassof().size(); i++) {
-			content += RDFTemplate.insertSubclass("", Extractor.getSubclassof().get(i)) + "\r\n";
+		for (Map.Entry<Integer, String> e : Extractor.getClassValues().entrySet()) {
+			content += RDFTemplate.insertClass(e.getValue()) + "\r\n";
+			
+			for (Entry<Integer, List<String>> e1 : Extractor.getSubClasses().entrySet()) {
+				for(int i = 0; i < e1.getValue().size(); i++) {
+					content += RDFTemplate.insertClass(e1.getValue().get(i)) + "\r\n";
+				}
+			}
+				content += RDFTemplate.insertEndClass() + "\r\n" + "\r\n";
 		}
-		content += RDFTemplate.insertEndClass() + "\r\n" + "\r\n";
 		
+		
+		// AB HIER WEITER MIT ANPASSUNG FÜR BUNDLED !
 			
 			for(Entry<Integer, String> e : Extractor.getMethodIriMap().entrySet()){
 				content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";

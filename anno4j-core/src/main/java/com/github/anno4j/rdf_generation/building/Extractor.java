@@ -8,76 +8,128 @@ import java.util.Map;
 
 import org.openrdf.annotations.Iri;
 
+import com.fasterxml.jackson.databind.node.IntNode;
+
 public class Extractor {
 
-	private static String classvalue;
-	private static String classcomment;
-	private static boolean superclassExists;
-	private static List<String> subclassof;
-	private static int id;
-	private static String classname;
+//	Classes:
+	private static int classID;
+	private static Map<Integer, String> classNames = new HashMap<Integer, String>();
+	private static Map<Integer, String> classValues = new HashMap<Integer, String>();
+	private static Map<Integer, List<String>> subClasses = new HashMap<Integer, List<String>>();
+	private static List<String> allSubClasses = new ArrayList<>();
+
+//	Properties:
+	private static int propID;
 	private static Map<Integer, String> idNameMap = new HashMap<Integer, String>(); // id and methodname
 	private static Map<Integer, String> methodIriMap = new HashMap<Integer, String>(); // id and "about" of property
-	private static Map<Integer, String> returnIriMap = new HashMap<Integer, String>(); // id and range (domain as
-																						// "about" of class, classvalue)
-	private static Map<Integer, String> typeIriMap = new HashMap<Integer, String>(); // id and type
+	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>(); // id and range (domain as
+																					// "about" of class, classvalue)
+	private static Map<Integer, String> typeMap = new HashMap<Integer, String>(); // id and type
 
 	public Extractor() {
-		classcomment = "";
-		superclassExists = false;
-		id = 0;
+		classID = 0;
+		propID = 0;
 	}
 
-	public static String extractFromList(List<Class<?>> classes) { // passt noch nicht, alle classen später in 1
-																	// dokument
-		return null;
-	}
-
-	public static String extractFrom(Class<?> refclass) {
-		
-		classname = getClassName(refclass.getCanonicalName());
-
-		if (refclass.isAnnotationPresent(Iri.class)) {
-			classvalue = refclass.getAnnotation(Iri.class).value();
-//			System.out.println("AnnotationValue: " + classvalue);
-//			System.out.println();
-		}
-
-		if (refclass.getInterfaces() != null) {
-			superclassExists = true;
-			subclassof = giveSimpleName(refclass.getInterfaces());
-		}
-
-		Method[] methods = refclass.getDeclaredMethods();
-		if (methods.length != 0) {
-			for (int i = 0; i < methods.length; i++) {
-				mapSetup(id++, methods[i]);
-			}
+	/**
+	 * Fügt nach und nach für jede klasse neue werte in den Extractor ein, buildet
+	 * am ende
+	 * 
+	 * @param classes
+	 * @return
+	 */
+	public static String extractMany(List<Class<?>> classes) {
+		for (int i = 0; i < classes.size(); i++) {
+			setup(classes.get(i));
 		}
 		return Builder.build();
 	}
 
-	private static String getClassName(String canonicalName) {
-		String name = null;
-		int nameindexFirst = canonicalName.lastIndexOf(".");
-		int nameindexLast = canonicalName.length();
-		name = canonicalName.substring(nameindexFirst+1, nameindexLast);
-		return name;
+	/**
+	 * Fügt nur eine Klasse in den Extractor ein und buildet
+	 * 
+	 * @param refclass
+	 * @return
+	 */
+	public static String extractOne(Class<?> refclass) {
+		setup(refclass);
+		return Builder.build();
 	}
 
-	private static List<String> giveSimpleName(Class<?>[] interfaces) {
+	/**
+	 * Das eigentliche reflecten und werte einfügen in den Extractor für 1 Klasse
+	 * 
+	 * @param refclass
+	 */
+	public static void setup(Class<?> refclass) {
+		classID++;
+		classNames.put(classID, extractLastName(refclass.getCanonicalName()));
+		classValues.put(classID, extractClassAnnotValue(refclass));
+
+		if (refclass.getInterfaces() != null) {
+			allSubClasses = LastPackageNames(refclass.getInterfaces());
+		}
+		subClasses.put(classID, allSubClasses);
+
+		propID++;
+		Method[] methods = refclass.getDeclaredMethods();
+		if (methods.length != 0) {
+			for (int i = 0; i < methods.length; i++) {
+				mapSetup(propID, methods[i]);
+			}
+		}
+	}
+
+	/**
+	 * Value der Klassenannotation extrahieren
+	 * 
+	 * @param refclass
+	 * @return
+	 */
+	private static String extractClassAnnotValue(Class<?> refclass) {
+		if (refclass.isAnnotationPresent(Iri.class)) {
+			return refclass.getAnnotation(Iri.class).value();
+//			System.out.println("AnnotationValue: " + classvalue);
+//			System.out.println();
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param clazz Ein Array aus Klassen, wovon man den letzten Namen bekommt,
+	 *              nicht die ganze Packagestruktur
+	 * @return
+	 */
+	private static List<String> LastPackageNames(Class<?>[] clazz) {
 		List<String> shortnames = new ArrayList<String>();
-		for (int i = 0; i < interfaces.length; i++) {
-			String name = interfaces[i].getCanonicalName();
-			int nameindexFirst = name.lastIndexOf(".");
-			int nameindexLast = name.length();
-			shortnames.add(name.substring(nameindexFirst+1, nameindexLast));
-			
+		for (int i = 0; i < clazz.length; i++) {
+			String name = clazz[i].getCanonicalName();
+			shortnames.add(extractLastName(name));
 //			System.out.println("SubClasses: " + name.substring(nameindexFirst+1, nameindexLast));
 		}
 		return shortnames;
 	}
 
+	/**
+	 * Extrahiert den letzten Teil einer packagestruktur
+	 * 
+	 * @param name
+	 * @return
+	 */
+	private static String extractLastName(String name) {
+		int nameindexFirst = name.lastIndexOf(".");
+		int nameindexLast = name.length();
+		return name.substring(nameindexFirst + 1, nameindexLast);
+	}
+
+	/**
+	 * Befüllt die Maps für Properties aber nur für eine Methode mit einer ID
+	 * 
+	 * @param mapID
+	 * @param method
+	 */
 	private static void mapSetup(int mapID, Method method) {
 
 		String methodIri = "";
@@ -87,7 +139,7 @@ public class Extractor {
 		}
 		idNameMap.put(mapID, method.getName());
 		methodIriMap.put(mapID, methodIri);
-		returnIriMap.put(mapID, method.getReturnType().toString());
+		rangeMap.put(mapID, method.getReturnType().toString());
 //		typeIriMap.put(mapID, type);
 
 //		 PRINTS:
@@ -98,24 +150,24 @@ public class Extractor {
 //		System.out.println("typeIriMap: " + type);
 	}
 
-	public static String getClassvalue() {
-		return classvalue;
+	public static int getClassID() {
+		return classID;
 	}
 
-	public String getClasscomment() {
-		return classcomment;
+	public static Map<Integer, String> getClassNames() {
+		return classNames;
 	}
 
-	public static boolean isSubclass() {
-		return superclassExists;
+	public static Map<Integer, String> getClassValues() {
+		return classValues;
 	}
 
-	public static List<String> getSubclassof() {
-		return subclassof;
+	public static Map<Integer, List<String>> getSubClasses() {
+		return subClasses;
 	}
 
-	public static int getId() {
-		return id;
+	public static int getPropID() {
+		return propID;
 	}
 
 	public static Map<Integer, String> getIdNameMap() {
@@ -126,19 +178,12 @@ public class Extractor {
 		return methodIriMap;
 	}
 
-	public static Map<Integer, String> getReturnIriMap() {
-		return returnIriMap;
+	public static Map<Integer, String> getRangeMap() {
+		return rangeMap;
 	}
 
-	public static Map<Integer, String> getTypeIriMap() {
-		return typeIriMap;
+	public static Map<Integer, String> getTypeMap() {
+		return typeMap;
 	}
 
-	public static String getClassname() {
-		return classname;
-	}
-
-	public static void setClassnames(String classname) {
-		Extractor.classname = classname;
-	}
 }
