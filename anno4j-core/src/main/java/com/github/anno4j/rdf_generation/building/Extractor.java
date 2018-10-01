@@ -15,6 +15,7 @@ public class Extractor {
 	private static boolean superclassExists;
 	private static List<String> subclassof;
 	private static int id;
+	private static String classname;
 	private static Map<Integer, String> idNameMap = new HashMap<Integer, String>(); // id and methodname
 	private static Map<Integer, String> methodIriMap = new HashMap<Integer, String>(); // id and "about" of property
 	private static Map<Integer, String> returnIriMap = new HashMap<Integer, String>(); // id and range (domain as
@@ -33,11 +34,13 @@ public class Extractor {
 	}
 
 	public static String extractFrom(Class<?> refclass) {
+		
+		classname = getClassName(refclass.getCanonicalName());
 
 		if (refclass.isAnnotationPresent(Iri.class)) {
 			classvalue = refclass.getAnnotation(Iri.class).value();
-			System.out.println("AnnotationValue: " + classvalue);
-			System.out.println();
+//			System.out.println("AnnotationValue: " + classvalue);
+//			System.out.println();
 		}
 
 		if (refclass.getInterfaces() != null) {
@@ -54,6 +57,14 @@ public class Extractor {
 		return Builder.build();
 	}
 
+	private static String getClassName(String canonicalName) {
+		String name = null;
+		int nameindexFirst = canonicalName.lastIndexOf(".");
+		int nameindexLast = canonicalName.length();
+		name = canonicalName.substring(nameindexFirst+1, nameindexLast);
+		return name;
+	}
+
 	private static List<String> giveSimpleName(Class<?>[] interfaces) {
 		List<String> shortnames = new ArrayList<String>();
 		for (int i = 0; i < interfaces.length; i++) {
@@ -62,7 +73,7 @@ public class Extractor {
 			int nameindexLast = name.length();
 			shortnames.add(name.substring(nameindexFirst+1, nameindexLast));
 			
-			System.out.println("SubClasses: " + name.substring(nameindexFirst+1, nameindexLast));
+//			System.out.println("SubClasses: " + name.substring(nameindexFirst+1, nameindexLast));
 		}
 		return shortnames;
 	}
@@ -121,5 +132,13 @@ public class Extractor {
 
 	public static Map<Integer, String> getTypeIriMap() {
 		return typeIriMap;
+	}
+
+	public static String getClassname() {
+		return classname;
+	}
+
+	public static void setClassnames(String classname) {
+		Extractor.classname = classname;
 	}
 }

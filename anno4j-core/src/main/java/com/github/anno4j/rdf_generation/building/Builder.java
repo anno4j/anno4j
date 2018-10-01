@@ -27,7 +27,7 @@ public class Builder {
 				content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";
 				content += RDFTemplate.insertType("") + "\r\n";
 				content += RDFTemplate.insertDomain(Extractor.getClassvalue()) + "\r\n";
-				content += RDFTemplate.insertRange("") + "\r\n";
+				content += RDFTemplate.insertRange(Mapper.mapReturn(e.getKey(), Extractor.getReturnIriMap())) + "\r\n";
 				content += RDFTemplate.insertEndProperty() + "\r\n" + "\r\n";
 			}
 			

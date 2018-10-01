@@ -1,7 +1,6 @@
 package com.github.anno4j.rdf_generation.examples;
 
 import org.openrdf.annotations.Iri;
-
 import com.github.anno4j.annotations.Functional;
 
 /**

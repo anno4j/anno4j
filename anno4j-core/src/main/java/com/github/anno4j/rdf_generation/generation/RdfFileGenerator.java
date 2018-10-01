@@ -30,7 +30,7 @@ public class RdfFileGenerator implements FileGenerator {
 
 		if (!config.isBundled()) {
 			for (Class<?> clazz : allclasses) { // nur für !bundled
-				System.out.println("Size of my Classes-List :" + allclasses.size());
+//				System.out.println("Size of my Classes-List :" + allclasses.size());
 				generateFile(clazz);
 			}
 		} else {
@@ -49,7 +49,7 @@ public class RdfFileGenerator implements FileGenerator {
 			if (info.getName().matches(packages) && !packages.endsWith(".")) {
 				final Class<?> clazz = info.load();
 				allclasses.add(clazz);
-				System.out.println(clazz.getCanonicalName());
+//				System.out.println(clazz.getCanonicalName());
 				return allclasses;
 			} else if(info.getName().startsWith(packages) && packages.endsWith(".")) {
 				final Class<?> clazz = info.load();
