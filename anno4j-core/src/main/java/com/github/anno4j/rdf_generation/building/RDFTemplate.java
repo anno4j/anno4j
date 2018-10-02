@@ -31,8 +31,8 @@ public class RDFTemplate { //FINAL??
 		return "</rdfs:Class>";
 	}
 
-	public static String insertSubclass(String ns, String subclassfragment) {
-		return "<rdfs:subClassOf rdfs:resource=''" + ns + subclassfragment + "''/>";
+	public static String insertSubclass(String uri) {
+		return "<rdfs:subClassOf rdfs:resource=''" + uri + "''/>";
 	}
 
 	public static String insertProperty(String methodValue) {

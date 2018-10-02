@@ -21,6 +21,7 @@ public class Extractor {
 
 //	Properties:
 	private static int propID;
+	private static Map<Integer, Integer> propToClassID = new HashMap<Integer, Integer>();
 	private static Map<Integer, String> idNameMap = new HashMap<Integer, String>(); // id and methodname
 	private static Map<Integer, String> methodIriMap = new HashMap<Integer, String>(); // id and "about" of property
 	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>(); // id and range (domain as
@@ -65,18 +66,24 @@ public class Extractor {
 	public static void setup(Class<?> refclass) {
 		classID++;
 		classNames.put(classID, extractLastName(refclass.getCanonicalName()));
+		System.out.println("CLASSNAMES: " + classNames);
+		System.out.println();
+		
 		classValues.put(classID, extractClassAnnotValue(refclass));
+		System.out.println("CLASSVALUES: " + classValues);
+		System.out.println();
 
 		if (refclass.getInterfaces() != null) {
 			allSubClasses = LastPackageNames(refclass.getInterfaces());
 		}
 		subClasses.put(classID, allSubClasses);
+		System.out.println("Subclasses: " + subClasses);
+		System.out.println();
 
-		propID++;
 		Method[] methods = refclass.getDeclaredMethods();
 		if (methods.length != 0) {
 			for (int i = 0; i < methods.length; i++) {
-				mapSetup(propID, methods[i]);
+				methodSetup(propID++, methods[i]);
 			}
 		}
 	}
@@ -127,19 +134,26 @@ public class Extractor {
 	/**
 	 * Befüllt die Maps für Properties aber nur für eine Methode mit einer ID
 	 * 
-	 * @param mapID
+	 * @param propID
 	 * @param method
 	 */
-	private static void mapSetup(int mapID, Method method) {
+	private static void methodSetup(int propID, Method method) {
+		
+		System.out.println("propID: " + propID);
+		System.out.println();
 
 		String methodIri = "";
 
+		propToClassID.put(propID, getClassID());
+		System.out.println("PropID to ClassID: " + propToClassID);
+		System.out.println();
+		
 		if (method.isAnnotationPresent(Iri.class)) {
 			methodIri = method.getAnnotation(Iri.class).value();
 		}
-		idNameMap.put(mapID, method.getName());
-		methodIriMap.put(mapID, methodIri);
-		rangeMap.put(mapID, method.getReturnType().toString());
+		idNameMap.put(propID, method.getName());
+		methodIriMap.put(propID, methodIri);
+		rangeMap.put(propID, method.getReturnType().toString());
 //		typeIriMap.put(mapID, type);
 
 //		 PRINTS:
@@ -184,6 +198,10 @@ public class Extractor {
 
 	public static Map<Integer, String> getTypeMap() {
 		return typeMap;
+	}
+
+	public static Map<Integer, Integer> getPropToClassID() {
+		return propToClassID;
 	}
 
 }

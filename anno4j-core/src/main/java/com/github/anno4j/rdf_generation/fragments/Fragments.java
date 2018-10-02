@@ -6,20 +6,18 @@ import java.util.List;
 public class Fragments {
 	
 	private static List<Fragment> fragments;
-	private FragBool fragBool;
-	private FragByte fragByte;
-	private FragChar fragChar;
-	private FragDate fragDate;
-	private FragFloat fragFloat;
-	private FragInteger fragInteger;
-	private FragLong fragLong;
-	private FragShort fragShort;
-	private FragString fragString;
-	private FragVoid fragVoid;
+	private static FragBool fragBool;
+	private static FragByte fragByte;
+	private static FragChar fragChar;
+	private static FragDate fragDate;
+	private static FragFloat fragFloat;
+	private static FragInteger fragInteger;
+	private static FragLong fragLong;
+	private static FragShort fragShort;
+	private static FragString fragString;
+	private static FragVoid fragVoid;
 	
-	
-	
-	public Fragments() {
+	public static List<Fragment> getFragments() {
 		fragments = new ArrayList<Fragment>();
 		fragBool = new FragBool();
 		fragByte = new FragByte();
@@ -42,11 +40,6 @@ public class Fragments {
 		fragments.add(fragShort);
 		fragments.add(fragString);
 		fragments.add(fragVoid);
-		
-	}
-	
-
-	public static List<Fragment> getFragments() {
 		return fragments;
 	}
 
