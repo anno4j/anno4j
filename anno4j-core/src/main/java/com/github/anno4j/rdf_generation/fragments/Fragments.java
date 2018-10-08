@@ -18,6 +18,11 @@ public class Fragments {
 	private static FragVoid fragVoid;
 	
 	public static List<Fragment> getFragments() {
+		setFragments();
+		return fragments;
+	}
+
+	public static void setFragments() {
 		fragments = new ArrayList<Fragment>();
 		fragBool = new FragBool();
 		fragByte = new FragByte();
@@ -40,7 +45,5 @@ public class Fragments {
 		fragments.add(fragShort);
 		fragments.add(fragString);
 		fragments.add(fragVoid);
-		return fragments;
 	}
-
 }

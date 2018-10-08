@@ -1,46 +1,103 @@
 package com.github.anno4j.rdf_generation.building;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.print.attribute.HashPrintJobAttributeSet;
+
 import org.openrdf.annotations.Iri;
 
-import com.fasterxml.jackson.databind.node.IntNode;
+import com.github.anno4j.annotations.Bijective;
+import com.github.anno4j.annotations.Functional;
 
 public class Extractor {
 
-//	Classes:
-	private static int classID;
-	private static Map<Integer, String> classNames = new HashMap<Integer, String>();
-	private static Map<Integer, String> classValues = new HashMap<Integer, String>();
-	private static Map<Integer, List<String>> subClasses = new HashMap<Integer, List<String>>();
-	private static List<String> allSubClasses = new ArrayList<>();
-
-//	Properties:
-	private static int propID;
-	private static Map<Integer, Integer> propToClassID = new HashMap<Integer, Integer>();
-	private static Map<Integer, String> idNameMap = new HashMap<Integer, String>(); // id and methodname
-	private static Map<Integer, String> methodIriMap = new HashMap<Integer, String>(); // id and "about" of property
-	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>(); // id and range (domain as
-																					// "about" of class, classvalue)
-	private static Map<Integer, String> typeMap = new HashMap<Integer, String>(); // id and type
-
-	public Extractor() {
-		classID = 0;
-		propID = 0;
-	}
+//	CLASSES:
 
 	/**
-	 * Fügt nach und nach für jede klasse neue werte in den Extractor ein, buildet
-	 * am ende
+	 * The unique ID of every class that will be converted.
+	 */
+	private static int classID = 0;
+
+	/**
+	 * Mapes the classID to the name of the class with the corresponding ID.
+	 */
+	private static Map<Integer, String> classNames = new HashMap<Integer, String>();
+
+	/**
+	 * Maps the classID to the annotation value of the class with the corresponding
+	 * ID.
+	 */
+	private static Map<Integer, String> classValues = new HashMap<Integer, String>();
+
+	/**
+	 * Maps the classID to a list of all superclasses of the class with the
+	 * corresponding ID.
+	 */
+	private static Map<Integer, List<String>> subClasses = new HashMap<Integer, List<String>>();
+
+	/**
+	 * A list of all superclasses of the currently extracted class.
+	 */
+	private static List<String> allSubClasses = new ArrayList<>();
+
+//	PROPERTIES:
+
+	/**
+	 * The unique ID of every method that will be converted.
+	 */
+	private static int propID = 0;
+
+	/**
+	 * Maps the ID of the method to the ID of the class to which it belongs.
+	 */
+	private static Map<Integer, Integer> propToClassID = new HashMap<Integer, Integer>();
+
+	/**
+	 * Maps the ID of the method to the name of the method with the corresponding
+	 * ID.
+	 */
+	private static Map<Integer, String> idNameMap = new HashMap<Integer, String>();
+
+	/**
+	 * Maps the ID of the method to the method annotation value of the method with
+	 * the corresponding ID.
+	 */
+	private static Map<Integer, String> methodIriMap = new HashMap<Integer, String>();
+
+	/**
+	 * Maps the ID of the method to the return value of the method with the
+	 * corresponding ID.
+	 */
+	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>();
+
+	/**
+	 * Maps the ID of the method to the type of the method with the corresponding
+	 * ID.
+	 */
+	private static Map<Integer, String> typeMap = new HashMap<Integer, String>();
+	
+	/**
+	 * A list that stores all annotations which can be mapped to types of a method.
+	 */
+	private static List<Class<? extends Annotation>> types = new ArrayList<>();
+	private static List<String> shortTypes = new ArrayList<>();
+
+
+	/**
+	 * Adds for every class contained in the classes list its class und method
+	 * values to the Extractor. One file which contains all classes is build.
 	 * 
-	 * @param classes
-	 * @return
+	 * @param classes The list of classes the convert to one file.
+	 * @return The converted file in "RDF/XML".
 	 */
 	public static String extractMany(List<Class<?>> classes) {
+		setTypes();
 		for (int i = 0; i < classes.size(); i++) {
 			setup(classes.get(i));
 		}
@@ -48,37 +105,44 @@ public class Extractor {
 	}
 
 	/**
-	 * Fügt nur eine Klasse in den Extractor ein und buildet
+	 * Adds the class and method values of one class to the Extractor and builds the
+	 * file.
 	 * 
-	 * @param refclass
-	 * @return
+	 * @param refclass The class to be converted.
+	 * @return The converted file in "RDF/XML".
 	 */
 	public static String extractOne(Class<?> refclass) {
+		setTypes();
 		setup(refclass);
 		return Builder.build();
 	}
 
 	/**
-	 * Das eigentliche reflecten und werte einfügen in den Extractor für 1 Klasse
+	 * By using java reflection a class is analysed and its class and method values
+	 * are added to the Extractor. The following values are being extracted:
 	 * 
-	 * @param refclass
+	 * - the name of the class - the Iri-annotation value of a class - all
+	 * superclasses of a class - various values concering the methods are set.
+	 * 
+	 * @param refclass The class that gets analysed via Reflection.
 	 */
 	public static void setup(Class<?> refclass) {
 		classID++;
 		classNames.put(classID, extractLastName(refclass.getCanonicalName()));
-		System.out.println("CLASSNAMES: " + classNames);
-		System.out.println();
-		
+//		System.out.println("CLASSNAMES: " + classNames);
+//		System.out.println();
+
 		classValues.put(classID, extractClassAnnotValue(refclass));
-		System.out.println("CLASSVALUES: " + classValues);
-		System.out.println();
+//		System.out.println("CLASSVALUES: " + classValues);
+//		System.out.println();
 
 		if (refclass.getInterfaces() != null) {
 			allSubClasses = LastPackageNames(refclass.getInterfaces());
 		}
 		subClasses.put(classID, allSubClasses);
-		System.out.println("Subclasses: " + subClasses);
-		System.out.println();
+//		System.out.println("Liste alles SubKlassen: ID: "+ getClassID() + " & " + allSubClasses);
+//		System.out.println("Subclasses jeder Klasse: " + subClasses);
+//		System.out.println();
 
 		Method[] methods = refclass.getDeclaredMethods();
 		if (methods.length != 0) {
@@ -89,10 +153,10 @@ public class Extractor {
 	}
 
 	/**
-	 * Value der Klassenannotation extrahieren
+	 * Returns the Iri-annotation value of a certain class
 	 * 
-	 * @param refclass
-	 * @return
+	 * @param refclass The class whose annotation value is returned
+	 * @return the Iri-annotation value of a class
 	 */
 	private static String extractClassAnnotValue(Class<?> refclass) {
 		if (refclass.isAnnotationPresent(Iri.class)) {
@@ -104,10 +168,11 @@ public class Extractor {
 	}
 
 	/**
+	 * Returns a list of classes where only the names of the classes are contained,
+	 * not the whole package structure.
 	 * 
-	 * @param clazz Ein Array aus Klassen, wovon man den letzten Namen bekommt,
-	 *              nicht die ganze Packagestruktur
-	 * @return
+	 * @param clazz The array containing all the classes
+	 * @return A list of all the classes names
 	 */
 	private static List<String> LastPackageNames(Class<?>[] clazz) {
 		List<String> shortnames = new ArrayList<String>();
@@ -120,10 +185,11 @@ public class Extractor {
 	}
 
 	/**
-	 * Extrahiert den letzten Teil einer packagestruktur
+	 * Returns a substring which starts after the last '.' and end at the end of
+	 * the string.
 	 * 
-	 * @param name
-	 * @return
+	 * @param name The string of which the substring is needed
+	 * @return The substring of "name"
 	 */
 	private static String extractLastName(String name) {
 		int nameindexFirst = name.lastIndexOf(".");
@@ -132,36 +198,57 @@ public class Extractor {
 	}
 
 	/**
-	 * Befüllt die Maps für Properties aber nur für eine Methode mit einer ID
+	 * Sets all method values in the maps above via Java Reflection.
+	 * 
+	 * The extracted values from the methods are:
+	 * - The ID of a method and the ID of the class to which it belongs.
+	 * - Name of the method
+	 * - Iri-annotation values of the method
+	 * - Return type of the method
+	 * - The type of the method
 	 * 
 	 * @param propID
 	 * @param method
 	 */
 	private static void methodSetup(int propID, Method method) {
-		
-		System.out.println("propID: " + propID);
-		System.out.println();
+
+//		System.out.println("propID: " + propID);
+//		System.out.println();
 
 		String methodIri = "";
 
 		propToClassID.put(propID, getClassID());
-		System.out.println("PropID to ClassID: " + propToClassID);
-		System.out.println();
-		
+//		System.out.println("PropID to ClassID: " + propToClassID);
+//		System.out.println();
+
 		if (method.isAnnotationPresent(Iri.class)) {
 			methodIri = method.getAnnotation(Iri.class).value();
 		}
 		idNameMap.put(propID, method.getName());
 		methodIriMap.put(propID, methodIri);
 		rangeMap.put(propID, method.getReturnType().toString());
-//		typeIriMap.put(mapID, type);
+		typeMap.put(propID, extractType(getTypes(), method));
 
 //		 PRINTS:
-		System.out.println("idNameMap: " + method.getName());
-		System.out.println("methdoIriMap: " + methodIri);
-		System.out.println("returnIriMap: " + method.getReturnType().toString());
-		System.out.println();
+//		System.out.println("idNameMap: " + method.getName());
+//		System.out.println("methdoIriMap: " + methodIri);
+//		System.out.println("returnIriMap: " + method.getReturnType().toString());
+//		System.out.println();
 //		System.out.println("typeIriMap: " + type);
+	}
+
+	private static String extractType(List<Class<? extends Annotation>> types, Method method) {
+		for(int i = 0; i < types.size(); i++) {
+			Annotation[] annotations = method.getAnnotations();
+			for(int j = 0; j < annotations.length; j++) {
+				if(annotations[j].annotationType().toString().equals(types.get(i).toString())) {
+					String type =  types.get(i).toString();
+					shortTypes.add(extractLastName(type));
+					return extractLastName(type);
+				}
+			}
+		}
+		return null;
 	}
 
 	public static int getClassID() {
@@ -203,5 +290,82 @@ public class Extractor {
 	public static Map<Integer, Integer> getPropToClassID() {
 		return propToClassID;
 	}
+	
+	public static List<Class<? extends Annotation>> getTypes() {
+		return types;
+	}
+	
+	public static void setTypes() {
+		types.add(Functional.class);
+		types.add(Bijective.class);
+	}
+	
+
+	public static void setClassID(int classID) {
+		Extractor.classID = classID;
+	}
+
+	public static void setClassNames(Map<Integer, String> classNames) {
+		Extractor.classNames = classNames;
+	}
+
+	public static void setClassValues(Map<Integer, String> classValues) {
+		Extractor.classValues = classValues;
+	}
+
+	public static void setSubClasses(Map<Integer, List<String>> subClasses) {
+		Extractor.subClasses = subClasses;
+	}
+
+	public static void setAllSubClasses(List<String> allSubClasses) {
+		Extractor.allSubClasses = allSubClasses;
+	}
+
+	public static void setPropID(int propID) {
+		Extractor.propID = propID;
+	}
+
+	public static void setPropToClassID(Map<Integer, Integer> propToClassID) {
+		Extractor.propToClassID = propToClassID;
+	}
+
+	public static void setIdNameMap(Map<Integer, String> idNameMap) {
+		Extractor.idNameMap = idNameMap;
+	}
+
+	public static void setMethodIriMap(Map<Integer, String> methodIriMap) {
+		Extractor.methodIriMap = methodIriMap;
+	}
+
+	public static void setRangeMap(Map<Integer, String> rangeMap) {
+		Extractor.rangeMap = rangeMap;
+	}
+
+	public static void setTypeMap(Map<Integer, String> typeMap) {
+		Extractor.typeMap = typeMap;
+	}
+
+	public static void setTypes(List<Class<? extends Annotation>> types) {
+		Extractor.types = types;
+	}
+
+	public static void setShortTypes(List<String> shortTypes) {
+		Extractor.shortTypes = shortTypes;
+	}
+
+	public static void clear() {
+		setClassID(0);
+		setClassNames(new HashMap<Integer, String>());
+		setClassValues(new HashMap<Integer, String>());
+		setSubClasses(new HashMap<Integer, List<String>>());
+		setAllSubClasses(new ArrayList<String>());
+		setPropID(0);
+		setPropToClassID(new HashMap<Integer, Integer>());
+		setIdNameMap(new HashMap<Integer, String>());
+		setMethodIriMap(new HashMap<Integer, String>());
+		setRangeMap(new HashMap<Integer, String>());
+		setTypeMap(new HashMap<Integer, String>());
+	}
+
 
 }

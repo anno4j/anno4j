@@ -12,11 +12,34 @@ import com.google.common.reflect.ClassPath;
 
 public class RdfFileGenerator implements FileGenerator {
 
+	/**
+	 * The content of the RDFS file which will be stored represented as a string.
+	 */
 	private String content;
+
+	/**
+	 * The configuration settings for generating a RDFS file.
+	 */
 	private Configuration config;
+	
+	/**
+	 * The path where the package or class to convert is stored. Needed to analyse
+	 * if more than one class should be converted.
+	 */
 	private String packages;
+
+	/**
+	 * The list where all classes which will be converted are stored.
+	 */
 	private List<Class<?>> allclasses = new ArrayList<>();
 
+	/**
+	 * The constructor of the FileGenerator.
+	 * 
+	 * @param config   The configurations needed for the convertion.
+	 * @param packages The path to the converted package or class, needed for
+	 *                 analysis.
+	 */
 	public RdfFileGenerator(Configuration config, String packages) {
 		content = "";
 		this.config = config;
@@ -24,9 +47,10 @@ public class RdfFileGenerator implements FileGenerator {
 	}
 
 	/**
-	 * Extracts all classes the user inputted, if not bundled, each class will be
-	 * converted separately, if bundled there will be only one output file, no
-	 * matter how many input classes.
+	 * All classes to be converted are being stored in the allclasses list. If the
+	 * boolean "bundled" is false, every class contained in the list will be
+	 * converted separately. If true, one bundled file which contains all classes
+	 * contained in the list will be generated.
 	 */
 	@Override
 	public void generate() throws IOException {
@@ -35,16 +59,21 @@ public class RdfFileGenerator implements FileGenerator {
 			for (Class<?> clazz : allclasses) { // nur für !bundled
 //				System.out.println("Size of my Classes-List :" + allclasses.size());
 				generateFile(clazz); // jede file wird extra generiert.
+				
 			}
 		} else {
-			generateBundledFile(allclasses); // einmalige file als allen klassen
+			generateBundledFile(allclasses); // einzige file für alle klassen
 		}
 	}
 
 	/**
-	 * Loads all classes from the packagesuructure the user typed in
+	 * Loads all classes from the path of a package or class. If the name of the
+	 * package doesn't end with a '.' and matches the name of a class perfectly,
+	 * only this one class will be stored in the list. If the name of the package
+	 * ends with a '.', it is assumed that the user wants to convert all classes
+	 * contained in the given package and all of them are stored in the list.
 	 * 
-	 * @return
+	 * @return The list of all classes which should be converted to a RDFS file.
 	 * @throws IOException
 	 */
 	private List<Class<?>> loadAllClasses() throws IOException {
@@ -69,9 +98,11 @@ public class RdfFileGenerator implements FileGenerator {
 	}
 
 	/**
-	 * Generates only one file from many input classes and writes the RDFS File
+	 * Generates one output file from contaning all classes stored in allclasses, if
+	 * necessary converts the file into the required serialization and stores the
+	 * RDFS file.
 	 * 
-	 * @param allclasses
+	 * @param allclasses The list where all classes to be converted are stored.
 	 * @throws IOException
 	 */
 	private void generateBundledFile(List<Class<?>> allclasses) throws IOException {
@@ -80,20 +111,24 @@ public class RdfFileGenerator implements FileGenerator {
 	}
 
 	/**
-	 * Generates a RDFS file from one input class and writes the generated file
+	 * Generates one output file for the given class, if necessary converts the file
+	 * into the required serialization and stores the generated RDFS file.
 	 * 
-	 * @param clazz
+	 * @param clazz The class which will be converted.
 	 * @throws IOException
 	 */
 	private void generateFile(Class<?> clazz) throws IOException { // generiert eine
 		content = Extractor.extractOne(clazz);
+		Extractor.clear();
 		serialCheckAndWrite(content);
 	}
 
 	/**
-	 * Wählt die richtige serialisierungsart aus und schreibt das dokument
+	 * Checks if the generated RDFS file is already in the correct serialization. If
+	 * not it is converted into the correct serialization. Afterwards the file is
+	 * being stored.
 	 * 
-	 * @param content
+	 * @param content The already converted RDFS file in "RDF/XML".
 	 * @throws IOException
 	 */
 	private void serialCheckAndWrite(String content) throws IOException {
@@ -111,10 +146,10 @@ public class RdfFileGenerator implements FileGenerator {
 	}
 
 	/**
-	 * Writes the RDFS-File
+	 * Stores the generated RDFS file.
 	 * 
-	 * @param content
-	 * @param path
+	 * @param content The converted RDFS file.
+	 * @param path    The path where to store the file.
 	 * @throws IOException
 	 */
 	public void writeFile(String content, String path) throws IOException {

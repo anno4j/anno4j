@@ -1,7 +1,13 @@
 package com.github.anno4j.rdf_generation.building;
 
-
-public class RDFTemplate { //FINAL??
+/**
+ * The Template to generate any RDFS File with as many classes and properties as
+ * required.
+ * 
+ * @author Brinninger Sandra
+ *
+ */
+public class RDFTemplate {
 
 	public static String insertHead() {
 		return "<?xml version=''1.0''encoding=''utf-8''?>";
@@ -11,14 +17,18 @@ public class RDFTemplate { //FINAL??
 		return "<rdf:RDF ";
 	}
 
-	public static String insertNamespaceTemp(int numberNS, String abbreviation, String namespace) {
-		return "xmlns:" + insertNamespaces(numberNS, abbreviation, namespace) + ">";
+	public static String insertNamespaceTemp(String abbreviation, String namespace) {
+		return "xmlns:" + insertNamespaces(abbreviation, namespace);
 	}
-	
-	public static String insertNamespaces(int numberNS, String abbreviation, String namespace) {
+
+	public static String insertNamespaces(String abbreviation, String namespace) {
 		return abbreviation + "=''" + namespace + "''";
 	}
 
+	public static String insertRdfEndTag() {
+		return ">";
+	}
+	
 	public static String insertEndRDF() {
 		return "</rdf:RDF>";
 	}

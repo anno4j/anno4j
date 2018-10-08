@@ -1,4 +1,4 @@
-package com.github.anno4j.rdf_generation.examples;
+package com.github.anno4j.rdf_generation.tests;
 
 import org.openrdf.annotations.Iri;
 import com.github.anno4j.annotations.Functional;
@@ -16,10 +16,10 @@ public interface Player extends PlayerInterface {
     @Iri("http://example.de/rank")
     void setRank(Integer score);
     
-    @Iri("http://example.de/ranked")
+    @Iri("http://example.de/rank")
     Player getFirstPlace();
     
-    @Iri("http://example.de/pet")
+    @Iri("http://example.de/Pet")
     Pet getPlayersPet(Player player);
     
 }
