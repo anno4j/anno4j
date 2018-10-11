@@ -8,8 +8,8 @@ public class Fragments {
 	private static List<Fragment> fragments;
 	private static FragBool fragBool;
 	private static FragByte fragByte;
-	private static FragChar fragChar;
 	private static FragDate fragDate;
+	private static FragDouble fragDouble;
 	private static FragFloat fragFloat;
 	private static FragInteger fragInteger;
 	private static FragLong fragLong;
@@ -26,8 +26,8 @@ public class Fragments {
 		fragments = new ArrayList<Fragment>();
 		fragBool = new FragBool();
 		fragByte = new FragByte();
-		fragChar = new FragChar();
 		fragDate = new FragDate();
+		fragDouble = new FragDouble();
 		fragFloat = new FragFloat();
 		fragInteger = new FragInteger();
 		fragLong = new FragLong();
@@ -37,8 +37,8 @@ public class Fragments {
 		
 		fragments.add(fragBool);
 		fragments.add(fragByte);
-		fragments.add(fragChar);
 		fragments.add(fragDate);
+		fragments.add(fragDouble);
 		fragments.add(fragFloat);
 		fragments.add(fragInteger);
 		fragments.add(fragLong);

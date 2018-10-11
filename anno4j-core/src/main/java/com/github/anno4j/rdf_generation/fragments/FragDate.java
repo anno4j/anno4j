@@ -11,10 +11,11 @@ public class FragDate implements Fragment {
 	private final static String uri = ns + fragment;
 
 	private final static String javaequiv = "class java.util.Date";
+	private final static String javaequiv2 = "class [Ljava.util.Date;";
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
-		if (javaequiv.equals(javaval)) {
+		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval)) {
 			return true;
 		}
 		return false;
@@ -23,5 +24,10 @@ public class FragDate implements Fragment {
 	@Override
 	public String getURI() {
 		return uri;
+	}
+	
+	@Override
+	public String getJavaEquiv() {
+		return "";
 	}
 }

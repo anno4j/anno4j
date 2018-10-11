@@ -2,8 +2,8 @@ package com.github.anno4j.rdf_generation.fragments;
 
 import com.github.anno4j.rdf_generation.namespaces.XSD;
 
-public class FragByte implements Fragment{
-	
+public class FragByte implements Fragment {
+
 	private final static String ns = XSD.NS;
 
 	private final static String fragment = "byte";
@@ -12,10 +12,13 @@ public class FragByte implements Fragment{
 
 	private final static String javaequiv = "class java.lang.Byte";
 	private final static String javaequiv2 = "byte";
+	private final static String javaequiv3 = "class [Ljava.lang.Byte;";
+	private final static String javaequiv4 = "class [B";
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
-		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval)) {
+		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval) || javaequiv3.equals(javaval)
+				|| javaequiv4.equals(javaval)) {
 			return true;
 		}
 		return false;
@@ -26,5 +29,9 @@ public class FragByte implements Fragment{
 		return uri;
 	}
 
+	@Override
+	public String getJavaEquiv() {
+		return "";
+	}
 
 }

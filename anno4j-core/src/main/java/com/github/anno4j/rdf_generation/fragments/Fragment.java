@@ -5,5 +5,7 @@ public interface Fragment {
 	public boolean hasRelationTo(String javaval);
 	
 	public String getURI();
+
+	public String getJavaEquiv();
 	
 }

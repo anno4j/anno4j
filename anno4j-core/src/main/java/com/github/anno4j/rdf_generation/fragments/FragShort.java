@@ -12,10 +12,13 @@ public class FragShort implements Fragment {
 
 	private final static String javaequiv = "class java.lang.Short";
 	private final static String javaequiv2 = "short";
+	private final static String javaequiv3 = "class [Ljava.lang.Short;";
+	private final static String javaequiv4 = "class [S";
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
-		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval)) {
+		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval) || javaequiv3.equals(javaval)
+				|| javaequiv4.equals(javaval)) {
 			return true;
 		}
 		return false;
@@ -26,5 +29,9 @@ public class FragShort implements Fragment {
 		return uri;
 	}
 
+	@Override
+	public String getJavaEquiv() {
+		return "";
+	}
 
 }

@@ -5,10 +5,6 @@ import java.util.Map;
 
 import com.github.anno4j.rdf_generation.fragments.Fragment;
 import com.github.anno4j.rdf_generation.fragments.Fragments;
-import com.github.anno4j.rdf_generation.types.Type;
-import com.github.anno4j.rdf_generation.types.Types;
-
-import ch.qos.logback.classic.pattern.ClassNameOnlyAbbreviator;
 
 public class Mapper {
 
@@ -45,9 +41,12 @@ public class Mapper {
 		List<Fragment> fraglist = Fragments.getFragments();
 		for (int i = 0; i < fraglist.size(); i++) {
 			// if the return value matches a primitive datatype
+			String javaequiv = fraglist.get(i).getJavaEquiv(); // only needed in case the method is void
 			if (fraglist.get(i).hasRelationTo(javavalue)) {
 				// return the datatype uri
 				return fraglist.get(i).getURI();
+			} else if (javaequiv.equals((String) javavalue)) {
+				return javaequiv;
 			} else {
 				// if the return value is a complex datatype
 				for (Map.Entry<Integer, String> e : Extractor.getClassNames().entrySet()) {
@@ -61,16 +60,6 @@ public class Mapper {
 						}
 					}
 				}
-			}
-		}
-		return null;
-	}
-
-	public static String mapType(String type) {
-		List<Type> typelist = Types.getTypes();
-		for (int i = 0; i < typelist.size(); i++) {
-			if (typelist.get(i).hasRelationTo(type)) {
-				return typelist.get(i).getURI();
 			}
 		}
 		return null;

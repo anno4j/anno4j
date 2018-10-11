@@ -53,10 +53,6 @@ public class RDFTemplate {
 		return "</rdf:Property>";
 	}
 
-	public static String insertType(String resource) {
-		return "<rdf:type rdf:resource=''" + resource + "''/>";
-	}
-
 	public static String insertDomain(String resource) {
 		return "<rdf:domain rdf:resource=''" + resource + "''/>";
 	}

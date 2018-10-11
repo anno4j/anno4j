@@ -28,7 +28,7 @@ public class MainClass {
 	public static void main(String[] args) throws IOException {
 		String packages = "com.github.anno4j.rdf_generation.tests.";
 		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "RDF/XML",
-				packages, true);
+				packages);
 		FileGenerator generator = new RdfFileGenerator(config, packages);
 		generator.generate();
 	}

@@ -12,10 +12,13 @@ public class FragInteger implements Fragment {
 
 	private final static String javaequiv = "class java.lang.Integer";
 	private final static String javaequiv2 = "int";
+	private final static String javaequiv3 = "class [Ljava.lang.Integer;";
+	private final static String javaequiv4 = "class [I";
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
-		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval)) {
+		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval) || javaequiv3.equals(javaval)
+				|| javaequiv4.equals(javaval)) {
 			return true;
 		}
 		return false;
@@ -24,5 +27,10 @@ public class FragInteger implements Fragment {
 	@Override
 	public String getURI() {
 		return uri;
+	}
+
+	@Override
+	public String getJavaEquiv() {
+		return "";
 	}
 }

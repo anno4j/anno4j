@@ -12,15 +12,17 @@ public class FragVoid implements Fragment {
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
-		if (javaequiv.equals(javaval)) {
-			return true;
-		}
 		return false;
 	}
 
 	@Override
 	public String getURI() {
 		return uri;
+	}
+	
+	@Override
+	public String getJavaEquiv() {
+		return javaequiv;
 	}
 
 }

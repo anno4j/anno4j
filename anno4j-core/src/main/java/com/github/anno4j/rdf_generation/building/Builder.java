@@ -53,15 +53,11 @@ public class Builder {
 		// annotation value, type,
 		// domain and range.
 		for (Entry<Integer, String> e : Extractor.getMethodIriMap().entrySet()) {
+			String range = Mapper.mapJavaReturn(e.getKey(), Extractor.getRangeMap());
+//			System.out.println(range);
+			if(range != "void") {
 			Integer classID = null;
 			content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";
-
-			// If a type is set for this method, it is printed into the template
-			for (Entry<Integer, String> e1 : Extractor.getTypeMap().entrySet()) {
-				if (e.getKey() == e1.getKey() && e1.getValue() != null) {
-					content += RDFTemplate.insertType(Mapper.mapType(e1.getValue())) + "\r\n";
-				}
-			}
 
 			// In order to get the domain of the property, the classID of the corresponding
 			// class needs to be found.
@@ -82,8 +78,9 @@ public class Builder {
 
 			// In order to get the range of the porperty, mapping needs to be done to handle
 			// primitive datatyped differentely than complex ones.
-			content += RDFTemplate.insertRange(Mapper.mapJavaReturn(e.getKey(), Extractor.getRangeMap())) + "\r\n";
+			content += RDFTemplate.insertRange(range) + "\r\n";
 			content += RDFTemplate.insertEndProperty() + "\r\n" + "\r\n";
+			}
 		}
 
 		content += RDFTemplate.insertEndRDF();
