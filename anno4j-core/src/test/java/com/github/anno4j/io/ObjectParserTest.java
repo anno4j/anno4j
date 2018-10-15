@@ -176,7 +176,7 @@ public class ObjectParserTest {
 
         // Get all resources:
         List<ResourceObject> resources = parser.parse(ResourceObject.class, TURTLE_MULTIPLE, url, RDFFormat.TURTLE, true);
-        assertEquals(9, resources.size());
+        assertEquals(15, resources.size());
         uris = getResourcesAsStrings(resources);
         assertTrue(uris.contains("http://www.example.com/ns#anno3"));
         assertTrue(uris.contains("http://www.example.com/ns#body3"));
