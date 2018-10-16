@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Class supports various helping method concerning timestamps.
  */
-public class TimeUtils {
+public class TimeHelper {
 
     /**
      * Creates a timestamp conform to the ISO 8601 specification, supported its single information bits.
@@ -61,27 +61,12 @@ public class TimeUtils {
      * @throws IllegalArgumentException If the format is not aligned with the ISO 8601 specification.
      */
     public static boolean testTimeString(String time) throws IllegalArgumentException {
-        return (testMillisFormat(time) || testNoMillisFormat(time));
-    }
-
-    private static boolean testNoMillisFormat(String time) {
-        DateTimeFormatter formatNoMillis = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC();
+        DateTimeFormatter format = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC();
 
         try {
-            formatNoMillis.parseDateTime(time);
+            format.parseDateTime(time);
             return true;
-        }  catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    private static boolean testMillisFormat(String time) {
-        DateTimeFormatter formatWithMillis = ISODateTimeFormat.dateTime().withZoneUTC();
-
-        try {
-            formatWithMillis.parseDateTime(time);
-            return true;
-        }  catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
