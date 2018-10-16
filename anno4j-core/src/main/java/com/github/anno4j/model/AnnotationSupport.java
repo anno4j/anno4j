@@ -4,7 +4,7 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.DCTERMS;
 import com.github.anno4j.model.namespaces.OADM;
-import com.github.anno4j.util.TimeHelper;
+import com.github.anno4j.util.TimeUtils;
 import org.apache.commons.io.IOUtils;
 import org.openrdf.annotations.Iri;
 import org.openrdf.annotations.Precedes;
@@ -243,7 +243,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
      * {@inheritDoc}
      */
     public void setGenerated(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
-        this.setGenerated(TimeHelper.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+        this.setGenerated(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     @Deprecated
@@ -252,7 +252,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
      * {@inheritDoc}
      */
     public void setAnnotatedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
-        this.setAnnotatedAt(TimeHelper.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+        this.setAnnotatedAt(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     @Deprecated
@@ -261,7 +261,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
      * {@inheritDoc}
      */
     public void setSerializedAt(int year, int month, int day, int hours, int minutes, int seconds, String timezoneID) {
-        this.setSerializedAt(TimeHelper.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
+        this.setSerializedAt(TimeUtils.createTimeString(year, month, day, hours, minutes, seconds, timezoneID));
     }
 
     @Override
@@ -269,7 +269,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
      * {@inheritDoc}
      */
     public void setGenerated(String generated) {
-        if (generated == null || TimeHelper.testTimeString(generated)) {
+        if (generated == null || TimeUtils.testTimeString(generated)) {
             this.generated = generated;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
@@ -282,7 +282,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
      * {@inheritDoc}
      */
     public void setSerializedAt(String serializedAt) {
-        if (serializedAt == null || TimeHelper.testTimeString(serializedAt)) {
+        if (serializedAt == null || TimeUtils.testTimeString(serializedAt)) {
             this.serializedAt = serializedAt;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
@@ -295,7 +295,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
      * {@inheritDoc}
      */
     public void setAnnotatedAt(String annotatedAt) {
-        if (annotatedAt == null || TimeHelper.testTimeString(annotatedAt)) {
+        if (annotatedAt == null || TimeUtils.testTimeString(annotatedAt)) {
             this.annotatedAt = annotatedAt;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");

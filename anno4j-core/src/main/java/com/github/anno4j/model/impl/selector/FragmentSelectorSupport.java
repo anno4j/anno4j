@@ -1,8 +1,13 @@
 package com.github.anno4j.model.impl.selector;
 
+import com.github.anno4j.Anno4j;
+import com.github.anno4j.model.SelectorFactory;
 import com.github.anno4j.model.SelectorSupport;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.selector.enums.FragmentSpecification;
 import com.github.anno4j.annotations.Partial;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,8 +35,10 @@ public abstract class FragmentSelectorSupport extends SelectorSupport implements
     private Pattern spatialPattern = Pattern.compile("xywh=(\\w+:)?(\\d+),(\\d+),(\\d+),(\\d+)");
 
     @Override
-    public String getConformsTo() {
-        return FragmentSpecification.W3C_MEDIA_FRAGMENTS.toString();
+    public ResourceObject getConformsTo() throws RepositoryConfigException, RepositoryException, InstantiationException, IllegalAccessException {
+        Anno4j anno4j = new Anno4j(this.getObjectConnection().getRepository());
+
+        return SelectorFactory.getMediaFragmentsSpecification(anno4j);
     }
 
     @Override

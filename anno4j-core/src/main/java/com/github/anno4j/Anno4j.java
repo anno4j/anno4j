@@ -16,18 +16,24 @@ import org.apache.marmotta.ldpath.api.functions.SelectorFunction;
 import org.apache.marmotta.ldpath.api.functions.TestFunction;
 import org.apache.marmotta.ldpath.api.selectors.NodeSelector;
 import org.apache.marmotta.ldpath.api.tests.NodeTest;
+import org.openrdf.annotations.Iri;
 import org.openrdf.idGenerator.IDGenerator;
 import org.openrdf.idGenerator.IDGeneratorAnno4jURN;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectConnection;
+import org.openrdf.repository.object.ObjectQuery;
 import org.openrdf.repository.object.ObjectRepository;
+import org.openrdf.repository.object.RDFObject;
 import org.openrdf.repository.object.config.ObjectRepositoryConfig;
 import org.openrdf.repository.object.config.ObjectRepositoryFactory;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.result.Result;
 import org.openrdf.sail.memory.MemoryStore;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -77,7 +83,12 @@ public class Anno4j implements TransactionCommands {
     private LDPathEvaluatorConfiguration evaluatorConfiguration = new LDPathEvaluatorConfiguration();
 
     /**
-     * Stores alls partial implementations of the defined interfaces, such as the ResourceObject or the
+     * Stores the {@link org.openrdf.annotations.Iri}-annotated interfaces in the classpath indexed by their IRI-string.
+     */
+    private Map<String, Class<? extends ResourceObject>> conceptsByIri = new HashMap<>();
+
+    /**
+     * Stores all partial implementations of the defined interfaces, such as the ResourceObject or the
      * Annotation interface.
      */
     private Set<Class<?>> partialClasses;
@@ -90,6 +101,10 @@ public class Anno4j implements TransactionCommands {
 
     public Anno4j() throws RepositoryException, RepositoryConfigException {
         this(new SailRepository(new MemoryStore()));
+    }
+
+    public Anno4j(boolean persistSchemaAnnotations) throws RepositoryException, RepositoryConfigException {
+        this(new SailRepository(new MemoryStore()), null, persistSchemaAnnotations);
     }
 
     public Anno4j(URI defaultContext) throws RepositoryException, RepositoryConfigException {
@@ -146,6 +161,9 @@ public class Anno4j implements TransactionCommands {
         // Bugfix: Searching for Reflections creates a lot ot Threads, that are not closed at the end by themselves,
         // so we close them manually.
         annotatedClasses.getConfiguration().getExecutorService().shutdown();
+
+        // Index conceptsByIri with @Iri annotation:
+        indexConcepts(annotatedClasses);
 
         // find classes with @Partial annotation
         this.partialClasses = annotatedClasses.getTypesAnnotatedWith(Partial.class, true);
@@ -224,6 +242,24 @@ public class Anno4j implements TransactionCommands {
         evaluatorConfiguration.setTestEvaluators(testEvaluators);
         evaluatorConfiguration.setTestFunctionEvaluators(testFunctionEvaluators);
         evaluatorConfiguration.setFunctionEvaluators(functionEvaluators);
+    }
+
+    /**
+     * Indexes all {@link Iri} annotated interfaces by their IRI.
+     * @param reflections Reflections object having an {@link TypeAnnotationsScanner} capturing all classes in classpath.
+     */
+    private void indexConcepts(Reflections reflections) {
+        // The conceptsByIri are @Iri annotated interfaces:
+        for(Class<?> concept : reflections.getTypesAnnotatedWith(Iri.class)) {
+            // Must be a sub-interface of ResourceObject:
+            if(concept.isAnnotationPresent(Iri.class) && concept.isInterface() && ResourceObject.class.isAssignableFrom(concept)) {
+                // Get the conceptsByIri annotation and IRI:
+                Iri iriAnnotation = concept.getAnnotation(Iri.class);
+                String iri = iriAnnotation.value();
+
+                conceptsByIri.put(iri, (Class<? extends ResourceObject>) concept);
+            }
+        }
     }
 
     private ObjectConnection createObjectConnection(URI context) throws RepositoryException {
@@ -422,7 +458,7 @@ public class Anno4j implements TransactionCommands {
      * Configures the Repository (Connector for local/remote SPARQL repository) to use in Anno4j.
      *
      * @param repository Repository to use in Anno4j.
-     * @param conceptJars URLs of JAR-files that are scanned for concepts.
+     * @param conceptJars URLs of JAR-files that are scanned for conceptsByIri.
      * @param behaviourJars URLs of JAR-files that are scanned for behaviours.
      * @throws RepositoryException
      * @throws RepositoryConfigException
@@ -473,6 +509,78 @@ public class Anno4j implements TransactionCommands {
 
     public URI getDefaultContext() {
         return defaultContext;
+    }
+
+    /**
+     * Returns a Java type that corresponds to a most specific class of which the given resource is an instance of.
+     * This method can be used to instantiate objects (see {@link #createObject(Class)}) for a resource which type is
+     * not known. Note that this method can return any most specific type if there exist multiple ones for the resource.
+     * To get all most specific types of a resource you may use {@link #getConcepts(String)}.
+     * @param resource The IRI of the resource for which to determine a most specific concept.
+     * @return Returns any (explicitly stated) most specific type of the given resource. This method returns
+     * {@link ResourceObject} if no type is stated for the given resource.
+     * @throws RepositoryException Thrown if there is an error accessing the triplestore.
+     */
+    public Class<? extends ResourceObject> getConcept(String resource) throws RepositoryException {
+        // Get all most specific concepts:
+        Collection<Class<? extends ResourceObject>> concepts = getConcepts(resource);
+
+        // Return any of those concepts:
+        if(!concepts.isEmpty()) {
+            return concepts.iterator().next();
+        } else {
+            return ResourceObject.class;
+        }
+    }
+
+    /**
+     * Returns all Java types that correspond to the most specific classes of which the given resource is an instance of.
+     * This method can e.g. be used to instantiate (see {@link #createObject(Class)}) an object for a resource with
+     * unknown types. Especially if there may not be a single Java type capturing all those classes. If there exists a Java type
+     * for every resource or only an arbitrary type is needed, you may use {@link #getConcept(String)} instead.
+     * @param resource The IRI of the resource for which to determine the most specific concepts.
+     * @return Returns the most specific (explicitly stated) concepts of {@code resource}. If no types can be determined
+     * the returned collection contains {@link ResourceObject}.
+     * @throws RepositoryException Thrown if there is an error accessing the triplestore.
+     */
+    public Collection<Class<? extends ResourceObject>> getConcepts(String resource) throws RepositoryException {
+        ObjectConnection connection = getObjectRepository().getConnection();
+        try {
+            /*
+            Select any class c1 of which the resource is an instance and for which there is no
+            other class c2, c2 != c1, that is a subclass of c1:
+             */
+            ObjectQuery query = connection.prepareObjectQuery(
+                    "SELECT ?c1 {" +
+                    "   <" + resource + "> a ?c1 . " +
+                    "   MINUS {" +
+                    "       <" + resource + "> a ?c2 . " +
+                    "       ?c2 rdfs:subClassOf+ ?c1 . " +
+                    "       FILTER(?c1 != ?c2)" +
+                    "   }" +
+                    "}"
+            );
+            Result<RDFObject> result = query.evaluate(RDFObject.class);
+
+            Collection<Class<? extends ResourceObject>> concepts = new HashSet<>();
+            while (result.hasNext()) {
+                // Get the classes IRI:
+                String clazzIri = result.next().toString();
+                // Look up the corresponding Java class:
+                if(conceptsByIri.containsKey(clazzIri)) {
+                    concepts.add(conceptsByIri.get(clazzIri));
+                }
+            }
+            // No class found? Every resource is instance of rdfs:Resource aka. ResourceObject:
+            if(concepts.isEmpty()) {
+                concepts.add(ResourceObject.class);
+            }
+
+            return concepts;
+
+        } catch (MalformedQueryException | QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
     }
 
     public Transaction createTransaction() throws RepositoryException {

@@ -4,7 +4,7 @@ import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.impl.ResourceObjectSupport;
 import com.github.anno4j.model.namespaces.OADM;
-import com.github.anno4j.util.TimeHelper;
+import com.github.anno4j.util.TimeUtils;
 import org.openrdf.annotations.Iri;
 import org.openrdf.repository.object.exceptions.ObjectPersistException;
 
@@ -28,7 +28,7 @@ public abstract class TimeStateSupport extends ResourceObjectSupport implements 
      * {@inheritDoc}
      */
     public void setSourceDateStart(String sourceDateStart) {
-        if (sourceDateStart == null || TimeHelper.testTimeString(sourceDateStart)) {
+        if (sourceDateStart == null || TimeUtils.testTimeString(sourceDateStart)) {
             this.sourceDateStart = sourceDateStart;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");
@@ -46,7 +46,7 @@ public abstract class TimeStateSupport extends ResourceObjectSupport implements 
      */
     @Override
     public void setSourceDateEnd(String sourceDateEnd) {
-        if (sourceDateEnd == null || TimeHelper.testTimeString(sourceDateEnd)) {
+        if (sourceDateEnd == null || TimeUtils.testTimeString(sourceDateEnd)) {
             this.sourceDateEnd = sourceDateEnd;
         } else {
             throw new ObjectPersistException("Incorrect timestamp format supported. The timestamp needs to be conform to the ISO 8601 specification.");

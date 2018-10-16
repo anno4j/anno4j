@@ -4,6 +4,7 @@ import com.github.anno4j.Anno4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.object.ObjectConnection;
 
 import java.util.List;
@@ -40,5 +41,16 @@ public class MotivationTest {
         assertEquals(1, result.size());
 
         assertEquals(motivation.getResource().toString(), result.get(0).getResource().toString());
+    }
+
+    @Test
+    public void testMultipleMotivation() throws RepositoryException, IllegalAccessException, InstantiationException {
+        Motivation motivation = MotivationFactory.getBookmarking(anno4j);
+
+        List<Motivation> result = anno4j.findAll(Motivation.class);
+        assertEquals(1, result.size());
+
+        Motivation motivation2 = MotivationFactory.getBookmarking(anno4j);
+        assertEquals(1, result.size());
     }
 }

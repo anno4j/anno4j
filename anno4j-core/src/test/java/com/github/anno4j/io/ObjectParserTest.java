@@ -1,30 +1,49 @@
 package com.github.anno4j.io;
 
+import com.github.anno4j.Anno4j;
 import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.Body;
 import com.github.anno4j.model.Target;
+import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.model.namespaces.DCTYPES;
 import com.github.anno4j.model.namespaces.RDF;
-import com.github.anno4j.io.ObjectParser;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.openrdf.annotations.Iri;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfigException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Testsuite testing the {@link ObjectParser} class.
  */
 public class ObjectParserTest {
+
+    /**
+     * Returns the URIs of the given resource objects (cf. {@link ResourceObject#getResourceAsString()}).
+     * @param resources The resources for which to get an URI.
+     * @return Returns the URIs of the given resources.
+     */
+    private static Collection<String> getResourcesAsStrings(Collection<? extends ResourceObject> resources) {
+        Collection<String> uris = new LinkedList<>();
+        for(ResourceObject resource : resources) {
+            uris.add(resource.getResourceAsString());
+        }
+        return uris;
+    }
 
     @Test
     public void testJSONLD() throws UpdateExecutionException {
@@ -109,6 +128,65 @@ public class ObjectParserTest {
         } catch (IOException | RepositoryException | RepositoryConfigException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testClearing() throws Exception {
+        Anno4j anno4j = new Anno4j(new SailRepository(new MemoryStore()), null, false);
+        ObjectParser parser = new ObjectParser();
+
+        List<Annotation> annotations = parser.parse(Annotation.class, TURTLE, new URL("http://example.com/"), RDFFormat.TURTLE, true);
+        assertEquals(1, annotations.size());
+
+        // Persist the annotations:
+        for(Annotation annotation : annotations) {
+            anno4j.persist(annotation);
+        }
+        // Test that values are available in the anno4j-connected repository:
+        Body body1 = anno4j.findByID(Body.class,"http://www.example.com/ns#body1");
+        Annotation anno1 = anno4j.findByID(Annotation.class,"http://www.example.com/ns#anno1");
+        assertEquals(Sets.newHashSet(body1), anno1.getBodies());
+
+        // Read another document clearing the internal triplestore:
+        annotations = parser.parse(Annotation.class, TURTLE2, new URL("http://example.com/"), RDFFormat.TURTLE, true);
+        assertEquals(1, annotations.size());
+
+        // Persist the annotations:
+        for(Annotation annotation : annotations) {
+            anno4j.persist(annotation);
+        }
+        // Test that values are available in the anno4j-connected repository:
+        Body body2 = anno4j.findByID(Body.class,"http://www.example.com/ns#body2");
+        Annotation anno2 = anno4j.findByID(Annotation.class,"http://www.example.com/ns#anno2");
+        assertEquals(Sets.newHashSet(body2), anno2.getBodies());
+    }
+
+    @Test
+    public void testGenericParsing() throws Exception {
+        URL url = new URL("http://example.com/");
+        ObjectParser parser = new ObjectParser();
+
+        // Get all dctype:Sound resources:
+        List<Sound> sounds = parser.parse(Sound.class, TURTLE_MULTIPLE, url, RDFFormat.TURTLE, true);
+        assertEquals(3, sounds.size());
+        Collection<String> uris = getResourcesAsStrings(sounds);
+        assertTrue(uris.contains("http://www.example.com/ns#body3"));
+        assertTrue(uris.contains("http://www.example.com/ns#body4"));
+        assertTrue(uris.contains("http://www.example.com/ns#body5"));
+
+        // Get all resources:
+        List<ResourceObject> resources = parser.parse(ResourceObject.class, TURTLE_MULTIPLE, url, RDFFormat.TURTLE, true);
+        assertEquals(15, resources.size());
+        uris = getResourcesAsStrings(resources);
+        assertTrue(uris.contains("http://www.example.com/ns#anno3"));
+        assertTrue(uris.contains("http://www.example.com/ns#body3"));
+        assertTrue(uris.contains("http://www.example.com/ns#target3"));
+        assertTrue(uris.contains("http://www.example.com/ns#anno4"));
+        assertTrue(uris.contains("http://www.example.com/ns#body4"));
+        assertTrue(uris.contains("http://www.example.com/ns#target4"));
+        assertTrue(uris.contains("http://www.example.com/ns#anno5"));
+        assertTrue(uris.contains("http://www.example.com/ns#body5"));
+        assertTrue(uris.contains("http://www.example.com/ns#target5"));
     }
 
     /**

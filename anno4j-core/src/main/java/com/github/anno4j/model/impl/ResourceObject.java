@@ -15,7 +15,30 @@ import org.openrdf.rio.RDFFormat;
 @Iri(Anno4jNS.RESOURCE)
 public interface ResourceObject extends RDFObject {
 
+    /**
+     * Returns a textual representation of the resource in a supported serialisation format including all triples
+     * having the given resource as subject. This method is equivalent to {@link #getTriples(RDFFormat, int, Resource...)}
+     * with a maximum path length of one exporting from the default graph.
+     * @see #getTriples(RDFFormat, int, Resource...)
+     * @param format The format the result should have.
+     * @return A textual representation if this object in the format.
+     */
     String getTriples(RDFFormat format);
+
+    /**
+     * Returns a textual representation of the resource in a supported serialisation format including all triples
+     * within a certain distance. The graph(s) of the connected repository are traversed starting at the given resource
+     * including all triples in the result being part of a path with a maximum length of {@code maxPathLength} (if positive).
+     * The result includes inferred triples if available.
+     * @param format The format the result should have.
+     * @param maxPathLength Maximum length of paths to include in the result. If this argument is negative the result will contain
+     *                      the connected component containing the given resource.
+     * @param contexts The context(s) to get data from. A value of {@code null} corresponds to the default graph.
+     * @return Returns a textual representation of the RDF data in the requested format.
+     * @throws RepositoryException Thrown if an error occurs while accessing the repository or exporting triples from it.
+     * @throws IllegalArgumentException Thrown if {@code maxPathLength} is zero.
+     */
+    String getTriples(RDFFormat format, int maxPathLength, Resource... contexts) throws RepositoryException;
 
     void setResource(Resource resource) throws MalformedQueryException, RepositoryException, UpdateExecutionException;
 
@@ -24,4 +47,11 @@ public interface ResourceObject extends RDFObject {
     String getResourceAsString();
 
     void delete();
+
+    /**
+     * Refreshes the (possibly) cached values of the properties of this resource and guarantees that subsequent calls to getter-methods
+     * will return current values. Please note that refreshing an object may also affect other objects representing the same resource.
+     * @throws RepositoryException Thrown if an error occurs while loading values from the connected repository.
+     */
+    void update() throws RepositoryException;
 }

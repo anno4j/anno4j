@@ -1,6 +1,7 @@
 package com.github.anno4j.schema_parsing.model;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.schema.model.owl.FunctionalProperty;
 import com.github.anno4j.schema.model.rdfs.RDFSClazz;
 import com.github.anno4j.schema.model.rdfs.RDFSProperty;
 import com.github.anno4j.schema.model.rdfs.RDFSPropertySupport;
@@ -66,4 +67,42 @@ public abstract class BuildableRDFSPropertySupport extends RDFSPropertySupport i
         }
     }
 
+    @Override
+    public Integer getMaximumCardinality(RDFSClazz domainClazz) throws RepositoryException {
+        // Functional properties have a maximum cardinality of one:
+        if(isInstance(FunctionalProperty.class)) {
+            return 1;
+        }
+
+        try {
+            ObjectQuery query = getObjectConnection().prepareObjectQuery(
+                    "SELECT ?card {" +
+                            "   ?r a owl:Restriction . " +
+                            "   <" + domainClazz.getResourceAsString() + "> rdfs:subClassOf+ ?r . " +
+                            "   ?r owl:onProperty <" + getResourceAsString() + "> . " +
+
+                            "   {" + // Case 1: The maximum cardinality is implicitly specified through a fixed cardinality:
+                            "       ?r owl:cardinality ?card . " +
+                            "   }" +
+                            "   UNION " +
+                            "   {" + // Case 2: The maximum cardinality is explicitly specified:
+                            "       ?r owl:maxCardinality ?card . " +
+                            "   }" +
+                            "   MINUS {" + // Ignore qualified cardinalities:
+                            "       ?r owl:onClass ?oc . " +
+                            "   }" +
+                            "}"
+            );
+
+            List<Number> result = query.evaluate(Number.class).asList();
+            if(result != null && !result.isEmpty()) {
+                return result.get(0).intValue();
+            } else {
+                return null;
+            }
+
+        } catch (MalformedQueryException | QueryEvaluationException e) {
+            throw new RepositoryException(e);
+        }
+    }
 }

@@ -18,11 +18,34 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * A transaction that supports the atomicity property and provides a validation of the datebases schema compliance
+ * A transaction that provides a validation of the databases schema compliance
  * at commit time.
- * The RDF data in the connected triplestore is validated whether it is compliant to the OWL schema information.
+ * The RDF data in the connected triplestore is validated being compliant to the OWL schema information and other constraints.
  * The species used is <a href="https://www.w3.org/TR/2004/REC-owl-features-20040210/#s3">OWL Lite</a> with support
- * for other non-negative values for <code>owl:minCardinality</code>, <code>owl:maxCardinality</code>, <code>owl:cardinality</code>.
+ * for any non-negative values for <code>owl:minCardinality</code>, <code>owl:maxCardinality</code>, <code>owl:cardinality</code>.
+ * The validation is done in a strict manner in order to prevent problematic instance data. Therefore different URIs are assumed to
+ * identify different individuals. Also the data must be complete in order to be accepted, e.g. there must be {@code n} values for
+ * a property {@code p} if {@code p} has a {@code owl:minCardinality} constraint of {@code n}.
+ * The integrity conditions are thus more strict than imposed by RDF(S)/OWL semantics, but can prevent problems when
+ * using data.<br/>
+ * <br/>
+ * The following characteristics are validated being complete assuming unique URIs:
+ * <ul>
+ *     <li>{@code owl:FunctionalProperty} (cf. {@link com.github.anno4j.annotations.Functional})</li>
+ *     <li>{@code owl:InverseFunctionalProperty} (cf. {@link com.github.anno4j.annotations.InverseFunctional})</li>
+ *     <li>{@code owl:SymmetricProperty} (cf. {@link com.github.anno4j.annotations.Symmetric})</li>
+ *     <li>{@code owl:TransitiveProperty} (cf. {@link com.github.anno4j.annotations.Transitive})</li>
+ *     <li>{@code owl:inverseOf} (cf. {@link com.github.anno4j.annotations.InverseOf})</li>
+ *     <li>{@code rdfs:subPropertyOf} (cf. {@link com.github.anno4j.annotations.SubPropertyOf})</li>
+ *     <li>{@code owl:someValuesFrom} (cf. {@link com.github.anno4j.annotations.SomeValuesFrom})</li>
+ *     <li>{@code owl:allValuesFrom} (cf. {@link com.github.anno4j.annotations.AllValuesFrom})</li>
+ *     <li>{@code owl:minCardinality} (cf. {@link com.github.anno4j.annotations.MinCardinality})</li>
+ *     <li>{@code owl:maxCardinality} (cf. {@link com.github.anno4j.annotations.MaxCardinality})</li>
+ *     <li>{@code owl:cardinality} (cf. {@link com.github.anno4j.annotations.Cardinality})</li>
+ *     <li>{@code owl:qualifiedMinCardinality} (cf. {@link com.github.anno4j.annotations.MinCardinality})</li>
+ *     <li>{@code owl:qualifiedMaxCardinality} (cf. {@link com.github.anno4j.annotations.MaxCardinality})</li>
+ *     <li>{@code owl:qualifiedCardinality} (cf. {@link com.github.anno4j.annotations.Cardinality})</li>
+ * </ul>
  */
 public class ValidatedTransaction extends Transaction {
 
@@ -33,16 +56,62 @@ public class ValidatedTransaction extends Transaction {
     public static class ValidationFailedException extends RepositoryException {
 
         /**
-         * Initializes the exception without providing a coausing object or property.
+         * The validated transaction which validation procedure has thrown this exception.
          */
-        public ValidationFailedException() { }
+        private ValidatedTransaction transaction;
+
+        /**
+         * Initializes the exception without providing a coausing object or property.
+         * @param transaction The transaction that throws this exception.
+         */
+        protected ValidationFailedException(ValidatedTransaction transaction) {
+            this.transaction = transaction;
+        }
 
         /**
          * Initializes the exception with a message.
          * @param message The message.
+         * @param transaction The transaction that throws this exception.
          */
-        public ValidationFailedException(String message) {
+        protected ValidationFailedException(String message, ValidatedTransaction transaction) {
             super(message);
+            this.transaction = transaction;
+        }
+
+        /**
+         * Rolls back the transaction that caused this exception, i.e. all modifications
+         * done by the transaction are undone.
+         * @throws RepositoryException Thrown if an error occurs while rolling back the transaction.
+         */
+        public void rollback() throws RepositoryException {
+            transaction.rollback();
+        }
+
+        /**
+         * Commits the transaction that caused this exception validating the written data <b>again</b>.
+         * To commit the transaction without any further validation see {@link #forceCommit()}.
+         * @throws RepositoryException Thrown if committing the transaction fails.
+         */
+        public void commit() throws RepositoryException {
+            transaction.commit();
+        }
+
+        /**
+         * Explicitly commits the transaction that caused this exception <b>without</b> any further validation.
+         * Any inconsistencies in the written data will be present in the connected repository.
+         * To commit the transaction with validation see {@link #commit()}.
+         * @throws RepositoryException Thrown if committing the transaction fails.
+         */
+        public void forceCommit() throws RepositoryException {
+            transaction.forceCommit();
+        }
+
+        /**
+         * @return Returns the transaction that caused this exception. If neither {@link #rollback()},
+         * {@link #commit()} or {@link #forceCommit()} were called before this transaction is still open and can be modified.
+         */
+        public ValidatedTransaction getTransaction() {
+            return transaction;
         }
     }
 
@@ -64,7 +133,10 @@ public class ValidatedTransaction extends Transaction {
     /**
      * Validates the schema compliance of the state resulting from the transaction.
      * The RDF data in the connected triplestore is validated against OWL schema information that is present in it.
-     * If validation fails a {@link ValidationFailedException} is thrown and the transaction is rolled back.
+     * This validation checks the <b>completeness</b> of the resources written while assuming that different URIs
+     * identify different resources. This is a more strict assumption than imposed by RDF(S)/OWL semantics.
+     * If validation fails a {@link ValidationFailedException} is thrown. This exception may be used to recommit or
+     * rollback the transaction.
      * Note that the validation operates under the assumption that the RDF data was valid at the time when
      * {@link #begin()} was called.
      * @throws ValidationFailedException Thrown if the state the transaction resulted in is not compliant to the schema.
@@ -76,26 +148,28 @@ public class ValidatedTransaction extends Transaction {
         Collection<ResourceObject> anchors = getAffectedResources();
 
         // Validate the graph:
-        try {
-            validateFunctional(anchors);
-            validateInverseFunctional(anchors);
-            validateSymmetric(anchors);
-            validateTransitive(anchors);
+        validateFunctional(anchors);
+        validateInverseFunctional(anchors);
+        validateSymmetric(anchors);
+        validateTransitive(anchors);
 
-            validateInverseOf(anchors);
-            validateSubPropertyOf(anchors);
+        validateInverseOf(anchors);
+        validateSubPropertyOf(anchors);
 
-            validateAllValuesFrom(anchors);
-            validateSomeValuesFrom(anchors);
-            validateMinCardinality(anchors);
-            validateMaxCardinality(anchors);
-
-        } catch (ValidationFailedException e) {
-            rollback();
-            throw e;
-        }
+        validateAllValuesFrom(anchors);
+        validateSomeValuesFrom(anchors);
+        validateMinCardinality(anchors);
+        validateMaxCardinality(anchors);
 
         // No exception thrown, commit the transaction:
+        super.commit();
+    }
+
+    /**
+     * Commits the transaction <b>without</b> consistency validation.
+     * @throws RepositoryException Thrown if an error occurs while committing the transaction.
+     */
+    protected void forceCommit() throws RepositoryException {
         super.commit();
     }
 
@@ -223,7 +297,7 @@ public class ValidatedTransaction extends Transaction {
                 String propertyIri = row[0].toString();
                 String objectIri = row[3].toString();
 
-                throw new ValidationFailedException("There are multiple distinct values for functional property " + propertyIri + " (from " + objectIri + ")");
+                throw new ValidationFailedException("There are multiple distinct values for functional property " + propertyIri + " (from " + objectIri + ")", this);
             }
 
         } catch (MalformedQueryException e) {
@@ -267,7 +341,8 @@ public class ValidatedTransaction extends Transaction {
 
                 throw new ValidationFailedException("Inverse functional property " + propertyIri
                         + " has multiple distinct pre-images (" + objectIri + ", " + secondPreImage
-                        + ") for image " + row[2].toString());
+                        + ") for image " + row[2].toString(),
+                        this);
             }
 
         } catch (QueryEvaluationException | MalformedQueryException e) {
@@ -311,7 +386,8 @@ public class ValidatedTransaction extends Transaction {
             String objectIri = row[2].toString();
 
             throw new ValidationFailedException("Symmetric property " + propertyIri + " maps " + objectIri +
-                    " to " + asymmetricTargetIri + ", but does not map inversely.");
+                    " to " + asymmetricTargetIri + ", but does not map inversely.",
+                    this);
         }
 
     }
@@ -344,7 +420,8 @@ public class ValidatedTransaction extends Transaction {
                 Object[] row = (Object[]) result.next();
 
                 throw new ValidationFailedException("Property " + row[2] + " is defined transitive, but mapping from "
-                        + row[0] + " to " + row[3] + " is missing (reachable via " + row[1] + ").");
+                        + row[0] + " to " + row[3] + " is missing (reachable via " + row[1] + ").",
+                        this);
             }
 
         } catch (MalformedQueryException | QueryEvaluationException e) {
@@ -387,7 +464,7 @@ public class ValidatedTransaction extends Transaction {
                 String objectIri = row[2].toString();
 
 
-                throw new ValidationFailedException("Missing inverse mapping from " + value + " to " + objectIri + " by " + propertyIri);
+                throw new ValidationFailedException("Missing inverse mapping from " + value + " to " + objectIri + " by " + propertyIri, this);
             }
         }
     }
@@ -429,7 +506,7 @@ public class ValidatedTransaction extends Transaction {
             String objectIri = row[3].toString();
 
 
-            throw new ValidationFailedException("Superproperty " + superPropertyIri + " of " + subPropertyIri + " is missing value " + value + " (resource: " + objectIri + ")");
+            throw new ValidationFailedException("Superproperty " + superPropertyIri + " of " + subPropertyIri + " is missing value " + value + " (resource: " + objectIri + ")", this);
         }
     }
 
@@ -476,7 +553,7 @@ public class ValidatedTransaction extends Transaction {
 
 
             throw new ValidationFailedException("Value " + valueIri + " of " + propertyIri +
-                    " (from " + objectIri + ") is not of required type " + targetClassIri);
+                    " (from " + objectIri + ") is not of required type " + targetClassIri, this);
         }
     }
 
@@ -531,7 +608,8 @@ public class ValidatedTransaction extends Transaction {
                 String objectIri = row[2].toString();
 
                 throw new ValidationFailedException("At least one value mapped by " + propertyIri +
-                        " (from " + objectIri + ") must be of type " + targetClassIri);
+                        " (from " + objectIri + ") must be of type " + targetClassIri,
+                        this);
             }
         }
     }
@@ -622,7 +700,7 @@ public class ValidatedTransaction extends Transaction {
                 // We can directly decide whether there are too few values of any type:
                 if(cardinality < minCardinality) {
                     throw new ValidationFailedException("Property " + propertyIri + " of " + objectIri
-                            + " has only " + cardinality + " values, but minimum cardinality is " + minCardinality);
+                            + " has only " + cardinality + " values, but minimum cardinality is " + minCardinality, this);
                 }
 
                 // If there is a minimum count for values of a certain type specified, also check that:
@@ -639,7 +717,8 @@ public class ValidatedTransaction extends Transaction {
                     if(onClassValueCount < minCardinality) {
                         throw new ValidationFailedException("Property " + propertyIri + " of " + objectIri +
                                 " requires at least " + minCardinality + " values of type " + onClassIri + " but only "
-                                + onClassValueCount + " of " + cardinality + " have this type.");
+                                + onClassValueCount + " of " + cardinality + " have this type.",
+                                this);
                     }
                 }
             }
@@ -704,7 +783,8 @@ public class ValidatedTransaction extends Transaction {
                 // We can directly decide from the above query result whether there are too many values of any type:
                 if(cardinality > maxCardinality && row[3] == null) {
                     throw new ValidationFailedException("Property " + propertyIri + " of " + objectIri
-                            + " has only " + cardinality + " values, but maximum cardinality is " + maxCardinality);
+                            + " has only " + cardinality + " values, but maximum cardinality is " + maxCardinality,
+                            this);
                 }
 
                 // If there is a maximum count for values of a certain type specified, also check that:
@@ -721,7 +801,8 @@ public class ValidatedTransaction extends Transaction {
                     if(maxCardinality < onClassValueCount) {
                         throw new ValidationFailedException("Property " + propertyIri + " of " + objectIri +
                                 " must have at most " + maxCardinality + " values of type " + onClassIri + " but "
-                                + onClassValueCount + " of have this type.");
+                                + onClassValueCount + " of have this type.",
+                                this);
                     }
                 }
             }

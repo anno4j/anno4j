@@ -17,6 +17,7 @@ anno4j-ontologies/target
 anno4j-ontologies/ontologies-core/target
 anno4j-ontologies/ontologies-mico/target
 anno4j-extensions/extension-sparqlmm/target
+anno4j-compile-tool/target/
 
 /anno4j-ontologies/ontologies-mmm/target/
 

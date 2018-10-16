@@ -6,7 +6,6 @@ import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.agent.Person;
 import com.github.anno4j.model.impl.agent.Software;
 import com.github.anno4j.model.impl.body.TextualBody;
-import com.github.anno4j.querying.Comparison;
 import com.github.anno4j.querying.QueryService;
 import org.apache.marmotta.ldpath.parser.ParseException;
 import org.junit.Before;
@@ -24,9 +23,7 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ResourceObjectTest {
 
@@ -103,7 +100,7 @@ public class ResourceObjectTest {
     public void testFindAllResourceObject() throws RepositoryException, IllegalAccessException, InstantiationException {
         anno4j.createObject(ResourceObject.class, new URIImpl("http://example.org/resource1"));
 
-        assertEquals(anno4j.findAll(ResourceObject.class).size(), 1);
+        assertEquals(anno4j.findAll(ResourceObject.class).size(), 3);
     }
 
     @Test
