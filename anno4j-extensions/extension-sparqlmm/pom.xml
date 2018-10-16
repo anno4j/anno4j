@@ -16,4 +16,8 @@
     <description />
 
     <dependencies />
+
+  <scm>
+    <tag>v2.4</tag>
+  </scm>
 </project>

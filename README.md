@@ -34,9 +34,9 @@ The current version 2.4 of Anno4j supports the [most current W3C recommendation 
 
 ### Snapshot
 Each push on the development branch triggers the build of a snapshot version. Snapshots are publicly available:
-```
+```xml
 	<dependency> 
-		<groupId>com.github.anno4j</groupId>
+	<groupId>com.github.anno4j</groupId>
    	<artifactId>anno4j-core</artifactId>
    	<version>X.X.X-SNAPSHOT</version>
 	</dependency>
