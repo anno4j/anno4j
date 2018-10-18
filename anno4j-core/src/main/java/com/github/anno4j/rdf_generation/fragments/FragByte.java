@@ -34,4 +34,8 @@ public class FragByte implements Fragment {
 		return "";
 	}
 
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 }

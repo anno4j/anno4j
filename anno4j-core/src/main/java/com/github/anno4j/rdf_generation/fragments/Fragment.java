@@ -8,4 +8,6 @@ public interface Fragment {
 
 	public String getJavaEquiv();
 	
+	public boolean hasRDFRange();
+	
 }

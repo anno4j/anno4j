@@ -30,4 +30,9 @@ public class FragDate implements Fragment {
 	public String getJavaEquiv() {
 		return "";
 	}
+	
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 }

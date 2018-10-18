@@ -34,4 +34,8 @@ public class FragDouble implements Fragment {
 		return "";
 	}
 
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 }

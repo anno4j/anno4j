@@ -33,5 +33,10 @@ public class FragLong implements Fragment {
 	public String getJavaEquiv() {
 		return "";
 	}
+	
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 
 }

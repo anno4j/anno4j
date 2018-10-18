@@ -12,6 +12,9 @@ public class FragVoid implements Fragment {
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
+		if (javaequiv.equals(javaval)) {
+			return true;
+		}
 		return false;
 	}
 
@@ -23,6 +26,11 @@ public class FragVoid implements Fragment {
 	@Override
 	public String getJavaEquiv() {
 		return javaequiv;
+	}
+	
+	@Override
+	public boolean hasRDFRange() {
+		return false;
 	}
 
 }

@@ -33,4 +33,10 @@ public class FragInteger implements Fragment {
 	public String getJavaEquiv() {
 		return "";
 	}
+	
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 }
+

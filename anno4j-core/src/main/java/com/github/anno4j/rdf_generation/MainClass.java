@@ -26,7 +26,7 @@ public class MainClass {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String packages = "com.github.anno4j.rdf_generation.tests.";
+		String packages = "com.github.anno4j.rdf_generation.tests.Player";
 		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "RDF/XML",
 				packages);
 		FileGenerator generator = new RdfFileGenerator(config, packages);

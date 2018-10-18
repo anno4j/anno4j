@@ -21,13 +21,17 @@ public class RdfFileGenerator implements FileGenerator {
 	 * The configuration settings for generating a RDFS file.
 	 */
 	private Configuration config;
-	
+
 	/**
 	 * The path where the package or class to convert is stored. Needed to analyse
 	 * if more than one class should be converted.
 	 */
 	private String packages;
-	
+
+	/**
+	 * True, if the user wants to convert more than one class to a RDFS file, false
+	 * otherwise.
+	 */
 	private boolean isPackage;
 
 	/**
@@ -58,13 +62,12 @@ public class RdfFileGenerator implements FileGenerator {
 	public void generate() throws IOException {
 		allclasses = loadAllClasses();
 		if (!isPackage) {
-			for (Class<?> clazz : allclasses) { // nur für !bundled
-//				System.out.println("Size of my Classes-List :" + allclasses.size());
-				generateFile(clazz); // jede file wird extra generiert.
-				
+			for (Class<?> clazz : allclasses) {
+				generateFile(clazz, packages);
+
 			}
 		} else {
-			generateBundledFile(allclasses); // einzige file für alle klassen
+			generateBundledFile(allclasses);
 		}
 	}
 
@@ -87,8 +90,7 @@ public class RdfFileGenerator implements FileGenerator {
 			if (info.getName().matches(packages) && !packages.endsWith(".")) {
 				final Class<?> clazz = info.load();
 				allclasses.add(clazz);
-//				System.out.println(clazz.getCanonicalName());
-				if(allclasses.size() < 2) {
+				if (allclasses.size() < 2) {
 					setPackage(false);
 				}
 				return allclasses; // lädt nur eine klasse, da packagestruktur nicht mit punkt endete und ein pfad
@@ -97,9 +99,8 @@ public class RdfFileGenerator implements FileGenerator {
 				final Class<?> clazz = info.load();
 				allclasses.add(clazz); // lädt alle klassen in dem package
 			}
-
 		}
-		if(allclasses.size() > 1) {
+		if (allclasses.size() > 1) {
 			setPackage(true);
 		}
 		return allclasses;
@@ -125,9 +126,8 @@ public class RdfFileGenerator implements FileGenerator {
 	 * @param clazz The class which will be converted.
 	 * @throws IOException
 	 */
-	private void generateFile(Class<?> clazz) throws IOException { // generiert eine
-		content = Extractor.extractOne(clazz);
-//		Extractor.clear();
+	private void generateFile(Class<?> clazz, String packagename) throws IOException { // generiert eine
+		content = Extractor.extractOne(clazz, packagename);
 		serialCheckAndWrite(content);
 	}
 
@@ -141,8 +141,7 @@ public class RdfFileGenerator implements FileGenerator {
 	 */
 	private void serialCheckAndWrite(String content) throws IOException {
 		if (config.getSerialization() == "RDF/XML") {
-			writeFile(content, config.getOutputPath()); // delete "", only to avoid NullPointer since generating class
-			// doesn't work
+			writeFile(content, config.getOutputPath());
 		} else if (config.getSerialization() == "TURTLE") {
 			// Converter
 		} else if (config.getSerialization() == "N3") {
@@ -171,11 +170,22 @@ public class RdfFileGenerator implements FileGenerator {
 		writer.close();
 	}
 
+	/**
+	 * Checks if the user wants to convert more than one class or not.
+	 * 
+	 * @return if the user wants to convert more than one class or not.
+	 */
 	public boolean isPackage() {
 		return isPackage;
 	}
 
+	/**
+	 * Sets the boolean if the user wants to convert more than one class or not.
+	 * 
+	 * @param isPackage If the user wants to convert more than one class or not.
+	 */
 	public void setPackage(boolean isPackage) {
 		this.isPackage = isPackage;
 	}
+
 }

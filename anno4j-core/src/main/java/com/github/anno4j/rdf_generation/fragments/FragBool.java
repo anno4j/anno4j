@@ -33,4 +33,9 @@ public class FragBool implements Fragment {
 	public String getJavaEquiv() {
 		return "";
 	}
+	
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 }

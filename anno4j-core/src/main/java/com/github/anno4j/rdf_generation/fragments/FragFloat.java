@@ -33,5 +33,10 @@ public class FragFloat implements Fragment {
 	public String getJavaEquiv() {
 		return "";
 	}
+	
+	@Override
+	public boolean hasRDFRange() {
+		return true;
+	}
 
 }

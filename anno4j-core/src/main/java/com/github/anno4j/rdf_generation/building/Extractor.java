@@ -1,5 +1,6 @@
 package com.github.anno4j.rdf_generation.building;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 import org.openrdf.annotations.Iri;
 
-import riotcmd.infer;
+import com.github.anno4j.rdf_generation.validation.Validator;
 
 public class Extractor {
 
@@ -41,7 +42,7 @@ public class Extractor {
 	/**
 	 * A list of all superclasses of the currently extracted class.
 	 */
-//	private static List<String> allSubClasses = new ArrayList<>();
+	private static List<String> allSubClasses = new ArrayList<>();
 
 //	PROPERTIES:
 
@@ -72,6 +73,8 @@ public class Extractor {
 	 * corresponding ID.
 	 */
 	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>();
+	
+	private static String packages;
 
 	/**
 	 * Adds for every class contained in the classes list its class und method
@@ -79,8 +82,9 @@ public class Extractor {
 	 * 
 	 * @param classes The list of classes the convert to one file.
 	 * @return The converted file in "RDF/XML".
+	 * @throws IOException 
 	 */
-	public static String extractMany(List<Class<?>> classes) {
+	public static String extractMany(List<Class<?>> classes) throws IOException {
 		for (int i = 0; i < classes.size(); i++) {
 			setup(classes.get(i));
 		}
@@ -93,8 +97,10 @@ public class Extractor {
 	 * 
 	 * @param refclass The class to be converted.
 	 * @return The converted file in "RDF/XML".
+	 * @throws IOException 
 	 */
-	public static String extractOne(Class<?> refclass) {
+	public static String extractOne(Class<?> refclass, String packages) throws IOException {
+		setPackages(packages);
 		setup(refclass);
 		return Builder.build();
 	}
@@ -113,26 +119,25 @@ public class Extractor {
 		classNames.put(classID, extractLastName(refclass.getCanonicalName()));
 		classValues.put(classID, extractClassAnnotValue(refclass));
 		Class<?>[] clazzes = refclass.getInterfaces();
-		List<String> allSubClasses = new ArrayList<>();
 		if (clazzes != null) {
-//			allSubClasses = LastPackageNames(refclass.getInterfaces());
-			for(int i = 0; i < clazzes.length; i++) {
-			allSubClasses = extractClassAnnotValues((clazzes));
+			for (int i = 0; i < clazzes.length; i++) {
+				allSubClasses = extractClassAnnotValues(clazzes);
 			}
 		}
 		subClasses.put(classID, allSubClasses);
-//		System.out.println(classNames);
-//		System.out.println(subClasses);
-		System.out.println("Liste alles SubKlassen: ID: "+ getClassID() + " & " + allSubClasses);
-		System.out.println("Subclasses jeder Klasse: " + subClasses);
-		System.out.println();
 
 		Method[] methods = refclass.getDeclaredMethods();
-			for (int i = 0; i < methods.length; i++) {
-				methodSetup(propID++, methods[i]);
-			}
+		for (int i = 0; i < methods.length; i++) {
+			methodSetup(propID++, methods[i]);
 		}
+	}
 
+	/**
+	 * Extracts the annotation value of every given class contained in the array.
+	 * 
+	 * @param classes All classes whose annotation values should be returned.
+	 * @return all annotation values of @classes
+	 */
 	private static List<String> extractClassAnnotValues(Class<?>[] classes) {
 		List<String> shortnames = new ArrayList<String>();
 		for (int i = 0; i < classes.length; i++) {
@@ -147,7 +152,7 @@ public class Extractor {
 	 * @param refclass The class whose annotation value is returned
 	 * @return the Iri-annotation value of a class
 	 */
-	private static String extractClassAnnotValue(Class<?> refclass) {
+	static String extractClassAnnotValue(Class<?> refclass) {
 		if (refclass.isAnnotationPresent(Iri.class)) {
 			return refclass.getAnnotation(Iri.class).value();
 		}
@@ -158,13 +163,13 @@ public class Extractor {
 	 * Returns a substring which starts after the last '.' and end at the end of the
 	 * string.
 	 * 
-	 * @param name The string of which the substring is needed
+	 * @param pathname The string of which the substring is needed
 	 * @return The substring of "name"
 	 */
-	private static String extractLastName(String name) {
-		int nameindexFirst = name.lastIndexOf(".");
-		int nameindexLast = name.length();
-		return name.substring(nameindexFirst + 1, nameindexLast);
+	public static String extractLastName(String pathname) {
+		int nameindexFirst = pathname.lastIndexOf(".");
+		int nameindexLast = pathname.length();
+		return pathname.substring(nameindexFirst + 1, nameindexLast);
 	}
 
 	/**
@@ -185,7 +190,7 @@ public class Extractor {
 		if (method.isAnnotationPresent(Iri.class)) {
 			methodIri = method.getAnnotation(Iri.class).value();
 		}
-		
+
 		idNameMap.put(propID, method.getName());
 		methodIriMap.put(propID, methodIri);
 		String returntype = method.getReturnType().toString();
@@ -271,18 +276,12 @@ public class Extractor {
 	public static void setRangeMap(Map<Integer, String> rangeMap) {
 		Extractor.rangeMap = rangeMap;
 	}
-
-//	public static void clear() {
-//		setClassID(0);
-//		setClassNames(new HashMap<Integer, String>());
-//		setClassValues(new HashMap<Integer, String>());
-//		setSubClasses(new HashMap<Integer, List<String>>());
-//		setAllSubClasses(new ArrayList<String>());
-//		setPropID(0);
-//		setPropToClassID(new HashMap<Integer, Integer>());
-//		setIdNameMap(new HashMap<Integer, String>());
-//		setMethodIriMap(new HashMap<Integer, String>());
-//		setRangeMap(new HashMap<Integer, String>());
-//		setTypeMap(new HashMap<Integer, String>());
-//	}
+	
+	private static void setPackages(String packages2) {
+		packages = packages2;
+	}
+	
+	public static String getPackages() {
+		return packages;
+	}
 }
