@@ -195,18 +195,6 @@ public class RdfFileGenerator implements FileGenerator {
 		}
 		writer.write(content);
 		writer.close();
-		
-		File file = new File("C:\\Users\\Brinninger Sandra\\Documents\\result.txt");
-		
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema;
-		try {
-			schema = sf.newSchema(file);
-			Validator validator = schema.newValidator();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	/**

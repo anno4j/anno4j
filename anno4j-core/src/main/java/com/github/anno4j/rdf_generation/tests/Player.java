@@ -12,7 +12,7 @@ import com.github.anno4j.rdf_generation.generation.FileGenerator;
 /**
  * A user playing a game.
  * Generated class for http://example.de/Player */
-@Iri("http://example.de/Player")
+//@Iri("http://example.de/Player")
 public interface Player extends File, Rank {
 
     @Iri("http://example.de/rank")

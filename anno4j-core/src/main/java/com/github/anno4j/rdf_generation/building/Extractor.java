@@ -89,7 +89,7 @@ public class Extractor {
 		for (int i = 0; i < classes.size(); i++) {
 			setup(classes.get(i));
 		}
-		return Builder.build();
+		return Builder.build(false);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class Extractor {
 	public static String extractOne(Class<?> refclass, String packages) throws IOException {
 		setPackages(packages);
 		setup(refclass);
-		return Builder.build();
+		return Builder.build(true);
 	}
 
 	/**

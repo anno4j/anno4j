@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.github.anno4j.rdf_generation.UserMessage;
+import com.github.anno4j.rdf_generation.configuration.Configuration;
 import com.github.anno4j.rdf_generation.namespaces.RDF;
 import com.github.anno4j.rdf_generation.namespaces.RDFS;
 
@@ -20,10 +21,10 @@ public class Builder {
 	 * Concatenates parts of the RDFTemplate in order to build the output file in
 	 * "RDF/XML".
 	 * 
-	 * @return The output file as a string in "RDF/XML".S
+	 * @return The output file as a string in "RDF/XML".
 	 * @throws IOException
 	 */
-	public static String build() throws IOException {
+	public static String build(boolean oneClassOnly) throws IOException {
 		content = addHead();
 
 		// Insert every class with class annotation, subclassOf and EndClassTag after
@@ -31,29 +32,35 @@ public class Builder {
 		for (Map.Entry<Integer, String> e : Extractor.getClassValues().entrySet()) {
 			if (e.getValue() == null || e.getValue().equals("")) {
 				UserMessage.showUser("No @Iri-Annotation found in a class");
-				return null;
-			}
-			content += RDFTemplate.insertClass(e.getValue()) + "\r\n";
+				if (oneClassOnly) {
+					return null;
+				}
+			} else {
+				content += RDFTemplate.insertClass(e.getValue()) + "\r\n";
 
-			for (Entry<Integer, List<String>> e1 : Extractor.getSubClasses().entrySet()) {
-				if (e1.getValue() != null) {
-					for (int i = 0; i < e1.getValue().size(); i++) {
-						if (e.getKey() == e1.getKey()) {
-							if (e1.getValue().get(i) != null) {
-								content += RDFTemplate.insertSubclass(e1.getValue().get(i)) + "\r\n";
-							} else if (e1.getValue().get(i) == null && e1.getValue().size() != 0) {
-								UserMessage.showUser("An undefined Subclass occured in class " + e.getValue());
+				for (Entry<Integer, List<String>> e1 : Extractor.getSubClasses().entrySet()) {
+					if (e1.getValue() != null) {
+						for (int i = 0; i < e1.getValue().size(); i++) {
+							if (e.getKey() == e1.getKey()) {
+								if (e1.getValue().get(i) != null) {
+									content += RDFTemplate.insertSubclass(e1.getValue().get(i)) + "\r\n";
+								} else if (e1.getValue().get(i) == null && e1.getValue().size() != 0) {
+									UserMessage.showUser("An undefined Subclass occured in class " + e.getValue());
+								}
 							}
 						}
 					}
 				}
+				content += RDFTemplate.insertEndClass() + "\r\n" + "\r\n";
 			}
-			content += RDFTemplate.insertEndClass() + "\r\n" + "\r\n";
 		}
 
 		// Insert every property after the other one. Every property contains an
 		// annotation value, domain and range.
 		for (Entry<Integer, String> e : Extractor.getMethodIriMap().entrySet()) {
+
+			// hier die neue map checken, ob die property in der map ist mit classvalues die
+			// null sind-> dann die property nicht konvertieren
 
 			if (e.getValue() == null || e.getValue().equals("")) {
 				UserMessage.showUser("One of the properites contains no @Iri-Annotation");
