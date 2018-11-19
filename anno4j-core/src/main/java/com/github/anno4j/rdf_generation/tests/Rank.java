@@ -14,6 +14,6 @@ public interface Rank extends AnyRank {
 	boolean getPet();
 	
 	@Iri("http://example.de/rank")
-	Anno4j achievedRank();
+	Rank achievedRank();
 
 }

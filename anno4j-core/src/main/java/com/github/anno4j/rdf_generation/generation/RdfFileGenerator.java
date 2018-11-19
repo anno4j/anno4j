@@ -1,14 +1,29 @@
 package com.github.anno4j.rdf_generation.generation;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+
+import org.mindswap.pellet.jena.PelletReasonerFactory;
+import org.xml.sax.SAXException;
+
 import com.github.anno4j.rdf_generation.configuration.Configuration;
 import com.github.anno4j.rdf_generation.building.Extractor;
 import com.google.common.reflect.ClassPath;
+import com.hp.hpl.jena.graph.Triple.Field;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class RdfFileGenerator implements FileGenerator {
 
@@ -63,7 +78,7 @@ public class RdfFileGenerator implements FileGenerator {
 		allclasses = loadAllClasses();
 		if (!isPackage) {
 			for (Class<?> clazz : allclasses) {
-				generateFile(clazz, packages);
+				generateFile(clazz);
 
 			}
 		} else {
@@ -115,8 +130,10 @@ public class RdfFileGenerator implements FileGenerator {
 	 * @throws IOException
 	 */
 	private void generateBundledFile(List<Class<?>> allclasses) throws IOException {
-		content = Extractor.extractMany(allclasses);
-		serialCheckAndWrite(content);
+		content = Extractor.extractMany(allclasses, packages);
+		if (content != null) {
+			serialCheckAndWrite(content);
+		}
 	}
 
 	/**
@@ -126,9 +143,11 @@ public class RdfFileGenerator implements FileGenerator {
 	 * @param clazz The class which will be converted.
 	 * @throws IOException
 	 */
-	private void generateFile(Class<?> clazz, String packagename) throws IOException { // generiert eine
-		content = Extractor.extractOne(clazz, packagename);
-		serialCheckAndWrite(content);
+	private void generateFile(Class<?> clazz) throws IOException { // generiert eine
+		content = Extractor.extractOne(clazz, packages);
+		if (content != null) {
+			serialCheckAndWrite(content);
+		}
 	}
 
 	/**
@@ -143,13 +162,21 @@ public class RdfFileGenerator implements FileGenerator {
 		if (config.getSerialization() == "RDF/XML") {
 			writeFile(content, config.getOutputPath());
 		} else if (config.getSerialization() == "TURTLE") {
-			// Converter
-		} else if (config.getSerialization() == "N3") {
-			// Converter
+			writeFile(content, config.getOutputPath());
+			convert(config.getSerialization());
+		} else if (config.getSerialization() == "N-TRIPLE") {
+			writeFile(content, config.getOutputPath());
+			convert(config.getSerialization());
 		} else {
 			System.out.println("WRONG SERIALIZATION");
 		}
 
+	}
+
+	private void convert(String serialization) throws FileNotFoundException {
+		OntModel m = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
+		m.read(new FileInputStream(new File(config.getOutputPath())), "RDF/XML");
+		m.write(new FileOutputStream(new File(config.getOutputPath())), serialization);
 	}
 
 	/**
@@ -168,6 +195,18 @@ public class RdfFileGenerator implements FileGenerator {
 		}
 		writer.write(content);
 		writer.close();
+		
+		File file = new File("C:\\Users\\Brinninger Sandra\\Documents\\result.txt");
+		
+		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema;
+		try {
+			schema = sf.newSchema(file);
+			Validator validator = schema.newValidator();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

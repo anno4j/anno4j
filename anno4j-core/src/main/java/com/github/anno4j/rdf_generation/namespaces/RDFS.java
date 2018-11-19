@@ -4,6 +4,6 @@ public class RDFS {
 
 	public final static String NS = "http://www.w3.org/2000/01/rdf-schema#";
 	
-	public final static String abbrev = "rdfs:";
+	public final static String abbrev = "rdfs";
 	
 }

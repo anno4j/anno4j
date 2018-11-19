@@ -10,7 +10,7 @@ package com.github.anno4j.rdf_generation.building;
 public class RDFTemplate {
 
 	public static String insertHead() {
-		return "<?xml version=''1.0''encoding=''utf-8''?>";
+		return "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 	}
 
 	public static String insertRdf() {
@@ -22,7 +22,7 @@ public class RDFTemplate {
 	}
 
 	public static String insertNamespaces(String abbreviation, String namespace) {
-		return abbreviation + "=''" + namespace + "''";
+		return abbreviation + "=\"" + namespace + "\"";
 	}
 
 	public static String insertRdfEndTag() {
@@ -34,7 +34,7 @@ public class RDFTemplate {
 	}
 
 	public static String insertClass(String classValue) {
-		return "<rdfs:Class rdf:about=''" + classValue + "''>";
+		return "<rdfs:Class rdf:about=\"" + classValue + "\">";
 	}
 
 	public static String insertEndClass() {
@@ -42,11 +42,11 @@ public class RDFTemplate {
 	}
 
 	public static String insertSubclass(String uri) {
-		return "<rdfs:subClassOf rdfs:resource=''" + uri + "''/>";
+		return "<rdfs:subClassOf rdfs:resource=\"" + uri + "\"/>";
 	}
 
 	public static String insertProperty(String methodValue) {
-		return "<rdf:Property rdf:about=''" + methodValue + "''>";
+		return "<rdf:Property rdf:about=\"" + methodValue + "\">";
 	}
 
 	public static String insertEndProperty() {
@@ -54,11 +54,11 @@ public class RDFTemplate {
 	}
 
 	public static String insertDomain(String resource) {
-		return "<rdf:domain rdf:resource=''" + resource + "''/>";
+		return "<rdfs:domain rdf:resource=\"" + resource + "\"/>";
 	}
 
 	public static String insertRange(String resource) {
-		return "<rdf:range rdf:resource=''" + resource + "''/>";
+		return "<rdfs:range rdf:resource=\"" + resource + "\"/>";
 	}
 
 }

@@ -73,7 +73,7 @@ public class Extractor {
 	 * corresponding ID.
 	 */
 	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>();
-	
+
 	private static String packages;
 
 	/**
@@ -82,9 +82,10 @@ public class Extractor {
 	 * 
 	 * @param classes The list of classes the convert to one file.
 	 * @return The converted file in "RDF/XML".
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public static String extractMany(List<Class<?>> classes) throws IOException {
+	public static String extractMany(List<Class<?>> classes, String packages) throws IOException {
+		setPackages(packages);
 		for (int i = 0; i < classes.size(); i++) {
 			setup(classes.get(i));
 		}
@@ -97,7 +98,7 @@ public class Extractor {
 	 * 
 	 * @param refclass The class to be converted.
 	 * @return The converted file in "RDF/XML".
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static String extractOne(Class<?> refclass, String packages) throws IOException {
 		setPackages(packages);
@@ -112,20 +113,24 @@ public class Extractor {
 	 * - the name of the class - the Iri-annotation value of a class - all
 	 * superclasses of a class - various values concering the methods are set.
 	 * 
-	 * @param refclass The class that gets analysed via Reflection.
+	 * @param refclass The class that gets analyzed via Reflection.
 	 */
 	public static void setup(Class<?> refclass) {
 		classID++;
 		classNames.put(classID, extractLastName(refclass.getCanonicalName()));
 		classValues.put(classID, extractClassAnnotValue(refclass));
+		
+		
 		Class<?>[] clazzes = refclass.getInterfaces();
-		if (clazzes != null) {
+		if (clazzes != null && clazzes.length > 0) {
 			for (int i = 0; i < clazzes.length; i++) {
-				allSubClasses = extractClassAnnotValues(clazzes);
+					allSubClasses = extractClassAnnotValues(clazzes);
 			}
+			subClasses.put(classID, allSubClasses);
+		} else {
+			subClasses.put(classID, null);
 		}
-		subClasses.put(classID, allSubClasses);
-
+		
 		Method[] methods = refclass.getDeclaredMethods();
 		for (int i = 0; i < methods.length; i++) {
 			methodSetup(propID++, methods[i]);
@@ -257,6 +262,10 @@ public class Extractor {
 		Extractor.subClasses = subClasses;
 	}
 
+	private static void setAllSubClasses(List<String> aaaallSubClasses) {
+		allSubClasses = aaaallSubClasses;
+	}
+
 	public static void setPropID(int propID) {
 		Extractor.propID = propID;
 	}
@@ -276,11 +285,11 @@ public class Extractor {
 	public static void setRangeMap(Map<Integer, String> rangeMap) {
 		Extractor.rangeMap = rangeMap;
 	}
-	
+
 	private static void setPackages(String packages2) {
 		packages = packages2;
 	}
-	
+
 	public static String getPackages() {
 		return packages;
 	}

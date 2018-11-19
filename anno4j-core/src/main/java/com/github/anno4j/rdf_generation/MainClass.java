@@ -25,12 +25,16 @@ public class MainClass {
 	 * @throws FileGenerationException
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		String packages = "com.github.anno4j.rdf_generation.tests.Player";
-		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "RDF/XML",
+		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "TURTLE",
 				packages);
 		FileGenerator generator = new RdfFileGenerator(config, packages);
-		generator.generate();
+		try {
+			generator.generate();
+		} catch (IOException e) {
+			UserMessage.showUser("IOException");
+		}
 	}
 
 }
