@@ -7,24 +7,34 @@ import org.openrdf.annotations.Iri;
 @Iri("http://www.example.de/Hauptgericht")
 public interface Hauptgericht {
 	
-	@Iri("http://www.example.de/hatName")
-	void setName(String name);
-	
+	//-----------
 	@Iri("http://www.example.de/hatName")
 	String getName();
 	
-	@Iri("http://www.example.de/istLeckerMit")
-	Hauptgericht getSuitableDish();
+	@Iri("http://www.example.de/hatName")
+	void setName(String name);
 	
-	@Iri("http://www.example.de/Menu")
-	void setMenu(Set<Hauptgericht> menu);
 	
-	@Iri("http://www.example.de/Menu")
-	Set<Hauptgericht> getMenu(Set<Hauptgericht> menu);
+	//-----------
+	@Iri("http://www.example.de/hatHauptbestandteil")
+	Ingredient getMainIngredient();
 	
-	@Iri("http://www.example.de/Menu")
-	void upgradeMenu(Hauptgericht dish);
+	@Iri("http://www.example.de/hatHauptbestandteil")
+	void setMainIngredient();
 	
+	
+	//-----------
+	@Iri("http://www.example.de/hatBestandteil")
+	Set<Ingredient> getIngredients();
+	
+	@Iri("http://www.example.de/hatBestandteil")
+	void setIngredients(Set<Ingredient> ingredients);
+	
+	@Iri("http://www.example.de/hatBestandteil")
+	void addIngredient(Ingredient ingredient);
+	
+	
+	//-----------
 	@Iri("http://www.example.de/hatKoch")
 	Koch getChef();
 	

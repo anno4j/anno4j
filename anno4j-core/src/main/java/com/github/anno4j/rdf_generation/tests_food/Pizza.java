@@ -5,13 +5,13 @@ import org.openrdf.annotations.Iri;
 @Iri("http://www.example.de/Pizza")
 public interface Pizza extends Hauptgericht {
 
-	@Iri("http://www.example.de/Koch")
-	boolean isChefItalian();
-	
-	@Iri("http://www.example.de/Pizzasorte")
-	void setName(String name);
-	
-	@Iri("http://www.example.de/Pizzasorte")
+	// -----------
+	@Iri("http://www.example.de/hatSortenname")
 	String getName();
-	
+
+	@Iri("http://www.example.de/hatSortenname")
+	void setName(String name); // selbes Getter/Setter-Paar wie in Klasse "Hauptgericht", aber andere URI.
+								// getName()/setName() überflüssig, da diese aus "Hauptgericht geerbt werden,
+								// oder wichtig, da speziellere URI im Bezug auf "Pizza" wichtiger ist ?!
+
 }
