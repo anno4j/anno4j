@@ -24,17 +24,13 @@ public class MainClass {
 	 * @throws RepositoryException
 	 * @throws FileGenerationException
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	public static void main(String[] args) {
-		String packages = "com.github.anno4j.rdf_generation.tests.";
+	public static void main(String[] args) throws IOException, ConvertionException {
+		String packages = "com.github.anno4j.rdf_generation.tests_food.";
 		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "RDF/XML",
 				packages);
 		FileGenerator generator = new RdfFileGenerator(config, packages);
-		try {
 			generator.generate();
-		} catch (IOException e) {
-			UserMessage.showUser("IOException");
-		}
 	}
-
 }

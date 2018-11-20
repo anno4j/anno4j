@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.github.anno4j.rdf_generation.UserMessage;
-import com.github.anno4j.rdf_generation.configuration.Configuration;
+import com.github.anno4j.rdf_generation.ConvertionException;
 import com.github.anno4j.rdf_generation.namespaces.RDF;
 import com.github.anno4j.rdf_generation.namespaces.RDFS;
 
@@ -16,6 +17,7 @@ public class Builder {
 	 * The output file in "RDF/XML" as a string.
 	 */
 	private static String content;
+	private final static Logger logger = LoggerFactory.getLogger(Builder.class);
 
 	/**
 	 * Concatenates parts of the RDFTemplate in order to build the output file in
@@ -23,17 +25,19 @@ public class Builder {
 	 * 
 	 * @return The output file as a string in "RDF/XML".
 	 * @throws IOException
+	 * @throws ConvertionException
 	 */
-	public static String build(boolean oneClassOnly) throws IOException {
+	public static String build(boolean oneClassOnly) throws IOException, ConvertionException {
 		content = addHead();
 
 		// Insert every class with class annotation, subclassOf and EndClassTag after
 		// another.
 		for (Map.Entry<Integer, String> e : Extractor.getClassValues().entrySet()) {
 			if (e.getValue() == null || e.getValue().equals("")) {
-				UserMessage.showUser("No @Iri-Annotation found in a class");
 				if (oneClassOnly) {
-					return null;
+					throw new ConvertionException("No Generation possible. No @Iri-Annotation found in class.");
+				} else {
+					logger.debug("No @Iri-Annotation found in a class. File will be generated without that class.");
 				}
 			} else {
 				content += RDFTemplate.insertClass(e.getValue()) + "\r\n";
@@ -45,7 +49,8 @@ public class Builder {
 								if (e1.getValue().get(i) != null) {
 									content += RDFTemplate.insertSubclass(e1.getValue().get(i)) + "\r\n";
 								} else if (e1.getValue().get(i) == null && e1.getValue().size() != 0) {
-									UserMessage.showUser("An undefined Subclass occured in class " + e.getValue());
+									logger.debug("An undefined Subclass occured in class " + e.getValue()
+											+ ". File will be generated without it.");
 								}
 							}
 						}
@@ -57,18 +62,46 @@ public class Builder {
 
 		// Insert every property after the other one. Every property contains an
 		// annotation value, domain and range.
+		boolean convertProp = false;
 		for (Entry<Integer, String> e : Extractor.getMethodIriMap().entrySet()) {
 
-			// hier die neue map checken, ob die property in der map ist mit classvalues die
+			// !!!!!! Die neue map checken, ob die property in der map ist mit classvalues
+			// die
+			// null sind-> dann die property nicht konvertieren
+
+			for (Entry<Integer, Integer> eMatch : Extractor.getPropToClassID().entrySet()) {
+				if (eMatch.getKey() == e.getKey()) {
+					Integer ClassIDtoCheck = eMatch.getValue();
+					for (Entry<Integer, String> eCheck : Extractor.getClassValues().entrySet()) {
+						if (eCheck.getKey() == ClassIDtoCheck) {
+							if (eCheck.getValue() == null || eCheck.getValue().equals("")) {
+								convertProp = false;
+							} else {
+								convertProp = true;
+							}
+						}
+					}
+				}
+
+			}
+
+			// !!!!!! Die neue map checken, ob die property in der map ist mit classvalues
+			// die
 			// null sind-> dann die property nicht konvertieren
 
 			if (e.getValue() == null || e.getValue().equals("")) {
-				UserMessage.showUser("One of the properites contains no @Iri-Annotation");
+				logger.debug(
+						"One of the properites contains no @Iri-Annotation. File will be generated without that property.");
+			}
+			if (!convertProp) {
+				logger.debug(
+						"Properites of class with no @Iri-Annotation can't be generated. File will be generated without those properties.");
+
 			} else {
 
 				String range = Mapper.mapJavaReturn(e.getKey(), Extractor.getRangeMap());
 				if (range == null || range.equals("")) {
-					UserMessage.showUser("Undefined complex datatype found, file will be generated without it");
+					throw new ConvertionException("No Generation possible. A complex datatype could not be found.");
 				}
 				if (range != "void") {
 					Integer classID = null;

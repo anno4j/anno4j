@@ -10,18 +10,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.XMLConstants;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
 import org.mindswap.pellet.jena.PelletReasonerFactory;
-import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.anno4j.rdf_generation.configuration.Configuration;
+import com.github.anno4j.rdf_generation.ConvertionException;
 import com.github.anno4j.rdf_generation.building.Extractor;
 import com.google.common.reflect.ClassPath;
-import com.hp.hpl.jena.graph.Triple.Field;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -31,6 +27,7 @@ public class RdfFileGenerator implements FileGenerator {
 	 * The content of the RDFS file which will be stored represented as a string.
 	 */
 	private String content;
+	private final Logger logger = LoggerFactory.getLogger(RdfFileGenerator.class);
 
 	/**
 	 * The configuration settings for generating a RDFS file.
@@ -72,9 +69,10 @@ public class RdfFileGenerator implements FileGenerator {
 	 * boolean "bundled" is false, every class contained in the list will be
 	 * converted separately. If true, one bundled file which contains all classes
 	 * contained in the list will be generated.
+	 * @throws ConvertionException 
 	 */
 	@Override
-	public void generate() throws IOException {
+	public void generate() throws IOException, ConvertionException {
 		allclasses = loadAllClasses();
 		if (!isPackage) {
 			for (Class<?> clazz : allclasses) {
@@ -128,8 +126,9 @@ public class RdfFileGenerator implements FileGenerator {
 	 * 
 	 * @param allclasses The list where all classes to be converted are stored.
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	private void generateBundledFile(List<Class<?>> allclasses) throws IOException {
+	private void generateBundledFile(List<Class<?>> allclasses) throws IOException, ConvertionException {
 		content = Extractor.extractMany(allclasses, packages);
 		if (content != null) {
 			serialCheckAndWrite(content);
@@ -142,8 +141,9 @@ public class RdfFileGenerator implements FileGenerator {
 	 * 
 	 * @param clazz The class which will be converted.
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	private void generateFile(Class<?> clazz) throws IOException { // generiert eine
+	private void generateFile(Class<?> clazz) throws IOException, ConvertionException { // generiert eine
 		content = Extractor.extractOne(clazz, packages);
 		if (content != null) {
 			serialCheckAndWrite(content);
@@ -167,8 +167,11 @@ public class RdfFileGenerator implements FileGenerator {
 		} else if (config.getSerialization() == "N-TRIPLE") {
 			writeFile(content, config.getOutputPath());
 			convert(config.getSerialization());
+		} else if (config.getSerialization() == "N3") {
+			writeFile(content, config.getOutputPath());
+			convert(config.getSerialization());
 		} else {
-			System.out.println("WRONG SERIALIZATION");
+			logger.debug("Unacceptable serialization used");
 		}
 
 	}

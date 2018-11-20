@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.openrdf.annotations.Iri;
 
-import com.github.anno4j.rdf_generation.validation.Validator;
+import com.github.anno4j.rdf_generation.ConvertionException;
 
 public class Extractor {
 
@@ -83,8 +83,9 @@ public class Extractor {
 	 * @param classes The list of classes the convert to one file.
 	 * @return The converted file in "RDF/XML".
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	public static String extractMany(List<Class<?>> classes, String packages) throws IOException {
+	public static String extractMany(List<Class<?>> classes, String packages) throws IOException, ConvertionException {
 		setPackages(packages);
 		for (int i = 0; i < classes.size(); i++) {
 			setup(classes.get(i));
@@ -99,8 +100,9 @@ public class Extractor {
 	 * @param refclass The class to be converted.
 	 * @return The converted file in "RDF/XML".
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	public static String extractOne(Class<?> refclass, String packages) throws IOException {
+	public static String extractOne(Class<?> refclass, String packages) throws IOException, ConvertionException {
 		setPackages(packages);
 		setup(refclass);
 		return Builder.build(true);
@@ -260,10 +262,6 @@ public class Extractor {
 
 	public static void setSubClasses(Map<Integer, List<String>> subClasses) {
 		Extractor.subClasses = subClasses;
-	}
-
-	private static void setAllSubClasses(List<String> aaaallSubClasses) {
-		allSubClasses = aaaallSubClasses;
 	}
 
 	public static void setPropID(int propID) {

@@ -49,15 +49,11 @@ public class Mapper {
 		if (isDatatypePrimitive(javavalue, fraglist)) {
 			for (int i = 0; i < fraglist.size(); i++) {
 				String javaequiv = fraglist.get(i).getJavaEquiv(); // void or ""
-//				System.out.println("VAL: " + javavalue);
 				if (javaequiv.equals(javavalue)) {
-//					System.out.println("VAL: " + javavalue);
-//					System.out.println("JAVAEQUIV: " + javaequiv);
 					return javaequiv;
 				} else {
 					if (fraglist.get(i).hasRelationTo(javavalue)) {
-//						System.out.println("URI: " + fraglist.get(i).getURI());
-						return fraglist.get(i).getURI(); // NICHT EINFACH DAS ERSTE NEHMEN !!!!!! passt das jetzt?
+						return fraglist.get(i).getURI(); 
 					}
 				}
 			}
@@ -125,7 +121,6 @@ public class Mapper {
 	}
 
 	private static Class<?> loadClass(String name) throws IOException {
-//		System.out.println(name);
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// Start reader by specifying for example how the name of the package "starts
 		// with"
