@@ -17,7 +17,7 @@ public interface Hauptgericht {
 	
 	//-----------
 	@Iri("http://www.example.de/hatHauptbestandteil")
-	Ingredient getMainIngredient();
+	Zutat getMainIngredient();
 	
 	@Iri("http://www.example.de/hatHauptbestandteil")
 	void setMainIngredient();
@@ -25,13 +25,13 @@ public interface Hauptgericht {
 	
 	//-----------
 	@Iri("http://www.example.de/hatBestandteil")
-	Set<Ingredient> getIngredients();
+	Set<Zutat> getIngredients();
 	
 	@Iri("http://www.example.de/hatBestandteil")
-	void setIngredients(Set<Ingredient> ingredients);
+	void setIngredients(Set<Zutat> ingredients);
 	
 	@Iri("http://www.example.de/hatBestandteil")
-	void addIngredient(Ingredient ingredient);
+	void addIngredient(Zutat ingredient);
 	
 	
 	//-----------
