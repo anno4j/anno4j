@@ -68,6 +68,8 @@ public class Builder {
 			// !!!!!! Die neue map checken, ob die property in der map ist mit classvalues
 			// die
 			// null sind-> dann die property nicht konvertieren
+			
+			//kann man das auslagern?? durch boolean convertProp(e.getKey()){.. }
 
 			for (Entry<Integer, Integer> eMatch : Extractor.getPropToClassID().entrySet()) {
 				if (eMatch.getKey() == e.getKey()) {
@@ -106,6 +108,9 @@ public class Builder {
 				if (range != "void") {
 					Integer classID = null;
 					content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";
+					if(propertyIsSub(e.getKey())) { // ich gebe die ID der methode rein, die einen return wert hat
+						content += RDFTemplate.insertSubProperty(getSubpropOfProp(e.getKey())) + "\r\n";
+					}
 
 					// In order to get the domain of the property, the classID of the corresponding
 					// class needs to be found.
@@ -136,6 +141,16 @@ public class Builder {
 
 		content += RDFTemplate.insertEndRDF();
 		return content;
+	}
+
+	private static String getSubpropOfProp(Integer key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static boolean propertyIsSub(Integer PropID) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	private static String addHead() {

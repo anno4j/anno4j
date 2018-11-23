@@ -42,7 +42,11 @@ public class RDFTemplate {
 	}
 
 	public static String insertSubclass(String uri) {
-		return "<rdfs:subClassOf rdfs:resource=\"" + uri + "\"/>";
+		return "<rdfs:subClassOf rdf:resource=\"" + uri + "\"/>";
+	}
+	
+	public static String insertSubProperty(String uri) {
+		return "<rdfs:subPropertyOf rdf:resource=\"" + uri + "\"/>";
 	}
 
 	public static String insertProperty(String methodValue) {
