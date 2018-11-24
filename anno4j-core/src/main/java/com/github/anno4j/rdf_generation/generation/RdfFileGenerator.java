@@ -27,6 +27,10 @@ public class RdfFileGenerator implements FileGenerator {
 	 * The content of the RDFS file which will be stored represented as a string.
 	 */
 	private String content;
+	
+	/**
+	 * The Logger for printing progress and given information to the user if a inconsistency occurred.
+	 */
 	private final Logger logger = LoggerFactory.getLogger(RdfFileGenerator.class);
 
 	/**
@@ -176,6 +180,12 @@ public class RdfFileGenerator implements FileGenerator {
 
 	}
 
+	/**
+	 * Converts the RDF/XML-File to a file in the given serialization and writes it.
+	 * 
+	 * @param serialization The serialization in which the file will be written.
+	 * @throws FileNotFoundException
+	 */
 	private void convert(String serialization) throws FileNotFoundException {
 		OntModel m = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
 		m.read(new FileInputStream(new File(config.getOutputPath())), "RDF/XML");

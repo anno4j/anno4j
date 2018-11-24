@@ -68,8 +68,8 @@ public class Builder {
 			// !!!!!! Die neue map checken, ob die property in der map ist mit classvalues
 			// die
 			// null sind-> dann die property nicht konvertieren
-			
-			//kann man das auslagern?? durch boolean convertProp(e.getKey()){.. }
+
+			// kann man das auslagern?? durch boolean convertProp(e.getKey()){.. }
 
 			for (Entry<Integer, Integer> eMatch : Extractor.getPropToClassID().entrySet()) {
 				if (eMatch.getKey() == e.getKey()) {
@@ -108,8 +108,16 @@ public class Builder {
 				if (range != "void") {
 					Integer classID = null;
 					content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";
-					if(propertyIsSub(e.getKey())) { // ich gebe die ID der methode rein, die einen return wert hat
-						content += RDFTemplate.insertSubProperty(getSubpropOfProp(e.getKey())) + "\r\n";
+					if (propertyIsSub(e.getKey())) { // ich gebe die ID der methode rein, die einen return wert hat
+						
+						// wenn eine klasse ein extends besitzt, also oben im RDFS-Dokument bereits eine subclassof zu Hauptgericht hat
+						// dann in der subklasse (evtl auch mehreren suchen, ob methode den selben namen haben, wenn ja -> subPropertyOf Methodenname
+						// evtl auch mehrere
+						// wenn nein -> nichts
+						
+						System.out.println(e.getValue());
+						content += RDFTemplate.insertSubProperty(getSuperpropOfProp(e.getKey())) + "\r\n";
+						System.out.println(getSuperpropOfProp(e.getKey()));
 					}
 
 					// In order to get the domain of the property, the classID of the corresponding
@@ -143,14 +151,126 @@ public class Builder {
 		return content;
 	}
 
-	private static String getSubpropOfProp(Integer key) {
-		// TODO Auto-generated method stub
+	private static String getSuperpropOfProp(Integer PropID) {
+		String nameOfProp = getNameOfProp(PropID);
+		if (nameOfProp != null) {
+			for (Entry<Integer, Integer> e : Extractor.getPropToClassID().entrySet()) {
+				if (PropID == e.getKey()) {
+					Integer ClassIDOfProp = e.getValue();
+					for (Entry<Integer, List<String>> eSuperClass : Extractor.getSubClasses().entrySet()) { // alle
+																											// superklassen
+																											// dieser
+																											// einer
+																											// Property
+																											// durchgehen
+																											// und nach
+																											// selben
+																											// namen der
+																											// methode
+																											// suchen
+						if (ClassIDOfProp == eSuperClass.getKey()) {
+							if (eSuperClass.getValue() != null) {
+								for (int i = 0; i < eSuperClass.getValue().size(); i++) {
+									String classAnnot = eSuperClass.getValue().get(i);
+									for (Entry<Integer, String> e1 : Extractor.getClassValues().entrySet()) {
+										if (classAnnot == e1.getValue()) {
+											Integer classID = e1.getKey();
+											for (Entry<Integer, Integer> e2 : Extractor.getPropToClassID().entrySet()) {
+												if (classID == e2.getValue()) {
+													Integer SuperPropID = e2.getKey();
+													for (Entry<Integer, String> e3 : Extractor.getIdNameMap()
+															.entrySet()) {
+														if (SuperPropID == e3.getKey()) {
+															if (e3.getValue().equals(nameOfProp)) {
+																return getAnnotOfProp(e3.getValue());
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private static String getAnnotOfProp(String nameOfProperty) {
+		for (Entry<Integer, String> e : Extractor.getIdNameMap().entrySet()) {
+			if(nameOfProperty.equals(e.getValue())) {
+				Integer PropID = e.getKey();
+				for (Entry<Integer, String> e1 : Extractor.getMethodIriMap().entrySet()) {
+					if(PropID == e1.getKey()) {
+						return e1.getValue();
+					}
+				}
+			}
+		}
 		return null;
 	}
 
 	private static boolean propertyIsSub(Integer PropID) {
-		// TODO Auto-generated method stub
+		String nameOfProp = getNameOfProp(PropID);
+		if (nameOfProp != null) {
+			for (Entry<Integer, Integer> e : Extractor.getPropToClassID().entrySet()) {
+				if (PropID == e.getKey()) {
+					Integer ClassIDOfProp = e.getValue();
+					for (Entry<Integer, List<String>> eSuperClass : Extractor.getSubClasses().entrySet()) { // alle
+																											// superklassen
+																											// dieser
+																											// einer
+																											// Property
+																											// durchgehen
+																											// und nach
+																											// selben
+																											// namen der
+																											// methode
+																											// suchen
+						if (ClassIDOfProp == eSuperClass.getKey()) {
+							if (eSuperClass.getValue() != null) {
+								for (int i = 0; i < eSuperClass.getValue().size(); i++) {
+									String classAnnot = eSuperClass.getValue().get(i);
+									for (Entry<Integer, String> e1 : Extractor.getClassValues().entrySet()) {
+										if (classAnnot == e1.getValue()) {
+											Integer classID = e1.getKey();
+											for (Entry<Integer, Integer> e2 : Extractor.getPropToClassID().entrySet()) {
+												if (classID == e2.getValue()) {
+													Integer SuperPropID = e2.getKey();
+													for (Entry<Integer, String> e3 : Extractor.getIdNameMap()
+															.entrySet()) {
+														if (SuperPropID == e3.getKey()) {
+															if (e3.getValue().equals(nameOfProp)) {
+																return true;
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		return false;
+	}
+
+	private static String getNameOfProp(Integer propID) {
+		for (Entry<Integer, String> e : Extractor.getIdNameMap().entrySet()) {
+			if (propID == e.getKey()) {
+				return e.getValue();
+			}
+		}
+		return null;
 	}
 
 	private static String addHead() {

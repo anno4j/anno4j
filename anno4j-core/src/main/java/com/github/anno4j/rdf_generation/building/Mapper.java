@@ -68,10 +68,21 @@ public class Mapper {
 		return null; // vorerst ohne Validierung
 	}
 
+	/**
+	 * 
+	 * @param javavalue
+	 * @return
+	 * @throws IOException
+	 */
 	private static String getComplexDatatypeBySearch(String javavalue) throws IOException {
 		return searchAnnotFromClass(Extractor.getPackages(), Extractor.extractLastName(javavalue));
 	}
 
+	/**
+	 * 
+	 * @param javavalue
+	 * @return
+	 */
 	private static String getComplexDatatypeByList(String javavalue) {
 		for (Map.Entry<Integer, String> e : Extractor.getClassNames().entrySet()) {
 			// if the return value is one of the classes in the package...
@@ -87,6 +98,12 @@ public class Mapper {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param javavalue
+	 * @param fraglist
+	 * @return
+	 */
 	private static boolean isDatatypePrimitive(String javavalue, List<Fragment> fraglist) {
 		for (int i = 0; i < fraglist.size(); i++) {
 			// if the return value matches a primitive datatype
@@ -97,6 +114,13 @@ public class Mapper {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param pathname
+	 * @param classname
+	 * @return
+	 * @throws IOException
+	 */
 	private static String searchAnnotFromClass(String pathname, String classname) throws IOException {
 		String packageabove = extractPackage(pathname);
 		String newclassname = extendPath(packageabove, classname);
@@ -110,16 +134,33 @@ public class Mapper {
 		}
 	}
 
+	/**
+	 * 
+	 * @param pathname
+	 * @return
+	 */
 	private static String extractPackage(String pathname) {
 		int beginIndex = 0;
 		int endIndex = pathname.lastIndexOf(".");
 		return pathname.substring(beginIndex, endIndex);
 	}
 
+	/**
+	 * 
+	 * @param pathname
+	 * @param classname
+	 * @return
+	 */
 	private static String extendPath(String pathname, String classname) {
 		return pathname + "." + classname;
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
 	private static Class<?> loadClass(String name) throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// Start reader by specifying for example how the name of the package "starts
