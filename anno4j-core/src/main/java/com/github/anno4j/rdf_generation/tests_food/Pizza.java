@@ -5,7 +5,7 @@ import org.openrdf.annotations.Iri;
 import com.github.anno4j.model.impl.ResourceObject;
 
 @Iri("http://www.example.de/Pizza")
-public interface Pizza extends Hauptgericht, ResourceObject {
+public interface Pizza extends Hauptgericht {
 
 	// -----------
 	@Iri("http://www.example.de/hatSortenname") 
