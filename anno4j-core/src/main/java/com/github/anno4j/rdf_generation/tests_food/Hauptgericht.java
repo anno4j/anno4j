@@ -32,7 +32,6 @@ public interface Hauptgericht extends ResourceObject {
 	@Iri("http://www.example.de/hatBestandteil")
 	void setIngredients(Set<Zutat> ingredients);
 	
-	@Iri("http://www.example.de/hatBestandteil")
 	void addIngredient(Zutat ingredient);
 	
 	
