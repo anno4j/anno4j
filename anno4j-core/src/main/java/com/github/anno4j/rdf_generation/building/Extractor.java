@@ -1,6 +1,7 @@
 package com.github.anno4j.rdf_generation.building;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -8,9 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.openrdf.annotations.Iri;
 
+import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.rdf_generation.ConvertionException;
 
 public class Extractor {
@@ -83,9 +86,11 @@ public class Extractor {
 	 * @param classes The list of classes the convert to one file.
 	 * @return The converted file in "RDF/XML".
 	 * @throws IOException
-	 * @throws ConvertionException 
+	 * @throws ConvertionException
+	 * @throws NoSuchMethodException
 	 */
-	public static String extractMany(List<Class<?>> classes, String packages) throws IOException, ConvertionException {
+	public static String extractMany(List<Class<?>> classes, String packages)
+			throws IOException, ConvertionException, NoSuchMethodException {
 		setPackages(packages);
 		for (int i = 0; i < classes.size(); i++) {
 			setup(classes.get(i));
@@ -100,9 +105,11 @@ public class Extractor {
 	 * @param refclass The class to be converted.
 	 * @return The converted file in "RDF/XML".
 	 * @throws IOException
-	 * @throws ConvertionException 
+	 * @throws ConvertionException
+	 * @throws NoSuchMethodException
 	 */
-	public static String extractOne(Class<?> refclass, String packages) throws IOException, ConvertionException {
+	public static String extractOne(Class<?> refclass, String packages)
+			throws IOException, ConvertionException, NoSuchMethodException {
 		setPackages(packages);
 		setup(refclass);
 		return Builder.build(true);
@@ -116,27 +123,49 @@ public class Extractor {
 	 * superclasses of a class - various values concering the methods are set.
 	 * 
 	 * @param refclass The class that gets analyzed via Reflection.
+	 * @throws NoSuchMethodException
+	 * @throws ConvertionException
 	 */
-	public static void setup(Class<?> refclass) {
+	public static void setup(Class<?> refclass) throws NoSuchMethodException, ConvertionException {
 		classID++;
 		classNames.put(classID, extractLastName(refclass.getCanonicalName()));
 		classValues.put(classID, extractClassAnnotValue(refclass));
-		
-		
+
 		Class<?>[] clazzes = refclass.getInterfaces();
 		if (clazzes != null && clazzes.length > 0) {
 			for (int i = 0; i < clazzes.length; i++) {
-					allSubClasses = extractClassAnnotValues(clazzes);
+				allSubClasses = extractClassAnnotValues(clazzes);
 			}
 			subClasses.put(classID, allSubClasses);
 		} else {
 			subClasses.put(classID, null);
 		}
-		
+
 		Method[] methods = refclass.getDeclaredMethods();
 		for (int i = 0; i < methods.length; i++) {
 			methodSetup(propID++, methods[i]);
 		}
+		
+		if (sameAnnotationvalue()) {
+			throw new ConvertionException(
+					"Two or more properties were annotated with the same URI. File cannot be generated.");
+		}
+	}
+
+	private static boolean sameAnnotationvalue() {
+		for (Entry<Integer, String> e1 : Extractor.getMethodIriMap().entrySet()) {
+			String annotValue1 = e1.getValue();
+			int idMethod1 = e1.getKey();
+			for (Entry<Integer, String> e2 : Extractor.getMethodIriMap().entrySet()) {
+				String annotValue2 = e2.getValue();
+				int idMethod2 = e2.getKey();
+				if (annotValue2.equals(annotValue1) && (idMethod1 != idMethod2)) {
+					System.out.println(annotValue1);
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -191,6 +220,8 @@ public class Extractor {
 	 */
 	private static void methodSetup(int propID, Method method) {
 
+		if (!method.isAnnotationPresent(Partial.class) && !method.getReturnType().toString().equals("void")) {
+			
 		String methodIri = "";
 		propToClassID.put(propID, getClassID());
 
@@ -198,17 +229,21 @@ public class Extractor {
 			methodIri = method.getAnnotation(Iri.class).value();
 		}
 
-		idNameMap.put(propID, method.getName());
-		methodIriMap.put(propID, methodIri);
-		String returntype = method.getReturnType().toString();
+			idNameMap.put(propID, method.getName());
+			if (methodIri != "" || methodIri != null) {
+				methodIriMap.put(propID, methodIri);
+			}
 
-		if (returntype.equals("interface java.util.Set") || returntype.equals("interface java.util.List")) {
-			Type type = method.getGenericReturnType();
-			ParameterizedType pType = (ParameterizedType) type;
-			Class<?> clazz = (Class<?>) pType.getActualTypeArguments()[0];
-			rangeMap.put(propID, clazz.toString());
-		} else {
-			rangeMap.put(propID, method.getReturnType().toString());
+			String returntype = method.getReturnType().toString();
+
+			if (returntype.equals("interface java.util.Set") || returntype.equals("interface java.util.List")) {
+				Type type = method.getGenericReturnType();
+				ParameterizedType pType = (ParameterizedType) type;
+				Class<?> clazz = (Class<?>) pType.getActualTypeArguments()[0];
+				rangeMap.put(propID, clazz.toString());
+			} else {
+				rangeMap.put(propID, method.getReturnType().toString());
+			}
 		}
 	}
 

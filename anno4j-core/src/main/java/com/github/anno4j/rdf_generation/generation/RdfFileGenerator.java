@@ -74,14 +74,14 @@ public class RdfFileGenerator implements FileGenerator {
 	 * converted separately. If true, one bundled file which contains all classes
 	 * contained in the list will be generated.
 	 * @throws ConvertionException 
+	 * @throws NoSuchMethodException 
 	 */
 	@Override
-	public void generate() throws IOException, ConvertionException {
+	public void generate() throws IOException, ConvertionException, NoSuchMethodException {
 		allclasses = loadAllClasses();
 		if (!isPackage) {
 			for (Class<?> clazz : allclasses) {
 				generateFile(clazz);
-
 			}
 		} else {
 			generateBundledFile(allclasses);
@@ -97,11 +97,10 @@ public class RdfFileGenerator implements FileGenerator {
 	 * 
 	 * @return The list of all classes which should be converted to a RDFS file.
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	private List<Class<?>> loadAllClasses() throws IOException {
+	private List<Class<?>> loadAllClasses() throws IOException, ConvertionException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		// Start reader by specifying for example how the name of the package "starts
-		// with"
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
 
 			if (info.getName().matches(packages) && !packages.endsWith(".")) {
@@ -110,12 +109,16 @@ public class RdfFileGenerator implements FileGenerator {
 				if (allclasses.size() < 2) {
 					setPackage(false);
 				}
-				return allclasses; // lädt nur eine klasse, da packagestruktur nicht mit punkt endete und ein pfad
-									// perfekt mit der eingabe übereinstimmt
+				return allclasses;
+				
 			} else if (info.getName().startsWith(packages) && packages.endsWith(".")) {
 				final Class<?> clazz = info.load();
-				allclasses.add(clazz); // lädt alle klassen in dem package
+				allclasses.add(clazz);
 			}
+			
+		}
+		if(allclasses.size() == 0) {
+			throw new ConvertionException("No input classes. No convertion possbile");
 		}
 		if (allclasses.size() > 1) {
 			setPackage(true);
@@ -131,8 +134,9 @@ public class RdfFileGenerator implements FileGenerator {
 	 * @param allclasses The list where all classes to be converted are stored.
 	 * @throws IOException
 	 * @throws ConvertionException 
+	 * @throws NoSuchMethodException 
 	 */
-	private void generateBundledFile(List<Class<?>> allclasses) throws IOException, ConvertionException {
+	private void generateBundledFile(List<Class<?>> allclasses) throws IOException, ConvertionException, NoSuchMethodException {
 		content = Extractor.extractMany(allclasses, packages);
 		if (content != null) {
 			serialCheckAndWrite(content);
@@ -146,8 +150,9 @@ public class RdfFileGenerator implements FileGenerator {
 	 * @param clazz The class which will be converted.
 	 * @throws IOException
 	 * @throws ConvertionException 
+	 * @throws NoSuchMethodException 
 	 */
-	private void generateFile(Class<?> clazz) throws IOException, ConvertionException { // generiert eine
+	private void generateFile(Class<?> clazz) throws IOException, ConvertionException, NoSuchMethodException { // generiert eine
 		content = Extractor.extractOne(clazz, packages);
 		if (content != null) {
 			serialCheckAndWrite(content);

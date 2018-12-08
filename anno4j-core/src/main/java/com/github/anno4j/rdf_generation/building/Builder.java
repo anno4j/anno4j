@@ -94,7 +94,7 @@ public class Builder {
 			if (e.getValue() == null || e.getValue().equals("")) {
 				logger.debug(
 						"One of the properites contains no @Iri-Annotation. File will be generated without that property.");
-			}
+			} else {
 			if (!convertProp) {
 				logger.debug(
 						"Properites of class with no @Iri-Annotation can't be generated. File will be generated without those properties.");
@@ -115,9 +115,9 @@ public class Builder {
 						// evtl auch mehrere
 						// wenn nein -> nichts
 						
-						System.out.println(e.getValue());
+						//System.out.println(e.getValue());
 						content += RDFTemplate.insertSubProperty(getSuperpropOfProp(e.getKey())) + "\r\n";
-						System.out.println(getSuperpropOfProp(e.getKey()));
+						//System.out.println(getSuperpropOfProp(e.getKey()));
 					}
 
 					// In order to get the domain of the property, the classID of the corresponding
@@ -145,7 +145,7 @@ public class Builder {
 					content += RDFTemplate.insertEndProperty() + "\r\n" + "\r\n";
 				}
 			}
-		}
+		}}
 
 		content += RDFTemplate.insertEndRDF();
 		return content;

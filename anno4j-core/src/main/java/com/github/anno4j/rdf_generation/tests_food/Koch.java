@@ -11,10 +11,10 @@ import com.github.anno4j.model.impl.ResourceObject;
 public interface Koch extends ResourceObject {
 
 	//-----------
-	@Iri("http://www.example.de/hatName")
+	@Iri("http://www.example.de/hatPersonenName")
 	String getName();
 
-	@Iri("http://www.example.de/hatName")
+	@Iri("http://www.example.de/hatPersonenName")
 	void setName(String name);
 
 	
