@@ -64,8 +64,7 @@ public class Mapper {
 				return getComplexDatatypeBySearch(javavalue);
 			}
 		}
-//		return Validator.;
-		return null; // vorerst ohne Validierung
+		return null;
 	}
 
 	/**
@@ -125,12 +124,10 @@ public class Mapper {
 		String packageabove = extractPackage(pathname);
 		String newclassname = extendPath(packageabove, classname);
 		Class<?> clazz = loadClass(newclassname);
-//		System.out.println("CLAZZ: " + clazz);
 		if (clazz != null) {
 			return Extractor.extractClassAnnotValue(clazz);
 		} else {
-			// Validator.
-			return null; // for now good enough
+			return null;
 		}
 	}
 
@@ -163,8 +160,6 @@ public class Mapper {
 	 */
 	private static Class<?> loadClass(String name) throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		// Start reader by specifying for example how the name of the package "starts
-		// with"
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
 			if (info.getName().matches(name)) {
 				final Class<?> clazz = info.load();

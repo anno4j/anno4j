@@ -62,62 +62,36 @@ public class Builder {
 
 		// Insert every property after the other one. Every property contains an
 		// annotation value, domain and range.
-		boolean convertProp = false;
 		for (Entry<Integer, String> e : Extractor.getMethodIriMap().entrySet()) {
-
-			// !!!!!! Die neue map checken, ob die property in der map ist mit classvalues
-			// die
-			// null sind-> dann die property nicht konvertieren
-
-			// kann man das auslagern?? durch boolean convertProp(e.getKey()){.. }
-
-			for (Entry<Integer, Integer> eMatch : Extractor.getPropToClassID().entrySet()) {
-				if (eMatch.getKey() == e.getKey()) {
-					Integer ClassIDtoCheck = eMatch.getValue();
-					for (Entry<Integer, String> eCheck : Extractor.getClassValues().entrySet()) {
-						if (eCheck.getKey() == ClassIDtoCheck) {
-							if (eCheck.getValue() == null || eCheck.getValue().equals("")) {
-								convertProp = false;
-							} else {
-								convertProp = true;
-							}
-						}
-					}
-				}
-
-			}
-
-			// !!!!!! Die neue map checken, ob die property in der map ist mit classvalues
-			// die
-			// null sind-> dann die property nicht konvertieren
 
 			if (e.getValue() == null || e.getValue().equals("")) {
 				logger.debug(
 						"One of the properites contains no @Iri-Annotation. File will be generated without that property.");
 			} else {
-			if (!convertProp) {
-				logger.debug(
-						"Properites of class with no @Iri-Annotation can't be generated. File will be generated without those properties.");
+				if (!convertProp(e)) {
+					logger.debug(
+							"Properites of class with no @Iri-Annotation can't be generated. File will be generated without those properties.");
 
-			} else {
+				} else {
 
-				String range = Mapper.mapJavaReturn(e.getKey(), Extractor.getRangeMap());
-				if (range == null || range.equals("")) {
-					throw new ConvertionException("No Generation possible. A complex datatype could not be found.");
-				}
-				if (range != "void") {
+					String range = Mapper.mapJavaReturn(e.getKey(), Extractor.getRangeMap());
+					if (range == null || range.equals("")) {
+						throw new ConvertionException("No Generation possible. A complex datatype could not be found.");
+					}
 					Integer classID = null;
 					content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";
 					if (propertyIsSub(e.getKey())) { // ich gebe die ID der methode rein, die einen return wert hat
-						
-						// wenn eine klasse ein extends besitzt, also oben im RDFS-Dokument bereits eine subclassof zu Hauptgericht hat
-						// dann in der subklasse (evtl auch mehreren suchen, ob methode den selben namen haben, wenn ja -> subPropertyOf Methodenname
+
+						// wenn eine klasse ein extends besitzt, also oben im RDFS-Dokument bereits eine
+						// subclassof zu Hauptgericht hat
+						// dann in der subklasse (evtl auch mehreren suchen, ob methode den selben namen
+						// haben, wenn ja -> subPropertyOf Methodenname
 						// evtl auch mehrere
 						// wenn nein -> nichts
-						
-						//System.out.println(e.getValue());
+
+						// System.out.println(e.getValue());
 						content += RDFTemplate.insertSubProperty(getSuperpropOfProp(e.getKey())) + "\r\n";
-						//System.out.println(getSuperpropOfProp(e.getKey()));
+						// System.out.println(getSuperpropOfProp(e.getKey()));
 					}
 
 					// In order to get the domain of the property, the classID of the corresponding
@@ -136,19 +110,32 @@ public class Builder {
 							}
 						}
 					}
-
-					// In order to get the range of the porperty, mapping needs to be done to handle
-					// primitive datatyped differentely than complex ones.
-					if (range != null) {
-						content += RDFTemplate.insertRange(range) + "\r\n";
-					}
+					content += RDFTemplate.insertRange(range) + "\r\n";
 					content += RDFTemplate.insertEndProperty() + "\r\n" + "\r\n";
 				}
 			}
-		}}
+		}
 
 		content += RDFTemplate.insertEndRDF();
 		return content;
+	}
+
+	private static boolean convertProp(Entry<Integer, String> e) {
+		for (Entry<Integer, Integer> eMatch : Extractor.getPropToClassID().entrySet()) {
+			if (eMatch.getKey() == e.getKey()) {
+				Integer ClassIDtoCheck = eMatch.getValue();
+				for (Entry<Integer, String> eCheck : Extractor.getClassValues().entrySet()) {
+					if (eCheck.getKey() == ClassIDtoCheck) {
+						if (eCheck.getValue() == null || eCheck.getValue().equals("")) {
+							return false;
+						} else {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private static String getSuperpropOfProp(Integer PropID) {
@@ -202,10 +189,10 @@ public class Builder {
 
 	private static String getAnnotOfProp(String nameOfProperty) {
 		for (Entry<Integer, String> e : Extractor.getIdNameMap().entrySet()) {
-			if(nameOfProperty.equals(e.getValue())) {
+			if (nameOfProperty.equals(e.getValue())) {
 				Integer PropID = e.getKey();
 				for (Entry<Integer, String> e1 : Extractor.getMethodIriMap().entrySet()) {
-					if(PropID == e1.getKey()) {
+					if (PropID == e1.getKey()) {
 						return e1.getValue();
 					}
 				}

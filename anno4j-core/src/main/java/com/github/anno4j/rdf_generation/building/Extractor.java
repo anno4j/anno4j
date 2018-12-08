@@ -142,14 +142,26 @@ public class Extractor {
 		}
 
 		Method[] methods = refclass.getDeclaredMethods();
+		Method[] methodsToConvert = null;
+
 		for (int i = 0; i < methods.length; i++) {
-			methodSetup(propID++, methods[i]);
+			if (!methods[i].isAnnotationPresent(Partial.class)) {
+				if(checkForGetterSetter(methods[i]) != null) {
+					methodSetup(propID++, methods[i]);
+				}
+			}
 		}
-		
+
 		if (sameAnnotationvalue()) {
 			throw new ConvertionException(
 					"Two or more properties were annotated with the same URI. File cannot be generated.");
 		}
+	}
+
+	private static Method checkForGetterSetter(Method method) {
+		if (method.getName().startsWith("get") || method.getName().startsWith("set")) {
+			return method;
+		} return null;
 	}
 
 	private static boolean sameAnnotationvalue() {
@@ -161,7 +173,7 @@ public class Extractor {
 				int idMethod2 = e2.getKey();
 				if (annotValue2.equals(annotValue1) && (idMethod1 != idMethod2)) {
 					System.out.println(annotValue1);
-						return true;
+					return true;
 				}
 			}
 		}
@@ -220,14 +232,14 @@ public class Extractor {
 	 */
 	private static void methodSetup(int propID, Method method) {
 
-		if (!method.isAnnotationPresent(Partial.class) && !method.getReturnType().toString().equals("void")) {
-			
-		String methodIri = "";
-		propToClassID.put(propID, getClassID());
+		if (!method.getReturnType().toString().equals("void")) {
 
-		if (method.isAnnotationPresent(Iri.class)) {
-			methodIri = method.getAnnotation(Iri.class).value();
-		}
+			String methodIri = "";
+			propToClassID.put(propID, getClassID());
+
+			if (method.isAnnotationPresent(Iri.class)) {
+				methodIri = method.getAnnotation(Iri.class).value();
+			}
 
 			idNameMap.put(propID, method.getName());
 			if (methodIri != "" || methodIri != null) {
