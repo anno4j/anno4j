@@ -225,9 +225,12 @@ public class Builder {
 	}
 
 	/**
+	 * Returns if a property with the input ID needs to be checked for having a
+	 * superproperty.
 	 * 
-	 * @param PropID
-	 * @return
+	 * @param PropID The ID of the property.
+	 * @return true, if the property with the corresponding ID has a superproperty,
+	 *         false otherwise.
 	 */
 	private static boolean propertyIsSub(Integer PropID) {
 		String nameOfProp = getNameOfProp(PropID);
@@ -269,6 +272,12 @@ public class Builder {
 		return false;
 	}
 
+	/**
+	 * Returns the name of a property with the corresponding ID.
+	 * 
+	 * @param propID The ID of the property.
+	 * @return The name of the property with the corresponding ID.
+	 */
 	private static String getNameOfProp(Integer propID) {
 		for (Entry<Integer, String> e : Extractor.getIdNameMap().entrySet()) {
 			if (propID == e.getKey()) {
@@ -278,6 +287,11 @@ public class Builder {
 		return null;
 	}
 
+	/**
+	 * Adds the Head to the RDFS Document.
+	 * 
+	 * @return The head of the document.
+	 */
 	private static String addHead() {
 		String content = RDFTemplate.insertHead() + "\r\n" + "\r\n";
 		content += RDFTemplate.insertRdf() + "\r\n";

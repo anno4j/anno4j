@@ -147,7 +147,7 @@ public class Extractor {
 
 		for (int i = 0; i < methods.length; i++) {
 			if (!methods[i].isAnnotationPresent(Partial.class)) {
-				if (checkForGetterSetter(methods[i]) != null) {
+				if (checkForGetterSetter(methods[i], methods) != null) {
 					methodSetup(propID++, methods[i]);
 				}
 			}
@@ -165,9 +165,56 @@ public class Extractor {
 	 * @param method the input method.
 	 * @return the method, if it is part of a getter- and setter pair.
 	 */
-	private static Method checkForGetterSetter(Method method) {
-		if (method.getName().startsWith("get") || method.getName().startsWith("set")) {
-			return method;
+	private static Method checkForGetterSetter(Method method, Method[] methods) {
+		boolean getter = false;
+		boolean setter = false;
+		if (method.getName().startsWith("get")) {
+			getter = true;
+		}
+		if (method.getName().startsWith("set")) {
+			setter = true;
+		}
+		String splittedname = splitGetSet(method.getName(), getter, setter);
+
+		if (splittedname != null) {
+			if (getter) {
+				String setterpartner = "set" + splittedname;
+				for (int i = 0; i < methods.length; i++) {
+					if (methods[i].getName().equals(setterpartner)) {
+						System.out.println(method.getName());
+						return method;
+					}
+				}
+			}
+			if (setter) {
+				String getterpartner = "get" + splittedname;
+				for (int i = 0; i < methods.length; i++) {
+					if (methods[i].getName().equals(getterpartner)) {
+						System.out.println(method.getName());
+						return method;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns a substring of the input name of a method. If the Method is a Getter,
+	 * the name will be returned without the "get". If the Method is a Setter,
+	 * the name will be returned without the "set". 
+	 * 
+	 * @param name The name of the method.
+	 * @param getter If the method is a Getter.
+	 * @param setter If the method is a Setter.
+	 * @return The methodname without "get" or "set".
+	 */
+	private static String splitGetSet(String name, boolean getter, boolean setter) {
+		if (getter) {
+			return name.substring(3, name.length());
+		}
+		if (setter) {
+			return name.substring(3, name.length());
 		}
 		return null;
 	}

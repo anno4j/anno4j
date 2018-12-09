@@ -49,7 +49,7 @@ public class Mapper {
 					return javaequiv;
 				} else {
 					if (fraglist.get(i).hasRelationTo(javavalue)) {
-						return fraglist.get(i).getURI(); 
+						return fraglist.get(i).getURI();
 					}
 				}
 			}
@@ -64,9 +64,11 @@ public class Mapper {
 	}
 
 	/**
+	 * Starts the search for a complex datatype in a complete input package.
 	 * 
-	 * @param javavalue
-	 * @return
+	 * @param javavalue The unknown complex datatype.
+	 * @return The @Iri annotation value of the class, which is the rdfs equivalent
+	 *         of the complex datatype.
 	 * @throws IOException
 	 */
 	private static String getComplexDatatypeBySearch(String javavalue) throws IOException {
@@ -74,9 +76,12 @@ public class Mapper {
 	}
 
 	/**
+	 * Starts looking for an unknown complex datatype in all other classes contained
+	 * in the input package.
 	 * 
-	 * @param javavalue
-	 * @return
+	 * @param javavalue The unkown complex datatype.
+	 * @return The @Iri annotation value of the class, which is the rdfs equivalent
+	 *         of the complex datatype.
 	 */
 	private static String getComplexDatatypeByList(String javavalue) {
 		for (Map.Entry<Integer, String> e : Extractor.getClassNames().entrySet()) {
@@ -94,10 +99,12 @@ public class Mapper {
 	}
 
 	/**
+	 * Checks if the input return value matches a return value in the list of
+	 * fragments, wich contains all primitive datatypes that can be converted.
 	 * 
-	 * @param javavalue
-	 * @param fraglist
-	 * @return
+	 * @param javavalue The return value.
+	 * @param fraglist  A list of all primitive datatypes, which can be converted.
+	 * @return true, if the input datatype is primitive, false otherwise.
 	 */
 	private static boolean isDatatypePrimitive(String javavalue, List<Fragment> fraglist) {
 		for (int i = 0; i < fraglist.size(); i++) {
@@ -110,10 +117,14 @@ public class Mapper {
 	}
 
 	/**
+	 * Checks if a class with an extracted classname is also part of the intput
+	 * packagestructure.
 	 * 
-	 * @param pathname
-	 * @param classname
-	 * @return
+	 * @param pathname  The input packagestructure.
+	 * @param classname The classname which we search for.
+	 * @return null, if a class with the given classname is not found in the
+	 *         package. The @Iri annotation value of the class with the given class
+	 *         name, if it was found in the package.
 	 * @throws IOException
 	 */
 	private static String searchAnnotFromClass(String pathname, String classname) throws IOException {
@@ -128,9 +139,10 @@ public class Mapper {
 	}
 
 	/**
+	 * Returns only the package without the last classname.
 	 * 
-	 * @param pathname
-	 * @return
+	 * @param pathname The complete input package sturcture.
+	 * @return The packagestructure without the classname.
 	 */
 	private static String extractPackage(String pathname) {
 		int beginIndex = 0;
@@ -139,25 +151,27 @@ public class Mapper {
 	}
 
 	/**
+	 * Extends a packagestructure with a new classname.
 	 * 
-	 * @param pathname
-	 * @param classname
-	 * @return
+	 * @param pathname  The package structure without a classname at the end.
+	 * @param classname The new classname
+	 * @return The concatenated package structure with the classname at the end.
 	 */
 	private static String extendPath(String pathname, String classname) {
 		return pathname + "." + classname;
 	}
 
 	/**
+	 * Loads a class with the name searchname, if it can be found.
 	 * 
-	 * @param name
-	 * @return
+	 * @param searchname The name of the class or package to be loaded.
+	 * @return The Class Object of the corresponding classname.
 	 * @throws IOException
 	 */
-	private static Class<?> loadClass(String name) throws IOException {
+	private static Class<?> loadClass(String searchname) throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			if (info.getName().matches(name)) {
+			if (info.getName().matches(searchname)) {
 				final Class<?> clazz = info.load();
 				return clazz;
 			}
