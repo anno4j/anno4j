@@ -1,7 +1,6 @@
 package com.github.anno4j.rdf_generation.building;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -77,6 +76,9 @@ public class Extractor {
 	 */
 	private static Map<Integer, String> rangeMap = new HashMap<Integer, String>();
 
+	/**
+	 * The structure of the input package.
+	 */
 	private static String packages;
 
 	/**
@@ -142,11 +144,10 @@ public class Extractor {
 		}
 
 		Method[] methods = refclass.getDeclaredMethods();
-		Method[] methodsToConvert = null;
 
 		for (int i = 0; i < methods.length; i++) {
 			if (!methods[i].isAnnotationPresent(Partial.class)) {
-				if(checkForGetterSetter(methods[i]) != null) {
+				if (checkForGetterSetter(methods[i]) != null) {
 					methodSetup(propID++, methods[i]);
 				}
 			}
@@ -158,12 +159,26 @@ public class Extractor {
 		}
 	}
 
+	/**
+	 * Checks an input method, if it is part of a getter-and setter pair.
+	 * 
+	 * @param method the input method.
+	 * @return the method, if it is part of a getter- and setter pair.
+	 */
 	private static Method checkForGetterSetter(Method method) {
 		if (method.getName().startsWith("get") || method.getName().startsWith("set")) {
 			return method;
-		} return null;
+		}
+		return null;
 	}
 
+	/**
+	 * Checks if two methods of different getter- and setter pairs have the same
+	 * annotation value.
+	 * 
+	 * @return true, if two methods of different getter- and setter pairs have the
+	 *         same annotation value, false otherwise.
+	 */
 	private static boolean sameAnnotationvalue() {
 		for (Entry<Integer, String> e1 : Extractor.getMethodIriMap().entrySet()) {
 			String annotValue1 = e1.getValue();

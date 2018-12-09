@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mindswap.pellet.jena.PelletReasonerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.anno4j.rdf_generation.configuration.Configuration;
 import com.github.anno4j.rdf_generation.ConvertionException;
@@ -27,11 +25,6 @@ public class RdfFileGenerator implements FileGenerator {
 	 * The content of the RDFS file which will be stored represented as a string.
 	 */
 	private String content;
-	
-	/**
-	 * The Logger for printing progress and given information to the user if a inconsistency occurred.
-	 */
-	private final Logger logger = LoggerFactory.getLogger(RdfFileGenerator.class);
 
 	/**
 	 * The configuration settings for generating a RDFS file.
@@ -166,8 +159,9 @@ public class RdfFileGenerator implements FileGenerator {
 	 * 
 	 * @param content The already converted RDFS file in "RDF/XML".
 	 * @throws IOException
+	 * @throws ConvertionException 
 	 */
-	private void serialCheckAndWrite(String content) throws IOException {
+	private void serialCheckAndWrite(String content) throws IOException, ConvertionException {
 		if (config.getSerialization() == "RDF/XML") {
 			writeFile(content, config.getOutputPath());
 		} else if (config.getSerialization() == "TURTLE") {
@@ -180,7 +174,7 @@ public class RdfFileGenerator implements FileGenerator {
 			writeFile(content, config.getOutputPath());
 			convert(config.getSerialization());
 		} else {
-			logger.debug("Unacceptable serialization used");
+			throw new ConvertionException("Unacceptable serialization used");
 		}
 
 	}

@@ -4,7 +4,6 @@ package com.github.anno4j.rdf_generation.building;
  * The Template to generate any RDFS File with as many classes and properties as
  * required.
  * 
- * @author Brinninger Sandra
  *
  */
 public class RDFTemplate {

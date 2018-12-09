@@ -17,6 +17,10 @@ public class Builder {
 	 * The output file in "RDF/XML" as a string.
 	 */
 	private static String content;
+
+	/**
+	 * The Logger for printing progress and user messages.
+	 */
 	private final static Logger logger = LoggerFactory.getLogger(Builder.class);
 
 	/**
@@ -120,6 +124,14 @@ public class Builder {
 		return content;
 	}
 
+	/**
+	 * Checks if an input entry with an property ID shouldn't be converted because
+	 * it belongs to a class with no @Iri annotation.
+	 * 
+	 * @param e The input entry.
+	 * @return true, if a property can be converted because its class has a
+	 *         present @Iri annotation, false otherwise.
+	 */
 	private static boolean convertProp(Entry<Integer, String> e) {
 		for (Entry<Integer, Integer> eMatch : Extractor.getPropToClassID().entrySet()) {
 			if (eMatch.getKey() == e.getKey()) {
@@ -138,38 +150,47 @@ public class Builder {
 		return false;
 	}
 
-	private static String getSuperpropOfProp(Integer PropID) {
-		String nameOfProp = getNameOfProp(PropID);
+	/**
+	 * Returns the Superproperty of the property that belongs to the input property
+	 * ID.
+	 * 
+	 * @param propID the input ID of a property of which the superproperty needs to
+	 *               be found.
+	 * @return The @Iri annotation value of the superproperty.
+	 */
+	private static String getSuperpropOfProp(Integer propID) {
+		String nameOfProp = getNameOfProp(propID);
+
+//		System.out.println("Name of originalProp: " + getAnnotOfProp(propID));
+
 		if (nameOfProp != null) {
 			for (Entry<Integer, Integer> e : Extractor.getPropToClassID().entrySet()) {
-				if (PropID == e.getKey()) {
+				if (propID == e.getKey()) {
 					Integer ClassIDOfProp = e.getValue();
-					for (Entry<Integer, List<String>> eSuperClass : Extractor.getSubClasses().entrySet()) { // alle
-																											// superklassen
-																											// dieser
-																											// einer
-																											// Property
-																											// durchgehen
-																											// und nach
-																											// selben
-																											// namen der
-																											// methode
-																											// suchen
+					for (Entry<Integer, List<String>> eSuperClass : Extractor.getSubClasses().entrySet()) {
 						if (ClassIDOfProp == eSuperClass.getKey()) {
 							if (eSuperClass.getValue() != null) {
 								for (int i = 0; i < eSuperClass.getValue().size(); i++) {
 									String classAnnot = eSuperClass.getValue().get(i);
+
+//									System.out.println("AnnotationValue of Superclass: " + classAnnot);
+
 									for (Entry<Integer, String> e1 : Extractor.getClassValues().entrySet()) {
 										if (classAnnot == e1.getValue()) {
 											Integer classID = e1.getKey();
 											for (Entry<Integer, Integer> e2 : Extractor.getPropToClassID().entrySet()) {
 												if (classID == e2.getValue()) {
-													Integer SuperPropID = e2.getKey();
+													Integer superPropID = e2.getKey();
 													for (Entry<Integer, String> e3 : Extractor.getIdNameMap()
 															.entrySet()) {
-														if (SuperPropID == e3.getKey()) {
+														if (superPropID == e3.getKey()) {
+
+//															System.out.println("Name der Subprop: "
+//																	+ getAnnotOfProp(e3.getKey()));
+//															System.out.println();
+
 															if (e3.getValue().equals(nameOfProp)) {
-																return getAnnotOfProp(e3.getValue());
+																return getAnnotOfProp(e3.getKey());
 															}
 														}
 													}
@@ -187,37 +208,34 @@ public class Builder {
 		return null;
 	}
 
-	private static String getAnnotOfProp(String nameOfProperty) {
-		for (Entry<Integer, String> e : Extractor.getIdNameMap().entrySet()) {
-			if (nameOfProperty.equals(e.getValue())) {
-				Integer PropID = e.getKey();
-				for (Entry<Integer, String> e1 : Extractor.getMethodIriMap().entrySet()) {
-					if (PropID == e1.getKey()) {
-						return e1.getValue();
-					}
-				}
+	/**
+	 * Returns the @Iri annotation value of the property with the input ID
+	 * 
+	 * @param propID The ID of the property of which the annotation value shall be
+	 *               returned.
+	 * @return the annotation value of the property with the corresponding ID.
+	 */
+	private static String getAnnotOfProp(int propID) {
+		for (Entry<Integer, String> e1 : Extractor.getMethodIriMap().entrySet()) {
+			if (propID == e1.getKey()) {
+				return e1.getValue();
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param PropID
+	 * @return
+	 */
 	private static boolean propertyIsSub(Integer PropID) {
 		String nameOfProp = getNameOfProp(PropID);
 		if (nameOfProp != null) {
 			for (Entry<Integer, Integer> e : Extractor.getPropToClassID().entrySet()) {
 				if (PropID == e.getKey()) {
 					Integer ClassIDOfProp = e.getValue();
-					for (Entry<Integer, List<String>> eSuperClass : Extractor.getSubClasses().entrySet()) { // alle
-																											// superklassen
-																											// dieser
-																											// einer
-																											// Property
-																											// durchgehen
-																											// und nach
-																											// selben
-																											// namen der
-																											// methode
-																											// suchen
+					for (Entry<Integer, List<String>> eSuperClass : Extractor.getSubClasses().entrySet()) {
 						if (ClassIDOfProp == eSuperClass.getKey()) {
 							if (eSuperClass.getValue() != null) {
 								for (int i = 0; i < eSuperClass.getValue().size(); i++) {

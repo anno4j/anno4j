@@ -4,12 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.openrdf.query.algebra.If;
-
 import com.github.anno4j.rdf_generation.fragments.Fragment;
 import com.github.anno4j.rdf_generation.fragments.Fragments;
-import com.github.anno4j.rdf_generation.generation.RdfFileGenerator;
-import com.github.anno4j.rdf_generation.validation.Validator;
 import com.google.common.reflect.ClassPath;
 
 public class Mapper {
