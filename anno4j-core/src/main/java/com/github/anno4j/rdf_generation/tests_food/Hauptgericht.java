@@ -5,6 +5,7 @@ import java.util.Set;
 import org.openrdf.annotations.Iri;
 
 import com.github.anno4j.annotations.Partial;
+import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.ResourceObject;
 
 @Iri("http://www.example.de/Hauptgericht")

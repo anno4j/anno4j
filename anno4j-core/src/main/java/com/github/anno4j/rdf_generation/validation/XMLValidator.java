@@ -24,9 +24,9 @@ public class XMLValidator {
 		// misformatted
 		try {
 			Document document = builder.parse(new InputSource("C:\\Users\\Brinninger Sandra\\Documents\\result.txt"));
-			System.out.println("doc is correctly formatted!");
+			System.out.println("document is correctly formatted!");
 		} catch (SAXException e) {
-			System.out.println("doc is misformatted!");
+			System.out.println("document is misformatted!");
 		} catch (IOException e) {}
 	}
 

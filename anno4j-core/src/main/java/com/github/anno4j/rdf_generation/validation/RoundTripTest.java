@@ -18,7 +18,7 @@ public class RoundTripTest {
 		config.setBasePackage("com.example.model");
 
 		JavaFileGenerator generator = new OWLJavaFileGenerator();
-		generator.addRDF("http://example.com/your_ontology.rdf.xml", "RDF/XML");
+		generator.addRDF("", "RDF/XML");
 
 		File outputDir = new File("C:\\Users\\Brinninger Sandra\\Documents\\resultround.txt");
 		generator.generateJavaFiles(config, outputDir);
