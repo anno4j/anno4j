@@ -13,7 +13,7 @@
         </server>
         <server>
             <id>github</id>
-            <username>Anno4jCI</username>
+            <username>anno4jbuildserver</username>
             <password>${env.GITHUB_PW}</password>
         </server>
     </servers>
