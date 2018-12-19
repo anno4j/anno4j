@@ -9,11 +9,11 @@ elif [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_BRANCH}" == "master"
     if [[ $COMMITMSG != \[maven-release-plugin\]* ]]; then
         echo "Release Anno4j:" $COMMITMSG
         echo "Modify git configuration"
-        git config --global user.email "anno4j@web.de"
-        git config --global user.name "Anno4jCI"
+        git config --global user.email "anno4jci@web.de"
+        git config --global user.name "anno4jbuildserver"
         echo "Add github remote repository"
         git remote rm origin
-        git remote add origin https://Anno4jCI:$GITHUB_PW@github.com/anno4j/anno4j.git
+        git remote add origin https://anno4jbuildserver:$GITHUB_PW@github.com/anno4j/anno4j.git
         echo "Checkout master branch"
         git checkout master || git checkout -b master
         echo "Decrypt gpg keyrings"
