@@ -7,6 +7,7 @@ import com.github.anno4j.querying.QueryService;
 import com.github.anno4j.querying.evaluation.LDPathEvaluatorConfiguration;
 import com.github.anno4j.querying.extension.QueryEvaluator;
 import com.github.anno4j.querying.extension.TestEvaluator;
+import com.github.anno4j.querying.objectqueries.ObjectQueryService;
 import com.github.anno4j.schema.OWLSchemaPersistingManager;
 import com.github.anno4j.schema.SchemaPersistingManager;
 import com.google.common.collect.Sets;
@@ -432,6 +433,12 @@ public class Anno4j implements TransactionCommands {
         Transaction transaction = createTransaction();
         transaction.setAllContexts(context);
         return transaction.createQueryService();
+    }
+
+    @Override
+    public ObjectQueryService createObjectQueryService() throws RepositoryException, RepositoryConfigException {
+        Transaction transaction = createTransaction();
+        return transaction.createObjectQueryService();
     }
 
     /**

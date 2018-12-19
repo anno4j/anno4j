@@ -2,9 +2,11 @@ package com.github.anno4j;
 
 import com.github.anno4j.model.impl.ResourceObject;
 import com.github.anno4j.querying.QueryService;
+import com.github.anno4j.querying.objectqueries.ObjectQueryService;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.object.ObjectRepository;
 
 import java.util.List;
@@ -49,6 +51,8 @@ public interface TransactionCommands {
      * @return query service object for specified type
      */
     QueryService createQueryService() throws RepositoryException;
+
+    ObjectQueryService createObjectQueryService() throws RepositoryException, RepositoryConfigException;
 
     <T> T createObject(Class<T> clazz) throws RepositoryException, IllegalAccessException, InstantiationException;
 
