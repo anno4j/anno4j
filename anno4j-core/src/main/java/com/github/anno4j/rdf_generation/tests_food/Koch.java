@@ -4,17 +4,16 @@ import java.util.Date;
 
 import org.openrdf.annotations.Iri;
 
-import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.model.impl.ResourceObject;
 
 @Iri("http://www.example.de/Koch")
 public interface Koch extends ResourceObject {
 
 	//-----------
-	@Iri("http://www.example.de/hatPersonenName")
+	@Iri("http://www.example.de/hatPersonenname")
 	String getName();
 
-	@Iri("http://www.example.de/hatPersonenName")
+	@Iri("http://www.example.de/hatPersonenname")
 	void setName(String name);
 
 	
@@ -43,7 +42,6 @@ public interface Koch extends ResourceObject {
 
 	
 	//-----------
-	@Partial
 	boolean isItalian();
 
 }

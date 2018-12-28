@@ -181,7 +181,6 @@ public class Extractor {
 				String setterpartner = "set" + splittedname;
 				for (int i = 0; i < methods.length; i++) {
 					if (methods[i].getName().equals(setterpartner)) {
-						System.out.println(method.getName());
 						return method;
 					}
 				}
@@ -190,7 +189,6 @@ public class Extractor {
 				String getterpartner = "get" + splittedname;
 				for (int i = 0; i < methods.length; i++) {
 					if (methods[i].getName().equals(getterpartner)) {
-						System.out.println(method.getName());
 						return method;
 					}
 				}
@@ -234,7 +232,6 @@ public class Extractor {
 				String annotValue2 = e2.getValue();
 				int idMethod2 = e2.getKey();
 				if (annotValue2.equals(annotValue1) && (idMethod1 != idMethod2)) {
-					System.out.println(annotValue1);
 					return true;
 				}
 			}

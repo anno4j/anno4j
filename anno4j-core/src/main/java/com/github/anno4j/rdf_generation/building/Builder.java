@@ -84,31 +84,17 @@ public class Builder {
 					}
 					Integer classID = null;
 					content += RDFTemplate.insertProperty(e.getValue()) + "\r\n";
-					if (propertyIsSub(e.getKey())) { // ich gebe die ID der methode rein, die einen return wert hat
-
-						// wenn eine klasse ein extends besitzt, also oben im RDFS-Dokument bereits eine
-						// subclassof zu Hauptgericht hat
-						// dann in der subklasse (evtl auch mehreren suchen, ob methode den selben namen
-						// haben, wenn ja -> subPropertyOf Methodenname
-						// evtl auch mehrere
-						// wenn nein -> nichts
-
-						// System.out.println(e.getValue());
+					if (propertyIsSub(e.getKey())) {
 						content += RDFTemplate.insertSubProperty(getSuperpropOfProp(e.getKey())) + "\r\n";
-						// System.out.println(getSuperpropOfProp(e.getKey()));
 					}
 
 					// In order to get the domain of the property, the classID of the corresponding
 					// class needs to be found.
 					for (Entry<Integer, Integer> e1 : Extractor.getPropToClassID().entrySet()) {
-						// propID of methodIriMap == propID of propToClassIDMap
 						if (e1.getKey() == e.getKey()) {
-							// e1.getValue is the classID of the class whose annotation value is
-							// needed.
 							classID = e1.getValue();
 							for (Entry<Integer, String> e2 : Extractor.getClassValues().entrySet()) {
 								if (e2.getKey() == classID) {
-									// insert the corresponding annotation value of the classID into the template.
 									content += RDFTemplate.insertDomain(e2.getValue()) + "\r\n";
 								}
 							}
@@ -160,9 +146,6 @@ public class Builder {
 	 */
 	private static String getSuperpropOfProp(Integer propID) {
 		String nameOfProp = getNameOfProp(propID);
-
-//		System.out.println("Name of originalProp: " + getAnnotOfProp(propID));
-
 		if (nameOfProp != null) {
 			for (Entry<Integer, Integer> e : Extractor.getPropToClassID().entrySet()) {
 				if (propID == e.getKey()) {
@@ -172,9 +155,6 @@ public class Builder {
 							if (eSuperClass.getValue() != null) {
 								for (int i = 0; i < eSuperClass.getValue().size(); i++) {
 									String classAnnot = eSuperClass.getValue().get(i);
-
-//									System.out.println("AnnotationValue of Superclass: " + classAnnot);
-
 									for (Entry<Integer, String> e1 : Extractor.getClassValues().entrySet()) {
 										if (classAnnot == e1.getValue()) {
 											Integer classID = e1.getKey();
@@ -184,11 +164,6 @@ public class Builder {
 													for (Entry<Integer, String> e3 : Extractor.getIdNameMap()
 															.entrySet()) {
 														if (superPropID == e3.getKey()) {
-
-//															System.out.println("Name der Subprop: "
-//																	+ getAnnotOfProp(e3.getKey()));
-//															System.out.println();
-
 															if (e3.getValue().equals(nameOfProp)) {
 																return getAnnotOfProp(e3.getKey());
 															}
@@ -261,7 +236,6 @@ public class Builder {
 											}
 										}
 									}
-
 								}
 							}
 						}

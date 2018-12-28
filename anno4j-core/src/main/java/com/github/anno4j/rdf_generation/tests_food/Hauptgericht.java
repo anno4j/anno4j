@@ -4,8 +4,6 @@ import java.util.Set;
 
 import org.openrdf.annotations.Iri;
 
-import com.github.anno4j.annotations.Partial;
-import com.github.anno4j.model.Annotation;
 import com.github.anno4j.model.impl.ResourceObject;
 
 @Iri("http://www.example.de/Hauptgericht")
@@ -44,7 +42,4 @@ public interface Hauptgericht extends ResourceObject {
 	@Iri("http://www.example.de/hatKoch")
 	void setChef(Koch chef);
 	
-	//-----------
-	@Partial
-	boolean isServedHot();
 }
