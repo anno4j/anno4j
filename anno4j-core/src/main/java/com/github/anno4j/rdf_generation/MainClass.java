@@ -1,5 +1,6 @@
 package com.github.anno4j.rdf_generation;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.openrdf.repository.RepositoryException;
@@ -29,8 +30,9 @@ public class MainClass {
 	 * @throws NoSuchMethodException 
 	 */
 	public static void main(String[] args) throws IOException, ConvertionException, NoSuchMethodException {
+		String filePath = new File("").getAbsolutePath();
 		String packages = "com.github.anno4j.rdf_generation.tests_food.";
-		Configuration config = new Configuration("C:\\Users\\Brinninger Sandra\\Documents\\result.txt", "RDF/XML",
+				Configuration config = new Configuration(filePath + "/src/main/resources/result.txt", "RDF/XML",
 				packages);
 		FileGenerator generator = new RdfFileGenerator(config, packages);
 			generator.generate();

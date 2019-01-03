@@ -2,8 +2,10 @@ package com.github.anno4j.rdf_generation.validation;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.reflect.ClassPath;
@@ -11,19 +13,23 @@ import com.google.common.reflect.ClassPath;
 public class GuavaTest {
 
 	boolean found = false;
-	public String classToPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgericht";
-	public String classNotToPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgerichte";
-	public String classReallyNotToPass = "C:\\\\Users\\\\Brinninger Sandra\\\\git\\\\anno4j\\\\anno4j-core\\\\src\\\\main\\\\java\\\\com\\\\github\\\\anno4j\\\\rdf_generation\\\\tests_food\\\\Hauptgericht";
+	String filePath = new File("").getAbsolutePath();
+	String path = filePath.replace("\\", "\\\\");
 
-	public String packageToPass = "com.github.anno4j.rdf_generation.tests_food.";
-	public String packageNotToPass = "com.github.anno4j.rdf_generation.package.";
-	public String packageReallyNotToPass = "C:\\\\Users\\\\Brinninger Sandra\\\\git\\\\anno4j\\\\anno4j-core\\\\src\\\\main\\\\java\\\\com\\\\github\\\\anno4j\\\\rdf_generation\\\\tests_food";
+	public String classPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgericht";
+	public String classNoPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgerichte";
+	public String classpathNoPass = path
+			+ "/src/main/java/com/github/anno4j/rdf_generation/tests_food/Hauptgericht";
+
+	public String packagePass = "com.github.anno4j.rdf_generation.tests_food.";
+	public String packageNoPass = "com.github.anno4j.rdf_generation.package.";
+	public String packagepathNoPass = path + "/src/main/java/com/github/anno4j/rdf_generation/tests_food";
 
 	@Test
 	public void testClassPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			boolean matches = info.getName().matches(classToPass);
+			boolean matches = info.getName().matches(classPass);
 			if (matches) {
 				found = true;
 			}
@@ -32,10 +38,10 @@ public class GuavaTest {
 	}
 
 	@Test
-	public void testClassNotPass() throws IOException {
+	public void testClassNoPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			boolean matches = info.getName().matches(classNotToPass);
+			boolean matches = info.getName().matches(classNoPass);
 			if (matches) {
 				found = true;
 			}
@@ -44,22 +50,24 @@ public class GuavaTest {
 	}
 
 	@Test
-	public void testClassReallyNotPass() throws IOException {
+	@Ignore 
+	// change path if your're not working on Windows
+	public void testClasspathNoPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			boolean matches = info.getName().matches(classReallyNotToPass);
+			boolean matches = info.getName().matches(classpathNoPass);
 			if (matches) {
 				found = true;
 			}
 		}
 		assertFalse(found);
 	}
-	
+
 	@Test
 	public void testPackagePass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			boolean matches = info.getName().startsWith(packageToPass);
+			boolean matches = info.getName().startsWith(packagePass);
 			if (matches) {
 				found = true;
 			}
@@ -68,10 +76,10 @@ public class GuavaTest {
 	}
 
 	@Test
-	public void testPackageNotPass() throws IOException {
+	public void testPackageNoPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			boolean matches = info.getName().startsWith(packageNotToPass);
+			boolean matches = info.getName().startsWith(packageNoPass);
 			if (matches) {
 				found = true;
 			}
@@ -80,10 +88,12 @@ public class GuavaTest {
 	}
 
 	@Test
-	public void testPackageReallyNotPass() throws IOException {
+	@Ignore 
+	// change path if your're not working on Windows
+	public void testPackagepathNoPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
-			boolean matches = info.getName().startsWith(packageReallyNotToPass);
+			boolean matches = info.getName().startsWith(packagepathNoPass);
 			if (matches) {
 				found = true;
 			}
