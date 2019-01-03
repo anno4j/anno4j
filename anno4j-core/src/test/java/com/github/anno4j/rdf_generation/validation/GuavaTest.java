@@ -10,6 +10,14 @@ import org.junit.Test;
 
 import com.google.common.reflect.ClassPath;
 
+/**
+ * 
+ * This Unittest tests if only a correct java package can be read via Google
+ * Guava. Choosing a package or class through a filepath is not correct.
+ * 
+ * The filepaths for the test need to be changed if you are not working on Windows.
+ *
+ */
 public class GuavaTest {
 
 	boolean found = false;
@@ -18,8 +26,7 @@ public class GuavaTest {
 
 	public String classPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgericht";
 	public String classNoPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgerichte";
-	public String classpathNoPass = path
-			+ "/src/main/java/com/github/anno4j/rdf_generation/tests_food/Hauptgericht";
+	public String classpathNoPass = path + "/src/main/java/com/github/anno4j/rdf_generation/tests_food/Hauptgericht";
 
 	public String packagePass = "com.github.anno4j.rdf_generation.tests_food.";
 	public String packageNoPass = "com.github.anno4j.rdf_generation.package.";
@@ -50,7 +57,7 @@ public class GuavaTest {
 	}
 
 	@Test
-	@Ignore 
+	@Ignore
 	// change path if your're not working on Windows
 	public void testClasspathNoPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -88,7 +95,7 @@ public class GuavaTest {
 	}
 
 	@Test
-	@Ignore 
+	@Ignore
 	// change path if your're not working on Windows
 	public void testPackagepathNoPass() throws IOException {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();

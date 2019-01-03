@@ -13,12 +13,12 @@ import org.xml.sax.SAXException;
 
 /**
  * 
- * Tests, if the input document is correctly formatted or not.
+ * This test checks if the input plaintext file contains a correctly formatted xml document.
  * 
- * Attention: Input Path only valid on Windows! 
+ * Filepath needs to be changed if you are not working on Windows.
  *
  */
-public class XMLValidator {
+public class XMLVal {
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		String filePath = new File("").getAbsolutePath();
@@ -38,5 +38,5 @@ public class XMLValidator {
 			System.out.println("document is misformatted!");
 		} catch (IOException e) {}
 	}
-
+	
 }
