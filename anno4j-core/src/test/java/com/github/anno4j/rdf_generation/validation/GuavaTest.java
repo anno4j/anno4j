@@ -25,11 +25,11 @@ public class GuavaTest {
 	String path = filePath.replace("\\", "\\\\");
 
 	public String classPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgericht";
-	public String classNoPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgerichte";
+	public String classNoPass = "com.github.anno4j.rdf_generation.tests_food.Hauptgerich";
 	public String classpathNoPass = path + "/src/main/java/com/github/anno4j/rdf_generation/tests_food/Hauptgericht";
 
 	public String packagePass = "com.github.anno4j.rdf_generation.tests_food.";
-	public String packageNoPass = "com.github.anno4j.rdf_generation.package.";
+	public String packageNoPass = "com.github.anno4j.rdf_generation.tests_foo.";
 	public String packagepathNoPass = path + "/src/main/java/com/github/anno4j/rdf_generation/tests_food";
 
 	@Test
