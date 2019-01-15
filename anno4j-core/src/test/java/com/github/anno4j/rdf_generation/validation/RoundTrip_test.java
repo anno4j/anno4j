@@ -27,12 +27,21 @@ public class RoundTrip_test {
 			throws RepositoryConfigException, RepositoryException, JavaFileGenerationException, IOException {
 		OntGenerationConfig config = new OntGenerationConfig();
 		config.setBasePackage("com.example.model");
+//		config.setBasePackage("com.github.anno4j.rdf_generation.validation.model");
 		String filePath = new File("").getAbsolutePath();
 
 		JavaFileGenerator generator = new OWLJavaFileGenerator();
-		generator.addRDF(filePath.toLowerCase() + "/src/main/resources/result.txt", "RDF/XML");
+//		generator.addRDF(filePath.toLowerCase() + "/src/main/resources/result.txt", "RDF/XML");
+		// Bei deinem Pfad fehlt denke ich das "anno4j-core" vor "src"
+		// Finde hier bitte mal raus, was filePath für Dich macht, und was Du weiter an den Pfad hängen musst
+		// Folgender Pfad hat bei mir funktioniert (ich habe result.txt ebenfalls in die Resources für die Tests kompiert)
+		generator.addRDF("/Users/Manu/IdeaProjects/anno4j/anno4j-core/src/test/resources/result.txt", "RDF/XML");
 
-		File outputDir = new File(filePath.toLowerCase() + "/src/main/resources/resultRoundTrip.txt");
+		// Selbes Spiel für diesen Pfad
+		// Wichtig aber vor allem: Der Pfad muss auf das Java-Package zeigen, wo du die erstellten Klassen haben möchtest!
+		// Als Hilfestellung, was ich oft mache: Suche den Ordner bei Dir in Windows und suche den Pfad
+//		File outputDir = new File(filePath.toLowerCase() + "/src/main/resources/resultRoundTrip.txt");
+		File outputDir = new File("/Users/Manu/IdeaProjects/anno4j/anno4j-core/src/test/java/com/github/anno4j/rdf_generation/validation/model/");
 		generator.generateJavaFiles(config, outputDir);
 	}
 
