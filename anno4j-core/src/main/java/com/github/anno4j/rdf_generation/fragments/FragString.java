@@ -16,11 +16,13 @@ public class FragString implements Fragment {
 	private final static String javaequiv4 = "class [Ljava.lang.String;";
 	private final static String javaequiv5 = "class [Ljava.lang.Character;";
 	private final static String javaequiv6 = "class [C";
+	private final static String javaequiv7 = "interface java.lang.CharSequence";
 
 	@Override
 	public boolean hasRelationTo(String javaval) {
 		if (javaequiv.equals(javaval) || javaequiv2.equals(javaval) || javaequiv3.equals(javaval)
-				|| javaequiv4.equals(javaval) || javaequiv5.equals(javaval) || javaequiv6.equals(javaval)) {
+				|| javaequiv4.equals(javaval) || javaequiv5.equals(javaval) || javaequiv6.equals(javaval)
+				|| javaequiv7.equals(javaval)) {
 			return true;
 		}
 		return false;
@@ -35,7 +37,7 @@ public class FragString implements Fragment {
 	public String getJavaEquiv() {
 		return "";
 	}
-	
+
 	@Override
 	public boolean hasRDFRange() {
 		return true;

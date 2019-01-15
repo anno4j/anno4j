@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rdf:RDF 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+<rdfs:Class rdf:about="http://www.example.de/Hauptgericht">
+</rdfs:Class>
+
+<rdfs:Class rdf:about="http://www.example.de/Koch">
+</rdfs:Class>
+
+<rdfs:Class rdf:about="http://www.example.de/Pizza">
+<rdfs:subClassOf rdf:resource="http://www.example.de/Hauptgericht"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:about="http://www.example.de/Zutat">
+</rdfs:Class>
+
+<rdf:Property rdf:about="http://www.example.de/hatKoch">
+<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
+<rdfs:range rdf:resource="http://www.example.de/Koch"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatNationalität">
+<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatPersonenname">
+<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatName">
+<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatAlter">
+<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatHauptbestandteil">
+<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
+<rdfs:range rdf:resource="http://www.example.de/Zutat"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatSortenname">
+<rdfs:domain rdf:resource="http://www.example.de/Pizza"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatBestandteil">
+<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
+<rdfs:range rdf:resource="http://www.example.de/Zutat"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatHerkunftsland">
+<rdfs:domain rdf:resource="http://www.example.de/Zutat"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatGeburtstag">
+<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</rdf:Property>
+
+</rdf:RDF>
