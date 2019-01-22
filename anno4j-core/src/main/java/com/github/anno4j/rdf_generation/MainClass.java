@@ -3,8 +3,6 @@ package com.github.anno4j.rdf_generation;
 import java.io.File;
 import java.io.IOException;
 
-import org.openrdf.repository.RepositoryException;
-
 import com.github.anno4j.rdf_generation.configuration.Configuration;
 import com.github.anno4j.rdf_generation.generation.FileGenerator;
 import com.github.anno4j.rdf_generation.generation.RdfFileGenerator;
@@ -22,11 +20,8 @@ public class MainClass {
 	 * file, false otherwise when the path to a package was given before
 	 * 
 	 * @param args
-	 * @throws RepositoryException
-	 * @throws FileGenerationException
 	 * @throws IOException
 	 * @throws ConvertionException 
-	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
 	public static void main(String[] args) throws IOException, ConvertionException, NoSuchMethodException {

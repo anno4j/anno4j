@@ -33,17 +33,9 @@ public class RoundTrip_test1 {
 		File path = new File(path2);
 
 		JavaFileGenerator generator = new OWLJavaFileGenerator();
-		// Bei deinem Pfad fehlt denke ich das "anno4j-core" vor "src"
-		// Finde hier bitte mal raus, was filePath für Dich macht, und was Du weiter an den Pfad hängen musst
-		// Folgender Pfad hat bei mir funktioniert (ich habe result.txt ebenfalls in die Resources für die Tests kopiert)
-		//generator.addRDF("/Users/Manu/IdeaProjects/anno4j/anno4j-core/src/test/resources/result.txt", "RDF/XML");
 		URI uri = path.toURI();
 		generator.addRDF(uri.toString(), "RDF/XML");
-
-		// Selbes Spiel für diesen Pfad
-		// Wichtig aber vor allem: Der Pfad muss auf das Java-Package zeigen, wo du die erstellten Klassen haben möchtest!
-		// Als Hilfestellung, was ich oft mache: Suche den Ordner bei Dir in Windows und suche den Pfad
-//		File outputDir = new File("/Users/Manu/IdeaProjects/anno4j/anno4j-core/src/test/java/com/github/anno4j/rdf_generation/validation/model/");
+		//change the following path
 		File outputDir = new File("/Users/Brinninger Sandra/git/anno4j/anno4j-core/src/test/java/com/github/anno4j/rdf_generation/validation/model/");
 		generator.generateJavaFiles(config, outputDir);
 	}

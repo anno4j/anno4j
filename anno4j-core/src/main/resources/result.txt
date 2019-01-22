@@ -31,9 +31,9 @@ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
 <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
 </rdf:Property>
 
-<rdf:Property rdf:about="http://www.example.de/hatBestandteil">
+<rdf:Property rdf:about="http://www.example.de/hatKoch">
 <rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
-<rdfs:range rdf:resource="http://www.example.de/Zutat"/>
+<rdfs:range rdf:resource="http://www.example.de/Koch"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="http://www.example.de/hatHerkunftsland">
@@ -41,9 +41,9 @@ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
 <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
 </rdf:Property>
 
-<rdf:Property rdf:about="http://www.example.de/hatKoch">
+<rdf:Property rdf:about="http://www.example.de/hatBestandteil">
 <rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
-<rdfs:range rdf:resource="http://www.example.de/Koch"/>
+<rdfs:range rdf:resource="http://www.example.de/Zutat"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="http://www.example.de/hatHauptbestandteil">
@@ -61,14 +61,14 @@ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
 <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
 </rdf:Property>
 
-<rdf:Property rdf:about="http://www.example.de/hatGeburtstag">
-<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
-</rdf:Property>
-
 <rdf:Property rdf:about="http://www.example.de/hatAlter">
 <rdfs:domain rdf:resource="http://www.example.de/Koch"/>
 <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="http://www.example.de/hatGeburtstag">
+<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
+<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
 </rdf:Property>
 
 </rdf:RDF>

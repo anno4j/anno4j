@@ -11,7 +11,6 @@ public interface FileGenerator {
 	 * 
 	 * @throws IOException
 	 * @throws ConvertionException 
-	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
     void generate() throws IOException, ConvertionException, NoSuchMethodException;

@@ -15,7 +15,7 @@ import com.google.common.reflect.ClassPath;
  * This Unittest tests if only a correct java package can be read via Google
  * Guava. Choosing a package or class through a filepath is not correct.
  * 
- * The filepaths for the test need to be changed if you are not working on Windows.
+ * The filepaths for the test may need to be changed if you are not working on Windows.
  *
  */
 public class GuavaTest {
