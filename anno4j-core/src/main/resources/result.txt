@@ -1,74 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?>
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-<rdf:RDF 
-xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+<http://www.example.de/hatPersonenname>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Koch> ;
+        rdfs:range   xsd:string .
 
-<rdfs:Class rdf:about="http://www.example.de/Hauptgericht">
-<rdfs:subClassOf rdf:resource="https://github.com/anno4j/ns#Resource"/>
-</rdfs:Class>
+<http://www.example.de/hatHauptbestandteil>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Hauptgericht> ;
+        rdfs:range   <http://www.example.de/Zutat> .
 
-<rdfs:Class rdf:about="http://www.example.de/Koch">
-<rdfs:subClassOf rdf:resource="https://github.com/anno4j/ns#Resource"/>
-</rdfs:Class>
+<http://www.example.de/hatBestandteil>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Hauptgericht> ;
+        rdfs:range   <http://www.example.de/Zutat> .
 
-<rdfs:Class rdf:about="http://www.example.de/Pizza">
-<rdfs:subClassOf rdf:resource="http://www.example.de/Hauptgericht"/>
-</rdfs:Class>
+<http://www.example.de/Pizza>
+        a                rdfs:Class ;
+        rdfs:subClassOf  <http://www.example.de/Hauptgericht> .
 
-<rdfs:Class rdf:about="http://www.example.de/Zutat">
-<rdfs:subClassOf rdf:resource="https://github.com/anno4j/ns#Resource"/>
-</rdfs:Class>
+<http://www.example.de/hatName>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Hauptgericht> ;
+        rdfs:range   xsd:string .
 
-<rdf:Property rdf:about="http://www.example.de/hatName">
-<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-</rdf:Property>
+<http://www.example.de/hatHerkunftsland>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Zutat> ;
+        rdfs:range   xsd:string .
 
-<rdf:Property rdf:about="http://www.example.de/hatSortenname">
-<rdfs:subPropertyOf rdf:resource="http://www.example.de/hatName"/>
-<rdfs:domain rdf:resource="http://www.example.de/Pizza"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-</rdf:Property>
+<http://www.example.de/Koch>
+        a                rdfs:Class ;
+        rdfs:subClassOf  <https://github.com/anno4j/ns#Resource> .
 
-<rdf:Property rdf:about="http://www.example.de/hatBestandteil">
-<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
-<rdfs:range rdf:resource="http://www.example.de/Zutat"/>
-</rdf:Property>
+<http://www.example.de/Hauptgericht>
+        a                rdfs:Class ;
+        rdfs:subClassOf  <https://github.com/anno4j/ns#Resource> .
 
-<rdf:Property rdf:about="http://www.example.de/hatHerkunftsland">
-<rdfs:domain rdf:resource="http://www.example.de/Zutat"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-</rdf:Property>
+<http://www.example.de/hatAlter>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Koch> ;
+        rdfs:range   xsd:integer .
 
-<rdf:Property rdf:about="http://www.example.de/hatKoch">
-<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
-<rdfs:range rdf:resource="http://www.example.de/Koch"/>
-</rdf:Property>
+<http://www.example.de/hatNationalität>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Koch> ;
+        rdfs:range   xsd:string .
 
-<rdf:Property rdf:about="http://www.example.de/hatHauptbestandteil">
-<rdfs:domain rdf:resource="http://www.example.de/Hauptgericht"/>
-<rdfs:range rdf:resource="http://www.example.de/Zutat"/>
-</rdf:Property>
+<http://www.example.de/hatSortenname>
+        a                   rdf:Property ;
+        rdfs:domain         <http://www.example.de/Pizza> ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.example.de/hatName> .
 
-<rdf:Property rdf:about="http://www.example.de/hatPersonenname">
-<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-</rdf:Property>
+<http://www.example.de/hatGeburtstag>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Koch> ;
+        rdfs:range   xsd:date .
 
-<rdf:Property rdf:about="http://www.example.de/hatNationalität">
-<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-</rdf:Property>
+<http://www.example.de/Zutat>
+        a                rdfs:Class ;
+        rdfs:subClassOf  <https://github.com/anno4j/ns#Resource> .
 
-<rdf:Property rdf:about="http://www.example.de/hatAlter">
-<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-</rdf:Property>
-
-<rdf:Property rdf:about="http://www.example.de/hatGeburtstag">
-<rdfs:domain rdf:resource="http://www.example.de/Koch"/>
-<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
-</rdf:Property>
-
-</rdf:RDF>
+<http://www.example.de/hatKoch>
+        a            rdf:Property ;
+        rdfs:domain  <http://www.example.de/Hauptgericht> ;
+        rdfs:range   <http://www.example.de/Koch> .

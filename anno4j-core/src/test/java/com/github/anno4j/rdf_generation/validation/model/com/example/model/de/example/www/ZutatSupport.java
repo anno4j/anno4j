@@ -1,4 +1,4 @@
-package com.example.model.de.example.www;
+package com.github.anno4j.rdf_generation.validation.model.com.example.model.de.example.www;
 
 import com.github.anno4j.annotations.Partial;
 import com.github.anno4j.schema.SchemaSanitizingObjectSupport;

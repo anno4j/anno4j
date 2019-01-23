@@ -1,9 +1,10 @@
-package com.example.model.de.example.www;
+package com.github.anno4j.rdf_generation.validation.model.com.example.model.de.example.www;
 
-import com.example.model.com.github.Resource;
 import java.lang.CharSequence;
 import java.util.Set;
 import org.openrdf.annotations.Iri;
+
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * Generated class for http://www.example.de/Hauptgericht */
