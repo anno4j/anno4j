@@ -165,7 +165,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
             parser.parse(IOUtils.toInputStream(sb.toString()), "");
 
         } catch (IOException | RDFHandlerException | RDFParseException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return out.toString();
@@ -234,7 +234,7 @@ public abstract class AnnotationSupport extends CreationProvenanceSupport implem
             // explicitly removing the rdf type triple from the repository
             connection.remove(getResource(), null, null);
         } catch (RepositoryException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
