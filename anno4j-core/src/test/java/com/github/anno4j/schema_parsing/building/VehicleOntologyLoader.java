@@ -25,6 +25,8 @@ public class VehicleOntologyLoader {
         File ontologyFile = new File(vehicleOntUrl.getFile());
 
         // Add the RDF data to the builder:
-        modelBuilder.addRDF(ontologyFile.getAbsolutePath());
+
+        //this gives a error un windows as jena seems to expect an uri
+        modelBuilder.addRDF(ontologyFile.toURI().toString());
     }
 }

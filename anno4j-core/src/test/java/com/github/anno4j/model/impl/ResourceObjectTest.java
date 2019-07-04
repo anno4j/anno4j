@@ -213,6 +213,7 @@ public class ResourceObjectTest {
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.JSONLD);
+        output = output.replaceAll("\\r", "");
 
         // Create Strings that need to be contained in the JSONLD output (at some place)
         String jsonldBody = "  \"@id\" : \"" + body.getResourceAsString() + "\",\n" +
@@ -260,6 +261,8 @@ public class ResourceObjectTest {
         Annotation an = anno4j.findByID(Annotation.class, annotation.getResourceAsString());
 
         String output = an.getTriples(RDFFormat.JSONLD);
+
+        output = output.replaceAll("\\r", "");
 
         String jsonldPersonType1 = "http://xmlns.com/foaf/0.1/Person";
         String jsonldPersonType2 = "https://github.com/anno4j/ns#Agent";
